@@ -16,12 +16,9 @@ function install_software() {
 }
 
 function setup_software() {
-    sudo chsh -s /usr/bin/fish vscode
+    sudo chsh -s /usr/bin/fish codespace
     mkdir -p ~/.config/github-copilot
     echo '{"joegoldin":{"version":"2021-10-14"}}' > ~/.config/github-copilot/terms.json
-    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-    ~/.tmux/plugins/tpm/scripts/install_plugins.sh
-    echo "TMUX plugins installed" >> ~/install.log
     echo `date +"%Y-%m-%d %T"` >> ~/install.log;
 }
 
