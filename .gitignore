@@ -137,5 +137,6 @@ etc/clusto*.conf
 !.config/fish/functions/*
 !.config/fish/themes
 !.config/fish/themes/*
+.config/fish/fish_variables
 
 !bootstrap.sh
