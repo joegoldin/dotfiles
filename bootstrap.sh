@@ -2,13 +2,13 @@
 # GitHub codespaces setup.
 
 function link_files() {
-    mkdir -p ~/.config
     mkdir -p /home/codespace/.config
     mkdir -p /home/codespace/.ssh
     touch /home/codespace/.ssh/environment
-    ln -s $(pwd)/tmux.conf ~/.tmux.conf
-    ln -s $(pwd)/.config/fish ~/.config
-    ln -s $(pwd)/.config/starship.toml ~/.config/starship.toml
+    ln -s $(pwd)/tmux.conf /home/codespace/.tmux.conf
+    rm -rf /home/codespace/.config/fish
+    ln -s $(pwd)/.config/fish /home/codespace/.config
+    ln -s $(pwd)/.config/starship.toml /home/codespace/.config/starship.toml
 }
 
 function install_software() {
