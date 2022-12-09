@@ -125,10 +125,17 @@ etc/clusto*.conf
 .hammerspoon/.*.swp
 
 # config stuff
-!.config
-.config/*
+!.config/
 !.config/starship.toml
 !.config/fish
-!.config/fish/**
+!.config/fish/config.fish
+!.config/fish/completions
+!.config/fish/completions/*
+!.config/fish/conf.d
+!.config/fish/conf.d/*
+!.config/fish/functions
+!.config/fish/functions/*
+!.config/fish/themes
+!.config/fish/themes/*
 
 !bootstrap.sh
