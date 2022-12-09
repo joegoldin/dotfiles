@@ -4,4 +4,8 @@ if test -e "/Applications/Sublime Text.app/Contents/SharedSupport/bin"; then fis
 if test -e "/Applications/Sublime Text.app/Contents/SharedSupport/bin"; then set -Ux EDITOR subl; end
 set -Ux Z_CMD "j"
 
+function fish_greeting
+    "🐟"
+end
+
 starship init fish | source
