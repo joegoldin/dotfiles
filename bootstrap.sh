@@ -7,7 +7,7 @@ function link_files() {
     mkdir -p /home/codespace/.ssh
     touch /home/codespace/.ssh/environment
     ln -s $(pwd)/tmux.conf ~/.tmux.conf
-    ln -s $(pwd)/.config/fish ~/.config/fish
+    ln -s $(pwd)/.config/fish ~/.config
     ln -s $(pwd)/.config/starship.toml ~/.config/starship.toml
 }
 
