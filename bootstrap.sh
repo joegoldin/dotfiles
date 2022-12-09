@@ -8,7 +8,7 @@ function link_files() {
     touch /home/codespace/.ssh/environment
     ln -s $(pwd)/tmux.conf ~/.tmux.conf
     ln -s $(pwd)/.config/fish ~/.config/fish
-    ln -s $(pwd)/starship.toml ~/.config/starship.toml
+    ln -s $(pwd)/.config/starship.toml ~/.config/starship.toml
 }
 
 function install_software() {
