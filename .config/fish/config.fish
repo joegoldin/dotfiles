@@ -5,7 +5,7 @@ if test -e "/Applications/Sublime Text.app/Contents/SharedSupport/bin"; then set
 set -Ux Z_CMD "j"
 
 function fish_greeting
-    "🐟"
+    echo "🐟"
 end
 
 starship init fish | source
