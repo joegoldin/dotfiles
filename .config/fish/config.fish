@@ -8,4 +8,4 @@ function fish_greeting
     echo "🐟"
 end
 
-starship init fish | source
+if which starship &> /dev/null; starship init fish | source; end
