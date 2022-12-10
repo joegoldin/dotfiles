@@ -10,6 +10,10 @@ if status is-interactive
     function gcm; command npx commitgpt -c $argv; end
 end
 
+if begin; test -n "$CODESPACES"; and $CODESPACES; end
+    set -xg SHELL "/usr/bin/fish"
+end
+
 function fish_greeting
     echo "🐟"
 end
