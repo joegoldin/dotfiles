@@ -44,6 +44,9 @@ function install_software
     curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
     curl https://sh.rustup.rs -sSf | sh
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    rustup target install wasm32-unknown-unknown
+    cargo install wasm-server-runner
+    cargo install cargo-watch
     install_exa
     npm install -g http-server webpack webpack-cli typescript ts-loader
     echo (date +"%Y-%m-%d %T")
