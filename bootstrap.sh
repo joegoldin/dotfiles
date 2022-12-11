@@ -11,6 +11,7 @@ function link_files
     mkdir -p /home/codespace/.config/fish
     ln -s (pwd)/.config/fish/config.fish /home/codespace/.config/fish/config.fish
     ln -s (pwd)/.config/starship.toml /home/codespace/.config/starship.toml
+    echo `date +"%Y-%m-%d %T"` >> ~/install.log;
 end
 
 # INSTALLER FUNCTIONS
@@ -43,13 +44,14 @@ function install_software
     curl https://sh.rustup.rs -sSf | sh
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     install_exa
-    install_haxe
+    echo `date +"%Y-%m-%d %T"` >> ~/install.log;
 end
 
 # CONFIGURE SOFTWARE
 function setup_software
     sudo chsh -s /usr/bin/fish codespace
-    curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
+    curl -sL https://git.io/fisher | source
+    fisher install jorgebucaran/fisher
     fisher install jorgebucaran/nvm.fish
     fisher install danhper/fish-ssh-agent
     fisher install jethrokuan/z
