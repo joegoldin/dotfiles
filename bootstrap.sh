@@ -40,6 +40,8 @@ function install_software() {
     sudo apt-get update
     sudo apt -o DPkg::Lock::Timeout=600 install unzip libgl1-mesa-glx mesa-utils xauth x11-apps build-essential kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common libpng-dev libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev libsqlite3-dev -y
     curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
+    curl https://sh.rustup.rs -sSf | sh
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     install_exa
     install_haxe
 }
@@ -63,6 +65,7 @@ function setup_software() {
     run_in_fish fisher install halostatue/fish-macos
     run_in_fish fisher install halostatue/fish-elixir
     run_in_fish fisher install eth-p/fish-plugin-sudo
+    run_in_fish fisher install halostatue/fish-rust
     run_in_fish nvm install lts
     run_in_fish npm install -g http-server webpack webpack-cli typescript ts-loader
     mkdir -p ~/.config/github-copilot
