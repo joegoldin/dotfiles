@@ -50,8 +50,8 @@ end
 # CONFIGURE SOFTWARE
 function setup_software
     sudo chsh -s /usr/bin/fish codespace
-    #curl -sL https://git.io/fisher | source
-    #fisher install jorgebucaran/fisher
+    curl -sL https://git.io/fisher | source
+    fisher install jorgebucaran/fisher
     #fisher install jorgebucaran/nvm.fish
     #fisher install danhper/fish-ssh-agent
     #fisher install jethrokuan/z
