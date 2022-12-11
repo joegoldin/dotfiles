@@ -53,7 +53,7 @@ function run_in_fish() {
 # CONFIGURE SOFTWARE
 function setup_software() {
     sudo chsh -s /usr/bin/fish codespace    
-    run_in_fish curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
+    run_in_fish curl -sL https://git.io/fisher \| source \&\& fisher install jorgebucaran/fisher
     run_in_fish "fisher install jorgebucaran/nvm.fish"
     run_in_fish fisher install danhper/fish-ssh-agent
     run_in_fish fisher install jethrokuan/z
@@ -63,8 +63,8 @@ function setup_software() {
     run_in_fish fisher install halostatue/fish-macos
     run_in_fish fisher install halostatue/fish-elixir
     run_in_fish fisher install eth-p/fish-plugin-sudo
-    nvm install lts
-    npm install -g http-server webpack webpack-cli typescript ts-loader
+    run_in_fish nvm install lts
+    run_in_fish npm install -g http-server webpack webpack-cli typescript ts-loader
     mkdir -p ~/.config/github-copilot
     echo '{"joegoldin":{"version":"2021-10-14"}}' > ~/.config/github-copilot/terms.json
     echo `date +"%Y-%m-%d %T"` >> ~/install.log;
