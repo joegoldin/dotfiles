@@ -7,19 +7,40 @@ function link_files() {
     touch /home/codespace/.ssh/environment
     ln -s $(pwd)/tmux.conf /home/codespace/.tmux.conf
     rm -rf /home/codespace/.config/fish
-    ln -s $(pwd)/.config/fish /home/codespace/.config
+    mkdir -p /home/codespace/.config/fish
+    ln -s $(pwd)/.config/fish/config.fish /home/codespace/.config/fish/config.fish
     ln -s $(pwd)/.config/starship.toml /home/codespace/.config/starship.toml
+}
+
+function install_exa() {
+    set -x EXA_VERSION (curl -s "https://api.github.com/repos/ogham/exa/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
+    curl -Lo exa.zip "https://github.com/ogham/exa/releases/latest/download/exa-linux-x86_64-v$EXA_VERSION.zip"
+    sudo unzip -q exa.zip bin/exa -d /usr/local
+    rm -rf exa.zip
 }
 
 function install_software() {
     sleep 20
     sudo apt-get update
-    sudo apt -o DPkg::Lock::Timeout=600 install libgl1-mesa-glx mesa-utils xauth x11-apps build-essential kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common -y
+    sudo apt -o DPkg::Lock::Timeout=600 install unzip libgl1-mesa-glx mesa-utils xauth x11-apps build-essential kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common -y
     curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
+    install_exa
 }
 
 function setup_software() {
     sudo chsh -s /usr/bin/fish codespace
+    curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
+    fisher install jorgebucaran/nvm.fish
+    fisher install danhper/fish-ssh-agent
+    fisher install jethrokuan/z
+    fisher install jorgebucaran/autopair.fish
+    fisher install nickeb96/puffer-fish
+    fisher install halostatue/fish-docker
+    fisher install halostatue/fish-macos
+    fisher install halostatue/fish-elixir
+    fisher install eth-p/fish-plugin-sudo
+    nvm install lts
+    npm install -g typescript -y
     mkdir -p ~/.config/github-copilot
     echo '{"joegoldin":{"version":"2021-10-14"}}' > ~/.config/github-copilot/terms.json
     echo `date +"%Y-%m-%d %T"` >> ~/install.log;
