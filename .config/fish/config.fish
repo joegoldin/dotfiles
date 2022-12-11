@@ -33,7 +33,7 @@ set -Ux nvm_default_version lts
 set -Ux Z_CMD "j"
 
 # thefuck
-thefuck --alias | source 
+if command -v thefuck &> /dev/null; thefuck --alias | source; end
 
 # Starship
-if which starship &> /dev/null; starship init fish | source; end
+if command -v starship &> /dev/null; starship init fish | source; end
