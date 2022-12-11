@@ -44,19 +44,25 @@ function install_software() {
     install_haxe
 }
 
+# RUN IN FISH
+function run_in_fish() {
+    cmd="$*"
+    fish -c "$cmd"
+}
+
 # CONFIGURE SOFTWARE
 function setup_software() {
-    sudo chsh -s /usr/bin/fish codespace
-    curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
-    fisher install jorgebucaran/nvm.fish
-    fisher install danhper/fish-ssh-agent
-    fisher install jethrokuan/z
-    fisher install jorgebucaran/autopair.fish
-    fisher install nickeb96/puffer-fish
-    fisher install halostatue/fish-docker
-    fisher install halostatue/fish-macos
-    fisher install halostatue/fish-elixir
-    fisher install eth-p/fish-plugin-sudo
+    sudo chsh -s /usr/bin/fish codespace    
+    run_in_fish curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
+    run_in_fish "fisher install jorgebucaran/nvm.fish"
+    run_in_fish fisher install danhper/fish-ssh-agent
+    run_in_fish fisher install jethrokuan/z
+    run_in_fish fisher install jorgebucaran/autopair.fish
+    run_in_fish fisher install nickeb96/puffer-fish
+    run_in_fish fisher install halostatue/fish-docker
+    run_in_fish fisher install halostatue/fish-macos
+    run_in_fish fisher install halostatue/fish-elixir
+    run_in_fish fisher install eth-p/fish-plugin-sudo
     nvm install lts
     npm install -g http-server webpack webpack-cli typescript ts-loader
     mkdir -p ~/.config/github-copilot
