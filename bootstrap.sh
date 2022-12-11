@@ -44,8 +44,8 @@ function install_software
     curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
     curl https://sh.rustup.rs -sSf | sh
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    fish_add_path $HOME/.cargo/bin
     rustup target install wasm32-unknown-unknown
-    source "$HOME/.cargo/env"
     cargo install wasm-server-runner
     cargo install cargo-watch
     cargo install matchbox_server
