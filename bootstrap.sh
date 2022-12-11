@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # GitHub codespaces setup.
 
+# LINK CONFIG FILES
 function link_files() {
     mkdir -p /home/codespace/.config
     mkdir -p /home/codespace/.ssh
@@ -12,6 +13,7 @@ function link_files() {
     ln -s $(pwd)/.config/starship.toml /home/codespace/.config/starship.toml
 }
 
+# INSTALLER FUNCTIONS
 function install_exa() {
     set -x EXA_VERSION (curl -s "https://api.github.com/repos/ogham/exa/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
     curl -Lo exa.zip "https://github.com/ogham/exa/releases/latest/download/exa-linux-x86_64-v$EXA_VERSION.zip"
@@ -32,6 +34,7 @@ function install_haxe {
     mkdir ~/haxelib && haxelib setup ~/haxelib
 }
 
+# INSTALL SOFTWARE
 function install_software() {
     sleep 20
     sudo apt-get update
@@ -41,6 +44,7 @@ function install_software() {
     install_haxe
 }
 
+# CONFIGURE SOFTWARE
 function setup_software() {
     sudo chsh -s /usr/bin/fish codespace
     curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
@@ -60,6 +64,7 @@ function setup_software() {
     echo `date +"%Y-%m-%d %T"` >> ~/install.log;
 }
 
+# RUN SCRIPT
 echo '🔗 Linking files.' >> ~/install.log;
 echo `date +"%Y-%m-%d %T"` >> ~/install.log;
 link_files
