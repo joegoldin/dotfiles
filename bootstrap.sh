@@ -40,12 +40,11 @@ end
 function install_software
     sleep 20
     sudo apt-get update
-    sudo add-apt-repository ppa:fish-shell/release-3 -y
-    sudo apt -o DPkg::Lock::Timeout=600 install fish unzip libgl1-mesa-glx mesa-utils xauth x11-apps build-essential kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common libpng-dev libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev libsqlite3-dev -y
+    sudo apt -o DPkg::Lock::Timeout=600 install unzip libgl1-mesa-glx mesa-utils xauth x11-apps build-essential kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common libpng-dev libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev libsqlite3-dev -y
     curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
     curl https://sh.rustup.rs -sSf | sh
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-    fish_add_path $HOME/.cargo/bin
+    set -gx PATH $PATH /home/codespace/.cargo/bin
     rustup target install wasm32-unknown-unknown
     cargo install wasm-server-runner
     cargo install cargo-watch
