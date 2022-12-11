@@ -47,6 +47,7 @@ function install_software
     rustup target install wasm32-unknown-unknown
     cargo install wasm-server-runner
     cargo install cargo-watch
+    cargo install matchbox_server
     install_exa
     npm install -g http-server webpack webpack-cli typescript ts-loader
     echo (date +"%Y-%m-%d %T")
