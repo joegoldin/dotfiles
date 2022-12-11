@@ -52,6 +52,8 @@ end
 function setup_software
     sudo chsh -s /usr/bin/fish codespace
     mkdir -p ~/.config/github-copilot
+    touch /home/codespace/.config/fish/.fisherinstalled
+    rm -rf /home/codespace/.config/fish/.fisherinstalled
     echo '{"joegoldin":{"version":"2021-10-14"}}' > ~/.config/github-copilot/terms.json
     echo (date +"%Y-%m-%d %T")
 end
