@@ -11,7 +11,7 @@ function link_files
     mkdir -p /home/codespace/.config/fish
     ln -s (pwd)/.config/fish/config.fish /home/codespace/.config/fish/config.fish
     ln -s (pwd)/.config/starship.toml /home/codespace/.config/starship.toml
-    echo `date +"%Y-%m-%d %T"` >> ~/install.log;
+    echo (date +"%Y-%m-%d %T")
 end
 
 # INSTALLER FUNCTIONS
@@ -44,29 +44,16 @@ function install_software
     curl https://sh.rustup.rs -sSf | sh
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     install_exa
-    echo `date +"%Y-%m-%d %T"` >> ~/install.log;
+    echo (date +"%Y-%m-%d %T")
 end
 
 # CONFIGURE SOFTWARE
 function setup_software
     sudo chsh -s /usr/bin/fish codespace
-    curl -sL https://git.io/fisher | source
-    fisher install jorgebucaran/fisher
-    #fisher install jorgebucaran/nvm.fish
-    #fisher install danhper/fish-ssh-agent
-    #fisher install jethrokuan/z
-    #fisher install jorgebucaran/autopair.fish
-    #fisher install nickeb96/puffer-fish
-    #fisher install halostatue/fish-docker
-    #fisher install halostatue/fish-macos
-    #fisher install halostatue/fish-elixir
-    #fisher install eth-p/fish-plugin-sudo
-    #fisher install halostatue/fish-rust
-    #nvm install lts
-    #npm install -g http-server webpack webpack-cli typescript ts-loader
+    npm install -g http-server webpack webpack-cli typescript ts-loader
     mkdir -p ~/.config/github-copilot
     echo '{"joegoldin":{"version":"2021-10-14"}}' > ~/.config/github-copilot/terms.json
-    echo `date +"%Y-%m-%d %T"` >> ~/install.log;
+    echo (date +"%Y-%m-%d %T")
 end
 
 # RUN SCRIPT
@@ -76,7 +63,7 @@ link_files
 echo '💽 Installing software' >> ~/install.log;
 echo (date +"%Y-%m-%d %T") >> ~/install.log;
 install_software
-echo '👩<200d>🔧 configure software' >> ~/install.log;
+echo '🔧 configure software' >> ~/install.log;
 echo (date +"%Y-%m-%d %T") >> ~/install.log;
 setup_software
 echo '✅ Done!' >> ~/install.log;
