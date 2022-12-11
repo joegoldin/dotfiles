@@ -40,7 +40,8 @@ function setup_software() {
     fisher install halostatue/fish-elixir
     fisher install eth-p/fish-plugin-sudo
     nvm install lts
-    npm install -g typescript -y
+    npm install -g typescript
+    npm install -g http-server
     mkdir -p ~/.config/github-copilot
     echo '{"joegoldin":{"version":"2021-10-14"}}' > ~/.config/github-copilot/terms.json
     echo `date +"%Y-%m-%d %T"` >> ~/install.log;
