@@ -31,7 +31,7 @@ function install_haxe {
     sudo add-apt-repository ppa:haxe/releases -y
     sudo apt-get update
     sudo apt-get install haxe -y
-    mkdir ~/.haxelib && haxelib setup ~/.haxelib
+    mkdir ~/.haxelib_home && haxelib setup ~/.haxelib_home
 }
 
 # INSTALL SOFTWARE
