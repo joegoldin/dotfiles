@@ -19,6 +19,12 @@ function install_exa() {
     rm -rf exa.zip
 }
 
+function install_subl {
+    sudo wget -O /usr/local/bin/rmate https://raw.github.com/aurora/rmate/master/rmate
+    sudo chmod a+x /usr/local/bin/rmate
+    sudo mv /usr/local/bin/rmate /usr/local/bin/subl
+}
+
 function install_software() {
     sleep 20
     sudo apt-get update
