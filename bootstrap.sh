@@ -44,13 +44,13 @@ function install_software
     curl https://sh.rustup.rs -sSf | sh
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     install_exa
+    npm install -g http-server webpack webpack-cli typescript ts-loader
     echo (date +"%Y-%m-%d %T")
 end
 
 # CONFIGURE SOFTWARE
 function setup_software
     sudo chsh -s /usr/bin/fish codespace
-    npm install -g http-server webpack webpack-cli typescript ts-loader
     mkdir -p ~/.config/github-copilot
     echo '{"joegoldin":{"version":"2021-10-14"}}' > ~/.config/github-copilot/terms.json
     echo (date +"%Y-%m-%d %T")
