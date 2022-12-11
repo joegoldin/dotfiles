@@ -14,7 +14,7 @@ function link_files() {
 function install_software() {
     sleep 20
     sudo apt-get update
-    sudo apt -o DPkg::Lock::Timeout=600 install xauth x11-apps build-essential kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common -y
+    sudo apt -o DPkg::Lock::Timeout=600 install libgl1-mesa-glx mesa-utils xauth x11-apps build-essential kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common -y
     curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
 }
 
