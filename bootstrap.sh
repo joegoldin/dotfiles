@@ -46,9 +46,8 @@ function install_software() {
     install_haxe
 }
 
-# CONFIGURE SOFTWARE
-function setup_software() {
-    sudo chsh -s /usr/bin/fish codespace    
+# SETUP FISH
+function fish_config() {
     fish -c "curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher"
     fish -c "fisher install jorgebucaran/nvm.fish"
     fish -c "fisher install danhper/fish-ssh-agent"
@@ -60,6 +59,12 @@ function setup_software() {
     fish -c "fisher install halostatue/fish-elixir"
     fish -c "fisher install eth-p/fish-plugin-sudo"
     fish -c "fisher install halostatue/fish-rust"
+}
+
+# CONFIGURE SOFTWARE
+function setup_software() {
+    sudo chsh -s /usr/bin/fish codespace    
+    fish_config
     fish -c "nvm install lts"
     fish -c "npm install -g http-server webpack webpack-cli typescript ts-loader"
     mkdir -p ~/.config/github-copilot
