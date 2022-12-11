@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env fish
 # GitHub codespaces setup.
 
 # LINK CONFIG FILES
@@ -6,17 +6,17 @@ function link_files() {
     mkdir -p /home/codespace/.config
     mkdir -p /home/codespace/.ssh
     touch /home/codespace/.ssh/environment
-    ln -s $(pwd)/tmux.conf /home/codespace/.tmux.conf
+    ln -s (pwd)/tmux.conf /home/codespace/.tmux.conf
     rm -rf /home/codespace/.config/fish
     mkdir -p /home/codespace/.config/fish
-    ln -s $(pwd)/.config/fish/config.fish /home/codespace/.config/fish/config.fish
-    ln -s $(pwd)/.config/starship.toml /home/codespace/.config/starship.toml
+    ln -s (pwd)/.config/fish/config.fish /home/codespace/.config/fish/config.fish
+    ln -s (pwd)/.config/starship.toml /home/codespace/.config/starship.toml
 }
 
 # INSTALLER FUNCTIONS
 function install_exa() {
-    EXA_VERSION=$(curl -s "https://api.github.com/repos/ogham/exa/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
-    curl -Lo exa.zip "https://github.com/ogham/exa/releases/latest/download/exa-linux-x86_64-v${EXA_VERSION}.zip"
+    set -x EXA_VERSION (curl -s "https://api.github.com/repos/ogham/exa/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
+    curl -Lo exa.zip "https://github.com/ogham/exa/releases/latest/download/exa-linux-x86_64-v$EXA_VERSION.zip"
     sudo unzip -q exa.zip bin/exa -d /usr/local
     rm -rf exa.zip
 }
@@ -46,27 +46,22 @@ function install_software() {
     install_haxe
 }
 
-# SETUP FISH
-function fish_config() {
-    fish -c "curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher"
-    fish -c "fisher install jorgebucaran/nvm.fish"
-    fish -c "fisher install danhper/fish-ssh-agent"
-    fish -c "fisher install jethrokuan/z"
-    fish -c "fisher install jorgebucaran/autopair.fish"
-    fish -c "fisher install nickeb96/puffer-fish"
-    fish -c "fisher install halostatue/fish-docker"
-    fish -c "fisher install halostatue/fish-macos"
-    fish -c "fisher install halostatue/fish-elixir"
-    fish -c "fisher install eth-p/fish-plugin-sudo"
-    fish -c "fisher install halostatue/fish-rust"
-}
-
 # CONFIGURE SOFTWARE
 function setup_software() {
-    sudo chsh -s /usr/bin/fish codespace    
-    fish_config
-    fish -c "nvm install lts"
-    fish -c "npm install -g http-server webpack webpack-cli typescript ts-loader"
+    sudo chsh -s /usr/bin/fish codespace
+    curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
+    fisher install jorgebucaran/nvm.fish
+    fisher install danhper/fish-ssh-agent
+    fisher install jethrokuan/z
+    fisher install jorgebucaran/autopair.fish
+    fisher install nickeb96/puffer-fish
+    fisher install halostatue/fish-docker
+    fisher install halostatue/fish-macos
+    fisher install halostatue/fish-elixir
+    fisher install eth-p/fish-plugin-sudo
+    fisher install halostatue/fish-rust
+    nvm install lts
+    npm install -g http-server webpack webpack-cli typescript ts-loader
     mkdir -p ~/.config/github-copilot
     echo '{"joegoldin":{"version":"2021-10-14"}}' > ~/.config/github-copilot/terms.json
     echo `date +"%Y-%m-%d %T"` >> ~/install.log;
