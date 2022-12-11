@@ -32,5 +32,8 @@ set -Ux LANG en_US.UTF-8
 set -Ux nvm_default_version lts
 set -Ux Z_CMD "j"
 
+# thefuck
+thefuck --alias | source 
+
 # Starship
 if which starship &> /dev/null; starship init fish | source; end
