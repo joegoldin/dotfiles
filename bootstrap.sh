@@ -31,7 +31,7 @@ function install_haxe {
     sudo add-apt-repository ppa:haxe/releases -y
     sudo apt-get update
     sudo apt-get install haxe -y
-    mkdir ~/haxelib && haxelib setup ~/haxelib
+    mkdir ~/.haxelib && haxelib setup ~/.haxelib
 }
 
 # INSTALL SOFTWARE
@@ -46,28 +46,22 @@ function install_software() {
     install_haxe
 }
 
-# RUN IN FISH
-function run_in_fish() {
-    cmd="$*"
-    fish -c "$cmd"
-}
-
 # CONFIGURE SOFTWARE
 function setup_software() {
     sudo chsh -s /usr/bin/fish codespace    
-    run_in_fish curl -sL https://git.io/fisher \| source \&\& fisher install jorgebucaran/fisher
-    run_in_fish "fisher install jorgebucaran/nvm.fish"
-    run_in_fish fisher install danhper/fish-ssh-agent
-    run_in_fish fisher install jethrokuan/z
-    run_in_fish fisher install jorgebucaran/autopair.fish
-    run_in_fish fisher install nickeb96/puffer-fish
-    run_in_fish fisher install halostatue/fish-docker
-    run_in_fish fisher install halostatue/fish-macos
-    run_in_fish fisher install halostatue/fish-elixir
-    run_in_fish fisher install eth-p/fish-plugin-sudo
-    run_in_fish fisher install halostatue/fish-rust
-    run_in_fish nvm install lts
-    run_in_fish npm install -g http-server webpack webpack-cli typescript ts-loader
+    fish -c "curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher"
+    fish -c "fisher install jorgebucaran/nvm.fish"
+    fish -c "fisher install danhper/fish-ssh-agent"
+    fish -c "fisher install jethrokuan/z"
+    fish -c "fisher install jorgebucaran/autopair.fish"
+    fish -c "fisher install nickeb96/puffer-fish"
+    fish -c "fisher install halostatue/fish-docker"
+    fish -c "fisher install halostatue/fish-macos"
+    fish -c "fisher install halostatue/fish-elixir"
+    fish -c "fisher install eth-p/fish-plugin-sudo"
+    fish -c "fisher install halostatue/fish-rust"
+    fish -c "nvm install lts"
+    fish -c "npm install -g http-server webpack webpack-cli typescript ts-loader"
     mkdir -p ~/.config/github-copilot
     echo '{"joegoldin":{"version":"2021-10-14"}}' > ~/.config/github-copilot/terms.json
     echo `date +"%Y-%m-%d %T"` >> ~/install.log;
