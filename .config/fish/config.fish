@@ -8,6 +8,7 @@ if status is-interactive
     function mv; command mv -i $argv; end
     function k; command kubectl $argv; end
     function gcm; command npx commitgpt -c $argv; end
+    function cargowatch; cargo watch -cx "run --release" $argv; end
 end
 
 if begin; test -n "$CODESPACES"; and $CODESPACES; end
