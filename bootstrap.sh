@@ -45,6 +45,7 @@ function install_software
     curl https://sh.rustup.rs -sSf | sh
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     rustup target install wasm32-unknown-unknown
+    source "$HOME/.cargo/env"
     cargo install wasm-server-runner
     cargo install cargo-watch
     cargo install matchbox_server
