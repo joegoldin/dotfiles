@@ -36,11 +36,32 @@ function install_haxe
     mkdir ~/.haxelib_home && haxelib setup ~/.haxelib_home
 end
 
+function install_gotools
+    # install gopls, dlv, hey
+    go get -u golang.org/x/tools/gopls
+    go get -u github.com/go-delve/delve/cmd/dlv
+    go get -u github.com/rakyll/hey
+    # vscode-go dependencies 
+    # via: https://github.com/microsoft/vscode-go/blob/master/.travis.yml
+    go get -u -v github.com/acroca/go-symbols
+    go get -u -v github.com/cweill/gotests/...
+    go get -u -v github.com/davidrjenni/reftools/cmd/fillstruct
+    go get -u -v github.com/haya14busa/goplay/cmd/goplay
+    go get -u -v github.com/mdempsky/gocode
+    go get -u -v github.com/ramya-rao-a/go-outline
+    go get -u -v github.com/rogpeppe/godef
+    go get -u -v github.com/sqs/goreturns
+    go get -u -v github.com/uudashr/gopkgs/cmd/gopkgs
+    go get -u -v github.com/zmb3/gogetdoc
+    go get -u -v golang.org/x/lint/golint
+    go get -u -v golang.org/x/tools/cmd/gorename
+end
+
 # INSTALL SOFTWARE
 function install_software
     sleep 20
     sudo apt-get update
-    sudo apt -o DPkg::Lock::Timeout=600 install unzip libgl1-mesa-glx mesa-utils xauth x11-apps build-essential kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common libpng-dev libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev libsqlite3-dev -y
+    sudo apt -o DPkg::Lock::Timeout=600 install golang unzip libgl1-mesa-glx mesa-utils xauth x11-apps build-essential kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common libpng-dev libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev libsqlite3-dev -y
     curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
     curl https://sh.rustup.rs -sSf | sh
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -49,6 +70,7 @@ function install_software
     cargo install wasm-server-runner
     cargo install cargo-watch
     cargo install matchbox_server
+    
     install_exa
     npm install -g http-server webpack webpack-cli typescript ts-loader
     echo (date +"%Y-%m-%d %T")
