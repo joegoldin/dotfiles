@@ -54,5 +54,6 @@ if ! test -e ~/.config/fish/.fisherinstalled
         fisher install halostatue/fish-elixir
         fisher install eth-p/fish-plugin-sudo
         fisher install halostatue/fish-rust
+        fisher install halostatue/fish-go
     end
 end
