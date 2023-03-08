@@ -13,12 +13,16 @@ function link_files
     ln -s (pwd)/.config/starship.toml /home/codespace/.config/starship.toml
     ln -s (pwd)/.config/cargo.toml /home/codespace/.config/cargo.toml
     echo (date +"%Y-%m-%d %T")
-end
+enda
 
 # UPGRADE DISTRO
 function apt_upgrade
+    sudo add-apt-repository -y ppa:apt-fast/stable
+    set -x DEBIAN_FRONTEND noninteractive
+    sudo apt update
     sudo apt install -y debconf-utils
     sudo debconf-set-selections < .dpkg-selections.conf
+    sudo apt-get install -y apt-fast
     sudo dpkg-reconfigure keyboard-configuration -f noninteractive
     sudo apt-add-repository ppa:fish-shell/release-3 --yes
     sudo apt update --yes
