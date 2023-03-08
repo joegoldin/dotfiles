@@ -48,7 +48,7 @@ apt_upgrade
 
 echo '💽 Installing software' >> ~/install.log;
 echo (date +"%Y-%m-%d %T") >> ~/install.log;
-/usr/bin/env fish install_software.fish
+fish install_software.fish
 
 echo '🔧 configure software' >> ~/install.log;
 echo (date +"%Y-%m-%d %T") >> ~/install.log;
