@@ -8,7 +8,7 @@ function apt_upgrade
     sudo dpkg-reconfigure keyboard-configuration -f noninteractive
     sudo apt-add-repository ppa:fish-shell/release-3 --yes
     sudo apt update --yes
-    sudo apt upgrade --yes
+    # sudo apt upgrade --yes
     sudo apt install -y fish
 end
 
@@ -48,12 +48,13 @@ function install_haxe
 end
 
 function install_lfe
-    sudo apt-get update
-    DEBIAN_FRONTEND=noninteractive sudo apt-get install erlang elixir -y
     cd /opt
     git clone https://github.com/lfe/lfe.git
     make compile
     sudo make install
+end
+
+function install_rebar3
     git clone https://github.com/erlang/rebar3.git
     cd rebar3
     ./bootstrap
@@ -64,8 +65,7 @@ end
 # INSTALL SOFTWARE
 function install_software
     sleep 20
-    DEBIAN_FRONTEND=noninteractive sudo apt-get update
-    DEBIAN_FRONTEND=noninteractive sudo apt -o DPkg::Lock::Timeout=600 install golang unzip libgl1-mesa-glx mesa-utils xauth x11-apps build-essential kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common libpng-dev libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev libsqlite3-dev -y
+    sudo apt -o DPkg::Lock::Timeout=600 install golang unzip libgl1-mesa-glx mesa-utils xauth x11-apps build-essential kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common libpng-dev libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev libsqlite3-dev erlang elixir -y
     curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
     curl https://sh.rustup.rs -sSf | sh
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -77,6 +77,7 @@ function install_software
     install_exa
     npm install -g http-server webpack webpack-cli typescript ts-loader
     install_lfe
+    install_rebar3
     echo (date +"%Y-%m-%d %T")
 end
 
