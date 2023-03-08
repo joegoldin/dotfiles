@@ -1,6 +1,14 @@
 #!/usr/bin/env fish
 # GitHub codespaces setup.
 
+# UPGRADE DISTRO
+function apt_upgrade
+    sudo apt-add-repository ppa:fish-shell/release-3 --yes
+    sudo apt update --yes
+    sudo apt upgrade --yes
+    sudo apt install -y fish
+end
+
 # LINK CONFIG FILES
 function link_files
     mkdir -p /home/codespace/.config
@@ -36,6 +44,20 @@ function install_haxe
     mkdir ~/.haxelib_home && haxelib setup ~/.haxelib_home
 end
 
+function install_lfe
+    sudo apt-get update
+    DEBIAN_FRONTEND=noninteractive sudo apt-get install erlang elixir -y
+    cd /opt
+    git clone https://github.com/lfe/lfe.git
+    make compile
+    sudo make install
+    git clone https://github.com/erlang/rebar3.git
+    cd rebar3
+    ./bootstrap
+    ./rebar3 local install
+    fish_add_path /home/codespace/.cache/rebar3/bin
+end
+
 # INSTALL SOFTWARE
 function install_software
     sleep 20
@@ -44,13 +66,14 @@ function install_software
     curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
     curl https://sh.rustup.rs -sSf | sh
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-    set -gx PATH $PATH /home/codespace/.cargo/bin
+    fish_add_path /home/codespace/.cargo/bin
     rustup target install wasm32-unknown-unknown
     cargo install wasm-server-runner
     cargo install cargo-watch
     cargo install matchbox_server
     install_exa
     npm install -g http-server webpack webpack-cli typescript ts-loader
+    install_lfe
     echo (date +"%Y-%m-%d %T")
 end
 
@@ -65,6 +88,9 @@ function setup_software
 end
 
 # RUN SCRIPT
+echo '⚙️ Upgrading distro.' >> ~/install.log;
+echo (date +"%Y-%m-%d %T") >> ~/install.log;
+apt_upgrade
 echo '🔗 Linking files.' >> ~/install.log;
 echo (date +"%Y-%m-%d %T") >> ~/install.log;
 link_files
