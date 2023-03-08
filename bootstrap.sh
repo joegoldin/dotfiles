@@ -3,10 +3,10 @@
 
 # UPGRADE DISTRO
 function apt_upgrade
-    sudo apt-add-repository ppa:fish-shell/release-3 --yes
-    sudo apt update --yes
-    sudo apt upgrade --yes
-    sudo apt install -y fish
+    DEBIAN_FRONTEND=noninteractive sudo apt-add-repository ppa:fish-shell/release-3 --yes
+    DEBIAN_FRONTEND=noninteractive sudo apt update --yes
+    DEBIAN_FRONTEND=noninteractive sudo apt upgrade --yes
+    DEBIAN_FRONTEND=noninteractive sudo apt install -y fish
 end
 
 # LINK CONFIG FILES
@@ -61,8 +61,8 @@ end
 # INSTALL SOFTWARE
 function install_software
     sleep 20
-    sudo apt-get update
-    sudo apt -o DPkg::Lock::Timeout=600 install golang unzip libgl1-mesa-glx mesa-utils xauth x11-apps build-essential kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common libpng-dev libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev libsqlite3-dev -y
+    DEBIAN_FRONTEND=noninteractive sudo apt-get update
+    DEBIAN_FRONTEND=noninteractive sudo apt -o DPkg::Lock::Timeout=600 install golang unzip libgl1-mesa-glx mesa-utils xauth x11-apps build-essential kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common libpng-dev libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev libsqlite3-dev -y
     curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
     curl https://sh.rustup.rs -sSf | sh
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
