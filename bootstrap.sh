@@ -17,17 +17,15 @@ end
 
 # UPGRADE DISTRO
 function apt_upgrade
-    sudo add-apt-repository -y ppa:apt-fast/stable
     set -x DEBIAN_FRONTEND noninteractive
     sudo apt update
     DEBIAN_FRONTEND=noninteractive sudo apt install -y debconf-utils
     sudo debconf-set-selections < .dpkg-selections.conf
-    sudo apt-get install -y apt-fast
-    sudo dpkg-reconfigure keyboard-configuration -f noninteractive
+    sudo /bin/bash -c "$(curl -sL https://git.io/vokNn)"
     sudo apt-add-repository ppa:fish-shell/release-3 --yes
     sudo apt update --yes
     # sudo apt upgrade --yes
-    sudo apt install -y fish
+    sudo apt-fast install -y fish
     sudo chsh -s /usr/bin/fish codespace
     source ~/.config/fish/config.fish
 end
@@ -59,7 +57,7 @@ end
 function install_haxe
     sudo add-apt-repository ppa:haxe/releases -y
     sudo apt-get update
-    sudo apt-get install haxe -y
+    sudo apt-fast install haxe -y
     mkdir ~/.haxelib_home && haxelib setup ~/.haxelib_home
 end
 
@@ -82,12 +80,11 @@ end
 # INSTALL SOFTWARE
 function install_software
     sleep 5
-    sudo apt -o DPkg::Lock::Timeout=600 install golang unzip libgl1-mesa-glx mesa-utils xauth build-essential \
+    sudo apt-fast -o DPkg::Lock::Timeout=600 install golang unzip libgl1-mesa-glx mesa-utils xauth build-essential \
         kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common libpng-dev \
         libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev libsqlite3-dev libncurses-dev \
         automake autoconf xsltproc fop erlang-base erlang-crypto erlang-syntax-tools erlang-doc erlang-manpages erlang-tools \
         erlang-dev erlang-inets erlang elixir -y
-    sudo apt install 
     curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
     curl https://sh.rustup.rs -sSf | sh
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
