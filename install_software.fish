@@ -38,7 +38,7 @@ function install_rebar3
 end
 
 # INSTALL SOFTWARE
-sleep 20
+sleep 5
 sudo apt -o DPkg::Lock::Timeout=600 install golang unzip libgl1-mesa-glx mesa-utils xauth x11-apps build-essential kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common libpng-dev libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev libsqlite3-dev libncurses-dev automake autoconf xsltproc xmllint fop erlang elixir -y
 curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
 curl https://sh.rustup.rs -sSf | sh
