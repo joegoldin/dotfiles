@@ -20,7 +20,7 @@ function apt_upgrade
     sudo add-apt-repository -y ppa:apt-fast/stable
     set -x DEBIAN_FRONTEND noninteractive
     sudo apt update
-    sudo apt install -y debconf-utils
+    DEBIAN_FRONTEND=noninteractive sudo apt install -y debconf-utils
     sudo debconf-set-selections < .dpkg-selections.conf
     sudo apt-get install -y apt-fast
     sudo dpkg-reconfigure keyboard-configuration -f noninteractive
