@@ -26,7 +26,6 @@ function apt_upgrade
     # sudo apt upgrade --yes
     sudo apt install -y fish
     sudo chsh -s /usr/bin/fish codespace
-    source ~/.config/fish/config.fish
 end
 
 # CONFIGURE SOFTWARE
