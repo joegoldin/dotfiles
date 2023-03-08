@@ -3,10 +3,13 @@
 
 # UPGRADE DISTRO
 function apt_upgrade
-    DEBIAN_FRONTEND=noninteractive sudo apt-add-repository ppa:fish-shell/release-3 --yes
-    DEBIAN_FRONTEND=noninteractive sudo apt update --yes
-    DEBIAN_FRONTEND=noninteractive sudo apt upgrade --yes
-    DEBIAN_FRONTEND=noninteractive sudo apt install -y fish
+    sudo apt install -y debconf-utils
+    sudo debconf-set-selections < .dpkg-selections.conf
+    sudo dpkg-reconfigure keyboard-configuration -f noninteractive
+    sudo apt-add-repository ppa:fish-shell/release-3 --yes
+    sudo apt update --yes
+    sudo apt upgrade --yes
+    sudo apt install -y fish
 end
 
 # LINK CONFIG FILES
