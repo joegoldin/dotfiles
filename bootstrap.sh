@@ -13,7 +13,7 @@ function link_files
     ln -s (pwd)/.config/starship.toml /home/codespace/.config/starship.toml
     ln -s (pwd)/.config/cargo.toml /home/codespace/.config/cargo.toml
     echo (date +"%Y-%m-%d %T")
-enda
+end
 
 # UPGRADE DISTRO
 function apt_upgrade
