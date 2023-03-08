@@ -21,7 +21,7 @@ function apt_upgrade
     sudo apt update
     DEBIAN_FRONTEND=noninteractive sudo apt install -y debconf-utils
     sudo debconf-set-selections < .dpkg-selections.conf
-    sudo /bin/bash -c "$(curl -sL https://git.io/vokNn)"
+    sudo /bin/bash -c "curl -sL https://git.io/vokNn | bash"
     sudo apt-add-repository ppa:fish-shell/release-3 --yes
     sudo apt update --yes
     # sudo apt upgrade --yes
