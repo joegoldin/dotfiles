@@ -38,6 +38,7 @@ function install_rebar3
 end
 
 # INSTALL SOFTWARE
+echo "Installing software in startup script..."
 sleep 5
 sudo apt -o DPkg::Lock::Timeout=600 install golang unzip libgl1-mesa-glx mesa-utils xauth build-essential \
     kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common libpng-dev \
@@ -57,4 +58,5 @@ install_exa
 npm install -g http-server webpack webpack-cli typescript ts-loader
 install_lfe
 install_rebar3
+echo "Done installing software!"
 echo (date +"%Y-%m-%d %T")
