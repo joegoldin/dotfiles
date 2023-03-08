@@ -1,17 +1,6 @@
 #!/usr/bin/env fish
 # GitHub codespaces setup.
 
-# UPGRADE DISTRO
-function apt_upgrade
-    sudo apt install -y debconf-utils
-    sudo debconf-set-selections < .dpkg-selections.conf
-    sudo dpkg-reconfigure keyboard-configuration -f noninteractive
-    sudo apt-add-repository ppa:fish-shell/release-3 --yes
-    sudo apt update --yes
-    # sudo apt upgrade --yes
-    sudo apt install -y fish
-end
-
 # LINK CONFIG FILES
 function link_files
     mkdir -p /home/codespace/.config
@@ -24,6 +13,18 @@ function link_files
     ln -s (pwd)/.config/starship.toml /home/codespace/.config/starship.toml
     ln -s (pwd)/.config/cargo.toml /home/codespace/.config/cargo.toml
     echo (date +"%Y-%m-%d %T")
+end
+
+# UPGRADE DISTRO
+function apt_upgrade
+    sudo apt install -y debconf-utils
+    sudo debconf-set-selections < .dpkg-selections.conf
+    sudo dpkg-reconfigure keyboard-configuration -f noninteractive
+    sudo apt-add-repository ppa:fish-shell/release-3 --yes
+    sudo apt update --yes
+    # sudo apt upgrade --yes
+    sudo apt install -y fish
+    source ~/.config/fish/config.fish
 end
 
 # INSTALLER FUNCTIONS
@@ -48,8 +49,14 @@ function install_haxe
 end
 
 function install_lfe
+    git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.11.2
+    asdf plugin add erlang
+    asdf plugin add elixir
+    asdf install erlang 25.2.3
+    asdf install elixir 1.14.3-otp-25
     cd /opt
     git clone https://github.com/lfe/lfe.git
+    cd lfe
     make compile
     sudo make install
 end
@@ -65,7 +72,7 @@ end
 # INSTALL SOFTWARE
 function install_software
     sleep 20
-    sudo apt -o DPkg::Lock::Timeout=600 install golang unzip libgl1-mesa-glx mesa-utils xauth x11-apps build-essential kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common libpng-dev libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev libsqlite3-dev erlang elixir -y
+    sudo apt -o DPkg::Lock::Timeout=600 install golang unzip libgl1-mesa-glx mesa-utils xauth x11-apps build-essential kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common libpng-dev libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev libsqlite3-dev libncurses-dev automake autoconf xsltproc xmllint fop libwxgtk3.0-gtk3-dev libwxgtk-webview3.0-gtk3-dev libwxgtk-media3.0-gtk3-dev -y
     curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
     curl https://sh.rustup.rs -sSf | sh
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -92,12 +99,12 @@ function setup_software
 end
 
 # RUN SCRIPT
-echo '⚙️ Upgrading distro.' >> ~/install.log;
-echo (date +"%Y-%m-%d %T") >> ~/install.log;
-apt_upgrade
 echo '🔗 Linking files.' >> ~/install.log;
 echo (date +"%Y-%m-%d %T") >> ~/install.log;
 link_files
+echo '⚙️ Upgrading distro.' >> ~/install.log;
+echo (date +"%Y-%m-%d %T") >> ~/install.log;
+apt_upgrade
 echo '💽 Installing software' >> ~/install.log;
 echo (date +"%Y-%m-%d %T") >> ~/install.log;
 install_software
