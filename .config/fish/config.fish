@@ -55,5 +55,6 @@ if ! test -e ~/.config/fish/.fisherinstalled
         fisher install eth-p/fish-plugin-sudo
         fisher install halostatue/fish-rust
         fisher install halostatue/fish-go
+        fisher install rstacruz/fish-asdf
     end
 end
