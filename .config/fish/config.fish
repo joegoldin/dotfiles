@@ -23,6 +23,12 @@ end
 if test -e /opt/homebrew/bin
     fish_add_path /opt/homebrew/bin
 end
+if test -e /home/codespace/.cargo/bin
+    fish_add_path /home/codespace/.cargo/bin
+end
+if test -e /home/codespace/.cache/rebar3/bin
+    fish_add_path /home/codespace/.cache/rebar3/bin
+end
 if test -e "/Applications/Sublime Text.app/Contents/SharedSupport/bin"
     fish_add_path "/Applications/Sublime Text.app/Contents/SharedSupport/bin"
     set -Ux EDITOR subl
