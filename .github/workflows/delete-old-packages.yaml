@@ -17,8 +17,8 @@ jobs:
         uses: snok/container-retention-policy@v2
         with:
           image-names: dotfiles*
-          cut-off: 1 minutes ago UTC
-          keep-at-least: 1
+          cut-off: 0 minutes ago UTC
+          keep-at-least: 0
           account-type: personal
           skip-tags: latest, v*
           token: ${{ secrets.PAT }}
