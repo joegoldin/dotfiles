@@ -21,4 +21,5 @@ jobs:
           cut-off: 1 minutes ago UTC
           keep-at-least: 1
           account-type: personal
+          skip-tags: latest
           token: ${{ secrets.PAT }}
