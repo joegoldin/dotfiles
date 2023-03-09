@@ -1,8 +1,14 @@
 #!/usr/bin/env fish
 # GitHub codespaces setup.
 
+# Create log file and write header
+set log_file ~/install.log
+echo '==========STARTING INSTALLATION===========' > $log_file
+
 # LINK CONFIG FILES
 function link_files
+    echo '🔗 Linking files.' >> $log_file;
+    echo (date +"%Y-%m-%d %T") >> $log_file;
     mkdir -p /home/codespace/.config
     mkdir -p /home/codespace/.ssh
     touch /home/codespace/.ssh/environment
@@ -12,11 +18,14 @@ function link_files
     ln -s (pwd)/.config/fish/config.fish /home/codespace/.config/fish/config.fish
     ln -s (pwd)/.config/starship.toml /home/codespace/.config/starship.toml
     ln -s (pwd)/.config/cargo.toml /home/codespace/.config/cargo.toml
-    echo (date +"%Y-%m-%d %T")
+    echo '✔️ Files linked successfully.' >> $log_file;
+    echo (date +"%Y-%m-%d %T") >> $log_file;
 end
 
 # UPGRADE DISTRO
 function apt_upgrade
+    echo '⚙️ Upgrading packages.' >> $log_file;
+    echo (date +"%Y-%m-%d %T") >> $log_file;
     set -x DEBIAN_FRONTEND noninteractive
     sudo apt update
     DEBIAN_FRONTEND=noninteractive sudo apt install -y debconf-utils
@@ -26,57 +35,74 @@ function apt_upgrade
     # sudo apt upgrade --yes
     sudo apt install -y fish
     sudo chsh -s /usr/bin/fish codespace
+    echo '✔️ Packages upgraded successfully.' >> $log_file;
+    echo (date +"%Y-%m-%d %T") >> $log_file;
 end
 
 # CONFIGURE SOFTWARE
 function setup_software
+    echo '🔧 Configuring software.' >> $log_file;
+    echo (date +"%Y-%m-%d %T") >> $log_file;
     mkdir -p ~/.config/github-copilot
     touch /home/codespace/.config/fish/.fisherinstalled
     rm -rf /home/codespace/.config/fish/.fisherinstalled
     echo '{"joegoldin":{"version":"2021-10-14"}}' > ~/.config/github-copilot/terms.json
-    echo (date +"%Y-%m-%d %T")
+    echo '✔️ Software configured successfully.' >> $log_file;
+    echo (date +"%Y-%m-%d %T") >> $log_file;
 end
 
 
 # INSTALLER FUNCTIONS
 function install_exa
+    echo '📥 Installing exa.' >> $log_file;
     set -x EXA_VERSION (curl -s "https://api.github.com/repos/ogham/exa/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
     curl -Lo exa.zip "https://github.com/ogham/exa/releases/latest/download/exa-linux-x86_64-v$EXA_VERSION.zip"
     sudo unzip -q exa.zip bin/exa -d /usr/local
     rm -rf exa.zip
+    echo '✔️ exa installed successfully.' >> $log_file;
 end
 
 function install_subl
+    echo '📥 Installing subl.' >> $log_file;
     sudo wget -O /usr/local/bin/rmate https://raw.github.com/aurora/rmate/master/rmate
     sudo chmod a+x /usr/local/bin/rmate
     sudo mv /usr/local/bin/rmate /usr/local/bin/subl
+    echo '✔️ subl installed successfully.' >> $log_file;
 end
 
 function install_haxe
+    echo '📥 Installing haxe.' >> $log_file;
     sudo add-apt-repository ppa:haxe/releases -y
     sudo apt-get update
     sudo apt install haxe -y
     mkdir ~/.haxelib_home && haxelib setup ~/.haxelib_home
+    echo '✔️ haxe installed successfully.' >> $log_file;
 end
 
 function install_lfe
+    echo '📥 Installing lfe.' >> $log_file;
     cd /opt
     git clone https://github.com/lfe/lfe.git
     cd lfe
     make compile
     sudo make install
+    echo '✔️ lfe installed successfully.' >> $log_file;
 end
 
 function install_rebar3
+    echo '📥 Installing rebar3.' >> $log_file;
     git clone https://github.com/erlang/rebar3.git
     cd rebar3
     ./bootstrap
     ./rebar3 local install
     fish_add_path /home/codespace/.cache/rebar3/bin
+    echo '✔️ rebar3 installed successfully.' >> $log_file;
 end
 
 # INSTALL SOFTWARE
 function install_software
+    echo '💽 Installing software.' >> $log_file;
+    echo (date +"%Y-%m-%d %T") >> $log_file;
     sleep 5
     sudo apt -o DPkg::Lock::Timeout=600 install golang unzip libgl1-mesa-glx mesa-utils xauth build-essential \
         kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common libpng-dev \
@@ -95,25 +121,15 @@ function install_software
     npm install -g http-server webpack webpack-cli typescript ts-loader
     install_lfe
     install_rebar3
-    echo (date +"%Y-%m-%d %T")
+    echo '✔️ Software installed successfully.' >> $log_file;
+    echo (date +"%Y-%m-%d %T") >> $log_file;
 end
 
 # RUN SCRIPT
-echo '🔗 Linking files.' >> ~/install.log;
-echo (date +"%Y-%m-%d %T") >> ~/install.log;
 link_files
-
-echo '⚙️ Upgrading stuffs.' >> ~/install.log;
-echo (date +"%Y-%m-%d %T") >> ~/install.log;
 apt_upgrade
-
-echo '💽 Installing software' >> ~/install.log;
-echo (date +"%Y-%m-%d %T") >> ~/install.log;
 install_software
-
-echo '🔧 configure software' >> ~/install.log;
-echo (date +"%Y-%m-%d %T") >> ~/install.log;
 setup_software
 
-echo '✅ Done!' >> ~/install.log;
-echo (date +"%Y-%m-%d %T") >> ~/install.log;
+# Write footer to log file
+echo '==========INSTALLATION COMPLETE===========' >> $log_file
