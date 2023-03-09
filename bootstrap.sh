@@ -5,6 +5,17 @@
 set log_file ~/install.log
 echo '==========STARTING INSTALLATION===========' > $log_file
 
+# Check if script has already run
+set flag_file /opt/.codespaces_setup_complete
+if test -f $flag_file
+    echo "This script has already been run. Exiting."
+    echo '==========INSTALLATION ABORTED============' >> $log_file
+    exit 0
+end
+
+# Create flag file to indicate script has run
+touch $flag_file
+
 # LINK CONFIG FILES
 function link_files
     echo '🔗 Linking files.' >> $log_file;
