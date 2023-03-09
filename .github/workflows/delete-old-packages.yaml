@@ -2,6 +2,10 @@ name: Delete old container images
 
 on:
   workflow_dispatch: {}
+  workflow_run:
+    workflows: [Docker]
+    types:
+      - completed
   schedule:
     - cron: '0 0 * * 0'  # the first day of the month
 
