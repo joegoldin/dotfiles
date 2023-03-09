@@ -6,11 +6,10 @@ on:
     workflows: [Docker]
     types:
       - completed
-  schedule:
-    - cron: '0 0 * * 0'  # the first day of the month
 
 jobs:
   clean-ghcr:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: Delete old unused container images
     runs-on: ubuntu-latest
     steps:
@@ -21,5 +20,5 @@ jobs:
           cut-off: 1 minutes ago UTC
           keep-at-least: 1
           account-type: personal
-          skip-tags: latest
+          skip-tags: latest, v*
           token: ${{ secrets.PAT }}
