@@ -9,7 +9,7 @@ on:
 
 jobs:
   clean-ghcr:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatc
     name: Delete old unused container images
     runs-on: ubuntu-latest
     steps:
