@@ -3,12 +3,14 @@
 
 # Create log file and write header
 set log_file ~/install.log
-echo '==========STARTING INSTALLATION===========' > $log_file
+echo '==========STARTING INSTALLATION===========' >> $log_file
+echo (date +"%Y-%m-%d %T") >> $log_file;
 
 # Check if script has already run
 set flag_file /opt/.codespaces_setup_complete
 if test -f $flag_file
     echo "This script has already been run. Exiting."
+    echo (date +"%Y-%m-%d %T") >> $log_file;
     echo '==========INSTALLATION ABORTED============' >> $log_file
     exit 0
 end
