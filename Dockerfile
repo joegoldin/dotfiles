@@ -1,5 +1,6 @@
 FROM mcr.microsoft.com/devcontainers/universal:2
 
+USER codespace
 WORKDIR /
 RUN mkdir -p /opt/dotfileinstall
 WORKDIR /opt/dotfileinstall
