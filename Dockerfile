@@ -4,7 +4,7 @@ USER codespace
 RUN mkdir -p /opt/dotfileinstall
 WORKDIR /opt/dotfileinstall
 COPY . .
-RUN fish bootstrap.sh
+RUN bash bootstrap.sh
 RUN touch /opt/.codespaces_setup_complete
 RUN rm -rf .vscode-server
 RUN rm -rf .vscode-server-insiders
