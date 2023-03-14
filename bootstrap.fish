@@ -112,7 +112,7 @@ function install_software
         kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common libpng-dev \
         libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev libsqlite3-dev libncurses-dev \
         automake autoconf xsltproc fop erlang-base erlang-crypto erlang-syntax-tools erlang-doc erlang-manpages erlang-tools \
-        erlang-dev erlang-inets erlang elixir -y
+        erlang-dev erlang-inets erlang elixir dpkg fakeroot -y
     curl -sS https://starship.rs/install.sh | sudo sh -s -- -y
     curl https://sh.rustup.rs -sSf | sh
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
