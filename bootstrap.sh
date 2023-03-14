@@ -3,6 +3,7 @@
 
 # Check if script has already run
 flag_file="/opt/.codespaces_setup_complete"
+log_file="~/install.log"
 if [ -f /opt/.codespaces_setup_complete ]; then
     echo "This script has already been run. Exiting..."
     echo "$(date +"%Y-%m-%d %T")" >> "$log_file"
