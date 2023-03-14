@@ -125,6 +125,7 @@ function install_software
     npm install -g http-server webpack webpack-cli typescript ts-loader
     install_lfe
     install_rebar3
+    yes | pip3 install thefuck --upgrade
     echo '✔️ Software installed successfully.' >> $log_file;
     echo (date +"%Y-%m-%d %T") >> $log_file;
 end
