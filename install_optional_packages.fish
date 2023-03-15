@@ -89,7 +89,7 @@ end
 
 # Script Execution
 
-if contains --reset $argv
+if contains -- --reset $argv
     reset_flags
 end
 
@@ -99,23 +99,23 @@ set haxe_choice 1
 set wine_choice 1
 set apt_upgrade_choice 1
 
-if contains --elixir $argv; or contains --erlang $argv
+if contains -- --elixir $argv; or contains -- --erlang $argv
     set erlang_choice 0
 end
 
-if contains --rust $argv
+if contains -- --rust $argv
     set rust_choice 0
 end
 
-if contains --haxe $argv
+if contains -- --haxe $argv
     set haxe_choice 0
 end
 
-if contains --wine $argv
+if contains -- --wine $argv
     set wine_choice 0
 end
 
-if contains --upgrade $argv
+if contains -- --upgrade $argv
     set apt_upgrade_choice 0
 end
 
