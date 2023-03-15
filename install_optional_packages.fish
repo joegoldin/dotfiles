@@ -88,60 +88,95 @@ function on_sigint --on-signal SIGINT
 end
 
 # Script Execution
+set argv (string match --regex --all '--silent|--elixir|--erlang|--rust|--haxe|--wine|--upgrade' $argv)
 
-if test (count $argv) -gt 0
-    if test $argv[1] = "--reset"
-        reset_flags
-    end
+if contains --silent $argv
+    set -xg silent_mode 1
+end
+
+if contains --reset $argv
+    reset_flags
 end
 
 set erlang_choice 1
-if not test -e /opt/.erlang_tools_installed
-    clear
-    set erlang_choice (dialog --stdout --title "Erlang/Elixir Packages" --yesno "Do you want to install Erlang and Elixir packages?" 0 0; echo $status)
-    clear
-else
-    clear
-    dialog --title "Erlang/Elixir Packages" --msgbox "Erlang and Elixir packages are already installed." 0 0
-    clear
-end
-
 set rust_choice 1
-if not test -e /opt/.rust_packages_installed
-    clear
-    set rust_choice (dialog --stdout --title "Rust Packages" --defaultno --yesno "Do you want to install Rust packages?" 0 0; echo $status)
-    clear
-else
-    clear
-    dialog --title "Rust Packages" --msgbox "Rust packages are already installed." 0 0
-    clear
-end
-
 set haxe_choice 1
-if not test -e /opt/.haxe_installed
-    clear
-    set haxe_choice (dialog --stdout --title "Haxe Packages" --defaultno --yesno "Do you want to install Haxe packages?" 0 0; echo $status)
-    clear
-else
-    clear
-    dialog --title "Haxe Packages" --msgbox "Haxe packages are already installed." 0 0
-    clear
-end
-
 set wine_choice 1
-if not test -e /opt/.wine_installed
-    clear
-    set wine_choice (dialog --stdout --title "Wine Packages" --defaultno --yesno "Do you want to install Wine?" 0 0; echo $status)
-    clear
-else
-    clear
-    dialog --title "Wine Packages" --msgbox "Wine packages are already installed." 0 0
-    clear
+set apt_upgrade_choice 1
+
+if contains --elixir $argv; or contains --erlang $argv
+    set erlang_choice 0
 end
 
-clear
-set apt_upgrade_choice (dialog --stdout --title "sudo apt-upgrade" --defaultno --yesno "Do you want to apt-upgrade?" 0 0; echo $status)
-clear
+if contains --rust $argv
+    set rust_choice 0
+end
+
+if contains --haxe $argv
+    set haxe_choice 0
+end
+
+if contains --wine $argv
+    set wine_choice 0
+end
+
+if contains --upgrade $argv
+    set apt_upgrade_choice 0
+end
+
+if test $erlang_choice -ne 0
+    if not test -e /opt/.erlang_tools_installed
+        clear
+        set erlang_choice (dialog --stdout --title "Erlang/Elixir Packages" --yesno "Do you want to install Erlang and Elixir packages?" 0 0; echo $status)
+        clear
+    else
+        clear
+        dialog --title "Erlang/Elixir Packages" --msgbox "Erlang and Elixir packages are already installed." 0 0
+        clear
+    end
+end
+
+if test $rust_choice -ne 0
+    if not test -e /opt/.rust_packages_installed
+        clear
+        set rust_choice (dialog --stdout --title "Rust Packages" --defaultno --yesno "Do you want to install Rust packages?" 0 0; echo $status)
+        clear
+    else
+        clear
+        dialog --title "Rust Packages" --msgbox "Rust packages are already installed." 0 0
+        clear
+    end
+end
+
+if test $haxe_choice -ne 0
+    if not test -e /opt/.haxe_installed
+        clear
+        set haxe_choice (dialog --stdout --title "Haxe Packages" --defaultno --yesno "Do you want to install Haxe packages?" 0 0; echo $status)
+        clear
+    else
+        clear
+        dialog --title "Haxe Packages" --msgbox "Haxe packages are already installed." 0 0
+        clear
+    end
+end
+
+if test $wine_choice -ne 0
+    if not test -e /opt/.wine_installed
+        clear
+        set wine_choice (dialog --stdout --title "Wine Packages" --defaultno --yesno "Do you want to install Wine?" 0 0; echo $status)
+        clear
+    else
+        clear
+        dialog --title "Wine Packages" --msgbox "Wine packages are already installed." 0 0
+        clear
+    end
+end
+
+if test $apt_upgrade_choice -ne 0
+    clear
+    set apt_upgrade_choice (dialog --stdout --title "sudo apt-upgrade" --defaultno --yesno "Do you want to apt-upgrade?" 0 0; echo $status)
+    clear
+end
 
 if test $erlang_choice -eq 0
     erlang_tools
