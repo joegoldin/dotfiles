@@ -2,6 +2,13 @@
 
 # Function Definitions
 
+log_file="/opt/install.log"
+function log
+    set message $argv[1]
+    echo $message >> $log_file
+    echo (date +"%Y-%m-%d %T") >> $log_file
+end
+
 function install_exa
     log '📥 Installing exa.'
     set -x EXA_VERSION (curl -s "https://api.github.com/repos/ogham/exa/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
