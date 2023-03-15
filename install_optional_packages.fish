@@ -88,11 +88,6 @@ function on_sigint --on-signal SIGINT
 end
 
 # Script Execution
-set argv (string match --regex --all '--silent|--elixir|--erlang|--rust|--haxe|--wine|--upgrade' $argv)
-
-if contains --silent $argv
-    set -xg silent_mode 1
-end
 
 if contains --reset $argv
     reset_flags
