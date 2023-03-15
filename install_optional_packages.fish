@@ -69,6 +69,11 @@ function erlang_tools
     install_lfe
 end
 
+function install_wine
+    sudo apt update -y
+    sudo apt install wine32 wine64 mono-devel fakeroot -y
+end
+
 function reset_flags
     rm -f /opt/.erlang_tools_installed
     rm -f /opt/.rust_packages_installed
