@@ -69,7 +69,6 @@ function install_software
     install_common_packages
     sudo chmod -R 1777 /tmp
     sudo rm -rf /tmp/*
-    sudo apt upgrade -y
     log '✔️ Software installed successfully.'
 end
 
