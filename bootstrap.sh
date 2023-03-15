@@ -3,7 +3,7 @@
 
 # Check if script has already run
 flag_file="/opt/.codespaces_setup_complete"
-log_file="~/install.log"
+log_file="/opt/install.log"
 touch $log_file
 if [ -f /opt/.codespaces_setup_complete ]; then
     echo "This script has already been run. Exiting..."
