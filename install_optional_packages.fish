@@ -27,7 +27,6 @@ function install_haxe
 end
 
 function install_rust_packages
-    curl https://sh.rustup.rs -sSf | sh
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     fish_add_path /home/codespace/.cargo/bin
     rustup target install wasm32-unknown-unknown
