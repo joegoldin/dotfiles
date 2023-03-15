@@ -64,3 +64,59 @@ if ! test -e ~/.config/fish/.fisherinstalled
         fisher install rstacruz/fish-asdf
     end
 end
+
+# Codespace specific stuff I didn't want to put above :shrug:
+if test -e /home/codespace
+    function copilot_what-the-shell
+        set TMPFILE (mktemp)
+        function remove_tmpfile --on-event fish_exit
+            rm -f $TMPFILE
+        end
+        if /home/codespace/nvm/current/bin/github-copilot-cli what-the-shell $argv --shellout $TMPFILE
+            if test -e "$TMPFILE"
+                set FIXED_CMD (cat $TMPFILE)
+                eval $FIXED_CMD
+            else
+                echo "Apologies! Extracting command failed"
+            end
+        else
+            return 1
+        end
+    end
+
+    function copilot_git-assist
+        set TMPFILE (mktemp)
+        function remove_tmpfile --on-event fish_exit
+            rm -f $TMPFILE
+        end
+        if /home/codespace/nvm/current/bin/github-copilot-cli git-assist $argv --shellout $TMPFILE
+            if test -e "$TMPFILE"
+                set FIXED_CMD (cat $TMPFILE)
+                eval $FIXED_CMD
+            else
+                echo "Apologies! Extracting command failed"
+            end
+        else
+            return 1
+        end
+    end
+
+    function copilot_gh-assist
+        set TMPFILE (mktemp)
+        function remove_tmpfile --on-event fish_exit
+            rm -f $TMPFILE
+        end
+        if /home/codespace/nvm/current/bin/github-copilot-cli gh-assist $argv --shellout $TMPFILE
+            if test -e "$TMPFILE"
+                set FIXED_CMD (cat $TMPFILE)
+                eval $FIXED_CMD
+            else
+                echo "Apologies! Extracting command failed"
+            end
+        else
+            return 1
+        end
+    end
+    abbr -a "git?" copilot_git-assist
+    abbr -a "??" copilot_what-the-shell
+end
