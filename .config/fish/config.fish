@@ -120,11 +120,8 @@ if test -e /home/codespace
     abbr -a "git?" copilot_git-assist
     abbr -a "??" copilot_what-the-shell
     
-    function optinstall
-        fish /opt/install_optional_packages.fish
-    end
-    
     function optionalinstall
-        fish /opt/install_optional_packages.fish
+        fish /opt/install_optional_packages.fish $argv
     end
+    abbr -a "optinstall" optionalinstall
 end
