@@ -2,6 +2,9 @@
 
 # Function Definitions
 
+set current_dir (pwd)
+cd /opt
+
 set log_file /opt/install.log
 function log
     set message $argv[1]
@@ -55,6 +58,7 @@ end
 
 function install_rebar3
     log '📥 Installing rebar3.'
+    cd /opt
     git clone https://github.com/erlang/rebar3.git
     cd rebar3
     ./bootstrap
@@ -83,6 +87,7 @@ function reset_flags
 end
 
 function on_sigint --on-signal SIGINT
+    cd $current_dir
     clear
     exit 1
 end
@@ -206,3 +211,5 @@ end
 
 sudo chmod -R 1777 /tmp
 sudo rm -rf /tmp/*
+
+cd $current_dir
