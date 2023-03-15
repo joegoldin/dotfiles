@@ -25,7 +25,7 @@ end
 function install_haxe
     log '📥 Installing haxe.'
     sudo add-apt-repository ppa:haxe/releases -y
-    sudo apt-get update
+    sudo apt-get update -y
     sudo apt install haxe -y
     mkdir ~/.haxelib_home && haxelib setup ~/.haxelib_home
     log '✔️ haxe installed successfully.'
@@ -41,7 +41,7 @@ function install_rust_packages
 end
 
 function install_erlang_elixir_packages
-    sudo apt update
+    sudo apt update -y
     sudo apt install erlang-base erlang-crypto erlang-syntax-tools erlang-doc erlang-manpages erlang-tools \
         erlang-dev erlang-inets erlang elixir -y
 end
