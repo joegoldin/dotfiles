@@ -102,6 +102,7 @@ function install_software
     sleep 5
     sudo apt install dpkg -y
     yes | sudo dpkg --add-architecture i386
+    sudo apt update
     sudo apt -o DPkg::Lock::Timeout=600 install golang unzip libgl1-mesa-glx mesa-utils xauth build-essential \
         kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common libpng-dev \
         libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev libsqlite3-dev libncurses-dev \
@@ -121,6 +122,7 @@ function install_software
     install_rebar3
     yes | pip3 install thefuck --upgrade
     sudo chmod -R 1777 /tmp
+    sudo rm -rf /tmp/*
     log '✔️ Software installed successfully.'
 end
 
