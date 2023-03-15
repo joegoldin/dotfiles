@@ -31,6 +31,7 @@ function apt_upgrade
     echo '⚙️ Upgrading packages.' >> $log_file;
     echo (date +"%Y-%m-%d %T") >> $log_file;
     set -x DEBIAN_FRONTEND noninteractive
+    sudo chmod -R 1777 /tmp
     sudo apt update
     DEBIAN_FRONTEND=noninteractive sudo apt install -y debconf-utils
     sudo debconf-set-selections < .dpkg-selections.conf
@@ -122,7 +123,7 @@ function install_software
     cargo install cargo-watch
     cargo install matchbox_server
     install_exa
-    npm install -g http-server webpack webpack-cli typescript ts-loader
+    yes | npm install -g http-server webpack webpack-cli typescript ts-loader @githubnext/github-copilot-cli
     install_lfe
     install_rebar3
     yes | pip3 install thefuck --upgrade
