@@ -5,8 +5,10 @@
 set log_file /opt/install.log
 function log
     set message $argv[1]
-    echo $message >> $log_file
-    echo (date +"%Y-%m-%d %T") >> $log_file
+    set currDate (date +"%Y-%m-%d %T")
+    set logMessage "$message\n$currDate"
+    echo $message
+    echo $logMessage >> $log_file
 end
 
 function install_exa
