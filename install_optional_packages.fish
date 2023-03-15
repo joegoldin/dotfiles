@@ -2,7 +2,7 @@
 
 # Function Definitions
 
-log_file="/opt/install.log"
+set log_file /opt/install.log
 function log
     set message $argv[1]
     echo $message >> $log_file
