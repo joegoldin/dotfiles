@@ -123,6 +123,7 @@ function install_software
     yes | pip3 install thefuck --upgrade
     sudo chmod -R 1777 /tmp
     sudo rm -rf /tmp/*
+    sudo apt upgrade -y
     log '✔️ Software installed successfully.'
 end
 
