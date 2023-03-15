@@ -83,24 +83,39 @@ if test (count $argv) -gt 0
     end
 end
 
+function on_sigint --on-signal SIGINT
+    clear
+    exit 1
+end
+
 if not test -e /opt/.erlang_tools_installed
+    clear
     set erlang_choice (dialog --stdout --title "Erlang/Elixir Packages" --yesno "Do you want to install Erlang and Elixir packages?" 0 0; echo $status)
+    clear
 end
 
 if not test -e /opt/.rust_packages_installed
+    clear
     set rust_choice (dialog --stdout --title "Rust Packages" --defaultno --yesno "Do you want to install Rust packages?" 0 0; echo $status)
+    clear
 end
 
 if not test -e /opt/.haxe_installed
+    clear
     set haxe_choice (dialog --stdout --title "Haxe Packages" --defaultno --yesno "Do you want to install Haxe packages?" 0 0; echo $status)
+    clear
 end
 
 if not test -e /opt/.wine_installed
+    clear
     set wine_choice (dialog --stdout --title "Wine Packages" --defaultno --yesno "Do you want to install Wine?" 0 0; echo $status)
+    clear
 end
 
 if not test -e /opt/.apt_upgrade_done
+    clear
     set apt_upgrade_choice (dialog --stdout --title "sudo apt-upgrade" --defaultno --yesno "Do you want to apt-upgrade?" 0 0; echo $status)
+    clear
 end
 
 if test $erlang_choice -eq 0
