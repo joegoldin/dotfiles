@@ -9,6 +9,6 @@ RUN touch /opt/.codespaces_setup_complete
 RUN rm -rf .vscode-server
 RUN rm -rf .vscode-server-insiders
 
-ENTRYPOINT ["/usr/bin/fish"]
+ENTRYPOINT ["/bin/fish"]
 
 LABEL org.opencontainers.image.description="joegoldin dotfiles precompiled base image"
