@@ -7,8 +7,10 @@ set log_file /opt/install.log
 # Functions
 function log
     set message $argv[1]
-    echo $message >> $log_file
-    echo (date +"%Y-%m-%d %T") >> $log_file
+    set currDate (date +"%Y-%m-%d %T")
+    set logMessage "$message\n$currDate"
+    echo $logMessage
+    echo $logMessage >> $log_file
 end
 
 function create_log_header
