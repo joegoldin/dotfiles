@@ -7,7 +7,7 @@ function log
     set message $argv[1]
     set currDate (date +"%Y-%m-%d %T")
     set logMessage "$message\n$currDate"
-    echo $message
+    echo $logMessage
     echo $logMessage >> $log_file
 end
 
