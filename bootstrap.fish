@@ -2,7 +2,7 @@
 # GitHub codespaces setup - install software and configure.
 
 # Variables
-set log_file ~/install.log
+set log_file /opt/install.log
 
 # Functions
 function log
