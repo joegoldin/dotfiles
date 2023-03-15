@@ -88,35 +88,53 @@ function on_sigint --on-signal SIGINT
     exit 1
 end
 
+set erlang_choice 1
 if not test -e /opt/.erlang_tools_installed
     clear
     set erlang_choice (dialog --stdout --title "Erlang/Elixir Packages" --yesno "Do you want to install Erlang and Elixir packages?" 0 0; echo $status)
     clear
+else
+    clear
+    dialog --title "Erlang/Elixir Packages" --msgbox "Erlang and Elixir packages are already installed." 0 0
+    clear
 end
 
+set rust_choice 1
 if not test -e /opt/.rust_packages_installed
     clear
     set rust_choice (dialog --stdout --title "Rust Packages" --defaultno --yesno "Do you want to install Rust packages?" 0 0; echo $status)
     clear
+else
+    clear
+    dialog --title "Rust Packages" --msgbox "Rust packages are already installed." 0 0
+    clear
 end
 
+set haxe_choice 1
 if not test -e /opt/.haxe_installed
     clear
     set haxe_choice (dialog --stdout --title "Haxe Packages" --defaultno --yesno "Do you want to install Haxe packages?" 0 0; echo $status)
     clear
+else
+    clear
+    dialog --title "Haxe Packages" --msgbox "Haxe packages are already installed." 0 0
+    clear
 end
 
+set wine_choice 1
 if not test -e /opt/.wine_installed
     clear
     set wine_choice (dialog --stdout --title "Wine Packages" --defaultno --yesno "Do you want to install Wine?" 0 0; echo $status)
     clear
+else
+    clear
+    dialog --title "Wine Packages" --msgbox "Wine packages are already installed." 0 0
+    clear
 end
 
-if not test -e /opt/.apt_upgrade_done
-    clear
-    set apt_upgrade_choice (dialog --stdout --title "sudo apt-upgrade" --defaultno --yesno "Do you want to apt-upgrade?" 0 0; echo $status)
-    clear
-end
+clear
+set apt_upgrade_choice (dialog --stdout --title "sudo apt-upgrade" --defaultno --yesno "Do you want to apt-upgrade?" 0 0; echo $status)
+clear
 
 if test $erlang_choice -eq 0
     erlang_tools
@@ -140,7 +158,6 @@ end
 
 if test $apt_upgrade_choice -eq 0
     sudo apt upgrade -y
-    touch /opt/.apt_upgrade_done
 end
 
 sudo chmod -R 1777 /tmp
