@@ -126,6 +126,7 @@ function install_software
     install_lfe
     install_rebar3
     yes | pip3 install thefuck --upgrade
+    sudo chmod -R 1777 /tmp
     echo '✔️ Software installed successfully.' >> $log_file;
     echo (date +"%Y-%m-%d %T") >> $log_file;
 end
