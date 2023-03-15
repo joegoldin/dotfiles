@@ -1,5 +1,7 @@
 #!/usr/bin/env fish
 
+# Function Definitions
+
 function install_exa
     log '📥 Installing exa.'
     set -x EXA_VERSION (curl -s "https://api.github.com/repos/ogham/exa/releases/latest" | grep -Po '"tag_name": "v\K[0-9.]+')
@@ -75,16 +77,17 @@ function reset_flags
     rm -f /opt/.apt_upgrade_done
 end
 
-if test (count $argv) -gt 0
-    if test $argv[1] = "--reset"
-        reset_flags
-        exit 0
-    end
-end
-
 function on_sigint --on-signal SIGINT
     clear
     exit 1
+end
+
+# Script Execution
+
+if test (count $argv) -gt 0
+    if test $argv[1] = "--reset"
+        reset_flags
+    end
 end
 
 set erlang_choice 1
