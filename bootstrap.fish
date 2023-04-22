@@ -35,6 +35,7 @@ function link_files
     ln -s (pwd)/.config/fish/config.fish /home/codespace/.config/fish/config.fish
     ln -s (pwd)/.config/starship.toml /home/codespace/.config/starship.toml
     ln -s (pwd)/.config/cargo.toml /home/codespace/.config/cargo.toml
+    ln -s (pwd)/.config/rebar.config /home/codespace/.config/rebar.config
     ln -s (pwd)/install_optional_packages.fish /opt/install_optional_packages.fish
     sudo chmod +x (pwd)/install_optional_packages.fish
     log '✔️ Files linked successfully.'
