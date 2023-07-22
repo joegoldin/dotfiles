@@ -41,6 +41,7 @@ function install_rust_packages
 end
 
 function install_erlang_elixir_packages
+    sudo add-apt-repository -y ppa:rabbitmq/rabbitmq-erlang
     sudo apt update -y
     sudo apt install erlang-base erlang-crypto erlang-syntax-tools erlang-doc erlang-manpages erlang-tools \
         erlang-dev erlang-inets erlang elixir -y
