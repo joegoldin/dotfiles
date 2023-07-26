@@ -73,6 +73,7 @@ function install_common_packages
     curl -Lo exa.zip "https://github.com/ogham/exa/releases/latest/download/exa-linux-x86_64-v$EXA_VERSION.zip"
     sudo unzip -q exa.zip bin/exa -d /usr/local
     rm -rf exa.zip
+    curl https://raw.githubusercontent.com/ibigio/shell-ai/main/install.sh | bash
 end
 
 function install_software
