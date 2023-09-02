@@ -62,7 +62,7 @@ function install_common_packages
     sudo apt -o DPkg::Lock::Timeout=800 install golang unzip libgl1-mesa-glx mesa-utils xauth build-essential \
         kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common libpng-dev \
         libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev libsqlite3-dev libncurses-dev \
-        automake autoconf xsltproc fop dialog -y
+        automake autoconf xsltproc fop dialog mosh -y
     yes | pip3 install thefuck --upgrade
     yes | npm install -g http-server webpack webpack-cli typescript ts-loader @githubnext/github-copilot-cli simple-https-proxy@latest
     simple-https-proxy --makeCerts=true
