@@ -64,12 +64,12 @@ end
 
 # zellij run [command]
 function zr
-    zellij run --name "$argv" -- zsh -ic "$argv"
+    zellij run --name "$argv" -- fish -c "$argv"
 end
 
 # zellij run floating [command]
 function zrf
-    zellij run --name "$argv" --floating -- zsh -ic "$argv"
+    zellij run --name "$argv" --floating -- fish -c "$argv"
 end
 
 # zellij edit file [file]
