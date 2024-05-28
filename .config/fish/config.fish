@@ -23,21 +23,19 @@ end
 if test -e /opt/homebrew/bin
     fish_add_path /opt/homebrew/bin
 end
-if test -e /home/codespace/.cargo/bin
-    fish_add_path /home/codespace/.cargo/bin
+if test -e ~/.cargo/bin
+    fish_add_path ~/.cargo/bin
 end
-if test -e /home/codespace/.cache/rebar3/bin
-    fish_add_path /home/codespace/.cache/rebar3/bin
-end
-if test -e "/Applications/Sublime Text.app/Contents/SharedSupport/bin"
-    fish_add_path "/Applications/Sublime Text.app/Contents/SharedSupport/bin"
-    set -Ux EDITOR subl
+if test -e ~/.cache/rebar3/bin
+    fish_add_path ~/.cache/rebar3/bin
 end
 
 # ENV
 set -Ux LANG en_US.UTF-8
 set -Ux nvm_default_version lts
 set -Ux Z_CMD "j"
+set -Ux REACT_EDITOR cursor
+set -Ux EDITOR cursor
 
 # thefuck
 if command -v thefuck &> /dev/null; thefuck --alias | source; end
@@ -52,76 +50,46 @@ if ! test -e ~/.config/fish/.fisherinstalled
     if ! test $status -eq 0
         rm -rf ~/.config/fish/.fisherinstalled
     else
-        fisher install danhper/fish-ssh-agent
-        fisher install jethrokuan/z
-        fisher install jorgebucaran/autopair.fish
-        fisher install nickeb96/puffer-fish
-        fisher install halostatue/fish-docker
-        fisher install halostatue/fish-elixir
-        fisher install eth-p/fish-plugin-sudo
-        fisher install halostatue/fish-rust
-        fisher install halostatue/fish-go
-        fisher install rstacruz/fish-asdf
+        fisher update
     end
 end
 
-# Codespace specific stuff I didn't want to put above :shrug:
-if test -e /home/codespace
-    function copilot_what-the-shell
-        set TMPFILE (mktemp)
-        function remove_tmpfile --on-event fish_exit
-            rm -f $TMPFILE
-        end
-        if /home/codespace/nvm/current/bin/github-copilot-cli what-the-shell $argv --shellout $TMPFILE
-            if test -e "$TMPFILE"
-                set FIXED_CMD (cat $TMPFILE)
-                eval $FIXED_CMD
-            else
-                echo "Apologies! Extracting command failed"
-            end
-        else
-            return 1
-        end
-    end
+# zellij aliases
+alias ze='zellij'
 
-    function copilot_git-assist
-        set TMPFILE (mktemp)
-        function remove_tmpfile --on-event fish_exit
-            rm -f $TMPFILE
-        end
-        if /home/codespace/nvm/current/bin/github-copilot-cli git-assist $argv --shellout $TMPFILE
-            if test -e "$TMPFILE"
-                set FIXED_CMD (cat $TMPFILE)
-                eval $FIXED_CMD
-            else
-                echo "Apologies! Extracting command failed"
-            end
-        else
-            return 1
-        end
-    end
-
-    function copilot_gh-assist
-        set TMPFILE (mktemp)
-        function remove_tmpfile --on-event fish_exit
-            rm -f $TMPFILE
-        end
-        if /home/codespace/nvm/current/bin/github-copilot-cli gh-assist $argv --shellout $TMPFILE
-            if test -e "$TMPFILE"
-                set FIXED_CMD (cat $TMPFILE)
-                eval $FIXED_CMD
-            else
-                echo "Apologies! Extracting command failed"
-            end
-        else
-            return 1
-        end
-    end
-    abbr -a "git?" copilot_git-assist
-    abbr -a "??" copilot_what-the-shell
-    
-    function optionalinstall
-        fish /opt/install_optional_packages.fish $argv
-    end
-    abbr -a "optinstall" optionalinstall
+# zellij attach [container]
+function za
+    zellij attach "$argv"
 end
+
+# zellij run [command]
+function zr
+    zellij run --name "$argv" -- zsh -ic "$argv"
+end
+
+# zellij run floating [command]
+function zrf
+    zellij run --name "$argv" --floating -- zsh -ic "$argv"
+end
+
+# zellij edit file [file]
+function zed
+    zellij edit $argv
+end
+
+# zellij attach
+function zs
+    set sessions (zellij list-sessions --no-formatting | awk '{printf "\033[1;36m%-20s\033[0m %s\n", $1, $3}')
+    set selected_session (echo "$sessions" | fzf --height (set -q FZF_TMUX_HEIGHT; and echo $FZF_TMUX_HEIGHT; or echo 20%) --ansi)
+    if test -n "$selected_session"
+        za (echo $selected_session | awk '{print $1}')
+    end
+end
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+if test -f ~/miniconda3/bin/conda
+    eval ~/miniconda3/bin/conda "shell.fish" "hook" $argv | source
+end
+# <<< conda initialize <<<
+fish_add_path ~/miniconda3/bin
