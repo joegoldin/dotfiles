@@ -37,6 +37,8 @@ set -Ux nvm_default_version lts
 set -Ux Z_CMD "j"
 set -Ux REACT_EDITOR cursor
 set -Ux EDITOR cursor
+set -Ux GOPATH ~/go
+fish_add_path $GOPATH/bin
 
 # thefuck
 if command -v thefuck &> /dev/null; thefuck --alias | source; end
@@ -57,8 +59,13 @@ end
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-if test -f ~/miniconda3/bin/conda
-    eval ~/miniconda3/bin/conda "shell.fish" "hook" $argv | source
+if test -f ~/miniconda/bin/conda
+    eval ~/miniconda/bin/conda "shell.fish" "hook" $argv | source
 end
 # <<< conda initialize <<<
-fish_add_path ~/miniconda3/bin
+fish_add_path ~/miniconda/bin
+
+# cargo
+if test -f ~/.cargo/env.fish
+    source ~/.cargo/env.fish
+end
