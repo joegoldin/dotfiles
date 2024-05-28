@@ -8,3 +8,9 @@ halostatue/fish-docker
 halostatue/fish-macos
 halostatue/fish-elixir
 eth-p/fish-plugin-sudo
+decors/fish-colored-man
+reitzig/sdkman-for-fish@dev
+halostatue/fish-go
+rstacruz/fish-asdf
+tom-doerr/codex.fish
+oh-my-fish/plugin-bang-bang
