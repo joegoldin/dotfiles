@@ -82,17 +82,17 @@ function install_software_mac
     log '💽 Installing mac software...'
     check_and_or_install fish brew install fish
     check_and_or_install go brew install go
-    check_and_or_install conda wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O $home_dir/miniconda.sh && bash $home_dir/miniconda.sh -b -p $home_dir/miniconda
+    check_and_or_install conda "wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O $home_dir/miniconda.sh && conda bash $home_dir/miniconda.sh -b -p $home_dir/miniconda"
     log '✔️ Mac software installed successfully.'
 end
 
 function install_common_packages
     log '💽 Installing common packages...'
-    python -m poetry --version >/dev/null 2>&1
+    python -m poetry --version &> /dev/null
     if not test $status -eq 0
         yes | pip install poetry --upgrade
     end
-    check_and_or_install rustc curl https://sh.rustup.rs -sSf | sh -s -- -y
+    check_and_or_install rustc "curl https://sh.rustup.rs -sSf | sh -s -- -y"
     check_and_or_install zellij cargo install --locked zellij
     check_and_or_install clai go install github.com/baalimago/clai@latest
     log '✔️ Common packages installed successfully.'
@@ -123,37 +123,45 @@ function link_files
     touch $home_dir/.ssh/environment
     # tmux
     if test -f $home_dir/.tmux.conf
-        mv $home_dir/.tmux.conf $home_dir/.tmux.conf.bak
+        rm -rf $home_dir/.tmux.conf.bak
+        mv -f $home_dir/.tmux.conf $home_dir/.tmux.conf.bak
     end
     ln -s (pwd)/tmux.conf $home_dir/.tmux.conf
     # fish
     if test -d $home_dir/.config/fish
-        mv $home_dir/.config/fish $home_dir/.config/.fish.bak
+        rm -rf $home_dir/.config/.fish.bak
+        mv -f $home_dir/.config/fish $home_dir/.config/.fish.bak
     end
     mkdir -p $home_dir/.config/fish
+    mkdir -p $home_dir/.config/fish/functions
+    mkdir -p $home_dir/.config/fish/completions
+    mkdir -p $home_dir/.config/fish/conf.d
     ln -s (pwd)/.config/fish/config.fish $home_dir/.config/fish/config.fish
     ln -s (pwd)/.config/fish/fish_plugins $home_dir/.config/fish/fish_plugins
-    ln -s (pwd)/.config/fish/functions $home_dir/.config/fish/functions
-    ln -s (pwd)/.config/fish/completions $home_dir/.config/fish/completions
-    ln -s (pwd)/.config/fish/conf.d $home_dir/.config/fish/conf.d
+    ln -s (pwd)/.config/fish/functions/assemblai.fish $home_dir/.config/fish/functions/assemblai.fish
+    ln -s (pwd)/.config/fish/functions/clai.fish $home_dir/.config/fish/functions/clai.fish
     # starship
     if test -f $home_dir/.config/starship.toml
-        mv $home_dir/.config/starship.toml $home_dir/.config/.starship.toml.bak
+        rm -rf $home_dir/.config/.starship.toml.bak
+        mv -f $home_dir/.config/starship.toml $home_dir/.config/.starship.toml.bak
     end
     ln -s (pwd)/.config/starship.toml $home_dir/.config/starship.toml
     # cargo
     if test -f $home_dir/.config/cargo.toml
-        mv $home_dir/.config/cargo.toml $home_dir/.config/.cargo.toml.bak
+        rm -rf $home_dir/.config/.cargo.toml.bak
+        mv -f $home_dir/.config/cargo.toml $home_dir/.config/.cargo.toml.bak
     end
     ln -s (pwd)/.config/cargo.toml $home_dir/.config/cargo.toml
     # rebar
     if test -f $home_dir/.config/rebar.config
-        mv $home_dir/.config/rebar.config $home_dir/.config/.rebar.config.bak
+        rm -rf $home_dir/.config/.rebar.config.bak
+        mv -f $home_dir/.config/rebar.config $home_dir/.config/.rebar.config.bak
     end
     ln -s (pwd)/.config/rebar.config $home_dir/.config/rebar.config
     # zellij
     if test -d $home_dir/.config/zellij
-        mv $home_dir/.config/zellij $home_dir/.config/.zellij.bak
+        rm -rf $home_dir/.config/.zellij.bak
+        mv -f $home_dir/.config/zellij $home_dir/.config/.zellij.bak
     end
     mkdir -p $home_dir/.config/zellij
     ln -s (pwd)/.config/zellij/config.kdl $home_dir/.config/zellij/config.kdl

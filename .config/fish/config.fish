@@ -53,7 +53,7 @@ if ! test -e ~/.config/fish/.fisherinstalled
     if ! test $status -eq 0
         rm -rf ~/.config/fish/.fisherinstalled
     else
-        fisher update
+        cat .config/fish/fish_plugins | fisher install
     end
 end
 
