@@ -121,23 +121,21 @@ function link_files
     # ssh
     mkdir -p $home_dir/.ssh
     touch $home_dir/.ssh/environment
-    # tmux
-    if test -f $home_dir/.tmux.conf
-        rm -rf $home_dir/.tmux.conf.bak
-        mv -f $home_dir/.tmux.conf $home_dir/.tmux.conf.bak
-    end
-    ln -s (pwd)/tmux.conf $home_dir/.tmux.conf
     # fish
-    if test -d $home_dir/.config/fish
-        rm -rf $home_dir/.config/.fish.bak
-        mv -f $home_dir/.config/fish $home_dir/.config/.fish.bak
-    end
     mkdir -p $home_dir/.config/fish
+    rm -rf $home_dir/.config/fish/functions
+    rm -rf $home_dir/.config/fish/completions
+    rm -rf $home_dir/.config/fish/conf.d
     mkdir -p $home_dir/.config/fish/functions
     mkdir -p $home_dir/.config/fish/completions
     mkdir -p $home_dir/.config/fish/conf.d
+    if test -f $home_dir/.config/fish/config.fish
+        rm -rf $home_dir/.config/fish/.config.fish.bak
+        mv -f $home_dir/.config/fish/config.fish $home_dir/.config/fish/.config.fish.bak
+    end
     ln -s (pwd)/.config/fish/config.fish $home_dir/.config/fish/config.fish
-    ln -s (pwd)/.config/fish/fish_plugins $home_dir/.config/fish/fish_plugins
+    rm -rf $home_dir/.config/fish/fish_plugins
+    cp -f (pwd)/.config/fish/fish_plugins $home_dir/.config/fish/fish_plugins
     ln -s (pwd)/.config/fish/functions/assemblai.fish $home_dir/.config/fish/functions/assemblai.fish
     ln -s (pwd)/.config/fish/functions/clai.fish $home_dir/.config/fish/functions/clai.fish
     # starship
@@ -152,12 +150,6 @@ function link_files
         mv -f $home_dir/.config/cargo.toml $home_dir/.config/.cargo.toml.bak
     end
     ln -s (pwd)/.config/cargo.toml $home_dir/.config/cargo.toml
-    # rebar
-    if test -f $home_dir/.config/rebar.config
-        rm -rf $home_dir/.config/.rebar.config.bak
-        mv -f $home_dir/.config/rebar.config $home_dir/.config/.rebar.config.bak
-    end
-    ln -s (pwd)/.config/rebar.config $home_dir/.config/rebar.config
     # zellij
     if test -d $home_dir/.config/zellij
         rm -rf $home_dir/.config/.zellij.bak
