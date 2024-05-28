@@ -166,6 +166,7 @@ function setup_software
     mkdir -p $home_dir/.config/github-copilot
     touch $home_dir/.config/fish/.fisherinstalled
     rm -rf $home_dir/.config/fish/.fisherinstalled
+    nvm install lts
     echo '{"joegoldin":{"version":"2021-10-14"}}' > $home_dir/.config/github-copilot/terms.json
     log '✔️ Software configured successfully.'
 end
