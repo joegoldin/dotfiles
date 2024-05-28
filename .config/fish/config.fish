@@ -1,5 +1,6 @@
 if status is-interactive
-    abbr -a ls "exa -la -s modified --header"
+    abbr -a ls "ls -la"
+    abbr -a lst "ls -lath"
     abbr -a awslogin "aws sso login"
 
     function mkdir; command mkdir -p $argv; end
