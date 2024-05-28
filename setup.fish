@@ -3,19 +3,20 @@
 
 # Function definitions
 
-set log_file /opt/install.log
 
 # If CODESPACES env var set, then set home_dir to /home/codespace, otherwise set to ~
 if set -q CODESPACES
     set home_dir /home/codespace
+    set log_file /opt/install.log
 else
     set home_dir ~
+    set log_file (pwd)/install.log
 end
 
 function log
     set message $argv[1]
     set currDate (date +"%Y-%m-%d %T")
-    set logMessage "$message"\n"$currDate"
+    set logMessage "[$currDate] $message"
     echo $logMessage
     echo $logMessage >> $log_file
 end
@@ -48,15 +49,15 @@ function apt_upgrade
     log '✔️ Packages upgraded successfully.'
 end
 
-function install_common_packages
-    log '💽 Installing common packages...'
-    yes | pip3 install thefuck --upgrade
-    yes | npm install -g http-server webpack webpack-cli typescript ts-loader simple-https-proxy@latest
-    simple-https-proxy --makeCerts=true
-    curl https://sh.rustup.rs -sSf | sh -s -- -y
-    cargo install --locked zellij
-    go install github.com/baalimago/clai@latest
-    log '✔️ Common packages installed successfully.'
+function check_and_or_install
+    set cmd $argv[1]
+    # rest of args for install cmd
+    if not test (which $cmd)
+        log "❌ $cmd not installed. Installing..."
+        eval $argv[2..-1]
+    else
+        log "✅ $cmd already installed."
+    end
 end
 
 function install_software_linux
@@ -79,13 +80,25 @@ end
 
 function install_software_mac
     log '💽 Installing mac software...'
-    brew install fish go 
-    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O ~/miniconda.sh
-    bash ~/miniconda.sh -b -p $home_dir/miniconda
+    check_and_or_install fish brew install fish
+    check_and_or_install go brew install go
+    check_and_or_install conda wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O $home_dir/miniconda.sh && bash $home_dir/miniconda.sh -b -p $home_dir/miniconda
     log '✔️ Mac software installed successfully.'
 end
 
-function install_software
+function install_common_packages
+    log '💽 Installing common packages...'
+    python -m poetry --version >/dev/null 2>&1
+    if not test $status -eq 0
+        yes | pip install poetry --upgrade
+    end
+    check_and_or_install rustc curl https://sh.rustup.rs -sSf | sh -s -- -y
+    check_and_or_install zellij cargo install --locked zellij
+    check_and_or_install clai go install github.com/baalimago/clai@latest
+    log '✔️ Common packages installed successfully.'
+end
+
+function install_software 
     sleep 5
 
     switch (uname -s)
@@ -109,9 +122,14 @@ function link_files
     mkdir -p $home_dir/.ssh
     touch $home_dir/.ssh/environment
     # tmux
+    if test -f $home_dir/.tmux.conf
+        mv $home_dir/.tmux.conf $home_dir/.tmux.conf.bak
+    end
     ln -s (pwd)/tmux.conf $home_dir/.tmux.conf
     # fish
-    rm -rf $home_dir/.config/fish
+    if test -d $home_dir/.config/fish
+        mv $home_dir/.config/fish $home_dir/.config/.fish.bak
+    end
     mkdir -p $home_dir/.config/fish
     ln -s (pwd)/.config/fish/config.fish $home_dir/.config/fish/config.fish
     ln -s (pwd)/.config/fish/fish_plugins $home_dir/.config/fish/fish_plugins
@@ -119,13 +137,24 @@ function link_files
     ln -s (pwd)/.config/fish/completions $home_dir/.config/fish/completions
     ln -s (pwd)/.config/fish/conf.d $home_dir/.config/fish/conf.d
     # starship
+    if test -f $home_dir/.config/starship.toml
+        mv $home_dir/.config/starship.toml $home_dir/.config/.starship.toml.bak
+    end
     ln -s (pwd)/.config/starship.toml $home_dir/.config/starship.toml
     # cargo
+    if test -f $home_dir/.config/cargo.toml
+        mv $home_dir/.config/cargo.toml $home_dir/.config/.cargo.toml.bak
+    end
     ln -s (pwd)/.config/cargo.toml $home_dir/.config/cargo.toml
     # rebar
+    if test -f $home_dir/.config/rebar.config
+        mv $home_dir/.config/rebar.config $home_dir/.config/.rebar.config.bak
+    end
     ln -s (pwd)/.config/rebar.config $home_dir/.config/rebar.config
     # zellij
-    rm -rf $home_dir/.config/zellij
+    if test -d $home_dir/.config/zellij
+        mv $home_dir/.config/zellij $home_dir/.config/.zellij.bak
+    end
     mkdir -p $home_dir/.config/zellij
     ln -s (pwd)/.config/zellij/config.kdl $home_dir/.config/zellij/config.kdl
     ln -s (pwd)/.config/zellij/plugins $home_dir/.config/zellij/plugins
