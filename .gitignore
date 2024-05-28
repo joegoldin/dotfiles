@@ -138,5 +138,8 @@ etc/clusto*.conf
 !.config/fish/themes
 !.config/fish/themes/*
 .config/fish/fish_variables
+!.config/zellij
+!.config/zellij/**
 
 !bootstrap.sh
+!setup.fish
