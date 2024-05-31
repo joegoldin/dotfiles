@@ -1,9 +1,6 @@
 #!/usr/bin/env fish
 # Dotfiles setup - install software and configure.
 
-# Function definitions
-
-
 # If CODESPACES env var set, then set home_dir to /home/codespace, otherwise set to ~
 if set -q CODESPACES
     set home_dir /home/codespace
@@ -70,8 +67,8 @@ function install_software_linux
         automake autoconf xsltproc fop dialog mosh -y
     wget -qO- "https://getbin.io/suyashkumar/ssl-proxy" | tar xvz 
     sudo mv ssl-proxy* /usr/local/bin/ssl-proxy
-    sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.22.3.linux-amd64.tar.gz
-    fish_add_path /usr/local/go/bin
+    source scripts/install_go.fish
+    install_go
     curl -sL https://cdn.geekbench.com/Geekbench-6.1.0-Linux.tar.gz | tar xvz && sudo mv Geekbench*/geekbench* /usr/local/bin/. && rm -rf Geekbench*
     wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $home_dir/miniconda.sh
     bash $home_dir/miniconda.sh -b -p $home_dir/miniconda
