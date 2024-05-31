@@ -141,5 +141,8 @@ etc/clusto*.conf
 !.config/zellij
 !.config/zellij/**
 
+!scripts
+!scripts/*
+
 !bootstrap.sh
 !setup.fish
