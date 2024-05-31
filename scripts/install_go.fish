@@ -1,8 +1,6 @@
 #!/usr/bin/env fish
 
 function install_go
-    set -e
-
     set VERSION "1.22.3"
     set -x GOROOT "$argv[1]/.go"
     set -x GOPATH "$argv[1]/go"
@@ -69,6 +67,6 @@ function install_go
     echo 'fish_add_path $GOROOT/bin' >> "$shell_profile"
 
     mkdir -p "$GOPATH/src" "$GOPATH/pkg" "$GOPATH/bin"
-    echo -e "\nGo $VERSION was installed into $GOROOT.\nMake sure to run:\n\n\tsource $shell_profile\n\nto update your environment variables."
+    echo -e "\nGo $VERSION was installed into $GOROOT.\n"
     rm -f "$TEMP_DIRECTORY/go.tar.gz"
 end
