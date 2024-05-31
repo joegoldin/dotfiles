@@ -18,6 +18,7 @@ function log
     set logMessage "[$currDate] $message"
     echo $logMessage
     echo $logMessage >> $log_file
+    sleep 0.1
 end
 
 function brew_upgrade
