@@ -8,7 +8,6 @@ if status is-interactive
     function cp; command cp -i $argv; end
     function mv; command mv -i $argv; end
     function k; command kubectl $argv; end
-    function gcm; command npx commitgpt -c $argv; end
     function cargowatch; cargo watch -cx "run --release" $argv; end
 end
 
@@ -37,25 +36,12 @@ set -Ux nvm_default_version lts
 set -Ux Z_CMD "j"
 set -Ux REACT_EDITOR cursor
 set -Ux EDITOR cursor
-set -Ux GOPATH ~/go
-fish_add_path $GOPATH/bin
 
 # thefuck
 if command -v thefuck &> /dev/null; thefuck --alias | source; end
 
 # Starship
 if command -v starship &> /dev/null; starship init fish | source; end
-
-# Fisher plugins
-if ! test -e ~/.config/fish/.fisherinstalled
-    touch ~/.config/fish/.fisherinstalled
-    curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
-    if ! test $status -eq 0
-        rm -rf ~/.config/fish/.fisherinstalled
-    else
-        cat .config/fish/fish_plugins | fisher install
-    end
-end
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
