@@ -66,7 +66,7 @@ function install_software_linux
         automake autoconf xsltproc fop dialog mosh -y
     check_and_or_install ssl-proxy "wget -qO- \"https://getbin.io/suyashkumar/ssl-proxy\" | tar xvz && sudo mv ssl-proxy* /usr/local/bin/ssl-proxy"
     check_and_or_install go "source scripts/install_go.fish && install_go $home_dir"
-    check_and_or_install miniconda "wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $home_dir/miniconda.sh && bash $home_dir/miniconda.sh -b -p $home_dir/miniconda"
+    check_and_or_install conda "wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $home_dir/miniconda.sh && bash $home_dir/miniconda.sh -b -p $home_dir/miniconda"
     log '✔️ Linux software installed successfully.'
 end
 
