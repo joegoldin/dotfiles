@@ -59,19 +59,16 @@ end
 
 function install_software_linux
     log '💽 Installing linux software...'
-    sudo apt install dpkg -y
+    check_and_or_install dpkg sudo apt install dpkg -y
     sudo apt update
-    sudo apt -o DPkg::Lock::Timeout=800 install golang unzip libgl1-mesa-glx mesa-utils xauth build-essential \
+    check_and_or_install jq sudo apt -o DPkg::Lock::Timeout=800 install unzip libgl1-mesa-glx mesa-utils xauth build-essential \
         kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common libpng-dev \
         libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev libsqlite3-dev libncurses-dev \
         automake autoconf xsltproc fop dialog mosh -y
-    wget -qO- "https://getbin.io/suyashkumar/ssl-proxy" | tar xvz 
-    sudo mv ssl-proxy* /usr/local/bin/ssl-proxy
-    source scripts/install_go.fish
-    install_go
-    curl -sL https://cdn.geekbench.com/Geekbench-6.1.0-Linux.tar.gz | tar xvz && sudo mv Geekbench*/geekbench* /usr/local/bin/. && rm -rf Geekbench*
-    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $home_dir/miniconda.sh
-    bash $home_dir/miniconda.sh -b -p $home_dir/miniconda
+    check_and_or_install "ssl-proxy wget -qO- \"https://getbin.io/suyashkumar/ssl-proxy\" | tar xvz && sudo mv ssl-proxy* /usr/local/bin/ssl-proxy"
+    check_and_or_install go source scripts/install_go.fish && install_go $home_dir
+    check_and_or_install geekbench "curl -sL https://cdn.geekbench.com/Geekbench-6.1.0-Linux.tar.gz | tar xvz && sudo mv Geekbench*/geekbench* /usr/local/bin/. && rm -rf Geekbench*"
+    check_and_or_install miniconda "wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $home_dir/miniconda.sh && check_and_or_install"
     log '✔️ Linux software installed successfully.'
 end
 
@@ -107,8 +104,6 @@ function install_software
         apt_upgrade
         install_software_linux
         install_common_packages
-        sudo chmod -R 1777 /tmp
-        sudo rm -rf /tmp/*
     end
 end
 
@@ -160,11 +155,9 @@ end
 
 function setup_software
     log '🔧 Configuring software...'
-    mkdir -p $home_dir/.config/github-copilot
-    touch $home_dir/.config/fish/.fisherinstalled
-    rm -rf $home_dir/.config/fish/.fisherinstalled
+    check_and_or_install fisher "curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher"
+    cat .config/fish/fish_plugins | fisher install
     nvm install lts
-    echo '{"joegoldin":{"version":"2021-10-14"}}' > $home_dir/.config/github-copilot/terms.json
     log '✔️ Software configured successfully.'
 end
 
