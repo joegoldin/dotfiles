@@ -61,9 +61,9 @@ end
 
 function install_software_linux
     log '💽 Installing linux software...'
-    check_and_or_install dpkg sudo apt install dpkg -y
+    sudo apt install dpkg -y
     sudo apt update
-    check_and_or_install jq sudo apt -o DPkg::Lock::Timeout=800 install unzip libgl1-mesa-glx mesa-utils xauth build-essential \
+    sudo apt -o DPkg::Lock::Timeout=800 install unzip libgl1-mesa-glx mesa-utils xauth build-essential \
         kitty-terminfo socat ncat bat jq ripgrep thefuck tmux libfuse2 fuse software-properties-common libpng-dev \
         libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev libsqlite3-dev libncurses-dev \
         automake autoconf xsltproc fop dialog mosh -y
