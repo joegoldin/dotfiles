@@ -10,6 +10,8 @@ else
     set log_file (pwd)/install.log
 end
 
+set script_dir (dirname (status --current-filename))
+
 function log
     set message $argv[1]
     set currDate (date +"%Y-%m-%d %T")
@@ -65,7 +67,7 @@ function install_software_linux
         libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev libsqlite3-dev libncurses-dev \
         automake autoconf xsltproc fop dialog mosh -y
     check_and_or_install ssl-proxy "wget -qO- \"https://getbin.io/suyashkumar/ssl-proxy\" | tar xvz && sudo mv ssl-proxy* /usr/local/bin/ssl-proxy"
-    check_and_or_install go "source scripts/install_go.fish && install_go $home_dir"
+    check_and_or_install go "source $script_dir/scripts/install_go.fish && install_go $home_dir"
     check_and_or_install conda "wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $home_dir/miniconda.sh && bash $home_dir/miniconda.sh -b -p $home_dir/miniconda"
     log '✔️ Linux software installed successfully.'
 end
