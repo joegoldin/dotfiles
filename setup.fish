@@ -28,7 +28,7 @@ function brew_upgrade
         brew update
     else
         # Install Homebrew
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        /bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         log '✔️ Homebrew installed successfully -- please re-run this script.'
         exit 0
     end
