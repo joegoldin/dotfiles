@@ -4,8 +4,8 @@ function install_go
     set -e
 
     set VERSION "1.22.3"
-    set GOROOT "$argv[1]/.go"
-    set GOPATH "$argv[1]/go"
+    set -x GOROOT "$argv[1]/.go"
+    set -x GOPATH "$argv[1]/go"
     set OS (uname -s)
     set ARCH (uname -m)
 
