@@ -82,6 +82,9 @@ end
 
 function install_common_packages
     log '💽 Installing common packages...'
+    curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
+    cat .config/fish/fish_plugins | fisher install
+    nvm install lts
     python -m poetry --version &> /dev/null
     if not test $status -eq 0
         yes | pip install poetry --upgrade
@@ -155,15 +158,13 @@ end
 
 function setup_software
     log '🔧 Configuring software...'
-    curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
-    cat .config/fish/fish_plugins | fisher install
-    nvm install lts
+    # pass lol
     log '✔️ Software configured successfully.'
 end
 
 # Run script
 log '==========STARTING INSTALLATION==========='
-install_software
 link_files
+install_software
 setup_software
 log '==========INSTALLATION COMPLETE==========='
