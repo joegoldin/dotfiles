@@ -3,6 +3,11 @@
 {
   home.packages = with pkgs; [
     nnn # terminal file manager
+    
+    git
+    gh
+
+    zellij
 
     # archives
     zip
@@ -15,6 +20,7 @@
     jq # A lightweight and flexible command-line JSON processor
     yq-go # yaml processer https://github.com/mikefarah/yq
     fzf # A command-line fuzzy finder
+    wget
 
     aria2 # A lightweight multi-protocol & multi-source command-line download utility
     socat # replacement of openbsd-netcat
@@ -32,6 +38,8 @@
     caddy
     gnupg
 
+    any-nix-shell
+
     # productivity
     glow # markdown previewer in terminal
   ];
@@ -42,6 +50,12 @@
     skim = {
       enable = true;
       enableBashIntegration = true;
+    };
+
+    direnv = {
+      enable = true;
+      enableBashIntegration = true; # see note on other shells below
+      nix-direnv.enable = true;
     };
   };
 }
