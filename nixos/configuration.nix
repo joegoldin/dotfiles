@@ -6,6 +6,8 @@
   lib,
   config,
   pkgs,
+  username,
+  hostname,
   ...
 }: {
   # You can import other NixOS modules here
@@ -22,6 +24,8 @@
 
     # Import your generated (nixos-generate-config) hardware configuration
     ./hardware-configuration.nix
+
+    inputs.nixos-wsl.nixosModules.default
     ./wsl.nix
   ];
 
@@ -79,11 +83,11 @@
     nixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
   };
 
-  networking.hostName = "joe-desktop";
+  networking.hostName = hostname;
 
   users.users = {
-    joe = {
-      # TODO: You can set an initial password for your user.
+    username = {
+      # You can set an initial password for your user.
       # If you do, you can skip setting a root password by passing '--no-root-passwd' to nixos-install.
       # Be sure to change it (using passwd) after rebooting!
       hashedPassword = "***REMOVED***";
@@ -91,7 +95,7 @@
       openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP0vgzxNgZd51jZ3K/s64jltFRSyVLxjLPWM4Q6747Zw"
       ];
-      extraGroups = ["wheel", "audio", "video", "docker", "networkmanager"];
+      extraGroups = ["wheel" "audio" "video" "docker" "networkmanager"];
     };
   };
 
@@ -107,6 +111,17 @@
       PasswordAuthentication = false;
     };
   };
+
+  # ld for wsl for vscode server
+  programs.nix-ld = {
+    enable = true;
+    package = pkgs.nix-ld-rs;
+  };
+
+  environment.systemPackages = with pkgs; [
+    git
+    wget
+  ];
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "24.05";
