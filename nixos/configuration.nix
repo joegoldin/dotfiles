@@ -86,7 +86,8 @@
   networking.hostName = hostname;
 
   users.users = {
-    username = {
+    "${username}" = {
+      shell = pkgs.bash;
       # You can set an initial password for your user.
       # If you do, you can skip setting a root password by passing '--no-root-passwd' to nixos-install.
       # Be sure to change it (using passwd) after rebooting!
@@ -116,6 +117,20 @@
   programs.nix-ld = {
     enable = true;
     package = pkgs.nix-ld-rs;
+  };
+
+  # enable fish so we have it for default shell
+  programs.fish.enable = true;
+
+  # load fish when bash starts
+  programs.bash = {
+    interactiveShellInit = ''
+      if [[ $(${pkgs.procps}/bin/ps --no-header --pid=$PPID --format=comm) != "fish" && -z ''${BASH_EXECUTION_STRING} ]]
+      then
+        shopt -q login_shell && LOGIN_OPTION='--login' || LOGIN_OPTION=""
+        exec ${pkgs.fish}/bin/fish $LOGIN_OPTION
+      fi
+    '';
   };
 
   environment.systemPackages = with pkgs; [
