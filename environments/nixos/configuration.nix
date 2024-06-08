@@ -23,10 +23,7 @@
     # ./users.nix
 
     # Import your generated (nixos-generate-config) hardware configuration
-    ./hardware-configuration.nix
-
-    inputs.nixos-wsl.nixosModules.default
-    ./wsl.nix
+    # ./hardware-configuration.nix # TODO generate this
   ];
 
   nixpkgs = {
