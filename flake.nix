@@ -15,6 +15,9 @@
 
     # wsl
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
+    
+    # 1password shell plugins
+    _1password-shell-plugins.url = "github:1Password/shell-plugins";
   };
 
   outputs = {
