@@ -42,15 +42,12 @@
     };
 
     taps = [
-      "homebrew/cask-fonts"
       "homebrew/services"
-      "homebrew/cask-versions"
       "argoproj/tap"
       "assemblyai/assemblyai"
       "cloudflare/cloudflare"
       "derailed/k9s"
       "homebrew/bundle"
-      "homebrew/cask-versions"
       "homebrew/services"
       "ibigio/tap"
       "saulpw/vd"
@@ -63,7 +60,6 @@
     # TODO Feel free to add your favorite apps here.
     brews = [
       "act"
-      "argoproj/tap/kubectl-argo-rollouts"
       "asciinema"
       "asdf"
       "assemblyai/assemblyai/assemblyai"
