@@ -92,6 +92,8 @@
     };
   };
 
+  services.nix-daemon.enable = true;
+
   # enable fish so we have it for default shell
   programs.fish.enable = true;
 
