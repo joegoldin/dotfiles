@@ -7,7 +7,6 @@
   #  NOTE: Your can find all available options in:
   #    https://daiderd.com/nix-darwin/manual/index.html
   # 
-  # TODO Fell free to modify this file to fit your needs.
   #
   ##########################################################################
 
@@ -31,7 +30,6 @@
     # otherwise Apple Store will refuse to install them.
     # For details, see https://github.com/mas-cli/mas 
     masApps = {
-      # TODO Feel free to add your favorite apps here.
       Xcode = 497799835;
       JumpDesktop = 524141863;
       TheUnarchiver = 425424353;
@@ -45,7 +43,6 @@
       "homebrew/services"
       "argoproj/tap"
       "assemblyai/assemblyai"
-      "cloudflare/cloudflare"
       "derailed/k9s"
       "homebrew/bundle"
       "homebrew/services"
@@ -57,7 +54,6 @@
     ];
 
     # `brew install`
-    # TODO Feel free to add your favorite apps here.
     brews = [
       "act"
       "asciinema"
@@ -65,7 +61,7 @@
       "assemblyai/assemblyai/assemblyai"
       "autoconf@2.69"
       "awscli"
-      "cloudflare/cloudflare/cloudflared"
+      "cloudflared"
       "cmake"
       "croc"
       "derailed/k9s/k9s"
@@ -121,7 +117,6 @@
     ];
 
     # `brew install --cask`
-    # TODO Feel free to add your favorite apps here.
     casks = [
       "arc"
       "google-chrome"
