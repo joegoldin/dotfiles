@@ -3,6 +3,7 @@
 {
   home.packages = with pkgs; [
     nnn # terminal file manager
+    nix
 
     git
     gh

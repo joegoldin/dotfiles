@@ -24,7 +24,7 @@
     ./git.nix
     ./starship.nix
 
-    inputs._1password-shell-plugins.hmModules.default
+    # inputs._1password-shell-plugins.hmModules.default
   ];
 
   # Enable home-manager
