@@ -8,6 +8,7 @@
     # at the same time. Here's an working example:
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     # Also see the 'unstable-packages' overlay at 'overlays/default.nix'.
+    nixpkgs-darwin.url = "github:nixos/nixpkgs/nixpkgs-24.05-darwin";
 
     # Home manager
     home-manager.url = "github:nix-community/home-manager/release-24.05";
@@ -18,6 +19,12 @@
     
     # 1password shell plugins
     _1password-shell-plugins.url = "github:1Password/shell-plugins";
+
+    # darwin
+    darwin = {
+      url = "github:lnl7/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs-darwin";
+    };
   };
 
   outputs = {
@@ -25,6 +32,7 @@
     nixpkgs,
     home-manager,
     nixos-wsl,
+    darwin,
     ...
   } @ inputs: let
     inherit (self) outputs;
@@ -39,10 +47,11 @@
     username = "joe";
     useremail = "joe@joegold.in";
     hostname = "${username}-desktop-nix";
+    homeDirectory = nixpkgs.lib.mkForce "/home/${username}";
     specialArgs =
       inputs
       // {
-        inherit inputs outputs username useremail hostname;
+        inherit inputs outputs username useremail hostname homeDirectory;
       };
     # This is a function that generates an attribute by calling a function you
     # pass to it, with each system as an argument
@@ -78,7 +87,28 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = specialArgs;
-            home-manager.users.joe = import ./home-manager/home.nix;
+            home-manager.users."${specialArgs.username}" = import ./home-manager/home.nix;
+          }
+        ];
+      };
+    };
+
+    # Darwin/macOS configuration entrypoint
+    # Available through 'darwin-rebuild --flake .#joe-macos'
+    darwinConfigurations = {
+      joe-macos = darwin.lib.darwinSystem {
+        specialArgs = specialArgs // {
+          username = "joegoldin";
+          homeDirectory = nixpkgs.lib.mkForce "/Users/${specialArgs.username}";
+        };
+        modules = [
+          ./darwin/configuration.nix
+          home-manager.darwinModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = specialArgs;
+            home-manager.users."${specialArgs.username}" = import ./home-manager/home.nix;
           }
         ];
       };
