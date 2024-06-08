@@ -7,6 +7,7 @@
   config,
   pkgs,
   username,
+  homeDirectory,
   ...
 }: {
   # You can import other home-manager modules here
@@ -43,7 +44,7 @@
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   home = {
     username = username;
-    homeDirectory = "/home/${username}";
+    homeDirectory = homeDirectory;
     stateVersion = "24.05";
   };
 }
