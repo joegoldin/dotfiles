@@ -8,6 +8,7 @@
   pkgs,
   username,
   hostname,
+  stateVersion,
   ...
 }: {
   # You can import other NixOS modules here
@@ -119,9 +120,6 @@
     package = pkgs.nix-ld-rs;
   };
 
-  # enable fish so we have it for default shell
-  programs.fish.enable = true;
-
   # load fish when bash starts
   programs.bash = {
     interactiveShellInit = ''
@@ -139,5 +137,5 @@
   ];
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-  system.stateVersion = "24.05";
+  system.stateVersion = stateVersion;
 }
