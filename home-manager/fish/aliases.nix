@@ -28,8 +28,18 @@ in
 		nbn = "nix build nixpkgs#";
 		nf = "nix flake";
 
+		ga = "git add";
+		gp = "git push";
+		gc = "git commit";
+		gd = "git diff";
+		gf = "git fetch";
+		gl = "git log";
+		gs = "git status";
+
 		snr = "sudo nixos-rebuild --flake .#joe-desktop";
 		snrs = "sudo nixos-rebuild --flake .#joe-desktop switch";
+		snrmac = "sudo nixos-rebuild --flake .#joe-macos";
+		snrsmac = "sudo nixos-rebuild --flake .#joe-macos switch";
 
 		s = mkIf hasSpecialisationCli "specialisation";
 
