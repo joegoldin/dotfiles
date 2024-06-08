@@ -3,9 +3,10 @@
 {
   home.packages = with pkgs; [
     nnn # terminal file manager
-    
+
     git
     gh
+    awscli2
 
     zellij
 
