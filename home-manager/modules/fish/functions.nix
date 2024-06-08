@@ -29,7 +29,7 @@
 
     # Transcribe the file with speaker detection and labels, summarization in bullet points and key topics detection
     echo "Transcribing and summarizing: $latest_m4a"
-    assemblyai transcribe "$latest_m4a" --speaker_labels=true --boost_param default --summarization=true --summary_model conversational --topic_detection=true # --word_boost "Skillz" 
+    assemblyai transcribe "$latest_m4a" --speaker_labels=true --boost_param default --summarization=true --summary_model conversational --topic_detection=true # --word_boost "Skillz"
   '';
 
   transcribe_file = ''
@@ -44,10 +44,10 @@
 
     # Transcribe the file with speaker detection and labels
     echo "Transcribing: $file_path"
-    assemblyai transcribe "$file_path" --speaker_labels=true --boost_param default # --word_boost "Skillz" 
-    '';
+    assemblyai transcribe "$file_path" --speaker_labels=true --boost_param default # --word_boost "Skillz"
+  '';
 
-    transcribe_file_summary = ''
+  transcribe_file_summary = ''
     # Takes a file as a parameter and transcribes it with summary
     set file_path $argv[1]
 
@@ -59,7 +59,7 @@
 
     # Transcribe the file with speaker detection and labels, summarization in bullet points and key topics detection
     echo "Transcribing and summarizing: $file_path"
-    assemblyai transcribe "$file_path" --speaker_labels=true --boost_param default --summarization=true --summary_mode bullets # --word_boost "Skillz" 
+    assemblyai transcribe "$file_path" --speaker_labels=true --boost_param default --summarization=true --summary_mode bullets # --word_boost "Skillz"
   '';
 
   ask = "clai query $argv";
@@ -85,7 +85,7 @@
     # Get the argument (question)
     set question (string join ' ' $argv)
 
-    rask "Given: \"$input_lines\"\n$question" 
+    rask "Given: \"$input_lines\"\n$question"
   '';
 
   askraw = "clai -raw query $argv";
@@ -104,14 +104,14 @@
   askcmd = ''
     set output (askrawcommand $argv)
     echo "$output"
-    echo "$output" | pbcopy 
+    echo "$output" | pbcopy
   '';
 
   askprevcmd = ''
     # Get the argument (question)
     set question (string join ' ' $argv)
 
-    ask "Previous Command: $history[1] \nGiven: $question" 
+    ask "Previous Command: $history[1] \nGiven: $question"
   '';
 
   cask = "clai -chat-model claude-3-opus-20240229 query $argv";
@@ -127,7 +127,7 @@
     # Get the argument (question)
     set question (string join ' ' $argv)
 
-    cask "Given: \"$input_lines\"\n$question" 
+    cask "Given: \"$input_lines\"\n$question"
   '';
 
   craskinput = ''
@@ -137,7 +137,7 @@
     # Get the argument (question)
     set question (string join ' ' $argv)
 
-    crask "Given: \"$input_lines\"\n$question" 
+    crask "Given: \"$input_lines\"\n$question"
   '';
 
   caskraw = "clai -chat-model claude-3-opus-20240229 -raw query $argv";
@@ -145,12 +145,12 @@
   caskcopy = ''
     set output (caskraw $argv)
     echo "$output"
-    echo "$output" | pbcopy 
+    echo "$output" | pbcopy
   '';
 
   caskrawcommand = ''
     set -l prompt "You are a terminal CLI tool that answers user questions by generating valid Fish shell commands. Your output should be ready to execute directly in the terminal, without any additional comments, notes, or formatting. NO MARKDOWN."
-    clai -chat-model claude-3-opus-20240229 -raw query "$prompt\nUser input: $argv" 
+    clai -chat-model claude-3-opus-20240229 -raw query "$prompt\nUser input: $argv"
   '';
 
   caskcmd = ''

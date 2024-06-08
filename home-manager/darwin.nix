@@ -8,6 +8,7 @@
   pkgs,
   username,
   homeDirectory,
+  stateVersion,
   ...
 }: {
   imports = [

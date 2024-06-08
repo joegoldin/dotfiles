@@ -1,6 +1,4 @@
-{ pkgs, ... }:
-
-{
+{pkgs, ...}: {
   home.packages = with pkgs; [
     nnn # terminal file manager
     nix
@@ -24,6 +22,7 @@
     jq # A lightweight and flexible command-line JSON processor
     yq-go # yaml processer https://github.com/mikefarah/yq
     fzf # A command-line fuzzy finder
+    grc
     wget
 
     aria2 # A lightweight multi-protocol & multi-source command-line download utility

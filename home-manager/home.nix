@@ -8,6 +8,7 @@
   pkgs,
   username,
   homeDirectory,
+  stateVersion,
   ...
 }: {
   # You can import other home-manager modules here
@@ -32,9 +33,7 @@
   systemd.user.startServices = "sd-switch";
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-  home = {
-    username = username;
-    homeDirectory = homeDirectory;
-    stateVersion = "24.05";
-  };
+  home.stateVersion = stateVersion;
+  home.username = username;
+  home.homeDirectory = homeDirectory;
 }
