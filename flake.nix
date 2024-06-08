@@ -10,6 +10,12 @@
     # Also see the 'unstable-packages' overlay at 'overlays/default.nix'.
     nixpkgs-darwin.url = "github:nixos/nixpkgs/nixpkgs-24.05-darwin";
 
+    # darwin
+    darwin = {
+      url = "github:lnl7/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs-darwin";
+    };
+
     # Home manager
     home-manager.url = "github:nix-community/home-manager/release-24.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
@@ -19,12 +25,6 @@
     
     # 1password shell plugins
     # _1password-shell-plugins.url = "github:1Password/shell-plugins";
-
-    # darwin
-    darwin = {
-      url = "github:lnl7/nix-darwin";
-      inputs.nixpkgs.follows = "nixpkgs-darwin";
-    };
   };
 
   outputs = {
@@ -81,13 +81,31 @@
         modules = [
           nixos-wsl.nixosModules.default
           # > Our main nixos configuration file <
-          ./nixos/configuration.nix
+          ./environments/wsl/configuration.nix
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = specialArgs;
-            home-manager.users."${specialArgs.username}" = import ./home-manager/home.nix;
+            home-manager.users."${specialArgs.username}" = import ./home-manager/nixos.nix;
+          }
+        ];
+      };
+
+      joe-nixos = nixpkgs.lib.nixosSystem {
+        specialArgs = specialArgs // {
+          hostname = "joe-nixos";
+        };
+        modules = [
+          nixos-wsl.nixosModules.default
+          # > Our main nixos configuration file <
+          ./environments/nixos/configuration.nix
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = specialArgs;
+            home-manager.users."${specialArgs.username}" = import ./home-manager/wsl.nix;
           }
         ];
       };
@@ -102,13 +120,13 @@
           homeDirectory = nixpkgs.lib.mkForce "/Users/${specialArgs.username}";
         };
         modules = [
-          ./darwin/configuration.nix
+          ./environments/darwin/configuration.nix
           home-manager.darwinModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = specialArgs;
-            home-manager.users."${specialArgs.username}" = import ./home-manager/home.nix;
+            home-manager.users."${specialArgs.username}" = import ./home-manager/darwin.nix;
           }
         ];
       };
