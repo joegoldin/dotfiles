@@ -5,6 +5,8 @@
     nnn # terminal file manager
     nix
 
+    clai-go # from go package via overlay
+
     git
     gh
     awscli2
