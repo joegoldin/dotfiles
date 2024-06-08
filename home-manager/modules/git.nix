@@ -33,22 +33,7 @@
       init.defaultBranch = "main";
       push.autoSetupRemote = true;
       pull.rebase = true;
-
-      # gpg = {
-      #   format = "ssh";
-      # };
-      # "gpg \"ssh\"" = {
-      #   program = "${lib.getExe' pkgs._1password-gui "op-ssh-sign"}";
-      # };
-      # commit = {
-      #   gpgsign = true;
-      # };
     };
-
-    # signing = {
-    #   key = "xxx";
-    #   signByDefault = true;
-    # };
 
     delta = {
       enable = true;
