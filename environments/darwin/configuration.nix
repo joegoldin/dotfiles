@@ -94,9 +94,6 @@
 
   services.nix-daemon.enable = true;
 
-  # enable fish so we have it for default shell
-  programs.fish.enable = true;
-
   # load fish when bash starts
   programs.bash = {
     interactiveShellInit = ''
@@ -112,7 +109,4 @@
     git
     wget
   ];
-
-  # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-#   system.stateVersion = "24.05";
 }
