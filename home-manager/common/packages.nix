@@ -2,6 +2,7 @@
   home.packages = with pkgs; [
     nnn # terminal file manager
     nix
+    devenv
 
     clai-go # from go package via overlay
 
@@ -65,8 +66,9 @@
 
     zellij = {
       enable = true;
-      enableFishIntegration = true;
-      enableBashIntegration = true;
+      enableFishIntegration = false;
+      enableBashIntegration = false;
+      enableZshIntegration = false;
     };
   };
 }

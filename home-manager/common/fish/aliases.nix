@@ -23,7 +23,7 @@ in {
     urlencode = "python3 -c 'import sys, urllib.parse as ul; print(ul.quote_plus(sys.stdin.read()))'";
 
     n = "nix";
-    nd = "nix develop -c $SHELL";
+    nd = "nix develop --impure -c fish";
     ns = "nix shell";
     nsn = "nix shell nixpkgs#";
     nb = "nix build";
