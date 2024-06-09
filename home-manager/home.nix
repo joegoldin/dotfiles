@@ -20,8 +20,8 @@
     # inputs.nix-colors.homeManagerModules.default
 
     # You can also split up your configuration and import pieces of it here:
-    ./modules/shell.nix
     ./modules/core.nix
+    ./modules/shell.nix
     ./modules/git.nix
     ./modules/starship.nix
   ];
@@ -36,4 +36,10 @@
   home.stateVersion = stateVersion;
   home.username = username;
   home.homeDirectory = homeDirectory;
+
+  # copy xdg config files
+  home.file."${config.xdg.configHome}" = {
+    source = ../dotfiles;
+    recursive = true;
+  };
 }

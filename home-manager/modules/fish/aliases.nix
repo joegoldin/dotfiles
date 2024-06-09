@@ -38,8 +38,8 @@ in {
     gl = "git log";
     gs = "git status";
 
-    snr = "sudo nixos-rebuild --flake .#joe-desktop";
-    snrs = "sudo nixos-rebuild --flake .#joe-desktop switch";
+    snrwsl = "sudo nixos-rebuild --flake .#joe-wsl";
+    snrswsl = "sudo nixos-rebuild --flake .#joe-wsl switch";
     snrmac = "sudo nixos-rebuild --flake .#joe-macos";
     snrsmac = "sudo nixos-rebuild --flake .#joe-macos switch";
 
