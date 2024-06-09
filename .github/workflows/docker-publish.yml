@@ -7,8 +7,8 @@ on:
     tags: [ 'v*.*.*' ]
     # when Dockerfile or this file change
     paths:
-      - '.devcontainer/Dockerfile'
-      - '.github/workflows/docker-publish.yml'
+      - '.devcontainer/**'
+      - '.github/workflows/**'
 
 env:
   # Use docker.io for Docker Hub if empty
