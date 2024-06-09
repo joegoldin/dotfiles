@@ -1,7 +1,7 @@
 # See here for base image contents: https://github.com/microsoft/vscode-dev-containers/tree/v0.194.0/containers/alpine/.devcontainer/base.Dockerfile
 
 ARG ALPINE_VERSION="3.20"
-FROM mcr.microsoft.com/vscode/devcontainers/base:0-alpine-${ALPINE_VERSION}
+FROM mcr.microsoft.com/devcontainers/base:alpine-${ALPINE_VERSION}
 
 USER root
 
@@ -44,8 +44,20 @@ RUN rm -r /nix-release \
 USER ${USERNAME}
 RUN . $HOME/.nix-profile/etc/profile.d/nix.sh \
   && $HOME/.nix-profile/bin/nix-collect-garbage --delete-old
-  # && $HOME/.nix-profile/bin/nix-store --optimise
+  # && $HOME/.nix-profile/bin/nix-store --optimise \
   # && $HOME/.nix-profile/bin/nix-store --verify --check-contents
+
+RUN version="0.35.0" \
+    && commit="5f9353ed8be369c4ac2b4d43596f5ff281746ec0" \
+    && url="https://cursor.blob.core.windows.net/remote-releases/${version}-${commit}/vscode-reh-linux-x64.tar.gz" \
+    && outDir="/home/vscode/.cursor-server/bin/$commit" \
+    && mkdir -p $outDir \
+    && mkdir /home/vscode/temp-cursor-server \
+    && curl -L $url -o /home/vscode/vscode-reh-linux-x64.tar.gz \
+    && tar -xzvf /home/vscode/vscode-reh-linux-x64.tar.gz -C /home/vscode/temp-cursor-server \
+    && cp -r /home/vscode/temp-cursor-server/vscode-reh-linux-x64/* $outDir \
+    && rm -rf /home/vscode/temp-cursor-server \
+    && rm -rf /home/vscode/vscode-reh-linux-x64.tar.gz
 
 # Podman does not support onbuild, but it tolerates it.
 ONBUILD ENV \
