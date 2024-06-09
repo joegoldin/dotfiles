@@ -43,9 +43,9 @@ RUN rm -r /nix-release \
 # you manage your Go installation from your shell.nix.
 USER ${USERNAME}
 RUN . $HOME/.nix-profile/etc/profile.d/nix.sh \
-  && $HOME/.nix-profile/bin/nix-collect-garbage --delete-old
-  # && $HOME/.nix-profile/bin/nix-store --optimise \
-  # && $HOME/.nix-profile/bin/nix-store --verify --check-contents
+  && $HOME/.nix-profile/bin/nix-collect-garbage --delete-old \
+  && $HOME/.nix-profile/bin/nix-store --optimise \
+  && $HOME/.nix-profile/bin/nix-store --verify --check-contents
 
 RUN version="0.35.0" \
     && commit="5f9353ed8be369c4ac2b4d43596f5ff281746ec0" \
