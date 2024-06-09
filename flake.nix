@@ -88,7 +88,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = specialArgs;
-            home-manager.users.${specialArgs.username} = import ./home-manager/wsl.nix;
+            home-manager.users.${specialArgs.username} = import ./home-manager/wsl;
           }
         ];
       };
@@ -107,7 +107,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = specialArgs;
-            home-manager.users.${specialArgs.username} = import ./home-manager/nixos.nix;
+            home-manager.users.${specialArgs.username} = import ./home-manager/nixos;
           }
         ];
       };
@@ -130,7 +130,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = specialArgs;
-            home-manager.users.${specialArgs.username} = import ./home-manager/darwin.nix;
+            home-manager.users.${specialArgs.username} = import ./home-manager/darwin;
           }
         ];
       };

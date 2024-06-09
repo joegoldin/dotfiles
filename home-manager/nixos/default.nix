@@ -12,6 +12,7 @@
   ...
 }: {
   imports = [
-    ./home.nix
+    ../common
+    ../common/cursor-linux-server.nix
   ];
 }
