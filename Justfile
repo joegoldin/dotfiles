@@ -1,5 +1,5 @@
 develop:
-	nix develop --impure . -c fish
+	nix --extra-experimental-features nix-command --extra-experimental-features flakes develop --impure . -c fish
 
 lint:
   nix fmt
