@@ -38,8 +38,8 @@
   home.homeDirectory = homeDirectory;
 
   # copy xdg config files
-  home.file."${config.xdg.configHome}" = {
-    source = ../dotfiles;
+  home.file."${config.xdg.configHome}/." = {
+    source = ../.config;
     recursive = true;
   };
 }
