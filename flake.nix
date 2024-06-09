@@ -27,6 +27,10 @@
     devenv.url = "github:cachix/devenv";
   };
 
+  nixConfig = {
+    experimental-features = "nix-command flakes";
+  };
+
   outputs = {
     self,
     nixpkgs,
