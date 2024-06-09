@@ -40,7 +40,7 @@
 
   # copy xdg config files
   home.file."${config.xdg.configHome}/." = {
-    source = ../../dotconfig;
+    source = ../../environments/common/dotconfig;
     recursive = true;
   };
 }
