@@ -3,7 +3,7 @@ name: Docker
 on:
   workflow_dispatch: {}
   push:
-    # Publish semver tags as releases.
+    # Publish semver tags as releases
     tags: [ 'v*.*.*' ]
     # when Dockerfile or this file change
     paths:
