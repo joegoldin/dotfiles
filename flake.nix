@@ -37,8 +37,7 @@
     flake-utils,
     systems,
     ...
-  } @ inputs:
-   let
+  } @ inputs: let
     inherit (self) outputs;
     username = "joe";
     useremail = "joe@joegold.in";
@@ -66,30 +65,33 @@
     # Your custom packages and modifications, exported as overlays
     overlays = import ./environments/common/overlays {inherit inputs;};
 
-    devShells = eachSystem (system:
-      let
-        pkgs = nixpkgs.legacyPackages.${system};
-      in
-      {
-        default = devenv.lib.mkShell {
-          inherit inputs pkgs;
-          modules = [
-            ({ pkgs, config, ... }: {
-              packages = [ 
-                pkgs.hello
-                pkgs.git
-                pkgs.git-lfs
-                pkgs.python312Full
-              ];
+    devShells = eachSystem (system: let
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
+      default = devenv.lib.mkShell {
+        inherit inputs pkgs;
+        modules = [
+          ({
+            pkgs,
+            config,
+            ...
+          }: {
+            packages = [
+              pkgs.hello
+              pkgs.git
+              pkgs.git-lfs
+              pkgs.python312Full
+              pkgs.just
+            ];
 
-              enterShell = ''
-                hello
-              '';
+            enterShell = ''
+              hello
+            '';
 
-              processes.run.exec = "hello";
-            })
-          ];
-        };
+            processes.run.exec = "hello";
+          })
+        ];
+      };
     });
 
     # NixOS configuration entrypoint

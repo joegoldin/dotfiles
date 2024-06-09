@@ -10,7 +10,7 @@ RUN sed -i -e 's/^root::/root:!:/' /etc/shadow
 
 RUN apk update \
  && apk upgrade \
- && apk add openssl curl bash sudo xz git httpie wget \
+ && apk add openssl curl bash sudo xz git httpie wget just \
  && rm -rf /var/cache/apk/*
 
 # See here for how to integrate Nix into Alpine: https://github.com/redoracle/nixos/blob/master/Dockerfile
