@@ -1,7 +1,15 @@
 # common/default.nix
-{ lib, inputs, outputs, pkgs, config, username, hostname, stateVersion, ... }:
-
 {
+  lib,
+  inputs,
+  outputs,
+  pkgs,
+  config,
+  username,
+  hostname,
+  stateVersion,
+  ...
+}: {
   imports = [
     # You can import other NixOS modules here
   ];
@@ -36,7 +44,7 @@
       options = lib.mkDefault "--delete-older-than 7d";
     };
 
-    registry = lib.mapAttrs (_: flake: { inherit flake; }) flakeInputs;
+    registry = lib.mapAttrs (_: flake: {inherit flake;}) flakeInputs;
     nixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
   };
 

@@ -1,7 +1,15 @@
 # common/default.nix
-{ lib, inputs, outputs, pkgs, config, username, hostname, stateVersion, ... }:
-
 {
+  lib,
+  inputs,
+  outputs,
+  pkgs,
+  config,
+  username,
+  hostname,
+  stateVersion,
+  ...
+}: {
   imports = [
     ../nixos/configuration.nix
     ./hardware-configuration.nix
