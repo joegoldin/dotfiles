@@ -12,6 +12,6 @@
   ...
 }: {
   imports = [
-    ./home.nix
+    ../common
   ];
 }
