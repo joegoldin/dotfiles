@@ -1,5 +1,5 @@
 {
-  "image": "ghcr.io/joegoldin/dotfiles:main",
+  "image": "ghcr.io/joegoldin/dotfiles:latest",
   "customizations": {
     "vscode": {
       "settings": {},
