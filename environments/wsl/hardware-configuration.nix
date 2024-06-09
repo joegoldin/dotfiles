@@ -8,8 +8,6 @@
   modulesPath,
   ...
 }: {
-  imports = [];
-
   boot.initrd.availableKernelModules = ["virtio_pci"];
   boot.initrd.kernelModules = [];
   boot.kernelModules = ["kvm-intel"];

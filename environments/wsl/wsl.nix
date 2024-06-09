@@ -14,7 +14,7 @@
     startMenuLaunchers = true;
 
     # Enable integration with Docker Desktop (needs to be installed)
-    docker-desktop.enable = false;
+    docker-desktop.enable = false; # false but it works!
 
     extraBin = with pkgs; [
       # Binaries for Docker Desktop wsl-distro-proxy
