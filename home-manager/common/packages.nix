@@ -3,6 +3,7 @@
     nnn # terminal file manager
     nix
     devenv
+    just
 
     clai-go # from go package via overlay
 

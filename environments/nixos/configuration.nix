@@ -1,10 +1,20 @@
 # This is your system's configuration file.
 # Use this to configure your system environment (it replaces /etc/nixos/configuration.nix)
-{ inputs, outputs, lib, config, pkgs, username, hostname, stateVersion, ... }:
-
+{
+  inputs,
+  outputs,
+  lib,
+  config,
+  pkgs,
+  username,
+  hostname,
+  stateVersion,
+  ...
+}:
 import ../common/default.nix {
   inherit lib inputs outputs config pkgs username hostname stateVersion;
-} // {
+}
+// {
   imports = [
     # we import these in the default.nix because we share this config with wsl
   ];
