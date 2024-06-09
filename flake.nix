@@ -65,6 +65,22 @@
     # Your custom packages and modifications, exported as overlays
     overlays = import ./environments/common/overlays {inherit inputs;};
 
+    devShells = forAllSystems (system: nixpkgs.legacyPackages.${system}.mkShell {
+      name = "nix-dev-shell";
+      buildInputs = [
+        nixpkgs.legacyPackages.${system}.git
+        nixpkgs.legacyPackages.${system}.nodejs
+        nixpkgs.legacyPackages.${system}.yarn
+        nixpkgs.legacyPackages.${system}.python312Full
+        nixpkgs.legacyPackages.${system}.docker
+        # Add any other packages you need for your development environment
+      ];
+
+      shellHook = ''
+        echo "Welcome to the development shell!"
+      '';
+    });
+
     # NixOS configuration entrypoint
     # Available through 'nixos-rebuild --flake .#joe-wsl'
     nixosConfigurations = {
