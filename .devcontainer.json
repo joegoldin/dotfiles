@@ -10,11 +10,7 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-vscode.makefile-tools",
-        "arrterian.nix-env-selector",
-        "bbenoist.Nix",
-        "jnoortheen.nix-ide",
-        "brettm12345.nixfmt-vscode"
+        "ms-vscode.makefile-tools"
       ]
     }
   }
