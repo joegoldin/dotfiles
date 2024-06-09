@@ -42,32 +42,32 @@ RUN rm -r /nix-release \
 # We install nixpkgs.go so the Go extension can bootstrap gopls, goimports, etc.  But it is better for your project if
 # you manage your Go installation from your shell.nix.
 USER ${USERNAME}
-RUN . $HOME/.nix-profile/etc/profile.d/nix.sh \
-  && $HOME/.nix-profile/bin/nix-collect-garbage --delete-old \
-  && $HOME/.nix-profile/bin/nix-store --optimise \
-  && $HOME/.nix-profile/bin/nix-store --verify --check-contents
+RUN . /home/${USERNAME}/.nix-profile/etc/profile.d/nix.sh \
+  && /home/${USERNAME}/.nix-profile/bin/nix-collect-garbage --delete-old \
+  && /home/${USERNAME}/.nix-profile/bin/nix-store --optimise \
+  && /home/${USERNAME}/.nix-profile/bin/nix-store --verify --check-contents
 
 RUN version="0.35.0" \
     && commit="5f9353ed8be369c4ac2b4d43596f5ff281746ec0" \
     && url="https://cursor.blob.core.windows.net/remote-releases/${version}-${commit}/vscode-reh-linux-x64.tar.gz" \
     && outDir="/home/vscode/.cursor-server/bin/$commit" \
     && mkdir -p $outDir \
-    && mkdir /home/vscode/temp-cursor-server \
-    && curl -L $url -o /home/vscode/vscode-reh-linux-x64.tar.gz \
-    && tar -xzvf /home/vscode/vscode-reh-linux-x64.tar.gz -C /home/vscode/temp-cursor-server \
-    && cp -r /home/vscode/temp-cursor-server/vscode-reh-linux-x64/* $outDir \
-    && rm -rf /home/vscode/temp-cursor-server \
-    && rm -rf /home/vscode/vscode-reh-linux-x64.tar.gz
+    && mkdir /home/${USERNAME}/temp-cursor-server \
+    && curl -L $url -o /home/${USERNAME}/vscode-reh-linux-x64.tar.gz \
+    && tar -xzvf /home/${USERNAME}/vscode-reh-linux-x64.tar.gz -C /home/${USERNAME}/temp-cursor-server \
+    && cp -r /home/${USERNAME}/temp-cursor-server/vscode-reh-linux-x64/* $outDir \
+    && rm -rf /home/${USERNAME}/temp-cursor-server \
+    && rm -rf /home/${USERNAME}/vscode-reh-linux-x64.tar.gz
 
 # Podman does not support onbuild, but it tolerates it.
 ONBUILD ENV \
     ENV=/etc/profile \
     USER=${USERNAME} \
-    PATH=$HOME/.nix-profile/bin:/nix/var/nix/profiles/per-user/${USERNAME}/profile/bin:/nix/var/nix/profiles/per-user/${USERNAME}/profile/sbin:/bin:/sbin:/usr/bin:/usr/sbin \
+    PATH=/home/${USERNAME}/.nix-profile/bin:/nix/var/nix/profiles/per-user/${USERNAME}/profile/bin:/nix/var/nix/profiles/per-user/${USERNAME}/profile/sbin:/bin:/sbin:/usr/bin:/usr/sbin \
     NIX_PATH=/nix/var/nix/profiles/per-user/${USERNAME}/channels
 
 ENV \
     ENV=/etc/profile \
     USER=${USERNAME} \
-    PATH=$HOME/.nix-profile/bin:/nix/var/nix/profiles/per-user/vscode/profile/bin:/nix/var/nix/profiles/per-user/vscode/profile/sbin:/bin:/sbin:/usr/bin:/usr/sbin \
-    NIX_PATH=/nix/var/nix/profiles/per-user/vscode/channels
+    PATH=/home/${USERNAME}/.nix-profile/bin:/nix/var/nix/profiles/per-user/${USERNAME}/profile/bin:/nix/var/nix/profiles/per-user/${USERNAME}/profile/sbin:/bin:/sbin:/usr/bin:/usr/sbin \
+    NIX_PATH=/nix/var/nix/profiles/per-user/${USERNAME}/channels
