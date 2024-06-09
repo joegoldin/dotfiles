@@ -25,6 +25,8 @@
     systems.url = "github:nix-systems/default";
     # devenv
     devenv.url = "github:cachix/devenv";
+    # nixpkgs-python
+    nixpkgs-python.url = "github:cachix/nixpkgs-python";
   };
 
   nixConfig = {
@@ -40,6 +42,7 @@
     devenv,
     flake-utils,
     systems,
+    nixpkgs-python,
     ...
   } @ inputs: let
     inherit (self) outputs;
