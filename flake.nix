@@ -78,10 +78,13 @@
           }: {
             packages = [
               pkgs.hello
+              pkgs.fish
               pkgs.git
               pkgs.git-lfs
-              pkgs.python312Full
               pkgs.just
+              pkgs.python312Full
+              pkgs.poetry
+              pkgs.direnv
             ];
 
             enterShell = ''
