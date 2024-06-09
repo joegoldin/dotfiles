@@ -13,10 +13,6 @@
       src = autopair.src;
     } # jorgebucaran/autopair
     {
-      name = "sdkman-for-fish";
-      src = sdkman-for-fish.src;
-    } # reitzig/sdkman-for-fish
-    {
       name = "puffer";
       src = puffer.src;
     } # nickeb96/puffer-fish

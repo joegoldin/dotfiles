@@ -42,6 +42,7 @@
     gnupg
 
     any-nix-shell
+    direnv
 
     # productivity
     glow # markdown previewer in terminal
