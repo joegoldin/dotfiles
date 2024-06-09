@@ -5,6 +5,10 @@ on:
   push:
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
+    # when Dockerfile or this file change
+    paths:
+      - '.devcontainer/Dockerfile'
+      - '.github/workflows/docker-publish.yml'
 
 env:
   # Use docker.io for Docker Hub if empty
