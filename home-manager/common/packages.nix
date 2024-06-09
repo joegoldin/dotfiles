@@ -2,7 +2,7 @@
   home.packages = with pkgs; [
     nnn # terminal file manager
     nix
-    cachix 
+    cachix
     devenv
     just
 
