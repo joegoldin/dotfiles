@@ -1,19 +1,5 @@
-// For format details, see https://aka.ms/devcontainer.json.
 {
-  "name": "Alpine Nix",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "args": {
-      // Update ALPINE_VERSION to pick an Alpine version: https://alpinelinux.org/releases/
-      "ALPINE_VERSION": "3.20",
-      // Update NIX_VERSION and NIX_SHA256 to change Nix versions: https://nixos.org/download.html
-      "NIX_VERSION": "2.18.2",
-      // See https://releases.nixos.org/?prefix=nix/nix-${NIX_VERSION} to find this hash.
-      "NIX_SHA256": "c4589f1968565e84ca9501307f269e62b8e3154aec891afc582a06a35aad4d7e",
-      // This must be the same as your containerUser.
-      "USERNAME": "vscode"
-    }
-  },
+  "image": "ghcr.io/joegoldin/dotfiles:main",
   "customizations": {
     "vscode": {
       "settings": {},

@@ -1,0 +1,24 @@
+name: Delete old container images
+
+on:
+  workflow_dispatch: {}
+  workflow_run:
+    workflows: [Docker]
+    types:
+      - completed
+
+jobs:
+  clean-ghcr:
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    name: Delete old unused container images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete old images
+        uses: snok/container-retention-policy@v2
+        with:
+          image-names: dotfiles*
+          cut-off: 15 minutes ago UTC
+          keep-at-least: 4
+          account-type: personal
+          skip-tags: latest, v*
+          token: ${{ secrets.PAT }}
