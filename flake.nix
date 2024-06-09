@@ -82,7 +82,7 @@
         modules = [
           nixos-wsl.nixosModules.default
           # > Our main nixos configuration file <
-          ./environments/wsl/configuration.nix
+          ./environments/wsl
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
@@ -101,7 +101,7 @@
           };
         modules = [
           # > Our main nixos configuration file <
-          ./environments/nixos/configuration.nix
+          ./environments/nixos
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
@@ -124,7 +124,7 @@
             homeDirectory = nixpkgs.lib.mkForce "/Users/${specialArgs.username}";
           };
         modules = [
-          ./environments/darwin/configuration.nix
+          ./environments/darwin
           home-manager.darwinModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
