@@ -52,13 +52,20 @@
     # Basically anywhere you would want to use grep, try sk instead.
     skim = {
       enable = true;
+      enableFishIntegration = true;
       enableBashIntegration = true;
     };
 
     direnv = {
       enable = true;
-      enableBashIntegration = true; # see note on other shells below
+      enableBashIntegration = true;
       nix-direnv.enable = true;
+    };
+
+    zellij = {
+      enable = true;
+      enableFishIntegration = true;
+      enableBashIntegration = true;
     };
   };
 }
