@@ -1,3 +1,5 @@
+# See here for base image contents: https://github.com/microsoft/vscode-dev-containers/tree/v0.194.0/containers/alpine/.devcontainer/base.Dockerfile
+
 ARG ALPINE_VERSION="3.20"
 FROM mcr.microsoft.com/devcontainers/base:alpine-${ALPINE_VERSION}
 
