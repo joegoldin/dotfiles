@@ -9,19 +9,22 @@
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     # Also see the 'unstable-packages' overlay at 'overlays/default.nix'.
     nixpkgs-darwin.url = "github:nixos/nixpkgs/nixpkgs-24.05-darwin";
-
     # darwin
     darwin = {
       url = "github:lnl7/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs-darwin";
     };
-
     # Home manager
     home-manager.url = "github:nix-community/home-manager/release-24.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-
     # wsl
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
+    # flake-utils
+    flake-utils.url = "github:numtide/flake-utils";
+    # systems
+    systems.url = "github:nix-systems/default";
+    # devenv
+    devenv.url = "github:cachix/devenv";
   };
 
   outputs = {
@@ -30,17 +33,13 @@
     home-manager,
     nixos-wsl,
     darwin,
+    devenv,
+    flake-utils,
+    systems,
     ...
-  } @ inputs: let
+  } @ inputs:
+   let
     inherit (self) outputs;
-    # Supported systems for your flake packages, shell, etc.
-    systems = [
-      "aarch64-linux"
-      "i686-linux"
-      "x86_64-linux"
-      "aarch64-darwin"
-      "x86_64-darwin"
-    ];
     username = "joe";
     useremail = "joe@joegold.in";
     hostname = "${username}-desktop-nix";
@@ -51,34 +50,46 @@
       // {
         inherit inputs outputs username useremail hostname homeDirectory stateVersion;
       };
-    # This is a function that generates an attribute by calling a function you
-    # pass to it, with each system as an argument
-    forAllSystems = nixpkgs.lib.genAttrs systems;
+    eachSystem = nixpkgs.lib.genAttrs (import systems);
+    basePackages = eachSystem (system: import ./environments/common/pkgs nixpkgs.legacyPackages.${system});
+    additionalPackages = eachSystem (system: {
+      devenv-up = self.devShells.${system}.default.config.procfileScript;
+    });
   in {
     # Your custom packages
     # Accessible through 'nix build', 'nix shell', etc
-    packages = forAllSystems (system: import ./environments/common/pkgs nixpkgs.legacyPackages.${system});
+    packages = eachSystem (system: basePackages.${system} // additionalPackages.${system});
     # Formatter for your nix files, available through 'nix fmt'
     # Other options beside 'alejandra' include 'nixpkgs-fmt'
-    formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
+    formatter = eachSystem (system: nixpkgs.legacyPackages.${system}.alejandra);
 
     # Your custom packages and modifications, exported as overlays
     overlays = import ./environments/common/overlays {inherit inputs;};
 
-    devShells = forAllSystems (system: nixpkgs.legacyPackages.${system}.mkShell {
-      name = "nix-dev-shell";
-      buildInputs = [
-        nixpkgs.legacyPackages.${system}.git
-        nixpkgs.legacyPackages.${system}.nodejs
-        nixpkgs.legacyPackages.${system}.yarn
-        nixpkgs.legacyPackages.${system}.python312Full
-        nixpkgs.legacyPackages.${system}.docker
-        # Add any other packages you need for your development environment
-      ];
+    devShells = eachSystem (system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+      in
+      {
+        default = devenv.lib.mkShell {
+          inherit inputs pkgs;
+          modules = [
+            ({ pkgs, config, ... }: {
+              packages = [ 
+                pkgs.hello
+                pkgs.git
+                pkgs.git-lfs
+                pkgs.python312Full
+              ];
 
-      shellHook = ''
-        echo "Welcome to the development shell!"
-      '';
+              enterShell = ''
+                hello
+              '';
+
+              processes.run.exec = "hello";
+            })
+          ];
+        };
     });
 
     # NixOS configuration entrypoint
