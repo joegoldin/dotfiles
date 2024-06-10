@@ -5,6 +5,7 @@
     cachix
     devenv
     just
+    pueue
 
     clai-go # from go package via overlay
 
