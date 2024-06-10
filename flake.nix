@@ -53,10 +53,10 @@
     hostname = "${username}-desktop-nix";
     homeDirectory = nixpkgs.lib.mkForce "/home/${username}";
     stateVersion = "24.05";
-    specialArgs =
+    commonSpecialArgs =
       inputs
       // {
-        inherit inputs outputs username useremail hostname homeDirectory stateVersion;
+        inherit inputs outputs useremail stateVersion username hostname homeDirectory;
       };
     eachSystem = nixpkgs.lib.genAttrs (import systems);
     basePackages = eachSystem (system: import ./environments/common/pkgs nixpkgs.legacyPackages.${system});
@@ -108,37 +108,41 @@
     # Available through 'nixos-rebuild --flake .#joe-wsl'
     nixosConfigurations = {
       joe-wsl = nixpkgs.lib.nixosSystem {
-        inherit specialArgs;
-        modules = [
-          nixos-wsl.nixosModules.default
-          # > Our main nixos configuration file <
-          ./environments/wsl
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = specialArgs;
-            home-manager.users.${specialArgs.username} = import ./home-manager/wsl;
-          }
-        ];
-      };
+          specialArgs =
+            commonSpecialArgs
+            // {
+              hostname = "joe-nixos-wsl";
+            };
+          modules = [
+            nixos-wsl.nixosModules.default
+            # > Our main nixos configuration file <
+            ./environments/wsl
+            home-manager.nixosModules.home-manager
+          ({ specialArgs, ... }: {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.extraSpecialArgs = specialArgs;
+              home-manager.users.${specialArgs.username} = import ./home-manager/wsl;
+            })
+          ];
+        };
 
       joe-nixos = nixpkgs.lib.nixosSystem {
-        specialArgs =
-          specialArgs
-          // {
-            hostname = "joe-nixos";
-          };
-        modules = [
+          specialArgs =
+            commonSpecialArgs
+            // {
+              hostname = "joe-nixos";
+            };
+          modules = [
           # > Our main nixos configuration file <
           ./environments/nixos
           home-manager.nixosModules.home-manager
-          {
+          ({ specialArgs, ... }: {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = specialArgs;
             home-manager.users.${specialArgs.username} = import ./home-manager/nixos;
-          }
+          })
         ];
       };
     };
@@ -147,21 +151,22 @@
     # Available through 'darwin-rebuild --flake .#joe-macos'
     darwinConfigurations = {
       joe-macos = darwin.lib.darwinSystem {
-        specialArgs =
-          specialArgs
-          // {
-            username = "joegoldin";
-            homeDirectory = nixpkgs.lib.mkForce "/Users/${specialArgs.username}";
-          };
-        modules = [
+          specialArgs =
+            commonSpecialArgs
+            // {
+              username = "joegoldin";
+              hostname = "joe-mac";
+              homeDirectory = nixpkgs.lib.mkForce "/Users/joegoldin";
+            };
+          modules = [
           ./environments/darwin
           home-manager.darwinModules.home-manager
-          {
+          ({ specialArgs, ... }: {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = specialArgs;
             home-manager.users.${specialArgs.username} = import ./home-manager/darwin;
-          }
+          })
         ];
       };
     };

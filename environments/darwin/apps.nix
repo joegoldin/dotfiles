@@ -117,22 +117,21 @@
 
     # `brew install --cask`
     casks = [
-      "arc"
-      "google-chrome"
+      # "arc"
+      # "google-chrome"
 
-      "cursor"
+      # "cursor"
 
-      "slack"
-      "discord"
+      # "slack"
+      # "discord"
 
-      "anki"
-      "stats"
+      # "anki"
+      # "stats"
 
       "android-platform-tools"
-      "bruno"
+      # "bruno"
       "flameshot"
-      "graphql-playground"
-      "jordanbaird-ice"
+      # "jordanbaird-ice"
       "michaelvillar-timer"
       "modern-csv"
       "ngrok"
