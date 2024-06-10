@@ -19,6 +19,13 @@ import ../common/default.nix {
     # we import these in the default.nix because we share this config with wsl
   ];
 
+  nix = let
+    flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
+  in {
+    # Opinionated: disable channels
+    channel.enable = false;
+  };
+
   programs._1password.enable = true;
   programs._1password-gui = {
     enable = true;
