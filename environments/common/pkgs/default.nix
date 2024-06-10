@@ -35,4 +35,13 @@ pkgs: {
       platforms = platforms.linux;
     };
   };
+
+  google-chrome-stable = pkgs.writeShellScriptBin "google-chrome" ''
+    exec -a $0 ${pkgs.google-chrome}/bin/google-chrome-stable $@
+  '';
+
+  aws-cli = pkgs.writeShellScriptBin "aws" ''
+    unset PYTHONPATH
+    exec ${pkgs.awscli2}/bin/aws "$@"
+  '';
 }
