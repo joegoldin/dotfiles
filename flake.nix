@@ -85,15 +85,15 @@
             config,
             ...
           }: {
-            packages = [
-              pkgs.hello
-              pkgs.fish
-              pkgs.git
-              pkgs.git-lfs
-              pkgs.just
-              pkgs.python312Full
-              pkgs.poetry
-              pkgs.direnv
+            packages = with pkgs; [
+              hello
+              fish
+              git
+              git-lfs
+              just
+              python312Full
+              poetry
+              direnv
             ];
 
             enterShell = ''
