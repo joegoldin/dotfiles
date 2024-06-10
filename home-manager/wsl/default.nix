@@ -14,6 +14,9 @@
     ../common/cursor-linux-server.nix
   ];
 
+  # lorri for nix-shell
+  services.lorri.enable = true;
+
   programs.git.extraConfig.gpg.ssh.program = "op-ssh-sign-wsl";
   programs.git.extraConfig.core.sshCommand = "ssh.exe";
   home.shellAliases = {

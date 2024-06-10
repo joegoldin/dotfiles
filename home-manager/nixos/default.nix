@@ -15,4 +15,7 @@
     ../common
     ../common/cursor-linux-server.nix
   ];
+
+  # lorri for nix-shell
+  services.lorri.enable = true;
 }
