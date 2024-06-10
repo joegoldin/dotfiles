@@ -38,10 +38,10 @@ in {
     gl = "git log";
     gs = "git status";
 
-    snrwsl = "sudo nixos-rebuild --flake .#joe-wsl";
-    snrswsl = "sudo nixos-rebuild --flake .#joe-wsl switch";
-    snrmac = "sudo nixos-rebuild --flake .#joe-macos";
-    snrsmac = "sudo nixos-rebuild --flake .#joe-macos switch";
+    snrwsl = "nix fmt && sudo nixos-rebuild --flake .#joe-wsl";
+    snrswsl = "nix fmt && sudo nixos-rebuild --flake .#joe-wsl switch";
+    snrmac = "nix fmt && sudo nixos-rebuild --flake .#joe-macos";
+    snrsmac = "nix fmt && sudo nixos-rebuild --flake .#joe-macos switch";
 
     s = mkIf hasSpecialisationCli "specialisation";
 
