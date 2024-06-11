@@ -31,13 +31,15 @@ import ../common/default.nix {
     ];
     config = {
       allowUnfree = true;
+      allowUnsupportedSystem = true;
+      experimental-features = "nix-command flakes";
     };
     hostPlatform = "aarch64-darwin";
   };
 
   users.users = {
     "${username}" = {
-      shell = pkgs.bash;
+      shell = pkgs.zsh;
       description = username;
     };
   };

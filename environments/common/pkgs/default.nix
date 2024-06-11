@@ -29,11 +29,6 @@ pkgs: {
       mkdir -p $outDir
       tar -xzvf $src -C $outDir
     '';
-
-    meta = with pkgs.lib; {
-      description = "A derivation that downloads and extracts a tarball to a specified directory.";
-      platforms = platforms.linux;
-    };
   };
 
   google-chrome-stable = pkgs.writeShellScriptBin "google-chrome" ''
