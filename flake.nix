@@ -61,7 +61,7 @@
     eachSystem = nixpkgs.lib.genAttrs (import systems);
     basePackages = eachSystem (system: import ./environments/common/pkgs nixpkgs.legacyPackages.${system});
     additionalPackages = eachSystem (system: {
-      devenv-up = self.devShells.${system}.default.config.procfileScript;
+      # devenv-up = self.devShells.${system}.default.config.procfileScript;
     });
   in {
     # Your custom packages
@@ -74,35 +74,9 @@
     # Your custom packages and modifications, exported as overlays
     overlays = import ./environments/common/overlays {inherit inputs;};
 
-    devShells = eachSystem (system: let
-      pkgs = nixpkgs.legacyPackages.${system};
-    in {
-      default = devenv.lib.mkShell {
-        inherit inputs pkgs;
-        modules = [
-          ({
-            pkgs,
-            config,
-            ...
-          }: {
-            packages = with pkgs; [
-              hello
-              fish
-              git
-              git-lfs
-              just
-              python312Full
-              poetry
-              direnv
-            ];
-
-            enterShell = ''
-              hello
-            '';
-          })
-        ];
-      };
-    });
+    nixos.config.allowUnfree = true;
+    nixos.config.allowUnsupportedSystem = true;
+    nixos.config.experimental-features = "nix-command flakes";
 
     # NixOS configuration entrypoint
     # Available through 'nixos-rebuild --flake .#joe-wsl'
@@ -122,6 +96,7 @@
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
               home-manager.extraSpecialArgs = specialArgs;
+            home-manager.backupFileExtension = "backup"; # enable moving existing files
               home-manager.users.${specialArgs.username} = import ./home-manager/wsl;
             })
           ];
@@ -141,6 +116,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = specialArgs;
+            home-manager.backupFileExtension = "backup"; # enable moving existing files
             home-manager.users.${specialArgs.username} = import ./home-manager/nixos;
           })
         ];
@@ -165,6 +141,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = specialArgs;
+            home-manager.backupFileExtension = "backup"; # enable moving existing files
             home-manager.users.${specialArgs.username} = import ./home-manager/darwin;
           })
         ];

@@ -6,6 +6,7 @@
     devenv
     just
     pueue
+    fish
 
     clai-go # from go package via overlay
 
