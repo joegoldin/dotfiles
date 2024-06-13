@@ -1,21 +1,20 @@
+# common/default.nix
 {
+  lib,
   inputs,
   outputs,
-  lib,
-  config,
   pkgs,
+  config,
   username,
   hostname,
   stateVersion,
   ...
-}:
-{
+}: {
   imports = [
-    ./system.nix
-    ./apps.nix
+    # You can import other NixOS modules here
   ];
 
-  nixpkgs.hostPlatform = lib.mkDefault "aarch64-darwin";
+  system.stateVersion = stateVersion;
 
   nixpkgs = {
     overlays = [
@@ -34,7 +33,8 @@
     flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
   in {
     settings = {
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = "nix-command flakes";
+      flake-registry = "";
       nix-path = config.nix.nixPath;
       trusted-users = ["${username}"];
       auto-optimise-store = false;
@@ -53,34 +53,24 @@
     nixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
   };
 
-  services.nix-daemon.enable = true;
-
   networking.hostName = hostname;
 
   users.users = {
     "${username}" = {
-      shell = pkgs.fish;
+      shell = pkgs.bash;
       # You can set an initial password for your user.
       # If you do, you can skip setting a root password by passing '--no-root-passwd' to nixos-install.
       # Be sure to change it (using passwd) after rebooting!
+      hashedPassword = "***REMOVED***";
+      isNormalUser = true;
       openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP0vgzxNgZd51jZ3K/s64jltFRSyVLxjLPWM4Q6747Zw"
       ];
-      description = username;
+      extraGroups = ["wheel" "audio" "video" "docker" "networkmanager"];
     };
   };
 
   programs.bash = {
-    interactiveShellInit = ''
-      if [[ $(${pkgs.procps}/bin/ps --no-header --pid=$PPID --format=comm) != "fish" && -z ''${BASH_EXECUTION_STRING} ]]
-      then
-        shopt -q login_shell && LOGIN_OPTION='--login' || LOGIN_OPTION=""
-        exec ${pkgs.fish}/bin/fish $LOGIN_OPTION
-      fi
-    '';
-  };
-
-  programs.zsh = {
     interactiveShellInit = ''
       if [[ $(${pkgs.procps}/bin/ps --no-header --pid=$PPID --format=comm) != "fish" && -z ''${BASH_EXECUTION_STRING} ]]
       then
