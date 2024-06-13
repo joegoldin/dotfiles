@@ -68,7 +68,6 @@
       "docutils"
       "entr"
       "expat"
-      "fish"
       "flyctl"
       "fontforge"
       "fx"
@@ -127,7 +126,7 @@
       # "discord"
 
       # "anki"
-      # "stats"
+      "stats"
 
       "android-platform-tools"
       # "bruno"
