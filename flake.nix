@@ -74,9 +74,9 @@
     # Your custom packages and modifications, exported as overlays
     overlays = import ./environments/common/overlays {inherit inputs;};
 
-    nixos.config.allowUnfree = true;
-    nixos.config.allowUnsupportedSystem = true;
-    nixos.config.experimental-features = "nix-command flakes";
+    # nixos.config.allowUnfree = true;
+    # nixos.config.allowUnsupportedSystem = true;
+    # nixos.config.experimental-features = "nix-command flakes";
 
     # NixOS configuration entrypoint
     # Available through 'nixos-rebuild --flake .#joe-wsl'
@@ -97,36 +97,36 @@
               home-manager.useUserPackages = true;
               home-manager.extraSpecialArgs = specialArgs;
             home-manager.backupFileExtension = "backup"; # enable moving existing files
-              home-manager.users.${specialArgs.username} = import ./home-manager/wsl;
-            })
-          ];
-        };
-
-      joe-nixos = nixpkgs.lib.nixosSystem {
-          specialArgs =
-            commonSpecialArgs
-            // {
-              hostname = "joe-nixos";
-            };
-          modules = [
-          # > Our main nixos configuration file <
-          ./environments/nixos
-          home-manager.nixosModules.home-manager
-          ({ specialArgs, ... }: {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = specialArgs;
-            home-manager.backupFileExtension = "backup"; # enable moving existing files
-            home-manager.users.${specialArgs.username} = import ./home-manager/nixos;
+            home-manager.users.${specialArgs.username} = import ./home-manager/wsl;
           })
         ];
       };
+
+      # joe-nixos = nixpkgs.lib.nixosSystem {
+      #   specialArgs =
+      #     commonSpecialArgs
+      #     // {
+      #       hostname = "joe-nixos";
+      #     };
+      #   modules = [
+      #     # > Our main nixos configuration file <
+      #     ./environments/nixos
+      #     home-manager.nixosModules.home-manager
+      #     ({specialArgs, ...}: {
+      #       home-manager.useGlobalPkgs = true;
+      #       home-manager.useUserPackages = true;
+      #       home-manager.extraSpecialArgs = specialArgs;
+      #       home-manager.backupFileExtension = "backup"; # enable moving existing files
+      #       home-manager.users.${specialArgs.username} = import ./home-manager/nixos;
+      #     })
+      #   ];
+      # };
     };
 
     # Darwin/macOS configuration entrypoint
     # Available through 'darwin-rebuild --flake .#Joes-MacBook-Air'
     darwinConfigurations = {
-      "Joes-MacBook-Air" = darwin.lib.darwinSystem {
+      Joes-MacBook-Air = darwin.lib.darwinSystem {
           specialArgs =
             commonSpecialArgs
             // {
@@ -137,7 +137,7 @@
           modules = [
           ./environments/darwin
           home-manager.darwinModules.home-manager
-          ({ specialArgs, ... }: {
+          ({specialArgs, ...}: {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = specialArgs;
