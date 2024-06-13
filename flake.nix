@@ -85,7 +85,7 @@
           specialArgs =
             commonSpecialArgs
             // {
-              hostname = "joe-nixos-wsl";
+              hostname = "joe-wsl";
             };
           modules = [
             nixos-wsl.nixosModules.default
@@ -124,14 +124,14 @@
     };
 
     # Darwin/macOS configuration entrypoint
-    # Available through 'darwin-rebuild --flake .#joe-macos'
+    # Available through 'darwin-rebuild --flake .#Joes-MacBook-Air'
     darwinConfigurations = {
-      joe-macos = darwin.lib.darwinSystem {
+      "Joes-MacBook-Air" = darwin.lib.darwinSystem {
           specialArgs =
             commonSpecialArgs
             // {
               username = "joegoldin";
-              hostname = "joe-mac";
+              hostname = "Joes-MacBook-Air";
               homeDirectory = nixpkgs.lib.mkForce "/Users/joegoldin";
             };
           modules = [

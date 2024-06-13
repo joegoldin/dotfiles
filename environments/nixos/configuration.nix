@@ -47,6 +47,8 @@ import ../common/default.nix {
     };
   };
 
+  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+
   # ld for wsl for vscode server
   programs.nix-ld = {
     enable = true;
