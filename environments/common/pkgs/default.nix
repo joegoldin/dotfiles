@@ -39,4 +39,12 @@ pkgs: {
     unset PYTHONPATH
     exec ${pkgs.awscli2}/bin/aws "$@"
   '';
+
+  shopt-script = pkgs.writeShellScriptBin "shopt" ''
+    args="";
+    for item in "$@"; do
+      args="$args $item";
+    done
+    shopt $args;
+  '';
 }
