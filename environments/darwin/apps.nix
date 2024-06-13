@@ -126,6 +126,9 @@
       # "discord"
 
       # "anki"
+
+      "1password-cli"
+
       "stats"
 
       "android-platform-tools"
