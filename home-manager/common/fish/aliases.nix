@@ -12,8 +12,7 @@
   hasAwsCli = hasPackage "awscli2";
   hasKubectl = hasPackage "kubectl";
 in {
-  shellAliases = rec {
-  };
+  shellAliases = rec {};
 
   shellAbbrs = {
     # Clear screen and scrollback
@@ -37,11 +36,6 @@ in {
     gf = "git fetch";
     gl = "git log";
     gs = "git status";
-
-    snrwsl = "nix fmt && sudo nixos-rebuild --flake .#joe-wsl";
-    snrswsl = "nix fmt && sudo nixos-rebuild --flake .#joe-wsl switch";
-    snrmac = "nix fmt && sudo nixos-rebuild --flake .#joe-macos";
-    snrsmac = "nix fmt && sudo nixos-rebuild --flake .#joe-macos switch";
 
     s = mkIf hasSpecialisationCli "specialisation";
 
