@@ -17,4 +17,4 @@ build-nixos:
 	sudo nixos-rebuild --flake .#joe-nixos switch
 
 build-macos:
-	sudo nixos-rebuild --flake .#joe-macos switch
+	nix run --extra-experimental-features nix-command --extra-experimental-features flakes nix-darwin -- switch --flake .#Joes-MacBook-Air

@@ -1,8 +1,10 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
+    coreutils
     nnn # terminal file manager
     nix
     cachix
+    direnv
     devenv
     just
     pueue
@@ -47,7 +49,6 @@
     gnupg
 
     any-nix-shell
-    direnv
 
     # productivity
     glow # markdown previewer in terminal

@@ -12,7 +12,7 @@
   ...
 }:
 {
-  system.stateVersion = stateVersion;
+  system.stateVersion = "${stateVersion}";
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
   nixpkgs = {
@@ -69,6 +69,7 @@
   };
 
   programs.bash = {
+    enable = true;
     interactiveShellInit = ''
       if [[ $(${pkgs.procps}/bin/ps --no-header --pid=$PPID --format=comm) != "fish" && -z ''${BASH_EXECUTION_STRING} ]]
       then
@@ -76,6 +77,10 @@
         exec ${pkgs.fish}/bin/fish $LOGIN_OPTION
       fi
     '';
+  };
+
+  programs.fish = {
+    enable = true;
   };
 
   environment.systemPackages = with pkgs; [
