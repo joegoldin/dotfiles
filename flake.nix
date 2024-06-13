@@ -50,7 +50,7 @@
     inherit (self) outputs;
     username = "joe";
     useremail = "joe@joegold.in";
-    hostname = "${username}-desktop-nix";
+    hostname = "${username}-nix";
     homeDirectory = nixpkgs.lib.mkForce "/home/${username}";
     stateVersion = "24.05";
     commonSpecialArgs =
@@ -73,10 +73,6 @@
 
     # Your custom packages and modifications, exported as overlays
     overlays = import ./environments/common/overlays {inherit inputs;};
-
-    # nixos.config.allowUnfree = true;
-    # nixos.config.allowUnsupportedSystem = true;
-    # nixos.config.experimental-features = "nix-command flakes";
 
     # NixOS configuration entrypoint
     # Available through 'nixos-rebuild --flake .#joe-wsl'
@@ -102,25 +98,26 @@
         ];
       };
 
-      joe-nixos = nixpkgs.lib.nixosSystem {
-        specialArgs =
-          commonSpecialArgs
-          // {
-            hostname = "joe-nixos";
-          };
-        modules = [
-          # > Our main nixos configuration file <
-          ./environments/nixos
-          home-manager.nixosModules.home-manager
-          ({specialArgs, ...}: {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = specialArgs;
-            home-manager.backupFileExtension = "backup"; # enable moving existing files
-            home-manager.users.${specialArgs.username} = import ./home-manager/nixos;
-          })
-        ];
-      };
+      # Disabled until I have a machine actually running nixos natively
+      # joe-nixos = nixpkgs.lib.nixosSystem {
+      #   specialArgs =
+      #     commonSpecialArgs
+      #     // {
+      #       hostname = "joe-nixos";
+      #     };
+      #   modules = [
+      #     # > Our main nixos configuration file <
+      #     ./environments/nixos
+      #     home-manager.nixosModules.home-manager
+      #     ({specialArgs, ...}: {
+      #       home-manager.useGlobalPkgs = true;
+      #       home-manager.useUserPackages = true;
+      #       home-manager.extraSpecialArgs = specialArgs;
+      #       home-manager.backupFileExtension = "backup"; # enable moving existing files
+      #       home-manager.users.${specialArgs.username} = import ./home-manager/nixos;
+      #     })
+      #   ];
+      # };
     };
 
     # Darwin/macOS configuration entrypoint

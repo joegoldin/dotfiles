@@ -1,20 +1,31 @@
 develop:
-	nix --extra-experimental-features nix-command --extra-experimental-features flakes develop --impure . -c fish
+  @nix --extra-experimental-features nix-command --extra-experimental-features flakes develop --impure . -c fish
 
 lint:
-  nix fmt
+  @echo "📝 Linting NixOS config..."
+  @nix fmt
+  @echo "✅ nix fmt passed!"
 
-check:
-  nix flake check
+check: lint
+  @echo "🔍 Checking NixOS config..."
+  @NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 NIXPKGS_ALLOW_UNFREE=1 NIXPKGS_ALLOW_BROKEN=1 nix flake check --impure
+  @echo "✅ flake check passed!"
 
 devup:
-	devenv up
+  @devenv up
 
 build-wsl:
-	sudo nixos-rebuild --flake .#joe-wsl switch
+  @echo "🔨 Building NixOS config for WSL 🪟 ({{os()}})"
+  @sudo nixos-rebuild --flake .#joe-wsl switch
 
 build-nixos:
-	sudo nixos-rebuild --flake .#joe-nixos switch
+  @echo "🔨 Building NixOS config for NixOS 🐧 ({{os()}})"
+  @sudo nixos-rebuild --flake .#joe-nixos switch
 
-build-macos:
-	nix run --extra-experimental-features 'nix-command flakes' nix-darwin -- switch --flake .#Joes-MacBook-Air
+build-macos: lint check
+  @echo "🔨 Building NixOS config for macOS 🍎 ({{os()}})"
+  @nix run --extra-experimental-features 'nix-command flakes' nix-darwin -- switch --flake .#Joes-MacBook-Air
+
+build:
+  @echo "🧱 Building on {{os()}}..."
+  @if [ \'{{os()}}\'=\'macos\' ]; then just build-macos; else just build-wsl; fi
