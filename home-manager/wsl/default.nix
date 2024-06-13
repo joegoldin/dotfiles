@@ -11,7 +11,7 @@
 }: {
   imports = [
     ../common
-    ../common/cursor-linux-server.nix
+    ../common/cursor-server-linux.nix
   ];
 
   # lorri for nix-shell
