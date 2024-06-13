@@ -10,8 +10,7 @@
   hostname,
   stateVersion,
   ...
-}:
-{
+}: {
   system.stateVersion = "${stateVersion}";
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
@@ -32,7 +31,7 @@
     flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
   in {
     settings = {
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = ["nix-command" "flakes"];
       nix-path = config.nix.nixPath;
       trusted-users = ["${username}"];
       auto-optimise-store = false;

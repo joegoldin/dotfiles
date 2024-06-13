@@ -8,8 +8,7 @@
   hostname,
   stateVersion,
   ...
-}:
-{
+}: {
   imports = [
     ./system.nix
     ./apps.nix
@@ -34,7 +33,7 @@
     flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
   in {
     settings = {
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = ["nix-command" "flakes"];
       nix-path = config.nix.nixPath;
       trusted-users = ["${username}"];
       auto-optimise-store = false;
@@ -80,7 +79,7 @@
         else
           LOGIN_OPTION=""
         fi
-        
+
         # Execute fish shell with the determined login option
         exec ${pkgs.fish}/bin/fish $LOGIN_OPTION
       fi
@@ -97,7 +96,7 @@
         else
           LOGIN_OPTION=""
         fi
-        
+
         # Execute fish shell with the determined login option
         exec ${pkgs.fish}/bin/fish $LOGIN_OPTION
       fi

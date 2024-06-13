@@ -14,9 +14,11 @@
     ../common/cursor-server-linux.nix
   ];
 
-  home.packages = (import ../common/packages.nix {inherit pkgs;}).home.packages ++ (with pkgs; [
-    # wsl only packages
-  ]);
+  home.packages =
+    (import ../common/packages.nix {inherit pkgs;}).home.packages
+    ++ (with pkgs; [
+      # wsl only packages
+    ]);
 
   # lorri for nix-shell
   services.lorri.enable = true;

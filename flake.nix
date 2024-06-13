@@ -82,20 +82,20 @@
     # Available through 'nixos-rebuild --flake .#joe-wsl'
     nixosConfigurations = {
       joe-wsl = nixpkgs.lib.nixosSystem {
-          specialArgs =
-            commonSpecialArgs
-            // {
-              hostname = "joe-wsl";
-            };
-          modules = [
-            nixos-wsl.nixosModules.default
-            # > Our main nixos configuration file <
-            ./environments/wsl
-            home-manager.nixosModules.home-manager
-          ({ specialArgs, ... }: {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.extraSpecialArgs = specialArgs;
+        specialArgs =
+          commonSpecialArgs
+          // {
+            hostname = "joe-wsl";
+          };
+        modules = [
+          nixos-wsl.nixosModules.default
+          # > Our main nixos configuration file <
+          ./environments/wsl
+          home-manager.nixosModules.home-manager
+          ({specialArgs, ...}: {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = specialArgs;
             home-manager.backupFileExtension = "backup"; # enable moving existing files
             home-manager.users.${specialArgs.username} = import ./home-manager/wsl;
           })
@@ -127,15 +127,15 @@
     # Available through 'darwin-rebuild --flake .#Joes-MacBook-Air'
     darwinConfigurations = {
       Joes-MacBook-Air = darwin.lib.darwinSystem {
-          system = "aarch64-darwin";
-          specialArgs =
-            commonSpecialArgs
-            // {
-              username = "joegoldin";
-              hostname = "Joes-MacBook-Air";
-              homeDirectory = nixpkgs.lib.mkForce "/Users/joegoldin";
-            };
-          modules = [
+        system = "aarch64-darwin";
+        specialArgs =
+          commonSpecialArgs
+          // {
+            username = "joegoldin";
+            hostname = "Joes-MacBook-Air";
+            homeDirectory = nixpkgs.lib.mkForce "/Users/joegoldin";
+          };
+        modules = [
           ./environments/darwin
           home-manager.darwinModules.home-manager
           ({specialArgs, ...}: {
@@ -143,7 +143,7 @@
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = specialArgs;
             home-manager.backupFileExtension = "backup"; # enable moving existing files
-            home-manager.users.joegoldin.imports = [ 
+            home-manager.users.joegoldin.imports = [
               ./home-manager/darwin
             ];
           })
