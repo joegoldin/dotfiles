@@ -22,6 +22,6 @@
     ]);
 
   programs.git.extraConfig = {
-    gpg."ssh".program = "${pkgs._1password-gui}/bin/op-ssh-sign";
+    gpg."ssh".program = "${pkgs._1password-gui}/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
   };
 }
