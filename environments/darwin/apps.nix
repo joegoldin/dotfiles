@@ -68,6 +68,7 @@
       "docutils"
       "entr"
       "expat"
+      "fish"
       "flyctl"
       "fontforge"
       "fx"

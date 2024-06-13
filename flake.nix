@@ -102,31 +102,32 @@
         ];
       };
 
-      # joe-nixos = nixpkgs.lib.nixosSystem {
-      #   specialArgs =
-      #     commonSpecialArgs
-      #     // {
-      #       hostname = "joe-nixos";
-      #     };
-      #   modules = [
-      #     # > Our main nixos configuration file <
-      #     ./environments/nixos
-      #     home-manager.nixosModules.home-manager
-      #     ({specialArgs, ...}: {
-      #       home-manager.useGlobalPkgs = true;
-      #       home-manager.useUserPackages = true;
-      #       home-manager.extraSpecialArgs = specialArgs;
-      #       home-manager.backupFileExtension = "backup"; # enable moving existing files
-      #       home-manager.users.${specialArgs.username} = import ./home-manager/nixos;
-      #     })
-      #   ];
-      # };
+      joe-nixos = nixpkgs.lib.nixosSystem {
+        specialArgs =
+          commonSpecialArgs
+          // {
+            hostname = "joe-nixos";
+          };
+        modules = [
+          # > Our main nixos configuration file <
+          ./environments/nixos
+          home-manager.nixosModules.home-manager
+          ({specialArgs, ...}: {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = specialArgs;
+            home-manager.backupFileExtension = "backup"; # enable moving existing files
+            home-manager.users.${specialArgs.username} = import ./home-manager/nixos;
+          })
+        ];
+      };
     };
 
     # Darwin/macOS configuration entrypoint
     # Available through 'darwin-rebuild --flake .#Joes-MacBook-Air'
     darwinConfigurations = {
       Joes-MacBook-Air = darwin.lib.darwinSystem {
+          system = "aarch64-darwin";
           specialArgs =
             commonSpecialArgs
             // {
@@ -142,7 +143,9 @@
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = specialArgs;
             home-manager.backupFileExtension = "backup"; # enable moving existing files
-            home-manager.users.${specialArgs.username} = import ./home-manager/darwin;
+            home-manager.users.joegoldin.imports = [ 
+              ./home-manager/darwin
+            ];
           })
         ];
       };
