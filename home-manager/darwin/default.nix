@@ -20,4 +20,8 @@
     ++ (with pkgs; [
       shopt-script
     ]);
+
+  programs.git.extraConfig = {
+    gpg."ssh".program = "${pkgs._1password-gui}/bin/op-ssh-sign";
+  };
 }
