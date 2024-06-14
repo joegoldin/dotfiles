@@ -17,19 +17,19 @@ check: lint
 [confirm]
 [macos]
 build: lint check
-  @echo "🔨  Building NixOS config for macOS 🍎  ({{os()}})"
+  @echo "🔨  Building NixOS config for macOS 🍎"
   @nix run --extra-experimental-features 'nix-command flakes' nix-darwin -- switch --flake .#Joes-MacBook-Air
 
 [confirm]
 [private]
 build-wsl: lint check
-  @echo "🔨  Building NixOS config for WSL 🪟  ({{os()}})"
+  @echo "🔨  Building NixOS config for WSL 🪟"
   @sudo nixos-rebuild --flake .#joe-wsl switch
 
 [confirm]
 [private]
 build-nixos: lint check
-  @echo "🔨  Building NixOS config for NixOS 🐧  ({{os()}})"
+  @echo "🔨  Building NixOS config for NixOS 🐧"
   @sudo nixos-rebuild --flake .#joe-nixos switch
 
 [linux]
