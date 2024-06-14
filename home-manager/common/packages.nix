@@ -51,6 +51,7 @@
     gnupg
 
     any-nix-shell
+    comma
 
     # productivity
     glow # markdown previewer in terminal
