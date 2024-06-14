@@ -34,7 +34,7 @@ build-nixos: lint check
 
 [linux]
 build:
-  @just {{ if "{{shell('uname -r')}}" =~ "WSL" { "build-wsl" } else { "build-nixos" } }}
+  @just {{ if shell('uname -r') =~ "WSL" { "build-wsl" } else { "build-nixos" } }}
 
 system-info:
   @echo "🖥️  This is an {{arch()}} machine on {{os()}}"
