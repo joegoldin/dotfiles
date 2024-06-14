@@ -1,6 +1,6 @@
 [private]
 default:
-  just --list
+  @just --list
 
 [unix]
 lint:
