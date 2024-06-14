@@ -21,5 +21,5 @@
       shopt-script
     ]);
 
-  programs.git.extraConfig,gpg.ssh.program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
+  programs.git.extraConfig.gpg.ssh.program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
 }
