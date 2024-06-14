@@ -6,7 +6,7 @@
     cachix
     direnv
     devenv
-    just
+    unstable.just
     pueue
     fish
 
