@@ -26,6 +26,7 @@ build-macos: lint check
   @echo "🔨 Building NixOS config for macOS 🍎 ({{os()}})"
   @nix run --extra-experimental-features 'nix-command flakes' nix-darwin -- switch --flake .#Joes-MacBook-Air
 
+target := if "{{os()}}" == "macos" { "build-macos" } else { "build-wsl" }
 build:
   @echo "🧱 Building on {{os()}}..."
-  @if [ \'{{os()}}\'=\'macos\' ]; then just build-macos; else just build-wsl; fi
+  @just {{target}}
