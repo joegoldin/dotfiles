@@ -1,9 +1,16 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   programs.ssh = {
     enable = true;
+    matchBlocks = {
+      # default = {
+      #   hostname = "*";
+      # };
+    };
     extraConfig = ''
-      Host *
-          IdentityAgent ~/.1password/agent.sock
     '';
   };
 }
