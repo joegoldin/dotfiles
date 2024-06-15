@@ -15,10 +15,14 @@ check: lint
   @echo "✅  flake check passed!"
 
 [confirm]
-[macos]
-build: lint check
+[private]
+build-macos: lint check
   @echo "🔨  Building NixOS config for macOS 🍎"
   @nix run --extra-experimental-features 'nix-command flakes' nix-darwin -- switch --flake .#Joes-MacBook-Air
+
+[macos]
+build:
+  @just build-macos
 
 [confirm]
 [private]
