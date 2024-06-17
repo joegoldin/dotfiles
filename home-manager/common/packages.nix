@@ -1,5 +1,6 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
+    # TODO order this list
     coreutils
     nnn # terminal file manager
     nix
@@ -9,6 +10,9 @@
     unstable.just
     pueue
     fish
+    pre-commit
+    bfg-repo-cleaner
+    gitleaks
 
     clai-go # from go package via overlay
 
@@ -52,6 +56,7 @@
 
     any-nix-shell
     comma
+    noseyparker
 
     # productivity
     glow # markdown previewer in terminal
