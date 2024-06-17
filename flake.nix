@@ -27,6 +27,8 @@
     devenv.url = "github:cachix/devenv";
     # nixpkgs-python
     nixpkgs-python.url = "github:cachix/nixpkgs-python";
+    # pre-commit-hooks
+    pre-commit-hooks.url = "github:cachix/pre-commit-hooks.nix";
   };
 
   nixConfig = {
@@ -45,6 +47,7 @@
     flake-utils,
     systems,
     nixpkgs-python,
+    pre-commit-hooks,
     ...
   } @ inputs: let
     inherit (self) outputs;
@@ -73,6 +76,29 @@
 
     # Your custom packages and modifications, exported as overlays
     overlays = import ./environments/common/overlays {inherit inputs;};
+
+    checks = eachSystem (system: {
+      pre-commit-check = pre-commit-hooks.lib.${system}.run {
+        src = ./.;
+        hooks = {
+          alejandra.enable = true;
+          check-yaml.enable = true;
+          end-of-file-fixer.enable = true;
+          gitleaks = {
+            enable = true;
+            name = "gitleaks";
+            entry = "${nixpkgs.legacyPackages.${system}.gitleaks}/bin/gitleaks detect --source . -v";
+          };
+        };
+      };
+    });
+
+    devShells = eachSystem (system: {
+      default = nixpkgs.legacyPackages.${system}.mkShell {
+        inherit (self.checks.${system}.pre-commit-check) shellHook;
+        buildInputs = self.checks.${system}.pre-commit-check.enabledPackages;
+      };
+    });
 
     # NixOS configuration entrypoint
     # Available through 'nixos-rebuild --flake .#joe-wsl'
