@@ -29,6 +29,15 @@
     nixpkgs-python.url = "github:cachix/nixpkgs-python";
     # pre-commit-hooks
     pre-commit-hooks.url = "github:cachix/pre-commit-hooks.nix";
+    #brew-nix
+    brew-nix = {
+      url = "github:BatteredBunny/brew-nix";
+      inputs.brew-api.follows = "brew-api";
+    };
+    brew-api = {
+      url = "github:BatteredBunny/brew-api";
+      flake = false;
+    };
   };
 
   nixConfig = {
@@ -48,6 +57,8 @@
     systems,
     nixpkgs-python,
     pre-commit-hooks,
+    brew-nix,
+    brew-api,
     ...
   } @ inputs: let
     inherit (self) outputs;
