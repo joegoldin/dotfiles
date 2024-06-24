@@ -14,13 +14,13 @@
     ./apps.nix
   ];
 
-  nixpkgs.hostPlatform = lib.mkDefault "aarch64-darwin";
-
   nixpkgs = {
+    hostPlatform = lib.mkDefault "aarch64-darwin";
     overlays = [
       outputs.overlays.additions
       outputs.overlays.modifications
       outputs.overlays.unstable-packages
+      inputs.brew-nix.overlays.default
     ];
     config = {
       allowUnfree = true;
