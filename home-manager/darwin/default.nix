@@ -10,7 +10,11 @@
   homeDirectory,
   stateVersion,
   ...
-}: {
+}: let
+  initConfigAdditions = ''
+    source ${pkgs.iterm2-terminal-integration}/iterm2_shell_integration.fish
+  '';
+in {
   imports = [
     ../common
   ];
@@ -19,6 +23,7 @@
     (import ../common/packages.nix {inherit pkgs;}).home.packages
     ++ (with pkgs; [
       shopt-script
+      iterm2-terminal-integration
       # brewCasks.1password-cli
       # brewCasks.stats
       # brewCasks.android-platform-tools
@@ -29,6 +34,10 @@
       # brewCasks.sanesidebuttons
       # brewCasks.tomatobar
     ]);
+  programs.fishrec.interactiveShellInit = lib.strings.concatStrings [
+    (import ../common/fish/init.nix {inherit pkgs;}).interactiveShellInit
+    initConfigAdditions
+  ];
 
   programs.git.extraConfig.gpg.ssh.program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
 
