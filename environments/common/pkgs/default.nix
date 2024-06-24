@@ -47,4 +47,21 @@ pkgs: {
     done
     shopt $args;
   '';
+
+  iterm2-terminal-integration = pkgs.stdenv.mkDerivation rec {
+    pname = "iterm2-terminal-integration";
+    version = "0.0.1";
+    sha256 = "sha256-tdn4z0tIc0nC5nApGwT7GYbiY91OTA4hNXZDDQ6g9qU=";
+
+    src = pkgs.fetchurl {
+      url = "https://iterm2.com/shell_integration/fish";
+      sha256 = "${sha256}";
+    };
+
+    installPhase = ''
+      outDir=$out/iterm2-terminal-integration/${sha256}
+      mkdir -p $outDir
+      mv $src $outDir/iterm2_shell_integration.fish
+    '';
+  };
 }
