@@ -116,30 +116,32 @@
     ];
 
     # `brew install --cask`
-    # casks = [
-    #   # "arc"
-    #   # "google-chrome"
+    casks = [
+      # "arc"
+      # "google-chrome"
 
-    #   # "cursor"
+      "cursor"
+      
+      "dash"
 
-    #   # "slack"
-    #   # "discord"
+      # "slack"
+      # "discord"
 
-    #   # "anki"
+      # "anki"
 
-    #   "1password-cli"
+      "1password-cli"
 
-    #   "stats"
+      "stats"
 
-    #   "android-platform-tools"
-    #   # "bruno"
-    #   "flameshot"
-    #   # "jordanbaird-ice"
-    #   "michaelvillar-timer"
-    #   "modern-csv"
-    #   "ngrok"
-    #   "sanesidebuttons"
-    #   "tomatobar"
-    # ];
+      # "android-platform-tools"
+      # "bruno"
+      # "flameshot"
+      # "jordanbaird-ice"
+      "michaelvillar-timer"
+      "modern-csv"
+      # "ngrok"
+      # "sanesidebuttons"
+      "tomatobar"
+    ];
   };
 }
