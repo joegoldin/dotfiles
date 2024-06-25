@@ -24,15 +24,6 @@ in {
     ++ (with pkgs; [
       shopt-script
       iterm2-terminal-integration
-      # brewCasks.1password-cli
-      # brewCasks.stats
-      # brewCasks.android-platform-tools
-      # brewCasks.flameshot
-      # brewCasks.michaelvillar-timer
-      # brewCasks.modern-csv
-      # brewCasks.ngrok
-      # brewCasks.sanesidebuttons
-      # brewCasks.tomatobar
     ]);
   programs.fish.interactiveShellInit = lib.strings.concatStrings [
     (import ../common/fish/init.nix {inherit pkgs;}).interactiveShellInit
