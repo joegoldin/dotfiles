@@ -122,7 +122,7 @@
 
       # "cursor"
 
-      # "dash"
+      "dash"
 
       # "slack"
       # "discord"
@@ -134,7 +134,7 @@
       "stats"
 
       # "android-platform-tools"
-      "bruno"
+      # "bruno"
       # "flameshot"
       # "jordanbaird-ice"
       "michaelvillar-timer"
