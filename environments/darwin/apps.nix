@@ -120,18 +120,18 @@
       # "arc"
       # "google-chrome"
 
-      "cursor"
-      
-      "dash"
+      # "cursor"
+
+      # "dash"
 
       # "slack"
       # "discord"
 
       # "anki"
 
-      "1password-cli"
+      # "1password-cli"
 
-      "stats"
+      # "stats"
 
       # "android-platform-tools"
       # "bruno"

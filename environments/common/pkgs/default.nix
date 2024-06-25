@@ -58,10 +58,16 @@ pkgs: {
       sha256 = "${sha256}";
     };
 
+    unpackPhase = ''
+      for srcFile in $src; do
+        cp $srcFile $(stripHash $srcFile)
+      done
+    '';
+
     installPhase = ''
-      outDir=$out/iterm2-terminal-integration/${sha256}
+      outDir=$out/bin
       mkdir -p $outDir
-      mv $src $outDir/iterm2_shell_integration.fish
+      cp $src $outDir/iterm2_shell_integration.fish
     '';
   };
 }

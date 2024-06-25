@@ -56,7 +56,6 @@
 
     any-nix-shell
     comma
-    noseyparker
 
     # productivity
     glow # markdown previewer in terminal
