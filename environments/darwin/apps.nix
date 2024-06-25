@@ -131,10 +131,10 @@
 
       # "1password-cli"
 
-      # "stats"
+      "stats"
 
       # "android-platform-tools"
-      # "bruno"
+      "bruno"
       # "flameshot"
       # "jordanbaird-ice"
       "michaelvillar-timer"
