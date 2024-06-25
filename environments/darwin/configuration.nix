@@ -14,8 +14,9 @@
     ./apps.nix
   ];
 
+  nixpkgs.hostPlatform = lib.mkDefault "aarch64-darwin";
+
   nixpkgs = {
-    hostPlatform = lib.mkDefault "aarch64-darwin";
     overlays = [
       outputs.overlays.additions
       outputs.overlays.modifications
@@ -104,6 +105,9 @@
   };
 
   programs.fish = {
+    interactiveShellInit = ''
+      ${pkgs.iterm2-terminal-integration}/iterm2_shell_integration.fish
+    '';
     enable = true;
   };
 

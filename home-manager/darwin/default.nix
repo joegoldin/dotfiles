@@ -12,7 +12,7 @@
   ...
 }: let
   initConfigAdditions = ''
-    source ${pkgs.iterm2-terminal-integration}/iterm2_shell_integration.fish
+    source ${pkgs.iterm2-terminal-integration}/bin/iterm2_shell_integration.fish
   '';
 in {
   imports = [
@@ -34,7 +34,7 @@ in {
       # brewCasks.sanesidebuttons
       # brewCasks.tomatobar
     ]);
-  programs.fishrec.interactiveShellInit = lib.strings.concatStrings [
+  programs.fish.interactiveShellInit = lib.strings.concatStrings [
     (import ../common/fish/init.nix {inherit pkgs;}).interactiveShellInit
     initConfigAdditions
   ];
