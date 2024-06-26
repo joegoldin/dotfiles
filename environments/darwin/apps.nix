@@ -29,7 +29,7 @@
     # otherwise Apple Store will refuse to install them.
     # For details, see https://github.com/mas-cli/mas
     masApps = {
-      Xcode = 497799835;
+      # Xcode = 497799835; // using the beta from apple dev
       JumpDesktop = 524141863;
       Flycut = 442160987;
       RosettaStone = 1476088902;
