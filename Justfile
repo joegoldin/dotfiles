@@ -18,7 +18,7 @@ check: lint
 [private]
 build-macos: lint check
   @echo "🔨  Building NixOS config for macOS 🍎"
-  @nix run --extra-experimental-features 'nix-command flakes' nix-darwin -- switch --flake .#Joes-MacBook-Air
+  @nix run --extra-experimental-features 'nix-command flakes' nix-darwin -- switch --flake .#Joes-MacBook-Pro
 
 [macos]
 build:
