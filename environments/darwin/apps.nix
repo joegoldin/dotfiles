@@ -32,12 +32,12 @@
       Xcode = 497799835;
       JumpDesktop = 524141863;
       TheUnarchiver = 425424353;
-      Magnet = 441258766;
       Flycut = 442160987;
       RosettaStone = 1476088902;
-      OnePassword = 1333542190;
       Amphetamine = 937984704;
       TestFlight = 899247664;
+      Tailscale = 1475387142;
+      Barbee = 1548711022;
     };
 
     taps = [
@@ -104,7 +104,6 @@
       "scrcpy"
       "stern"
       "swift-format"
-      "tailscale"
       "tailspin"
       "tcl-tk"
       "telnet"
@@ -137,6 +136,7 @@
       "sublime-merge"
       "iterm2"
       "itermai"
+      "1password"
       "1password-cli"
       "rectangle-pro"
       "stats"
@@ -145,7 +145,6 @@
       "android-platform-tools"
       "bruno"
       "shottr"
-      "jordanbaird-ice"
       "michaelvillar-timer"
       "modern-csv"
       "mac-mouse-fix"
