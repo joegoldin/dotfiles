@@ -106,7 +106,6 @@
 
   programs.fish = {
     interactiveShellInit = ''
-      ${pkgs.iterm2-terminal-integration}/iterm2_shell_integration.fish
     '';
     enable = true;
   };

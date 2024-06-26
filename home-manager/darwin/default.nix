@@ -12,6 +12,7 @@
   ...
 }: let
   initConfigAdditions = ''
+    eval $(/opt/homebrew/bin/brew shellenv)
     source ${pkgs.iterm2-terminal-integration}/bin/iterm2_shell_integration.fish
   '';
 in {
@@ -31,4 +32,16 @@ in {
   ];
 
   programs.git.extraConfig.gpg.ssh.program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
+
+  programs.ssh = {
+    enable = true;
+    matchBlocks = {
+      # default = {
+      #   hostname = "*";
+      # };
+    };
+    extraConfig = lib.mkOrder 100 ''
+      IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+    '';
+  };
 }
