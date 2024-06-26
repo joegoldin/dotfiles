@@ -31,7 +31,6 @@
     masApps = {
       Xcode = 497799835;
       JumpDesktop = 524141863;
-      TheUnarchiver = 425424353;
       Flycut = 442160987;
       RosettaStone = 1476088902;
       Amphetamine = 937984704;
