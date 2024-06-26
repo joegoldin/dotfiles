@@ -36,6 +36,8 @@
       Flycut = 442160987;
       RosettaStone = 1476088902;
       OnePassword = 1333542190;
+      Amphetamine = 937984704;
+      TestFlight = 899247664;
     };
 
     taps = [
@@ -101,6 +103,8 @@
       "schappim/ocr/ocr"
       "scrcpy"
       "stern"
+      "swift-format"
+      "tailscale"
       "tailspin"
       "tcl-tk"
       "telnet"
@@ -117,30 +121,34 @@
 
     # `brew install --cask`
     casks = [
-      # "arc"
-      # "google-chrome"
-
-      # "cursor"
-
-      "dash"
-
-      # "slack"
-      # "discord"
-
-      # "anki"
-
-      # "1password-cli"
-
+      "arc"
+      "google-chrome"
+      "notion"
+      "notion-calendar"
+      "cursor"
+      "logseq"
+      "intellidock"
+      "postico"
+      "slack"
+      "discord"
+      "roon"
+      "monodraw"
+      "sublime-text"
+      "sublime-merge"
+      "iterm2"
+      "itermai"
+      "1password-cli"
+      "rectangle-pro"
       "stats"
-
-      # "android-platform-tools"
-      # "bruno"
-      # "flameshot"
-      # "jordanbaird-ice"
+      "lulu"
+      "daisydisk"
+      "android-platform-tools"
+      "bruno"
+      "shottr"
+      "jordanbaird-ice"
       "michaelvillar-timer"
       "modern-csv"
-      # "ngrok"
-      # "sanesidebuttons"
+      "mac-mouse-fix"
       "tomatobar"
     ];
   };
