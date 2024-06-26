@@ -66,6 +66,7 @@
       "croc"
       "derailed/k9s/k9s"
       "dive"
+      "direnv"
       "docutils"
       "entr"
       "expat"
