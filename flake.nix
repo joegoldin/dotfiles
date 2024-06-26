@@ -183,6 +183,30 @@
           })
         ];
       };
+
+      Joes-MacBook-Pro = darwin.lib.darwinSystem {
+        system = "aarch64-darwin";
+        specialArgs =
+          commonSpecialArgs
+          // {
+            username = "joe";
+            hostname = "Joes-MacBook-Pro";
+            homeDirectory = nixpkgs.lib.mkForce "/Users/joe";
+          };
+        modules = [
+          ./environments/darwin
+          home-manager.darwinModules.home-manager
+          ({specialArgs, ...}: {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = specialArgs;
+            home-manager.backupFileExtension = "backup"; # enable moving existing files
+            home-manager.users.joe.imports = [
+              ./home-manager/darwin
+            ];
+          })
+        ];
+      };
     };
   };
 }
