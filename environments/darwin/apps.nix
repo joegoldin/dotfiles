@@ -149,6 +149,7 @@
       "mac-mouse-fix"
       "tomatobar"
       "zoom"
+      "rectangle-pro"
     ];
   };
 }
