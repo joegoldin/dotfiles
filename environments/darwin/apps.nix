@@ -126,7 +126,6 @@
       "notion-calendar"
       "cursor"
       "logseq"
-      "intellidock"
       "postico"
       "slack"
       "discord"
