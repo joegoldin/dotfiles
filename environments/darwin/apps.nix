@@ -129,6 +129,7 @@
       "cursor"
       "daisydisk"
       "discord"
+      "figma"
       "google-chrome"
       "iterm2"
       "itermai"
