@@ -149,6 +149,7 @@
       "modern-csv"
       "mac-mouse-fix"
       "tomatobar"
+      "zoom"
     ];
   };
 }
