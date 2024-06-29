@@ -51,6 +51,7 @@
       "schappim/ocr"
       "txn2/tap"
       "versent/taps"
+      "blacktop/tap"
     ];
 
     # `brew install`
@@ -85,6 +86,7 @@
       "jj"
       "keyring"
       "kubectx"
+      "lporg"
       "marp-cli"
       "mas"
       "mysql"
