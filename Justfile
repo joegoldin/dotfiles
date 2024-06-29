@@ -21,8 +21,14 @@ build-macos: lint check
   @nix run --extra-experimental-features 'nix-command flakes' nix-darwin -- switch --flake .#Joes-MacBook-Pro
 
 [macos]
+organize-launchpad:
+  @echo "🔨  Organizing Launchpad..."
+  @lporg load --config ~/.config/lporg.yaml --yes --no-backup
+
+[macos]
 build:
   @just build-macos
+  @just organize-launchpad
 
 [confirm]
 [private]
