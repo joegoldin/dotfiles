@@ -139,7 +139,6 @@ dock_items:
     - /Applications/iTerm.app
     - /Applications/Cursor.app
     - /Applications/Xcode-beta.app
-    - /Applications/RocketSim.app
     - /Applications/Xcode-beta.app/Contents/Developer/Applications/Simulator.app
     - /Applications/Sublime Text.app
     - /Applications/Sublime Merge.app
