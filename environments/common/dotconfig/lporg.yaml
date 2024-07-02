@@ -30,10 +30,9 @@ apps:
         - Calculator
         - Freeform
         - Home
-        - Passwords
         - Siri
         - iPhone Mirroring
-        - Xcode-beta
+        - Passwords
         - TestFlight
         - System Settings
         - folder: Other
@@ -71,6 +70,7 @@ apps:
                 - Chess
                 - Feedback Assistant
                 - Tips
+        - Xcode-beta
     - number: 2
       items:
         - 1Password
@@ -89,8 +89,10 @@ apps:
         - Modern CSV
         - Monodraw
         - Notion
+        - Patterns
         - Postico 2
         - Proton Mail
+        - RocketSim
         - Roon
         - Rosetta Stone Learn Languages
         - Slack
@@ -116,6 +118,7 @@ apps:
                 - Stats
                 - Tailscale
                 - TomatoBar
+                - Peek
 widgets:
   pages: []
 dock_items:
