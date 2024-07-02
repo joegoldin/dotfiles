@@ -37,6 +37,9 @@
       TestFlight = 899247664;
       Tailscale = 1475387142;
       Barbee = 1548711022;
+      Peek = 1554235898;
+      Patterns = 429449079;
+      RocketSim = 1504940162;
     };
 
     taps = [
