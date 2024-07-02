@@ -26,6 +26,11 @@ organize-launchpad:
   @lporg load --config ~/.config/lporg.yaml --yes --no-backup
 
 [macos]
+save-launchpad:
+  @echo "🔨  Organizing Launchpad..."
+  @lporg save --config $(pwd)/environments/common/dotconfig/lporg.yaml
+
+[macos]
 build:
   @just build-macos
   @just organize-launchpad
