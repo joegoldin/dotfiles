@@ -36,7 +36,7 @@
     fzf # A command-line fuzzy finder
     grc
     wget
-
+    httpie
     kubectl
 
     aria2 # A lightweight multi-protocol & multi-source command-line download utility
