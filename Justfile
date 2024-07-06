@@ -23,7 +23,7 @@ build-macos: lint check
 [macos]
 organize-launchpad:
   @echo "🔨  Organizing Launchpad..."
-  @lporg load --config ~/.config/lporg.yaml --yes --no-backup
+  @lporg load --config $(pwd)/environments/common/dotconfig/lporg.yaml --yes --no-backup
 
 [macos]
 save-launchpad:

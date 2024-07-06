@@ -21,6 +21,7 @@
     awscli2
 
     zellij
+    flyctl
 
     # archives
     zip
