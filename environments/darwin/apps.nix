@@ -152,6 +152,7 @@
       "shottr"
       "slack"
       "stats"
+      "steam"
       "sublime-merge"
       "sublime-text"
       "tomatobar"
