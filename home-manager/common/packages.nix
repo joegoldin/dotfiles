@@ -1,65 +1,52 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
-    # TODO order this list
-    coreutils
-    nnn # terminal file manager
-    nix
-    cachix
-    direnv
-    devenv
-    unstable.just
-    pueue
-    fish
-    pre-commit
-    bfg-repo-cleaner
-    gitleaks
-
-    clai-go # from go package via overlay
-
-    git
-    gh
-    awscli2
-
-    zellij
-    flyctl
-
-    # archives
-    zip
-    xz
-    unzip
-    p7zip
-
-    # utils
-    ripgrep # recursivel searches directories for a regex pattern
-    jq # A lightweight and flexible command-line JSON processor
-    yq-go # yaml processer https://github.com/mikefarah/yq
-    fzf # A command-line fuzzy finder
-    grc
-    wget
-    httpie
-    kubectl
-
+    any-nix-shell
     aria2 # A lightweight multi-protocol & multi-source command-line download utility
-    socat # replacement of openbsd-netcat
-    nmap # A utility for network discovery and security auditing
-
-    # misc
+    awscli2
+    bfg-repo-cleaner
+    cachix
+    caddy
+    clai-go # from go package via overlay
+    comma
+    coreutils
     cowsay
+    devenv
+    direnv
     file
-    which
-    tree
+    fish
+    flyctl
+    fzf # A command-line fuzzy finder
+    gawk
+    gh
+    git
+    gitleaks
+    glow # markdown previewer in terminal
+    gnumake
+    gnupg
     gnused
     gnutar
-    gawk
+    grc
+    httpie
+    jq # A lightweight and flexible command-line JSON processor
+    kubectl
+    nix
+    nmap
+    nnn # terminal file manager
+    p7zip
+    pre-commit
+    pueue
+    ripgrep # recursivel searches directories for a regex pattern
+    socat # replacement of openbsd-netcat
+    tree
+    unstable.just
+    unzip
+    wget
+    which
+    xz
+    yq-go # yaml processer https://github.com/mikefarah/yq
+    zellij
+    zip
     zstd
-    caddy
-    gnupg
-
-    any-nix-shell
-    comma
-
-    # productivity
-    glow # markdown previewer in terminal
   ];
 
   programs = {
