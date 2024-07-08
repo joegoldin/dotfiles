@@ -15,8 +15,8 @@ pkgs: {
 
   cursor-server-linux = pkgs.stdenv.mkDerivation rec {
     pname = "cursor-server-linux";
-    version = "0.35.1";
-    commit = "a915e3254b1192ce240c078da83fc1768a6e3e90";
+    version = "0.36.2";
+    commit = "9a6d781540ba2732cf26551c07629e68121c6580";
     sha256 = "0k89z9j489wgidn3f1r1bq19jh3v0h0m09ghqldprvyckyv4417m";
 
     src = pkgs.fetchurl {
