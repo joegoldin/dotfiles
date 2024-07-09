@@ -33,6 +33,7 @@
     nmap
     nnn # terminal file manager
     p7zip
+    pinentry-curses
     pre-commit
     pueue
     ripgrep # recursivel searches directories for a regex pattern

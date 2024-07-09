@@ -24,4 +24,12 @@
 
   # lorri for nix-shell
   services.lorri.enable = true;
+
+  # gnupg gpg stuff
+  services.gnome-keyring.enable = true;
+  programs.gpg.enable = true;
+  services.gpg-agent = {
+    enable = true;
+    pinentryFlavor = "curses";
+  };
 }
