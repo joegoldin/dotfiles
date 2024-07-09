@@ -30,4 +30,12 @@
     ssh-add = "ssh-add.exe";
     op = "op.exe";
   };
+
+  # gnupg gpg stuff
+  services.gnome-keyring.enable = true;
+  programs.gpg.enable = true;
+  services.gpg-agent = {
+    enable = true;
+    pinentryPackage = pkgs.pinentry-curses;
+  };
 }
