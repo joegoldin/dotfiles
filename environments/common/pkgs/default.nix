@@ -70,4 +70,26 @@ pkgs: {
       cp $src $outDir/iterm2_shell_integration.fish
     '';
   };
+
+  helm-with-plugins = pkgs.wrapHelm pkgs.kubernetes-helm {
+    plugins = with pkgs.kubernetes-helmPlugins; [
+      helm-secrets
+      helm-diff
+      helm-s3
+      helm-git
+    ];
+  };
+  helmfile-with-plugins = pkgs.helmfile-wrapped.override {
+    inherit
+      (pkgs.wrapHelm pkgs.kubernetes-helm {
+        plugins = with pkgs.kubernetes-helmPlugins; [
+          helm-secrets
+          helm-diff
+          helm-s3
+          helm-git
+        ];
+      })
+      pluginsDir
+      ;
+  };
 }

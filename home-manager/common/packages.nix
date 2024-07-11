@@ -28,6 +28,8 @@
     gnutar
     grc
     httpie
+    helm-with-plugins
+    helmfile-with-plugins
     jq # A lightweight and flexible command-line JSON processor
     kubectl
     nix
