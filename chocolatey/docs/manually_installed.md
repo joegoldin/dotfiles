@@ -1,3 +1,5 @@
+# Manually installed windows packages
+
 - 1Password
   - [`1PasswordSetup-latest.exe`](https://downloads.1password.com/win/1PasswordSetup-latest.exe)
   - Newest version not available on chocolatey index
