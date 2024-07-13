@@ -32,3 +32,4 @@ choco install wiztree
 choco install zoom
 choco install bruno
 choco install nodejs
+choco install just
