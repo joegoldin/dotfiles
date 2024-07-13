@@ -31,3 +31,4 @@ choco install wavelink
 choco install wiztree
 choco install zoom
 choco install bruno
+choco install nodejs
