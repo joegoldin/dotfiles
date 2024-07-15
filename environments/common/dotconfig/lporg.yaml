@@ -32,7 +32,6 @@ apps:
         - Home
         - Siri
         - iPhone Mirroring
-        - Passwords
         - TestFlight
         - Xcode-beta
         - System Settings
@@ -71,6 +70,7 @@ apps:
                 - Chess
                 - Feedback Assistant
                 - Tips
+                - Passwords
     - number: 2
       items:
         - 1Password
@@ -147,6 +147,7 @@ dock_items:
     - /Applications/iTerm.app
     - /Applications/Cursor.app
     - /Applications/Xcode-beta.app
+    - /Applications/A Companion for SwiftUI.app
     - /Applications/Xcode-beta.app/Contents/Developer/Applications/Simulator.app
     - /Applications/Sublime Text.app
     - /Applications/Sublime Merge.app
