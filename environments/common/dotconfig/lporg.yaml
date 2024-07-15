@@ -34,6 +34,7 @@ apps:
         - iPhone Mirroring
         - Passwords
         - TestFlight
+        - Xcode-beta
         - System Settings
         - folder: Other
           pages:
@@ -70,12 +71,12 @@ apps:
                 - Chess
                 - Feedback Assistant
                 - Tips
-        - Xcode-beta
     - number: 2
       items:
         - 1Password
         - Arc
         - Bruno
+        - A Companion for SwiftUI
         - Cursor
         - DaisyDisk
         - Discord
@@ -92,7 +93,6 @@ apps:
         - Patterns
         - Postico 2
         - Proton Mail
-        - RocketSim
         - Roon
         - Rosetta Stone Learn Languages
         - Slack
@@ -101,6 +101,11 @@ apps:
         - Sublime Text
         - Timer
         - zoom.us
+        - folder: Games
+          pages:
+            - number: 1
+              items:
+                - Tabletop Simulator
         - folder: Utilities
           pages:
             - number: 1
@@ -120,6 +125,7 @@ apps:
                 - Tailscale
                 - TomatoBar
                 - Peek
+                - RocketSim
 widgets:
   pages: []
 dock_items:
