@@ -34,3 +34,4 @@ choco install bruno
 choco install nodejs
 choco install just
 choco install obs-studio
+choco install audacity
