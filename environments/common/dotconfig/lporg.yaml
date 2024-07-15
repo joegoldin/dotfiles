@@ -80,6 +80,7 @@ apps:
         - Cursor
         - DaisyDisk
         - Discord
+        - Docker
         - Figma
         - Flying Logic
         - Google Chrome
