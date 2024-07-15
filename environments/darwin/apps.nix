@@ -134,6 +134,7 @@
       "cursor"
       "daisydisk"
       "discord"
+      "docker"
       "figma"
       "google-chrome"
       "iterm2"
