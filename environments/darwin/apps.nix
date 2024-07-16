@@ -159,7 +159,6 @@
       "sublime-merge"
       "sublime-text"
       "tomatobar"
-      "xcodes"
       "zoom"
     ];
   };
