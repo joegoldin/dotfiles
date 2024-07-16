@@ -28,13 +28,24 @@
   - `Flying Logic Installer.exe`
     - [`flying_logic_win_x64.zip`](https://s3.amazonaws.com/flyinglogic.com/download/flying_logic_win_x64.zip)
   - Not available on chocolatey index
+  
+- Jumpshare
+  - [`JumpshareInstaller.exe`](https://d21hi1or3tbtjm.cloudfront.net/desktop/windows/JumpshareInstaller.exe)
+  - Newest version not available on chocolatey index
 
 - MOTU M Series
   - [`MOTU M Series Installer *.exe`](https://cdn-data.motu.com/downloads/audio/mseries/driver/RC/MOTU%20M%20Series%20Installer%20(95601).exe)
   - Not available on chocolatey index
 
+- OBS Background Removal
+  - [obs-backgroundremoval-*-windows-x64-Installer.exe](https://github.com/occ-ai/obs-backgroundremoval/releases/download/1.1.13/obs-backgroundremoval-1.1.13-windows-x64-Installer.exe)
+
 - REALFORCE CONNECT
   - [`REALFORCE CONNECT Software Setup_*.exe`](https://www.realforce.co.jp/support/download/software/win/files/REALFORCE%20CONNECT%20Software%20Setup_3-2-0.exe)
+  - Not available on chocolatey index
+
+- Simplify3d
+  - `Simplify3D-5.*-windows-x64-installer.zip`
   - Not available on chocolatey index
 
 - Steam
