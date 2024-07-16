@@ -40,6 +40,7 @@
       Peek = 1554235898;
       Patterns = 429449079;
       RocketSim = 1504940162;
+      DevCleaner = 1388020431;
     };
 
     taps = [
