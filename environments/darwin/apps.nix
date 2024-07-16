@@ -87,6 +87,7 @@
       "httpie"
       "jenv"
       "jj"
+      "jumpshare"
       "keyring"
       "kubectx"
       "lporg"
