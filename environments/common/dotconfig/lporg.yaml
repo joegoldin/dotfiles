@@ -115,20 +115,20 @@ apps:
                 - Amphetamine
                 - Barbee
                 - Barrier
+                - DevCleaner
                 - Flycut
                 - iTermAI
                 - LuLu
                 - Mac Mouse Fix
+                - Peek
                 - Proton Mail Bridge
                 - Rectangle Pro
+                - RocketSim
                 - Shottr
                 - SoundSource
                 - Stats
                 - Tailscale
                 - TomatoBar
-                - Peek
-                - RocketSim
-                - DevCleaner
 widgets:
   pages: []
 dock_items:
