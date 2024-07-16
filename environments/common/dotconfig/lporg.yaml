@@ -75,7 +75,6 @@ apps:
       items:
         - 1Password
         - Arc
-        - Bruno
         - A Companion for SwiftUI
         - Cursor
         - DaisyDisk
@@ -84,8 +83,10 @@ apps:
         - Figma
         - Flying Logic
         - Google Chrome
+        - HTTPie
         - iTerm
         - Jump Desktop
+        - Jumpshare
         - LocalSend
         - Logseq
         - Modern CSV
