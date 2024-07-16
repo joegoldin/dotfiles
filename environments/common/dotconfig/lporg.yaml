@@ -33,7 +33,6 @@ apps:
         - Siri
         - iPhone Mirroring
         - TestFlight
-        - Xcode-beta
         - System Settings
         - folder: Other
           pages:
@@ -128,6 +127,7 @@ apps:
                 - TomatoBar
                 - Peek
                 - RocketSim
+                - Xcodes
 widgets:
   pages: []
 dock_items:
@@ -147,9 +147,9 @@ dock_items:
     - /System/Applications/Photos.app
     - /Applications/iTerm.app
     - /Applications/Cursor.app
-    - /Applications/Xcode-beta.app
     - /Applications/A Companion for SwiftUI.app
     - /Applications/Xcode-beta.app/Contents/Developer/Applications/Simulator.app
+    - /Applications/HTTPie.app
     - /Applications/Sublime Text.app
     - /Applications/Sublime Merge.app
     - /Applications/Postico 2.app
