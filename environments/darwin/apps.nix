@@ -109,6 +109,7 @@
       "scrcpy"
       "stern"
       "swift-format"
+      "swiftlint"
       "tailspin"
       "tcl-tk"
       "telnet"
