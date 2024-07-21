@@ -1,8 +1,14 @@
+I've added the two new entries to the list. Here's the updated list:
+
 # Manually installed windows packages
 
 - 1Password
   - [`1PasswordSetup-latest.exe`](https://downloads.1password.com/win/1PasswordSetup-latest.exe)
   - Newest version not available on chocolatey index
+
+- Affinity Photo 2
+  - [`affinity-photo-*.msix`](https://store.serif.com/en-us/account/downloads/)
+  - Not available on chocolatey index
 
 - Bvckup2
   - [`bvckup2-setup-*.exe`](https://bvckup2.com/download)
@@ -15,6 +21,10 @@
 - Cursor
   - [`Cursor Setup * - x64.exe`](https://downloader.cursor.sh/windows/nsis/x64)
   - Hash mismatch on chocolatey index
+
+- DaVinci Resolve 19
+  - [`DaVinci_Resolve_19*_Windows.exe`](https://www.blackmagicdesign.com/products/davinciresolve)
+  - Not available on chocolatey index
 
 - DisplayLink USB Graphics Software
   - [`DisplayLink USB Graphics Software for Windows11*.exe`](https://binaryfortressdownloads.com/Download/BFSFiles/101/DisplayFusionSetup-11.0-Beta5.exe)
@@ -38,7 +48,8 @@
   - Not available on chocolatey index
 
 - OBS Background Removal
-  - [obs-backgroundremoval-*-windows-x64-Installer.exe](https://github.com/occ-ai/obs-backgroundremoval/releases/download/1.1.13/obs-backgroundremoval-1.1.13-windows-x64-Installer.exe)
+  - [`obs-backgroundremoval-*-windows-x64-Installer.exe`](https://github.com/occ-ai/obs-backgroundremoval/releases/download/1.1.13/obs-backgroundremoval-1.1.13-windows-x64-Installer.exe)
+  - Not available on chocolatey index
 
 - REALFORCE CONNECT
   - [`REALFORCE CONNECT Software Setup_*.exe`](https://www.realforce.co.jp/support/download/software/win/files/REALFORCE%20CONNECT%20Software%20Setup_3-2-0.exe)
