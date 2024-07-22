@@ -2,8 +2,11 @@
 {
   imports = [ (modulesPath + "/profiles/qemu-guest.nix") ];
   boot = {
-    tmpOnTmpfs = true;
-    tmpOnTmpfsSize = "12G";
+    tmp = {
+      useTmpfs = true;
+      tmpfsSize = "10G";
+      cleanOnBoot = true;
+    };
     loader.grub = {
       efiSupport = true;
       efiInstallAsRemovable = true;
@@ -14,4 +17,5 @@
   boot.initrd.availableKernelModules = [ "ata_piix" "uhci_hcd" "xen_blkfront" ];
   boot.initrd.kernelModules = [ "nvme" ];
   fileSystems."/" = { device = "/dev/mapper/ocivolume-root"; fsType = "xfs"; };
+  zramSwap.enable = true;
 }
