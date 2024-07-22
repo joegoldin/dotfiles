@@ -43,13 +43,13 @@ build-wsl: lint check
 
 [confirm]
 [private]
-build-nixos: lint check
+build-bastion: lint check
   @echo "🔨  Building NixOS config for NixOS 🐧"
-  @sudo nixos-rebuild --flake .#joe-nixos switch
+  @sudo nixos-rebuild --flake .#joe-bastion switch
 
 [linux]
 build:
-  @just {{ if shell('uname -r') =~ "WSL" { "build-wsl" } else { "build-nixos" } }}
+  @just {{ if shell('uname -r') =~ "WSL" { "build-wsl" } else { "build-bastion" } }}
 
 system-info:
   @echo "🖥️  This is an {{arch()}} machine on {{os()}}"

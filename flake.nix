@@ -135,7 +135,7 @@
         ];
       };
 
-      bastion = nixpkgs.lib.nixosSystem {
+      joe-bastion = nixpkgs.lib.nixosSystem {
         specialArgs =
           commonSpecialArgs
           // {
