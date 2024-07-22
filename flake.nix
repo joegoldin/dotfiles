@@ -135,26 +135,25 @@
         ];
       };
 
-      # Disabled until I have a machine actually running nixos natively
-      # joe-nixos = nixpkgs.lib.nixosSystem {
-      #   specialArgs =
-      #     commonSpecialArgs
-      #     // {
-      #       hostname = "joe-nixos";
-      #     };
-      #   modules = [
-      #     # > Our main nixos configuration file <
-      #     ./environments/nixos
-      #     home-manager.nixosModules.home-manager
-      #     ({specialArgs, ...}: {
-      #       home-manager.useGlobalPkgs = true;
-      #       home-manager.useUserPackages = true;
-      #       home-manager.extraSpecialArgs = specialArgs;
-      #       home-manager.backupFileExtension = "backup"; # enable moving existing files
-      #       home-manager.users.${specialArgs.username} = import ./home-manager/nixos;
-      #     })
-      #   ];
-      # };
+      bastion = nixpkgs.lib.nixosSystem {
+        specialArgs =
+          commonSpecialArgs
+          // {
+            hostname = "bastion";
+          };
+        modules = [
+          # > Our main nixos configuration file <
+          ./environments/oracle-cloud
+          home-manager.nixosModules.home-manager
+          ({specialArgs, ...}: {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = specialArgs;
+            home-manager.backupFileExtension = "backup"; # enable moving existing files
+            home-manager.users.${specialArgs.username} = import ./home-manager/nixos;
+          })
+        ];
+      };
     };
 
     # Darwin/macOS configuration entrypoint
