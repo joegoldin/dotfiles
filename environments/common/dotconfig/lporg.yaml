@@ -74,10 +74,12 @@ apps:
     - number: 2
       items:
         - 1Password
+        - Affinity Photo 2
         - Arc
         - A Companion for SwiftUI
         - Cursor
         - DaisyDisk
+        - DaVinci Resolve
         - Discord
         - Docker
         - Figma
@@ -129,6 +131,13 @@ apps:
                 - Stats
                 - Tailscale
                 - TomatoBar
+                - Blackmagic Proxy Generator Lite
+                - DaVinci Control Panels Setup
+    - number: 3
+      items:
+        - Fairlight Studio Utility
+        - Blackmagic RAW Player
+        - Blackmagic RAW Speed Test
 widgets:
   pages: []
 dock_items:
@@ -150,7 +159,6 @@ dock_items:
     - /Applications/Cursor.app
     - /Applications/A Companion for SwiftUI.app
     - /Applications/Xcode-beta.app
-    - /Applications/Xcode-beta.app/Contents/Developer/Applications/Simulator.app
     - /Applications/HTTPie.app
     - /Applications/Sublime Text.app
     - /Applications/Sublime Merge.app
