@@ -34,6 +34,7 @@ apps:
         - iPhone Mirroring
         - TestFlight
         - Xcode-beta
+        - SF Symbols
         - System Settings
         - folder: Other
           pages:
@@ -89,6 +90,7 @@ apps:
         - iTerm
         - Jump Desktop
         - Jumpshare
+        - Kanary Copilot
         - LocalSend
         - Logseq
         - Modern CSV
@@ -133,11 +135,9 @@ apps:
                 - TomatoBar
                 - Blackmagic Proxy Generator Lite
                 - DaVinci Control Panels Setup
-    - number: 3
-      items:
-        - Fairlight Studio Utility
-        - Blackmagic RAW Player
-        - Blackmagic RAW Speed Test
+                - Fairlight Studio Utility
+                - Blackmagic RAW Player
+                - Blackmagic RAW Speed Test
 widgets:
   pages: []
 dock_items:
