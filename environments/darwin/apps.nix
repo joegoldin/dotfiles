@@ -132,6 +132,7 @@
       "android-platform-tools"
       "arc"
       "barrier"
+      "blender"
       "cursor"
       "daisydisk"
       "discord"
