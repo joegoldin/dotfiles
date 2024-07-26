@@ -105,6 +105,7 @@ apps:
         - Steam
         - Sublime Merge
         - Sublime Text
+        - TypingMind
         - zoom.us
         - folder: Games
           pages:
@@ -157,8 +158,8 @@ dock_items:
     - /System/Applications/Photos.app
     - /Applications/iTerm.app
     - /Applications/Cursor.app
+    - /Users/joe/Applications/TypingMind.app
     - /Applications/A Companion for SwiftUI.app
-    - /Applications/Xcode-beta.app
     - /Applications/HTTPie.app
     - /Applications/Sublime Text.app
     - /Applications/Sublime Merge.app
