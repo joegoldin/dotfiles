@@ -15,9 +15,9 @@ pkgs: {
 
   cursor-server-linux = pkgs.stdenv.mkDerivation rec {
     pname = "cursor-server-linux";
-    version = "0.37.1";
-    commit = "bee043c1bb0095dab94043787985ccfc7cc38e50";
-    sha256 = "11yzghnwd115fd0kh5w85d4jv701wfnck7yyahwcia7lk2jvvgx3";
+    version = "0.38.1";
+    commit = "39ded7305e8d625076ebbbf98510c53152232660";
+    sha256 = "1b0vx876j9rpjvv3r1kyvg5nhzqhgs9yyf7k07lb8y4xcx3sb87p";
 
     src = pkgs.fetchurl {
       url = "https://cursor.blob.core.windows.net/remote-releases/${version}-${commit}/vscode-reh-linux-x64.tar.gz";
