@@ -13,6 +13,7 @@ choco install discord.install
 choco install docker-desktop
 choco install epicgameslauncher
 # choco install figma # manually installing because of hash mismatch
+choco install goggalaxy
 choco install httpie
 choco install httpie-desktop
 choco install jdownloader
