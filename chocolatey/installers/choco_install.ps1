@@ -5,6 +5,7 @@ choco install boxstarter
 choco install 7zip
 choco install audacity
 choco install barrier
+choco install blender
 choco install clipjump
 # choco install cursoride # manually installing because of hash mismatch
 choco install discord.install
