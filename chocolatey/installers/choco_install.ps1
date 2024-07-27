@@ -34,6 +34,7 @@ choco install slack
 # choco install steam # manually installing because of hash mismatch
 choco install streamdeck
 choco install tailscale
+choco install vortex
 choco install wavelink
 choco install wiztree
 choco install zoom
