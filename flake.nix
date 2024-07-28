@@ -43,6 +43,11 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # agenix
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   nixConfig = {
@@ -65,6 +70,7 @@
     brew-nix,
     brew-api,
     disko,
+    agenix,
     ...
   } @ inputs: let
     inherit (self) outputs;
@@ -87,8 +93,6 @@
     # Your custom packages
     # Accessible through 'nix build', 'nix shell', etc
     packages = eachSystem (system: basePackages.${system} // additionalPackages.${system});
-    # Formatter for your nix files, available through 'nix fmt'
-    # Other options beside 'alejandra' include 'nixpkgs-fmt'
     formatter = eachSystem (system: nixpkgs.legacyPackages.${system}.alejandra);
 
     # Your custom packages and modifications, exported as overlays
@@ -128,7 +132,7 @@
           };
         modules = [
           nixos-wsl.nixosModules.default
-          # > Our main nixos configuration file <
+          # > Our main nixos configuration <
           ./environments/wsl
           home-manager.nixosModules.home-manager
           ({specialArgs, ...}: {
@@ -138,10 +142,11 @@
             home-manager.backupFileExtension = "backup"; # enable moving existing files
             home-manager.users.${specialArgs.username} = import ./home-manager/wsl;
           })
+          agenix.nixosModules.default
         ];
       };
 
-      joe-bastion = nixpkgs.lib.nixosSystem {
+      oracle-cloud-bastion = nixpkgs.lib.nixosSystem {
         specialArgs =
           commonSpecialArgs
           // {
@@ -149,7 +154,7 @@
           };
         modules = [
           disko.nixosModules.disko
-          # > Our main nixos configuration file <
+          # > Our main nixos configuration <
           ./environments/oracle-cloud
           home-manager.nixosModules.home-manager
           ({specialArgs, ...}: {
@@ -159,37 +164,17 @@
             home-manager.backupFileExtension = "backup"; # enable moving existing files
             home-manager.users.${specialArgs.username} = import ./home-manager/nixos;
           })
+          agenix.nixosModules.default
+          {
+            age.secrets.cf.file = ../secrets/cf.age;
+          }
         ];
       };
     };
 
     # Darwin/macOS configuration entrypoint
-    # Available through 'darwin-rebuild --flake .#Joes-MacBook-Air'
+    # Available through 'darwin-rebuild --flake .#Joes-MacBook-Pro'
     darwinConfigurations = {
-      Joes-MacBook-Air = darwin.lib.darwinSystem {
-        system = "aarch64-darwin";
-        specialArgs =
-          commonSpecialArgs
-          // {
-            username = "joegoldin";
-            hostname = "Joes-MacBook-Air";
-            homeDirectory = nixpkgs.lib.mkForce "/Users/joegoldin";
-          };
-        modules = [
-          ./environments/darwin
-          home-manager.darwinModules.home-manager
-          ({specialArgs, ...}: {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = specialArgs;
-            home-manager.backupFileExtension = "backup"; # enable moving existing files
-            home-manager.users.joegoldin.imports = [
-              ./home-manager/darwin
-            ];
-          })
-        ];
-      };
-
       Joes-MacBook-Pro = darwin.lib.darwinSystem {
         system = "aarch64-darwin";
         specialArgs =
@@ -200,6 +185,7 @@
             homeDirectory = nixpkgs.lib.mkForce "/Users/joe";
           };
         modules = [
+          # > Our main darwin configuration <
           ./environments/darwin
           home-manager.darwinModules.home-manager
           ({specialArgs, ...}: {
@@ -211,6 +197,7 @@
               ./home-manager/darwin
             ];
           })
+          agenix.nixosModules.default
         ];
       };
     };

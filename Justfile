@@ -45,7 +45,7 @@ build-wsl: lint check
 [private]
 build-bastion: lint check
   @echo "🔨  Building NixOS config for NixOS 🐧"
-  @sudo nixos-rebuild --flake .#joe-bastion switch
+  @sudo nixos-rebuild --flake .#oracle-cloud-bastion switch
 
 [linux]
 build:

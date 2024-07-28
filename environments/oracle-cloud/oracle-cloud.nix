@@ -1,10 +1,12 @@
 # Edit this configuration file to define what should be installed on
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
-
-{ config, lib, pkgs, ... }:
-
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}: {
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -15,6 +17,18 @@
 
   # Set your time zone.
   time.timeZone = "America/Los_Angeles";
+
+  services.cloudflared = {
+    enable = true;
+    tunnels = {
+      "dd9aada3-d855-47fd-b782-f5314c2bb81e" = {
+        credentialsFile = config.age.secrets.cf.path;
+        ingress = {
+          "bastion.joegold.in" = "ssh://localhost:22";
+        };
+        default = "http_status:404";
+      };
+    };
 
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
@@ -34,5 +48,4 @@
   #
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "24.05"; # Did you read the comment?
-
 }
