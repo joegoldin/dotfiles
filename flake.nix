@@ -38,6 +38,11 @@
       url = "github:BatteredBunny/brew-api";
       flake = false;
     };
+    #disko
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   nixConfig = {
@@ -59,6 +64,7 @@
     pre-commit-hooks,
     brew-nix,
     brew-api,
+    disko,
     ...
   } @ inputs: let
     inherit (self) outputs;
@@ -142,6 +148,7 @@
             hostname = "bastion";
           };
         modules = [
+          disko.nixosModules.disko
           # > Our main nixos configuration file <
           ./environments/oracle-cloud
           home-manager.nixosModules.home-manager
