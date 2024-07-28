@@ -9,6 +9,7 @@
   username,
   hostname,
   stateVersion,
+  agenix,
   ...
 }: {
   system.stateVersion = "${stateVersion}";
@@ -84,6 +85,7 @@
   environment.systemPackages = with pkgs; [
     git
     wget
+    agenix.packages.${pkgs.system}.default
   ];
 
   programs._1password.enable = true;

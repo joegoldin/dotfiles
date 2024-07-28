@@ -7,6 +7,7 @@
   username,
   hostname,
   stateVersion,
+  agenix,
   ...
 }: {
   imports = [
@@ -116,5 +117,6 @@
   environment.systemPackages = with pkgs; [
     git
     wget
+    agenix.packages.${pkgs.system}.default
   ];
 }
