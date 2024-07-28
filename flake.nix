@@ -170,7 +170,7 @@
               file = ./secrets/cf.age;
               mode = "650";
               owner = specialArgs.username;
-              group = specialArgs.username;
+              group = "users";
             };
             age.identityPaths = ["/home/joe/.ssh/id_ed25519"];
           })
