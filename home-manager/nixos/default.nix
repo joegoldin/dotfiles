@@ -21,6 +21,7 @@
     ++ (with pkgs; [
       # nixos only packages
       tailscale
+      cloudflared
     ]);
 
   # lorri for nix-shell
