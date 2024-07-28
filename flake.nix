@@ -167,7 +167,7 @@
           agenix.nixosModules.default
           {
             age.secrets.cf.file = ./secrets/cf.age;
-            age.identityPaths = [ "/home/joe/.ssh/id_ed25519" ];
+            age.identityPaths = ["/home/joe/.ssh/id_ed25519"];
           }
         ];
       };
