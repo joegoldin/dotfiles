@@ -23,8 +23,10 @@ in {
   home.packages =
     (import ../common/packages.nix {inherit pkgs;}).home.packages
     ++ (with pkgs; [
+      # macos only packages
       shopt-script
       iterm2-terminal-integration
+      clai-go
     ]);
   programs.fish.interactiveShellInit = lib.strings.concatStrings [
     (import ../common/fish/init.nix {inherit pkgs;}).interactiveShellInit

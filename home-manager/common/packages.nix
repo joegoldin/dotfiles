@@ -7,7 +7,7 @@
     bfg-repo-cleaner
     cachix
     caddy
-    clai-go # from go package via overlay
+    # clai-go # from go package via overlay
     comma
     coreutils
     cowsay
