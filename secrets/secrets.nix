@@ -5,5 +5,5 @@ let
   bastion = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJow7z2zGzCIumF/6ZhJDyBe7WwNm1x4CmvzBhIVDhTl";
   systems = [bastion];
 in {
-  "cf.age".publicKeys = users ++ systems;
+  "cf.json.age".publicKeys = users ++ systems;
 }
