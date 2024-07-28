@@ -165,10 +165,15 @@
             home-manager.users.${specialArgs.username} = import ./home-manager/nixos;
           })
           agenix.nixosModules.default
-          {
-            age.secrets.cf.file = ./secrets/cf.age;
+          ({specialArgs, ...}: {
+            age.secrets.cf = { 
+              file = ./secrets/cf.age;
+              mode = "650";
+              owner = specialArgs.username;
+              group = specialArgs.username;
+            };
             age.identityPaths = ["/home/joe/.ssh/id_ed25519"];
-          }
+          })
         ];
       };
     };
