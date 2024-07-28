@@ -166,7 +166,7 @@
           })
           agenix.nixosModules.default
           {
-            age.secrets.cf.file = ../secrets/cf.age;
+            age.secrets.cf.file = ./secrets/cf.age;
           }
         ];
       };
