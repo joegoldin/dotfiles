@@ -167,8 +167,8 @@
           agenix.nixosModules.default
           ({specialArgs, ...}: {
             age.secrets.cf = {
-              file = ./secrets/cf.age;
-              mode = "650";
+              file = ./secrets/cf.json.age;
+              mode = "655";
               owner = specialArgs.username;
               group = "users";
             };
