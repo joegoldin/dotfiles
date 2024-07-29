@@ -136,6 +136,7 @@
       "cursor"
       "daisydisk"
       "discord"
+      "displaylink"
       "docker"
       "figma"
       "google-chrome"
