@@ -55,7 +55,7 @@
 
   users.users = {
     "${username}" = {
-      shell = pkgs.bash;
+      shell = pkgs.fish;
       # You can set an initial password for your user.
       # If you do, you can skip setting a root password by passing '--no-root-passwd' to nixos-install.
       # Be sure to change it (using passwd) after rebooting!
@@ -69,13 +69,11 @@
   };
 
   programs.bash = {
-    interactiveShellInit = ''
-      if [[ $(${pkgs.procps}/bin/ps --no-header --pid=$PPID --format=comm) != "fish" && -z ''${BASH_EXECUTION_STRING} ]]
-      then
-        shopt -q login_shell && LOGIN_OPTION='--login' || LOGIN_OPTION=""
-        exec ${pkgs.fish}/bin/fish $LOGIN_OPTION
-      fi
-    '';
+    enable = true;
+  };
+
+  programs.zsh = {
+    enable = true;
   };
 
   programs.fish = {
