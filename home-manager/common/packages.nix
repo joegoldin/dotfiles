@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
     act
-    any-nix-shell
+    nix-your-shell
     aria2 # A lightweight multi-protocol & multi-source command-line download utility
     awscli2
     bfg-repo-cleaner
