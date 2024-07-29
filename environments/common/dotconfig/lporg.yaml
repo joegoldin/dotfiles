@@ -159,6 +159,7 @@ dock_items:
     - /Applications/iTerm.app
     - /Applications/Cursor.app
     - /Users/joe/Applications/TypingMind.app
+    - /Applications/Xcode.app
     - /Applications/A Companion for SwiftUI.app
     - /Applications/HTTPie.app
     - /Applications/Sublime Text.app
@@ -172,7 +173,7 @@ dock_items:
       view: 1
       sort: 2
   settings:
-    autohide: true
+    autohide: false
     largesize: null
     magnification: false
     minimize-to-application: false
