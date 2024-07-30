@@ -32,8 +32,8 @@ apps:
         - Home
         - Siri
         - iPhone Mirroring
-        - TestFlight
         - SF Symbols
+        - TestFlight
         - Xcode
         - System Settings
         - folder: Other
@@ -117,10 +117,16 @@ apps:
             - number: 1
               items:
                 - Amphetamine
-                - Barbee
                 - Barrier
+                - Blackmagic Proxy Generator Lite
+                - Blackmagic RAW Player
+                - Blackmagic RAW Speed Test
+                - DaVinci Control Panels Setup
+                - DisplayLink Manager
                 - DevCleaner
+                - Fairlight Studio Utility
                 - Flycut
+                - Ice
                 - iTermAI
                 - LuLu
                 - Mac Mouse Fix
@@ -133,11 +139,6 @@ apps:
                 - Stats
                 - Tailscale
                 - TomatoBar
-                - Blackmagic Proxy Generator Lite
-                - DaVinci Control Panels Setup
-                - Fairlight Studio Utility
-                - Blackmagic RAW Player
-                - Blackmagic RAW Speed Test
                 - Timer
 widgets:
   pages: []
