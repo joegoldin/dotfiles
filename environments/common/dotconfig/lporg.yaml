@@ -75,6 +75,7 @@ apps:
     - number: 2
       items:
         - 1Password
+        - Affinity Designer 2
         - Affinity Photo 2
         - Arc
         - Blender
@@ -107,11 +108,6 @@ apps:
         - Sublime Text
         - TypingMind
         - zoom.us
-        - folder: Games
-          pages:
-            - number: 1
-              items:
-                - Tabletop Simulator
         - folder: Utilities
           pages:
             - number: 1
@@ -140,6 +136,13 @@ apps:
                 - Tailscale
                 - TomatoBar
                 - Timer
+    - number: 3
+      items:
+        - folder: Games
+          pages:
+            - number: 1
+              items:
+                - Tabletop Simulator
 widgets:
   pages: []
 dock_items:
@@ -156,6 +159,7 @@ dock_items:
     - /System/Applications/Calendar.app
     - /System/Applications/Mail.app
     - /Applications/Roon.app
+    - /Applications/Affinity Photo 2.app
     - /System/Applications/Photos.app
     - /Applications/iTerm.app
     - /Applications/Cursor.app
