@@ -39,6 +39,7 @@
     pinentry-curses
     pre-commit
     pueue
+    (import ./python.nix {inherit pkgs;})
     ripgrep # recursivel searches directories for a regex pattern
     socat # replacement of openbsd-netcat
     tree
