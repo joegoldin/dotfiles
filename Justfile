@@ -33,7 +33,6 @@ save-launchpad:
 [macos]
 build:
   @just build-macos
-  @just organize-launchpad
 
 [confirm]
 [private]
