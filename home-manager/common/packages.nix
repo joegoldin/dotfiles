@@ -30,7 +30,7 @@
     httpie
     helm-with-plugins
     helmfile-with-plugins
-    jekyll
+    hugo
     jq # A lightweight and flexible command-line JSON processor
     kubectl
     nix
