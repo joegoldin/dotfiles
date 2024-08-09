@@ -1,5 +1,7 @@
 Update-ExecutionPolicy Unrestricted
 
+choco feature enable -n allowGlobalConfirmation
+
 choco install boxstarter
 
 choco install 7zip
