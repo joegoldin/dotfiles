@@ -24,6 +24,7 @@ choco install lghub
 choco install librehardwaremonitor
 choco install localsend
 choco install logseq
+choco install make
 choco install microsoft-windows-terminal
 choco install mpc-hc-clsid2
 choco install msedgeredirect
