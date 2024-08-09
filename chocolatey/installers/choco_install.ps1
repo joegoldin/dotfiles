@@ -39,5 +39,6 @@ choco install streamdeck
 choco install tailscale
 choco install vortex
 choco install wavelink
+choco install which
 choco install wiztree
 choco install zoom
