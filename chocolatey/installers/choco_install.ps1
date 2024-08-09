@@ -7,6 +7,7 @@ choco install audacity
 choco install barrier
 choco install blender
 choco install clipjump
+choco install chromedriver
 # choco install cursoride # manually installing because of hash mismatch
 choco install discord.install
 # choco install displayfusion --pre # manually installing for beta version
