@@ -11,6 +11,7 @@
   hasSpecialisationCli = hasPackage "specialisation";
   hasAwsCli = hasPackage "awscli2";
   hasKubectl = hasPackage "kubectl";
+  hasLazydocker = hasPackage "lazydocker";
 in {
   shellAliases = rec {};
 
@@ -47,5 +48,6 @@ in {
     awslogin = mkIf hasAwsCli "aws sso login";
 
     k = mkIf hasKubectl "kubectl";
+    lzd = mkIf hasLazydocker "lazydocker";
   };
 }
