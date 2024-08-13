@@ -33,6 +33,7 @@
     hugo
     jq # A lightweight and flexible command-line JSON processor
     kubectl
+    lazydocker
     nix
     nmap
     nnn # terminal file manager
