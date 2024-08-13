@@ -29,6 +29,7 @@ choco install localsend
 choco install logseq
 choco install make
 choco install microsoft-windows-terminal
+choco install miniconda3 --version=3.10.1
 choco install mpc-hc-clsid2
 choco install msedgeredirect
 choco install nodejs
