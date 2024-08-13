@@ -24,6 +24,7 @@ choco install httpie
 choco install httpie-desktop
 choco install jdownloader
 choco install just
+choco install lazydocker
 choco install lghub
 choco install librehardwaremonitor
 choco install localsend
