@@ -29,7 +29,7 @@ choco install localsend
 choco install logseq
 choco install make
 choco install microsoft-windows-terminal
-winget install -e --id Python.Python.3.10
+winget install -e --id Python.Python.3.10 --silent --accept-source-agreements
 choco install mpc-hc-clsid2
 choco install msedgeredirect
 choco install nodejs
