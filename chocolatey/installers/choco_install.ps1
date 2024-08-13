@@ -46,3 +46,4 @@ choco install wavelink
 choco install which
 choco install wiztree
 choco install zoom
+choco install zoxide
