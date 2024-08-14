@@ -30,7 +30,6 @@
     ssh = "ssh.exe";
     ssh-add = "ssh-add.exe";
     op = "op.exe";
-    cursor = "/mnt/c/Users/Joe/AppData/Local/Programs/cursor/Cursor.exe";
   };
 
   # gnupg gpg stuff
