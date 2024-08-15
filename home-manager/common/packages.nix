@@ -37,6 +37,7 @@
     nix
     nmap
     nnn # terminal file manager
+    openring
     p7zip
     pinentry-curses
     pre-commit
