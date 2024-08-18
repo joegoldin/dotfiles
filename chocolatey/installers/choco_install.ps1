@@ -44,6 +44,7 @@ choco install slack
 choco install streamdeck
 choco install tailscale
 choco install vcvrack
+choco install voicemeeter-potato
 choco install vortex
 choco install wavelink
 choco install which
