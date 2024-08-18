@@ -1,5 +1,3 @@
-I've added the two new entries to the list. Here's the updated list:
-
 # Manually installed windows packages
 
 - 1Password
@@ -8,6 +6,10 @@ I've added the two new entries to the list. Here's the updated list:
 
 - Affinity Photo 2
   - [`affinity-photo-*.msix`](https://store.serif.com/en-us/account/downloads/)
+  - Not available on chocolatey index
+
+- Battle.net
+  - [`Battle.net-Setup.exe`](https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe)
   - Not available on chocolatey index
 
 - Bvckup2
