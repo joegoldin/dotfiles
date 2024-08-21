@@ -16,6 +16,7 @@ check: lint flake-update
 
 [unix]
 flake-update:
+  @echo "🔄  Updating flake..."
   @nix flake update
 
 [confirm]
