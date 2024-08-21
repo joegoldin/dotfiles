@@ -35,13 +35,22 @@ sed -i.bak -e "/cursor-server-linux =.*{/,/};/{
     s/sha256 = \".*\";/sha256 = \"$sha256\";/
 }" "$nix_file"
 
-echo "Updated $nix_file with version: $versionz, commit: $commit, sha256: $sha256"
+echo "Updated $nix_file with cursor-server-linux version: $versionz, commit: $commit, sha256: $sha256"
 
 # Change directories if supplied
 cd ..
 
 # Build the project with the build tool
 just build
+
+# Add the modified file to git staging area
+git add "environments/common/pkgs/default.nix*"
+
+# Commit the changes with a message
+git commit -m "Update $nix_file with cursor-server-linux version: $versionz"
+
+# Push the changes to the remote repository
+git push origin main
 
 # Restore the previous directory
 popd
