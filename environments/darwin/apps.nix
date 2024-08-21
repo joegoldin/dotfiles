@@ -132,6 +132,7 @@
       "arc"
       "barrier"
       "blender"
+      "chromedriver"
       "cursor"
       "daisydisk"
       "discord"
@@ -162,6 +163,7 @@
       "steam"
       "sublime-merge"
       "sublime-text"
+      "swiftlint"
       "tomatobar"
       "zoom"
     ];
