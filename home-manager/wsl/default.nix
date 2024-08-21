@@ -15,7 +15,7 @@
   ];
 
   home.packages =
-    (import ../common/packages.nix {inherit pkgs;}).home.packages
+    (import ../common/packages.nix {inherit pkgs lib;}).home.packages
     ++ (with pkgs; [
       # wsl only packages
       clai-go

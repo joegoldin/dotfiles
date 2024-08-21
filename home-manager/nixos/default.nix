@@ -17,7 +17,7 @@
   ];
 
   home.packages =
-    (import ../common/packages.nix {inherit pkgs;}).home.packages
+    (import ../common/packages.nix {inherit pkgs lib;}).home.packages
     ++ (with pkgs; [
       # nixos only packages
       tailscale
