@@ -9,14 +9,18 @@ lint:
   @echo "✅  nix fmt passed!"
 
 [unix]
-check: lint
+check: lint flake-update
   @echo "🔍  Checking NixOS config..."
   @NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 NIXPKGS_ALLOW_UNFREE=1 NIXPKGS_ALLOW_BROKEN=1 nix flake check --impure --all-systems
   @echo "✅  flake check passed!"
 
+[unix]
+flake-update:
+  @nix flake update
+
 [confirm]
 [private]
-build-macos: lint check
+build-macos: check
   @echo "🔨  Building NixOS config for macOS 🍎"
   @nix run --extra-experimental-features 'nix-command flakes' nix-darwin -- switch --flake .#Joes-MacBook-Pro
 
@@ -36,13 +40,13 @@ build:
 
 [confirm]
 [private]
-build-wsl: lint check
+build-wsl: check
   @echo "🔨  Building NixOS config for WSL 🪟"
   @sudo nixos-rebuild --flake .#joe-wsl switch
 
 [confirm]
 [private]
-build-bastion: lint check
+build-bastion: check
   @echo "🔨  Building NixOS config for NixOS 🐧"
   @sudo nixos-rebuild --flake .#oracle-cloud-bastion switch
 
