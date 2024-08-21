@@ -163,7 +163,6 @@
       "steam"
       "sublime-merge"
       "sublime-text"
-      "swiftlint"
       "tomatobar"
       "zoom"
     ];
