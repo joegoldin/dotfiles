@@ -35,7 +35,7 @@
       httpie
       helm-with-plugins
       helmfile-with-plugins
-      hugo
+      unstable.hugo
       jq # A lightweight and flexible command-line JSON processor
       kubectl
       lazydocker
