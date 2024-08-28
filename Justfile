@@ -19,6 +19,12 @@ flake-update:
   @echo "🔄  Updating flake..."
   @nix flake update
 
+[unix]
+nix-gc:
+  @echo "🧹  Garbage collecting nix..."
+  @nix-env --delete-generations 14d
+  @nix-store --gc
+
 [confirm]
 [private]
 build-macos: check
