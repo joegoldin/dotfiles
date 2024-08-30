@@ -2,8 +2,13 @@
 with pkgs; (python3.withPackages (ps:
     with ps;
       [
+        anthropic
+        black
+        flake8
+        isort
         jupyter
         numpy
+        openai
         scikit-learn
       ]
       ++ (
