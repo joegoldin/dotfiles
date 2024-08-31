@@ -18,6 +18,8 @@
       cowsay
       devenv
       direnv
+      elixir_1_15
+      erlang_27
       file
       fish
       flyctl
