@@ -53,6 +53,7 @@
       (import ./python.nix {inherit pkgs lib;})
       ripgrep # recursivel searches directories for a regex pattern
       socat # replacement of openbsd-netcat
+      tesseract
       tree
       unstable.just
       unzip
