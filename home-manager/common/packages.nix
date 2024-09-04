@@ -39,6 +39,7 @@
       helmfile-with-plugins
       unstable.hugo
       jq # A lightweight and flexible command-line JSON processor
+      k9s
       kubectl
       lazydocker
       nix
