@@ -102,12 +102,15 @@ apps:
         - Proton Mail
         - Roon
         - Rosetta Stone Learn Languages
+        - screenpipe
         - Slack
         - Steam
         - Sublime Merge
         - Sublime Text
         - TypingMind
         - zoom.us
+    - number: 3
+      items:
         - folder: Utilities
           pages:
             - number: 1
@@ -136,8 +139,6 @@ apps:
                 - Tailscale
                 - TomatoBar
                 - Timer
-    - number: 3
-      items:
         - folder: Games
           pages:
             - number: 1
@@ -164,8 +165,10 @@ dock_items:
     - /Applications/iTerm.app
     - /Applications/Cursor.app
     - /Users/joe/Applications/TypingMind.app
+    - /Applications/screenpipe.app
     - /Applications/Xcode.app
     - /Applications/A Companion for SwiftUI.app
+    - /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
     - /Applications/HTTPie.app
     - /Applications/Sublime Text.app
     - /Applications/Sublime Merge.app
@@ -178,7 +181,7 @@ dock_items:
       view: 1
       sort: 2
   settings:
-    autohide: false
+    autohide: true
     largesize: null
     magnification: false
     minimize-to-application: false
