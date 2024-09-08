@@ -17,6 +17,7 @@ choco install discord.install
 # choco install displaylink # manually installing for latest version
 choco install docker-desktop
 choco install epicgameslauncher
+choco install equalizerapo
 choco install ffmpeg
 # choco install figma # manually installing because of hash mismatch
 choco install go

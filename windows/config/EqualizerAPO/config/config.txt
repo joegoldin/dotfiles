@@ -1,0 +1,2 @@
+sampleRate: 96000
+Include: Aiaiai TMA-2 HD Wireless GraphicEq.txt
