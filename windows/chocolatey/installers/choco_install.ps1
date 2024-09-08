@@ -44,6 +44,7 @@ choco install quicklook
 choco install slack
 # choco install steam # manually installing because of hash mismatch
 choco install streamdeck
+choco install sublimemerge
 choco install tailscale
 choco install tesseract
 choco install unity-hub
