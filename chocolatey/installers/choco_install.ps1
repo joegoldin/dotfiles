@@ -9,6 +9,7 @@ choco install audacity
 choco install barrier
 choco install blender
 choco install clipjump
+choco install cmake
 choco install chromedriver
 # choco install cursoride # manually installing because of hash mismatch
 choco install discord.install
