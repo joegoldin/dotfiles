@@ -49,6 +49,7 @@ choco install vcvrack
 choco install voicemeeter-potato
 choco install vortex
 choco install wavelink
+choco install wget
 choco install which
 choco install wiztree
 choco install zoom
