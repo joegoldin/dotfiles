@@ -32,6 +32,10 @@
   - [`DisplayLink USB Graphics Software for Windows11*.exe`](https://binaryfortressdownloads.com/Download/BFSFiles/101/DisplayFusionSetup-11.0-Beta5.exe)
   - Beta version not available on chocolatey index
 
+- EqualizerAPO
+  - [`EqualizerAPO64-*`](https://sourceforge.net/projects/equalizerapo/)
+  - Requires setup on installation
+
 - Figma
   - [`FigmaSetup.exe`](https://desktop.figma.com/win/FigmaSetup.exe)
   - Hash mismatch on chocolatey index
