@@ -53,6 +53,7 @@
       pueue
       (import ./python.nix {inherit pkgs lib;})
       ripgrep # recursivel searches directories for a regex pattern
+      rustup
       socat # replacement of openbsd-netcat
       tesseract
       tree

@@ -102,7 +102,6 @@
       "protobuf"
       "redis"
       "ruby"
-      "rust"
       "saml2aws"
       "saulpw/vd/visidata"
       "schappim/ocr/ocr"
