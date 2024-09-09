@@ -6,6 +6,8 @@
 
     direnv hook fish | source
 
+    fish_add_path $HOME/.cargo/bin
+
     ${pkgs.nix-your-shell}/bin/nix-your-shell fish | source
   '';
 }
