@@ -5,6 +5,7 @@ with pkgs; (python3.withPackages (ps:
         anthropic
         black
         flake8
+        flask
         isort
         jupyter
         numpy
