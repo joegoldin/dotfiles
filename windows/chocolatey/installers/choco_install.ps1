@@ -31,6 +31,7 @@ choco install lghub
 choco install librehardwaremonitor
 choco install localsend
 choco install logseq
+choco install lycheeslicer
 choco install make
 choco install microsoft-windows-terminal
 winget install -e --id Python.Python.3.10 --silent --accept-source-agreements
