@@ -12,6 +12,7 @@ with pkgs; (python3.withPackages (ps:
         ollama
         openai
         scikit-learn
+        tabulate
       ]
       ++ (
         if (stdenv.isDarwin && stdenv.isAarch64)
