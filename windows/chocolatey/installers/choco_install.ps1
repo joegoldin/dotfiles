@@ -49,6 +49,7 @@ choco install sublimemerge
 choco install tailscale
 choco install tesseract
 choco install unity-hub
+choco install uvtools
 choco install vcvrack
 choco install voicemeeter-potato
 choco install vortex
