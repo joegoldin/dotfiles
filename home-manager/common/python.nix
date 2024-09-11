@@ -9,6 +9,7 @@ with pkgs; (python3.withPackages (ps:
         isort
         jupyter
         numpy
+        ollama
         openai
         scikit-learn
       ]
