@@ -15,6 +15,8 @@
     ./apps.nix
   ];
 
+  ids.gids.nixbld = 30000;
+
   nixpkgs.hostPlatform = lib.mkDefault "aarch64-darwin";
 
   nixpkgs = {
