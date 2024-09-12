@@ -43,6 +43,7 @@ choco install obs-studio
 choco install powertoys
 choco install quicklook
 choco install slack
+choco install sqlitebrowser
 # choco install steam # manually installing because of hash mismatch
 choco install streamdeck
 choco install sublimemerge
