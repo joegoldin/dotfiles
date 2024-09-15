@@ -22,6 +22,7 @@ choco install ffmpeg
 # choco install figma # manually installing because of hash mismatch
 choco install go
 choco install goggalaxy
+choco install hakunekonightly
 choco install httpie
 choco install httpie-desktop
 choco install jdownloader
