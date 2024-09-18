@@ -94,4 +94,9 @@
     wget
     agenix.packages.${pkgs.system}.default
   ];
+
+  nixpkgs.flake = {
+    setFlakeRegistry = false;
+    setNixPath = false;
+  };
 }
