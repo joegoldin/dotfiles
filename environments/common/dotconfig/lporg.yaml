@@ -144,6 +144,9 @@ apps:
             - number: 1
               items:
                 - Tabletop Simulator
+        - Ollama
+        - Charles
+        - Proxyman
 widgets:
   pages: []
 dock_items:
@@ -169,6 +172,7 @@ dock_items:
     - /Applications/Xcode.app
     - /Applications/A Companion for SwiftUI.app
     - /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
+    - /Applications/Proxyman.app
     - /Applications/HTTPie.app
     - /Applications/Sublime Text.app
     - /Applications/Sublime Merge.app
