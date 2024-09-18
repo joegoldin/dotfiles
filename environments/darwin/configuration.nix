@@ -14,6 +14,7 @@
     ./system.nix
     ./apps.nix
   ];
+  system.stateVersion = 5;
 
   ids.gids.nixbld = 30000;
 
