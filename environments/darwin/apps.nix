@@ -152,6 +152,7 @@
       "monodraw"
       "notion"
       "postico"
+      "proxyman"
       "rectangle-pro"
       "roon"
       "sf-symbols"
