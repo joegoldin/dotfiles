@@ -128,7 +128,6 @@
       "1password"
       "1password-cli"
       "android-platform-tools"
-      "arc"
       "barrier"
       "blender"
       "chromedriver"
@@ -164,6 +163,7 @@
       "sublime-merge"
       "sublime-text"
       "tomatobar"
+      "zen-browser"
       "zoom"
     ];
   };
