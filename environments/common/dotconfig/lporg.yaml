@@ -78,6 +78,7 @@ apps:
         - Affinity Designer 2
         - Affinity Photo 2
         - Arc
+        - BambuStudio
         - Blender
         - A Companion for SwiftUI
         - Cursor
@@ -97,20 +98,23 @@ apps:
         - Modern CSV
         - Monodraw
         - Notion
+        - Ollama
         - Patterns
         - Postico 2
         - Proton Mail
+        - Proxyman
         - Roon
         - Rosetta Stone Learn Languages
         - screenpipe
         - Slack
         - Steam
         - Sublime Merge
-        - Sublime Text
-        - TypingMind
-        - zoom.us
     - number: 3
       items:
+        - Sublime Text
+        - TypingMind
+        - Zen Browser
+        - zoom.us
         - folder: Utilities
           pages:
             - number: 1
@@ -139,21 +143,20 @@ apps:
                 - Tailscale
                 - TomatoBar
                 - Timer
+                - Charles
+                - Xcode-beta
         - folder: Games
           pages:
             - number: 1
               items:
                 - Tabletop Simulator
-        - Ollama
-        - Charles
-        - Proxyman
 widgets:
   pages: []
 dock_items:
   apps:
     - /System/Applications/Launchpad.app
-    - /Applications/Arc.app
     - /System/Applications/Messages.app
+    - /Applications/Zen Browser.app
     - /Applications/Discord.app
     - /Applications/Slack.app
     - /Applications/Logseq.app
