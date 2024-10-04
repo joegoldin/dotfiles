@@ -80,6 +80,7 @@ apps:
         - Arc
         - BambuStudio
         - Blender
+        - ChatGPT
         - A Companion for SwiftUI
         - Cursor
         - DaisyDisk
@@ -108,9 +109,9 @@ apps:
         - screenpipe
         - Slack
         - Steam
-        - Sublime Merge
     - number: 3
       items:
+        - Sublime Merge
         - Sublime Text
         - TypingMind
         - Zen Browser
