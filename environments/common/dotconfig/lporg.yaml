@@ -173,6 +173,8 @@ dock_items:
     - /Applications/Cursor.app
     - /Users/joe/Applications/TypingMind.app
     - /Applications/screenpipe.app
+    - /Applications/ChatGPT.app
+    - /System/Applications/VoiceMemos.app
     - /Applications/Xcode.app
     - /Applications/A Companion for SwiftUI.app
     - /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
