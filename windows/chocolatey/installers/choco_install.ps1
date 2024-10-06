@@ -6,6 +6,7 @@ choco install boxstarter
 
 choco install 7zip
 choco install audacity
+choco install autodesk-fusion360
 choco install barrier
 choco install blender
 choco install clipjump
