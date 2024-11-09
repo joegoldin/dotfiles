@@ -149,11 +149,6 @@ apps:
                 - Timer
                 - Charles
                 - Xcode-beta
-        - folder: Games
-          pages:
-            - number: 1
-              items:
-                - Tabletop Simulator
 widgets:
   pages: []
 dock_items:
