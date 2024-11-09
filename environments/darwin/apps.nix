@@ -152,6 +152,7 @@
       "michaelvillar-timer"
       "modern-csv"
       "monodraw"
+      "mountain-duck"
       "notion"
       "orion"
       "postico"
