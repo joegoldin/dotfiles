@@ -77,7 +77,7 @@ apps:
         - 1Password
         - Affinity Designer 2
         - Affinity Photo 2
-        - Arc
+        - Android Studio
         - BambuStudio
         - Blender
         - ChatGPT
@@ -85,6 +85,7 @@ apps:
         - Cursor
         - DaisyDisk
         - DaVinci Resolve
+        - Developer
         - Discord
         - Docker
         - Figma
@@ -100,6 +101,7 @@ apps:
         - Monodraw
         - Notion
         - Ollama
+        - Orion
         - Patterns
         - Postico 2
         - Proton Mail
@@ -107,10 +109,10 @@ apps:
         - Roon
         - Rosetta Stone Learn Languages
         - screenpipe
-        - Slack
-        - Steam
     - number: 3
       items:
+        - Slack
+        - Steam
         - Sublime Merge
         - Sublime Text
         - TypingMind
@@ -157,7 +159,7 @@ dock_items:
   apps:
     - /System/Applications/Launchpad.app
     - /System/Applications/Messages.app
-    - /Applications/Zen Browser.app
+    - /Applications/Orion.app
     - /Applications/Discord.app
     - /Applications/Slack.app
     - /Applications/Logseq.app
