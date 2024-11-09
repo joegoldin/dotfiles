@@ -99,6 +99,7 @@ apps:
         - Logseq
         - Modern CSV
         - Monodraw
+        - Mountain Duck
         - Notion
         - Ollama
         - Orion
@@ -106,17 +107,17 @@ apps:
         - Postico 2
         - Proton Mail
         - Proxyman
+        - QuartzCode
         - Roon
-        - Rosetta Stone Learn Languages
-        - screenpipe
     - number: 3
       items:
+        - Rosetta Stone Learn Languages
+        - screenpipe
         - Slack
         - Steam
         - Sublime Merge
         - Sublime Text
         - TypingMind
-        - Zen Browser
         - zoom.us
         - folder: Utilities
           pages:
