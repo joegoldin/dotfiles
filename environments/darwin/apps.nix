@@ -153,6 +153,7 @@
       "modern-csv"
       "monodraw"
       "notion"
+      "orion"
       "postico"
       "proxyman"
       "rectangle-pro"
@@ -167,7 +168,6 @@
       "sublime-merge"
       "sublime-text"
       "tomatobar"
-      "zen-browser"
       "zoom"
     ];
   };
