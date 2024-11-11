@@ -75,6 +75,8 @@ apps:
     - number: 2
       items:
         - 1Password
+        - Affinity Designer 2
+        - Affinity Photo 2
         - Android Studio
         - BambuStudio
         - Blender
@@ -140,18 +142,13 @@ dock_items:
     - /Applications/Slack.app
     - /Applications/Logseq.app
     - /Applications/Notion.app
-    - /Applications/Flying Logic.app
     - /Applications/Figma.app
     - /System/Applications/Calendar.app
     - /System/Applications/Mail.app
     - /Applications/Roon.app
-    - /Applications/Affinity Photo 2.app
     - /System/Applications/Photos.app
     - /Applications/iTerm.app
     - /Applications/Cursor.app
-    - /Users/joe/Applications/TypingMind.app
-    - /Applications/screenpipe.app
-    - /Applications/ChatGPT.app
     - /System/Applications/VoiceMemos.app
     - /Applications/Xcode.app
     - /Applications/A Companion for SwiftUI.app
