@@ -75,49 +75,36 @@ apps:
     - number: 2
       items:
         - 1Password
-        - Affinity Designer 2
-        - Affinity Photo 2
         - Android Studio
         - BambuStudio
         - Blender
-        - ChatGPT
         - A Companion for SwiftUI
         - Cursor
         - DaisyDisk
-        - DaVinci Resolve
         - Developer
         - Discord
         - Docker
         - Figma
-        - Flying Logic
         - Google Chrome
         - HTTPie
         - iTerm
         - Jump Desktop
-        - Jumpshare
         - LocalSend
         - Logseq
         - Modern CSV
         - Monodraw
         - Mountain Duck
         - Notion
-        - Ollama
         - Orion
         - Patterns
         - Postico 2
-        - Proton Mail
         - Proxyman
-        - QuartzCode
         - Roon
-    - number: 3
-      items:
         - Rosetta Stone Learn Languages
-        - screenpipe
         - Slack
         - Steam
         - Sublime Merge
         - Sublime Text
-        - TypingMind
         - zoom.us
         - folder: Utilities
           pages:
@@ -125,13 +112,8 @@ apps:
               items:
                 - Amphetamine
                 - Barrier
-                - Blackmagic Proxy Generator Lite
-                - Blackmagic RAW Player
-                - Blackmagic RAW Speed Test
-                - DaVinci Control Panels Setup
                 - DisplayLink Manager
                 - DevCleaner
-                - Fairlight Studio Utility
                 - Flycut
                 - Ice
                 - iTermAI
@@ -147,8 +129,6 @@ apps:
                 - Tailscale
                 - TomatoBar
                 - Timer
-                - Charles
-                - Xcode-beta
 widgets:
   pages: []
 dock_items:
@@ -195,5 +175,5 @@ dock_items:
     minimize-to-application: false
     mru-spaces: false
     show-recents: true
-    tilesize: 48
+    tilesize: 64
 desktop: {}
