@@ -42,7 +42,6 @@
       DevCleaner = 1388020431;
       ACompanionForSwiftUI = 1485436674;
       AppleDeveloper = 640199958;
-      QuartzCode = 913523893;
       LocalSend = 1661733229;
     };
 
