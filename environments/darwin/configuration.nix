@@ -16,8 +16,6 @@
   ];
   system.stateVersion = 5;
 
-  ids.gids.nixbld = 30000;
-
   nixpkgs.hostPlatform = lib.mkDefault "aarch64-darwin";
 
   nixpkgs = {
@@ -58,7 +56,7 @@
     configureBuildUsers = true;
   };
 
-  ids.uids.nixbld = lib.mkForce 30000;
+  ids.uids.nixbld = lib.mkForce 350;
 
   services.nix-daemon.enable = true;
 
