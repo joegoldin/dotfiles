@@ -40,6 +40,10 @@
       Patterns = 429449079;
       RocketSim = 1504940162;
       DevCleaner = 1388020431;
+      ACompanionForSwiftUI = 1485436674;
+      AppleDeveloper = 640199958;
+      QuartzCode = 913523893;
+      LocalSend = 1661733229;
     };
 
     taps = [
@@ -155,6 +159,7 @@
       "notion"
       "orion"
       "postico"
+      "protonmail-bridge"
       "proxyman"
       "rectangle-pro"
       "roon"
