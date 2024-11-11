@@ -134,6 +134,7 @@
       "1password-cli"
       "android-platform-tools"
       "android-studio"
+      "bambu-studio"
       "barrier"
       "blender"
       "chromedriver"
