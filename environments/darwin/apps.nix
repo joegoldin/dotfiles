@@ -145,7 +145,6 @@
       "iterm2"
       "itermai"
       "jordanbaird-ice"
-      "jumpshare"
       "logseq"
       "lulu"
       "mac-mouse-fix"
