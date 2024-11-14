@@ -98,6 +98,7 @@ apps:
         - Mountain Duck
         - Notion
         - Orion
+        - Parsec
         - Patterns
         - Postico 2
         - Proxyman
@@ -108,6 +109,8 @@ apps:
         - Sublime Merge
         - Sublime Text
         - zoom.us
+    - number: 3
+      items:
         - folder: Utilities
           pages:
             - number: 1
