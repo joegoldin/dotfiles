@@ -134,6 +134,7 @@ apps:
                 - Tailscale
                 - TomatoBar
                 - Timer
+        - TypingMind
 widgets:
   pages: []
 dock_items:
@@ -158,6 +159,7 @@ dock_items:
     - /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
     - /Applications/Proxyman.app
     - /Applications/HTTPie.app
+    - /Users/joe/Applications/Orion/WebApps/TypingMind.app
     - /Applications/Sublime Text.app
     - /Applications/Sublime Merge.app
     - /Applications/Postico 2.app
