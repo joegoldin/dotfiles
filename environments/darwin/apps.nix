@@ -160,6 +160,7 @@
       "mountain-duck"
       "notion"
       "orion"
+      "parsec"
       "postico"
       "protonmail-bridge"
       "proxyman"
