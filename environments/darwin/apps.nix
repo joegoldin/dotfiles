@@ -132,6 +132,7 @@
     casks = [
       "1password"
       "1password-cli"
+      "adobe-creative-cloud"
       "affinity-designer"
       "affinity-photo"
       "android-platform-tools"
