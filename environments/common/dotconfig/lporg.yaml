@@ -75,8 +75,12 @@ apps:
     - number: 2
       items:
         - 1Password
-        - Affinity Designer 2
-        - Affinity Photo 2
+        - Adobe Acrobat
+        - Adobe After Effects 2025
+        - Adobe Audition 2025
+        - Adobe Media Encoder 2025
+        - Adobe Premiere Pro 2025
+        - Adobe Photoshop 2025
         - Android Studio
         - BambuStudio
         - Blender
@@ -105,16 +109,20 @@ apps:
         - Roon
         - Rosetta Stone Learn Languages
         - Slack
+    - number: 3
+      items:
         - Steam
         - Sublime Merge
         - Sublime Text
+        - TypingMind
         - zoom.us
-    - number: 3
-      items:
         - folder: Utilities
           pages:
             - number: 1
               items:
+                - Acrobat Distiller
+                - Adobe After Effects Render Engine 2025
+                - Adobe Creative Cloud Diagnostics
                 - Amphetamine
                 - Barrier
                 - DisplayLink Manager
@@ -134,7 +142,6 @@ apps:
                 - Tailscale
                 - TomatoBar
                 - Timer
-        - TypingMind
 widgets:
   pages: []
 dock_items:
