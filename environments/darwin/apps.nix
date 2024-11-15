@@ -133,8 +133,6 @@
       "1password"
       "1password-cli"
       "adobe-creative-cloud"
-      "affinity-designer"
-      "affinity-photo"
       "android-platform-tools"
       "android-studio"
       "bambu-studio"
