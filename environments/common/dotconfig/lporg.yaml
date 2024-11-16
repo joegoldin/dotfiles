@@ -120,6 +120,8 @@ apps:
           pages:
             - number: 1
               items:
+                - AdobeCleanUpUtility
+                - AdobeGCClient
                 - Acrobat Distiller
                 - Adobe After Effects Render Engine 2025
                 - Adobe Creative Cloud Diagnostics
