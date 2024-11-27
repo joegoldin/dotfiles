@@ -175,6 +175,7 @@
       "sublime-merge"
       "sublime-text"
       "tomatobar"
+      "whisky"
       "zoom"
     ];
   };
