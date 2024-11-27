@@ -115,6 +115,7 @@ apps:
         - Sublime Merge
         - Sublime Text
         - TypingMind
+        - Whisky
         - zoom.us
         - folder: Utilities
           pages:
@@ -186,5 +187,5 @@ dock_items:
     minimize-to-application: false
     mru-spaces: false
     show-recents: true
-    tilesize: 64
+    tilesize: 47
 desktop: {}
