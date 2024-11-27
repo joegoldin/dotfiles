@@ -82,9 +82,11 @@ apps:
         - Adobe Premiere Pro 2025
         - Adobe Photoshop 2025
         - Android Studio
+        - Autodesk Fusion
         - BambuStudio
         - Blender
         - A Companion for SwiftUI
+        - CrossOver
         - Cursor
         - DaisyDisk
         - Developer
@@ -107,15 +109,14 @@ apps:
         - Postico 2
         - Proxyman
         - Roon
-        - Rosetta Stone Learn Languages
-        - Slack
     - number: 3
       items:
+        - Rosetta Stone Learn Languages
+        - Slack
         - Steam
         - Sublime Merge
         - Sublime Text
         - TypingMind
-        - Whisky
         - zoom.us
         - folder: Utilities
           pages:
@@ -127,6 +128,7 @@ apps:
                 - Adobe After Effects Render Engine 2025
                 - Adobe Creative Cloud Diagnostics
                 - Amphetamine
+                - Autodesk Fusion Service Utility
                 - Barrier
                 - DisplayLink Manager
                 - DevCleaner
@@ -138,10 +140,12 @@ apps:
                 - Peek
                 - Proton Mail Bridge
                 - Rectangle Pro
+                - Remove Autodesk Fusion
                 - RocketSim
                 - Shottr
                 - SoundSource
                 - Stats
+                - Steam Support Center
                 - Tailscale
                 - TomatoBar
                 - Timer
