@@ -78,6 +78,7 @@ apps:
         - Adobe Acrobat
         - Adobe After Effects 2025
         - Adobe Audition 2025
+        - Adobe Illustrator 2025
         - Adobe Media Encoder 2025
         - Adobe Premiere Pro 2025
         - Adobe Photoshop 2025
@@ -108,9 +109,9 @@ apps:
         - Patterns
         - Postico 2
         - Proxyman
-        - Roon
     - number: 3
       items:
+        - Roon
         - Rosetta Stone Learn Languages
         - Slack
         - Steam
@@ -130,6 +131,7 @@ apps:
                 - Amphetamine
                 - Autodesk Fusion Service Utility
                 - Barrier
+                - Contact Sheets
                 - DisplayLink Manager
                 - DevCleaner
                 - Flycut
@@ -137,6 +139,7 @@ apps:
                 - iTermAI
                 - LuLu
                 - Mac Mouse Fix
+                - Make Calendar
                 - Peek
                 - Proton Mail Bridge
                 - Rectangle Pro
@@ -149,6 +152,7 @@ apps:
                 - Tailscale
                 - TomatoBar
                 - Timer
+                - Web Gallery
 widgets:
   pages: []
 dock_items:
