@@ -97,6 +97,7 @@ apps:
         - Figma
         - Google Chrome
         - HTTPie
+        - Immersed
         - iTerm
         - Jump Desktop
         - LocalSend
@@ -108,9 +109,9 @@ apps:
         - Notion
         - Orion
         - Parsec
-        - Patterns
     - number: 3
       items:
+        - Patterns
         - Postico 2
         - Proxyman
         - Roon
