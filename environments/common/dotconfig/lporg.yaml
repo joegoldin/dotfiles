@@ -30,9 +30,9 @@ apps:
         - Calculator
         - Freeform
         - Home
+        - Image Playground
         - Siri
         - iPhone Mirroring
-        - SF Symbols
         - TestFlight
         - Xcode
         - System Settings
@@ -118,6 +118,7 @@ apps:
         - Proxyman
         - Roon
         - Rosetta Stone Learn Languages
+        - SF Symbols
         - Slack
         - Steam
         - Sublime Merge
@@ -184,6 +185,7 @@ dock_items:
     - /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
     - /Applications/Proxyman.app
     - /Applications/HTTPie.app
+    - /Applications/ChatGPT.app
     - /Users/joe/Applications/Orion/WebApps/TypingMind.app
     - /Applications/Sublime Text.app
     - /Applications/Sublime Merge.app
@@ -202,5 +204,5 @@ dock_items:
     minimize-to-application: false
     mru-spaces: false
     show-recents: true
-    tilesize: 47
+    tilesize: 64
 desktop: {}
