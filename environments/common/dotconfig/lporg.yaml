@@ -86,6 +86,7 @@ apps:
         - Autodesk Fusion
         - BambuStudio
         - Blender
+        - ChatGPT
         - A Companion for SwiftUI
         - Creative Cloud
         - CrossOver
@@ -96,6 +97,7 @@ apps:
         - Docker
         - Figma
         - Google Chrome
+        - HiDock
         - HTTPie
         - Immersed
         - iTerm
@@ -107,10 +109,10 @@ apps:
         - Monodraw
         - Mountain Duck
         - Notion
-        - Orion
-        - Parsec
     - number: 3
       items:
+        - Orion
+        - Parsec
         - Patterns
         - Postico 2
         - Proxyman
