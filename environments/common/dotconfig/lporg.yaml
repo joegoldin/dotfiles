@@ -198,11 +198,11 @@ dock_items:
       view: 1
       sort: 2
   settings:
-    autohide: true
+    autohide: false
     largesize: null
     magnification: false
     minimize-to-application: false
     mru-spaces: false
     show-recents: true
-    tilesize: 64
+    tilesize: 48
 desktop: {}
