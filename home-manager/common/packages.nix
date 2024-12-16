@@ -42,6 +42,7 @@
       k9s
       kubectl
       lazydocker
+      llm
       nix
       nmap
       nnn # terminal file manager
