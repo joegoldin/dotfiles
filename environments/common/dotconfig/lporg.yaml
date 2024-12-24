@@ -87,6 +87,7 @@ apps:
         - BambuStudio
         - Blender
         - ChatGPT
+        - Claude
         - A Companion for SwiftUI
         - Creative Cloud
         - CrossOver
@@ -108,9 +109,9 @@ apps:
         - Modern CSV
         - Monodraw
         - Mountain Duck
-        - Notion
     - number: 3
       items:
+        - Notion
         - Orion
         - Parsec
         - Patterns
@@ -185,6 +186,7 @@ dock_items:
     - /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
     - /Applications/Proxyman.app
     - /Applications/HTTPie.app
+    - /Applications/Claude.app
     - /Applications/ChatGPT.app
     - /Users/joe/Applications/Orion/WebApps/TypingMind.app
     - /Applications/Sublime Text.app
@@ -198,11 +200,11 @@ dock_items:
       view: 1
       sort: 2
   settings:
-    autohide: false
+    autohide: true
     largesize: null
     magnification: false
     minimize-to-application: false
     mru-spaces: false
     show-recents: true
-    tilesize: 48
+    tilesize: 64
 desktop: {}

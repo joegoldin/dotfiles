@@ -141,6 +141,7 @@
       "blender"
       "chatgpt"
       "chromedriver"
+      "claude"
       "crossover"
       "cursor"
       "daisydisk"
