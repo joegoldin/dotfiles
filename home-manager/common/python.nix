@@ -2,7 +2,6 @@
 with pkgs; (python3.withPackages (ps:
     with ps;
       [
-        (aiohttp.overridePythonAttrs (_: {doCheck = false;}))
         anthropic
         black
         flake8
