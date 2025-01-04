@@ -51,7 +51,7 @@ pkgs: {
   iterm2-terminal-integration = pkgs.stdenv.mkDerivation rec {
     pname = "iterm2-terminal-integration";
     version = "0.0.1";
-    sha256 = "sha256-29XvF/8KGd63NOAqWPoxODPQAMA8gNr+MIHFEqcKov4=";
+    sha256 = "sha256-aKTt7HRMlB7htADkeMavWuPJOQq1EHf27dEIjKgQgo0=";
 
     src = pkgs.fetchurl {
       url = "https://iterm2.com/shell_integration/fish";
