@@ -6,4 +6,5 @@ let
   systems = [bastion];
 in {
   "cf.json.age".publicKeys = users ++ systems;
+  "raspi-printer-wlan.age".publicKeys = users;
 }
