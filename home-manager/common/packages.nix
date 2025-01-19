@@ -6,6 +6,7 @@
   home.packages = with pkgs;
     lib.flatten [
       act
+      unstable.aider-chat
       nix-your-shell
       aria2 # A lightweight multi-protocol & multi-source command-line download utility
       awscli2
