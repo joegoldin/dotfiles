@@ -27,6 +27,18 @@ nix-gc:
   @nix-store --gc
   @echo "✅  Garbage collected!"
 
+[macos]
+build-zero2w-image:
+  @echo "🔨  Building Nix image for Raspberry Pi Zero 2 W 🥧"
+  @nix build -L .#nixosConfigurations.zero2w-printer.config.system.build.sdImage
+  @echo "✅  Built for Raspberry Pi Zero 2 W!"
+
+[macos]
+build-zero2w-remote:
+  @echo "🔨  Building Nix config for Raspberry Pi Zero 2 W and deploying to remote 🥧"
+  @nix run github:serokell/deploy-rs .#nixosConfigurations.zero2w-printer -- --ssh-user joe --hostname zero2w-printer.local
+  @echo "✅  Built for Raspberry Pi Zero 2 W!"
+
 [confirm]
 [private]
 build-macos: check

@@ -48,6 +48,8 @@
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # deploy-rs
+    deploy-rs.url = "github:serokell/deploy-rs";
   };
 
   nixConfig = {
@@ -71,6 +73,7 @@
     brew-api,
     disko,
     agenix,
+    deploy-rs,
     ...
   } @ inputs: let
     inherit (self) outputs;
@@ -176,6 +179,28 @@
           })
         ];
       };
+
+      zero2w-printer = nixpkgs.lib.nixosSystem {
+        specialArgs =
+          commonSpecialArgs
+          // {
+            hostname = "zero2w-printer";
+          };
+        modules = [
+          "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
+          ./environments/raspi
+          agenix.nixosModules.default
+          ({specialArgs, ...}: {
+            age.secrets.raspi-printer-wlan = {
+              file = ./secrets/raspi-printer-wlan.age;
+              mode = "655";
+              owner = specialArgs.username;
+              group = "users";
+            };
+            age.identityPaths = ["/home/joe/.ssh/id_ed25519"];
+          })
+        ];
+      };
     };
 
     # Darwin/macOS configuration entrypoint
@@ -205,6 +230,17 @@
           })
           agenix.nixosModules.default
         ];
+      };
+    };
+
+    deploy = {
+      user = "root";
+      nodes = {
+        zero2w-printer = {
+          hostname = "zero2w-printer";
+          profiles.system.path =
+            deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.zero2w-printer;
+        };
       };
     };
   };
