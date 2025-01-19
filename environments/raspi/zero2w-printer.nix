@@ -126,10 +126,9 @@
     agenix.packages.${pkgs.system}.default
     (python3.withPackages (ps:
       with ps;
-        [
-          venv
-        ]
+        [ ]
       )
     )
+    devenv
   ];
 }
