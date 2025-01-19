@@ -29,7 +29,8 @@ nix-gc:
 
 build-zero2w-image:
   @echo "🔨  Building Nix image for Raspberry Pi Zero 2 W 🥧"
-  @nix build -L .#nixosConfigurations.zero2w-printer.config.system.build.sdImage
+  @ssh joe@bastion.joegold.in -- "cd dotfiles; nix build -L .#nixosConfigurations.zero2w-printer.config.system.build.sdImage"
+  @scp joe@bastion.joegold.in:/home/joe/dotfiles/result/sd-image/zero2.img .
   @echo "✅  Built for Raspberry Pi Zero 2 W!"
 
 build-zero2w-remote:
