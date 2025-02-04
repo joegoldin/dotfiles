@@ -38,7 +38,6 @@
       httpie
       helm-with-plugins
       helmfile-with-plugins
-      inotify-tools
       unstable.hugo
       jq # A lightweight and flexible command-line JSON processor
       k9s
