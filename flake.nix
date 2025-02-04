@@ -71,7 +71,6 @@
     brew-api,
     disko,
     agenix,
-    deploy-rs,
     ...
   } @ inputs: let
     inherit (self) outputs;
