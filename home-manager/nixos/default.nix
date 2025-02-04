@@ -22,6 +22,7 @@
       # nixos only packages
       tailscale
       cloudflared
+      inotify-tools
     ]);
 
   # lorri for nix-shell
