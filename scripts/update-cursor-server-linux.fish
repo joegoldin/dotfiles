@@ -12,7 +12,7 @@ while read line
 end
 
 # Extract version and commit using `string match` and `awk` to clean up processing
-set versionz (echo "$inputBlock" | string trim | string split '\n' | grep '^Version:' | awk -F': ' '{print $2}')
+set versionz (echo "$inputBlock" | string trim | string split '\n' | grep '^Version:' | awk -F': ' '{print $2}' | awk -F' ' '{print $1}')
 set commit (echo "$inputBlock" | string trim | string split '\n' | grep '^Commit:' | awk -F': ' '{print $2}')
 
 # Ensure both 'version' and 'commit' are non-empty
