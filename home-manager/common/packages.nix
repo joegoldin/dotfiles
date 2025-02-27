@@ -6,20 +6,19 @@
   home.packages = with pkgs;
     lib.flatten [
       act
-      unstable.aider-chat
+      pkgs.unstable.aider-chat
       nix-your-shell
       aria2 # A lightweight multi-protocol & multi-source command-line download utility
       awscli2
       bfg-repo-cleaner
       cachix
       caddy
-      # clai-go # from go package via overlay
       comma
       coreutils
       cowsay
       devenv
       direnv
-      elixir_1_15
+      elixir_1_18
       erlang_27
       file
       fish
@@ -43,7 +42,6 @@
       k9s
       kubectl
       lazydocker
-      llm
       nix
       nmap
       nnn # terminal file manager
@@ -53,7 +51,7 @@
       pinentry-curses
       pre-commit
       pueue
-      (import ./python.nix {inherit pkgs lib;})
+      (import ./python {inherit pkgs lib unstable;})
       ripgrep # recursivel searches directories for a regex pattern
       rustup
       socat # replacement of openbsd-netcat
