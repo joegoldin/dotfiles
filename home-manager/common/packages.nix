@@ -38,6 +38,7 @@
       helm-with-plugins
       helmfile-with-plugins
       unstable.hugo
+      imagemagick
       jq # A lightweight and flexible command-line JSON processor
       k9s
       kubectl
