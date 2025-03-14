@@ -14,6 +14,7 @@ apps:
         - Maps
         - Find My
         - Photo Booth
+        - Image Playground
         - Photos
         - Music
         - Podcasts
@@ -30,7 +31,6 @@ apps:
         - Calculator
         - Freeform
         - Home
-        - Image Playground
         - Siri
         - iPhone Mirroring
         - TestFlight
@@ -68,9 +68,9 @@ apps:
                 - Terminal
                 - AirPort Utility
                 - Migration Assistant
+                - Tips
                 - Chess
                 - Feedback Assistant
-                - Tips
                 - Passwords
     - number: 2
       items:
@@ -89,7 +89,6 @@ apps:
         - ChatGPT
         - Claude
         - A Companion for SwiftUI
-        - Creative Cloud
         - CrossOver
         - Cursor
         - DaisyDisk
@@ -109,9 +108,9 @@ apps:
         - Modern CSV
         - Monodraw
         - Mountain Duck
+        - Notion
     - number: 3
       items:
-        - Notion
         - Orion
         - Parsec
         - Patterns
@@ -120,6 +119,7 @@ apps:
         - Roon
         - Rosetta Stone Learn Languages
         - SF Symbols
+        - Silhouette Studio
         - Slack
         - Steam
         - Sublime Merge
@@ -131,10 +131,13 @@ apps:
           pages:
             - number: 1
               items:
-                - AdobeCleanUpUtility
-                - AdobeGCClient
+                - Web Gallery
+            - number: 2
+              items:
                 - Acrobat Distiller
                 - Adobe After Effects Render Engine 2025
+                - AdobeCleanUpUtility
+                - AdobeGCClient
                 - Adobe Creative Cloud Diagnostics
                 - Amphetamine
                 - Autodesk Fusion Service Utility
@@ -149,7 +152,6 @@ apps:
                 - Mac Mouse Fix
                 - Make Calendar
                 - Peek
-                - Proton Mail Bridge
                 - Rectangle Pro
                 - Remove Autodesk Fusion
                 - RocketSim
@@ -161,7 +163,6 @@ apps:
                 - TomatoBar
                 - Timer
                 - Virtual Desktop Updater
-                - Web Gallery
 widgets:
   pages: []
 dock_items:
@@ -187,12 +188,12 @@ dock_items:
     - /Applications/Proxyman.app
     - /Applications/HTTPie.app
     - /Applications/Claude.app
-    - /Applications/ChatGPT.app
     - /Users/joe/Applications/Orion/WebApps/TypingMind.app
     - /Applications/Sublime Text.app
     - /Applications/Sublime Merge.app
     - /Applications/Postico 2.app
     - /Applications/zoom.us.app
+    - /Applications/Parsec.app
     - /System/Applications/iPhone Mirroring.app
     - /System/Applications/System Settings.app
   others:

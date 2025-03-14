@@ -172,6 +172,7 @@
       "roon"
       "sf-symbols"
       "shottr"
+      "silhouette-studio"
       "slack"
       "soundsource"
       "skip"
