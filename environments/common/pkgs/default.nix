@@ -15,13 +15,13 @@ pkgs: {
 
   cursor-server-linux = pkgs.stdenv.mkDerivation rec {
     pname = "cursor-server-linux";
-    version = "0.47.5";
-    commit = "53d6da1322f934a1058e7569ee0847b24879d180";
-    sha256 = "0wz0v2h0p8f63k25iqhpqzg7hpiz0f2qsd0hp6psv791lv2xx4iv";
+    version = "0.47.8";
+    commit = "82ef0f61c01d079d1b7e5ab04d88499d5af500e0";
+    sha256 = "11adfsb5vmh2pfwssf640bwd2jzy15hxfqx5shi73wdln2vvmyz0";
 
     src = pkgs.fetchurl {
       url = "https://cursor.blob.core.windows.net/remote-releases/${version}-${commit}/vscode-reh-linux-x64.tar.gz";
-      sha256 = "0wz0v2h0p8f63k25iqhpqzg7hpiz0f2qsd0hp6psv791lv2xx4iv";
+      sha256 = "11adfsb5vmh2pfwssf640bwd2jzy15hxfqx5shi73wdln2vvmyz0";
     };
 
     installPhase = ''
