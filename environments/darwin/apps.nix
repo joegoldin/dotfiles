@@ -125,6 +125,8 @@
       "virtualenv"
       "watchman"
       "wget"
+      "xcbeautify"
+      "xcode-build-server"
       "yarn"
     ];
 
@@ -166,7 +168,6 @@
       "orion"
       "parsec"
       "postico"
-      "protonmail-bridge"
       "proxyman"
       "rectangle-pro"
       "roon"
