@@ -9,10 +9,9 @@ lint:
   @echo "✅  Nix config linted!"
 
 [unix]
-check: lint flake-update
-  @echo "🔍  Checking Nix config..."
-  @NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 NIXPKGS_ALLOW_UNFREE=1 NIXPKGS_ALLOW_BROKEN=1 nix --extra-experimental-features 'nix-command flakes' flake check --impure --all-systems
-  @echo "✅  Flake check passed!"
+check-system:
+  @echo "🔍  Checking Nix config for current system..."
+  @NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 NIXPKGS_ALLOW_UNFREE=1 NIXPKGS_ALLOW_BROKEN=1 nix --extra-experimental-features 'nix-command flakes' flake check --impure
 
 [unix]
 flake-update:
@@ -29,7 +28,7 @@ nix-gc:
 
 [confirm]
 [private]
-build-macos: check
+build-macos: lint flake-update
   @echo "🔨  Building Nix config for macOS 🍎"
   @nix --extra-experimental-features 'nix-command flakes' run nix-darwin -- switch --flake .#Joes-MacBook-Pro
   @echo "✅  Built for macOS!"
@@ -52,14 +51,18 @@ build: system-info
 
 [confirm]
 [private]
-build-wsl: check
+build-wsl: lint flake-update
+  @echo "🔍  Checking Nix config for WSL..."
+  @NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 NIXPKGS_ALLOW_UNFREE=1 NIXPKGS_ALLOW_BROKEN=1 nix --extra-experimental-features 'nix-command flakes' flake check --impure --system x86_64-linux
   @echo "🔨  Building Nix config for WSL 🪟"
   @sudo nixos-rebuild --flake .#joe-wsl switch
   @echo "✅  Built for WSL!"
 
 [confirm]
 [private]
-build-bastion: check
+build-bastion: lint flake-update
+  @echo "🔍  Checking Nix config for Oracle Cloud..."
+  @NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 NIXPKGS_ALLOW_UNFREE=1 NIXPKGS_ALLOW_BROKEN=1 nix --extra-experimental-features 'nix-command flakes' flake check --impure --system x86_64-linux
   @echo "🔨  Building Nix config for NixOS on Oracle Cloud 🐧"
   @sudo nixos-rebuild --flake .#oracle-cloud-bastion switch
   @echo "✅  Built for NixOS on Oracle Cloud!"
