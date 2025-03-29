@@ -78,7 +78,7 @@ apps:
         - Adobe Acrobat
         - Adobe After Effects 2025
         - Adobe Audition 2025
-        - Adobe Illustrator 2025
+        - Adobe Illustrator 2024
         - Adobe Media Encoder 2025
         - Adobe Premiere Pro 2025
         - Adobe Photoshop 2025
@@ -90,6 +90,7 @@ apps:
         - Claude
         - A Companion for SwiftUI
         - CrossOver
+        - Cryptomator
         - Cursor
         - DaisyDisk
         - Developer
@@ -103,7 +104,6 @@ apps:
         - iTerm
         - Jump Desktop
         - LocalSend
-        - Logseq
         - Meta Quest Remote Desktop
         - Modern CSV
         - Monodraw
@@ -111,6 +111,7 @@ apps:
         - Notion
     - number: 3
       items:
+        - Obsidian
         - Orion
         - Parsec
         - Patterns
@@ -130,9 +131,6 @@ apps:
         - folder: Utilities
           pages:
             - number: 1
-              items:
-                - Web Gallery
-            - number: 2
               items:
                 - Acrobat Distiller
                 - Adobe After Effects Render Engine 2025
@@ -163,6 +161,7 @@ apps:
                 - TomatoBar
                 - Timer
                 - Virtual Desktop Updater
+                - Web Gallery
 widgets:
   pages: []
 dock_items:
@@ -172,28 +171,31 @@ dock_items:
     - /Applications/Orion.app
     - /Applications/Discord.app
     - /Applications/Slack.app
-    - /Applications/Logseq.app
+    - /Applications/Obsidian.app
     - /Applications/Notion.app
     - /Applications/Figma.app
     - /System/Applications/Calendar.app
     - /System/Applications/Mail.app
     - /Applications/Roon.app
     - /System/Applications/Photos.app
+    - /System/Applications/VoiceMemos.app
     - /Applications/iTerm.app
     - /Applications/Cursor.app
-    - /System/Applications/VoiceMemos.app
     - /Applications/Xcode.app
     - /Applications/A Companion for SwiftUI.app
     - /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
     - /Applications/Proxyman.app
     - /Applications/HTTPie.app
     - /Applications/Claude.app
+    - /Applications/ChatGPT.app
     - /Users/joe/Applications/Orion/WebApps/TypingMind.app
     - /Applications/Sublime Text.app
     - /Applications/Sublime Merge.app
     - /Applications/Postico 2.app
     - /Applications/zoom.us.app
     - /Applications/Parsec.app
+    - /private/var/folders/v0/3q5969_11jn1fk_7d6vmrgyh0000gn/T/winetemp-32244732-33792-1741277804-0/wineboot.exe
+    - /Applications/CrossOver.app
     - /System/Applications/iPhone Mirroring.app
     - /System/Applications/System Settings.app
   others:
