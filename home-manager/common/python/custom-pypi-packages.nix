@@ -368,7 +368,7 @@
     doCheck = false;
 
     # Basic import check
-    pythonImportsCheck = ["deepgram_sdk"];
+    pythonImportsCheck = ["deepgram"];
 
     meta = with lib; {
       description = "The official Python SDK for the Deepgram automated speech recognition platform.";
