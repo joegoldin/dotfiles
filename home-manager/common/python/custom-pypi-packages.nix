@@ -336,4 +336,44 @@
       license = licenses.asl20;
     };
   };
+
+  deepgram-sdk = pythonBase.pkgs.buildPythonPackage rec {
+    pname = "deepgram-sdk";
+    version = "3.10.1";
+    format = "pyproject";
+
+    src = pkgs.fetchurl {
+      url = "https://files.pythonhosted.org/packages/source/d/deepgram_sdk/deepgram_sdk-3.10.1.tar.gz";
+      sha256 = "sha256-JDhOn/6lvxsvi7MFw0txvra4xayg9V0BnryfUGr5L9A=";
+    };
+
+    nativeBuildInputs = with pythonBase.pkgs; [
+      setuptools
+      wheel
+      poetry-core
+    ];
+    # Dependencies
+    propagatedBuildInputs = with pythonBase.pkgs; [
+      aenum
+      aiofiles
+      aiohttp
+      dataclasses-json
+      deprecation
+      httpx
+      typing-extensions
+      websockets
+    ];
+
+    # Disable tests - enable if you have specific test dependencies
+    doCheck = false;
+
+    # Basic import check
+    pythonImportsCheck = ["deepgram_sdk"];
+
+    meta = with lib; {
+      description = "The official Python SDK for the Deepgram automated speech recognition platform.";
+      homepage = "https://github.com/deepgram/deepgram-python-sdk";
+      license = licenses.mit;
+    };
+  };
 }
