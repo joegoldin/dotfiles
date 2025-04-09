@@ -52,6 +52,7 @@
       ++ [
         # Custom packages from PyPI
         customPackages.claudesync
+        customPackages.deepgram-sdk
         customPackages.fal-client
         customPackages.llm-anthropic
         customPackages.llm-cmd

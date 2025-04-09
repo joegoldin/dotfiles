@@ -159,9 +159,9 @@ apps:
                 - Steam Support Center
                 - Tailscale
                 - TomatoBar
-                - Timer
                 - Virtual Desktop Updater
                 - Web Gallery
+        - Jump Desktop Connect
 widgets:
   pages: []
 dock_items:
@@ -175,7 +175,6 @@ dock_items:
     - /Applications/Notion.app
     - /Applications/Figma.app
     - /System/Applications/Calendar.app
-    - /System/Applications/Mail.app
     - /Applications/Roon.app
     - /System/Applications/Photos.app
     - /System/Applications/VoiceMemos.app
@@ -194,8 +193,6 @@ dock_items:
     - /Applications/Postico 2.app
     - /Applications/zoom.us.app
     - /Applications/Parsec.app
-    - /private/var/folders/v0/3q5969_11jn1fk_7d6vmrgyh0000gn/T/winetemp-32244732-33792-1741277804-0/wineboot.exe
-    - /Applications/CrossOver.app
     - /System/Applications/iPhone Mirroring.app
     - /System/Applications/System Settings.app
   others:
