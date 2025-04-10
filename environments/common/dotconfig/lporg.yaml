@@ -97,6 +97,7 @@ apps:
         - Discord
         - Docker
         - Figma
+        - Gemini
         - Google Chrome
         - HiDock
         - HTTPie
@@ -108,9 +109,9 @@ apps:
         - Modern CSV
         - Monodraw
         - Mountain Duck
-        - Notion
     - number: 3
       items:
+        - Notion
         - Obsidian
         - Orion
         - Parsec
@@ -146,6 +147,7 @@ apps:
                 - Flycut
                 - Ice
                 - iTermAI
+                - Jump Desktop Connect
                 - LuLu
                 - Mac Mouse Fix
                 - Make Calendar
@@ -161,7 +163,6 @@ apps:
                 - TomatoBar
                 - Virtual Desktop Updater
                 - Web Gallery
-        - Jump Desktop Connect
 widgets:
   pages: []
 dock_items:
@@ -187,6 +188,7 @@ dock_items:
     - /Applications/HTTPie.app
     - /Applications/Claude.app
     - /Applications/ChatGPT.app
+    - /Users/joe/Applications/Orion/WebApps/Gemini.app
     - /Users/joe/Applications/Orion/WebApps/TypingMind.app
     - /Applications/Sublime Text.app
     - /Applications/Sublime Merge.app
