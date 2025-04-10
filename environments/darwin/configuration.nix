@@ -89,6 +89,7 @@
 
   environment.systemPackages = with pkgs; [
     git
+    jdk
     wget
     agenix.packages.${pkgs.system}.default
   ];
