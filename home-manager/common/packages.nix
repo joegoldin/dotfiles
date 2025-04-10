@@ -7,10 +7,10 @@
     lib.flatten [
       act
       pkgs.unstable.aider-chat
-      nix-your-shell
       aria2 # A lightweight multi-protocol & multi-source command-line download utility
       awscli2
       bfg-repo-cleaner
+      bun
       cachix
       caddy
       comma
@@ -46,6 +46,7 @@
       nix
       nmap
       nnn # terminal file manager
+      nix-your-shell
       (import ./node.nix {inherit pkgs lib;})
       openring
       p7zip
