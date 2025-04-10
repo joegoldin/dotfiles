@@ -13,6 +13,7 @@
       bun
       cachix
       caddy
+      clojure
       comma
       coreutils
       cowsay
