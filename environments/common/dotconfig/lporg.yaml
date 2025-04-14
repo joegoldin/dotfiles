@@ -89,6 +89,7 @@ apps:
         - ChatGPT
         - Claude
         - A Companion for SwiftUI
+        - Creative Cloud
         - CrossOver
         - Cryptomator
         - Cursor
@@ -108,9 +109,9 @@ apps:
         - Meta Quest Remote Desktop
         - Modern CSV
         - Monodraw
-        - Mountain Duck
     - number: 3
       items:
+        - Mountain Duck
         - Notion
         - Obsidian
         - Orion
@@ -135,8 +136,6 @@ apps:
               items:
                 - Acrobat Distiller
                 - Adobe After Effects Render Engine 2025
-                - AdobeCleanUpUtility
-                - AdobeGCClient
                 - Adobe Creative Cloud Diagnostics
                 - Amphetamine
                 - Autodesk Fusion Service Utility
@@ -175,7 +174,6 @@ dock_items:
     - /Applications/Obsidian.app
     - /Applications/Notion.app
     - /Applications/Figma.app
-    - /System/Applications/Calendar.app
     - /Applications/Roon.app
     - /System/Applications/Photos.app
     - /System/Applications/VoiceMemos.app
