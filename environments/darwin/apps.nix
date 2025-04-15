@@ -169,6 +169,7 @@
       "orion"
       "parsec"
       "postico"
+      "proton-mail"
       "proxyman"
       "rectangle-pro"
       "roon"

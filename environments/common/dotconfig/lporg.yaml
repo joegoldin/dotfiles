@@ -115,9 +115,11 @@ apps:
         - Notion
         - Obsidian
         - Orion
+        - Parallels Desktop
         - Parsec
         - Patterns
         - Postico 2
+        - Proton Mail
         - Proxyman
         - Roon
         - Rosetta Stone Learn Languages
@@ -129,6 +131,8 @@ apps:
         - Sublime Text
         - TypingMind
         - Virtual Desktop Streamer
+        - Xbox Cloud Gaming
+        - YouTube
         - zoom.us
         - folder: Utilities
           pages:
@@ -170,7 +174,9 @@ dock_items:
     - /System/Applications/Messages.app
     - /Applications/Orion.app
     - /Applications/Discord.app
+    - /Applications/Proton Mail.app
     - /Applications/Slack.app
+    - /Applications/zoom.us.app
     - /Applications/Obsidian.app
     - /Applications/Notion.app
     - /Applications/Figma.app
@@ -183,6 +189,7 @@ dock_items:
     - /Applications/A Companion for SwiftUI.app
     - /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
     - /Applications/Proxyman.app
+    - /System/Applications/iPhone Mirroring.app
     - /Applications/HTTPie.app
     - /Applications/Claude.app
     - /Applications/ChatGPT.app
@@ -190,21 +197,19 @@ dock_items:
     - /Users/joe/Applications/Orion/WebApps/TypingMind.app
     - /Applications/Sublime Text.app
     - /Applications/Sublime Merge.app
-    - /Applications/Postico 2.app
-    - /Applications/zoom.us.app
+    - /Users/joe/Parallels/Windows 11.pvm/Windows 11.app
     - /Applications/Parsec.app
-    - /System/Applications/iPhone Mirroring.app
     - /System/Applications/System Settings.app
   others:
     - path: ~/Downloads
       view: 1
       sort: 2
   settings:
-    autohide: true
+    autohide: false
     largesize: null
     magnification: false
     minimize-to-application: false
     mru-spaces: false
     show-recents: true
-    tilesize: 64
+    tilesize: 48
 desktop: {}
