@@ -20,7 +20,6 @@
       flask
       isort
       jupyter
-      llm
       numpy
       ollama
       openai
@@ -51,9 +50,9 @@
       nixPythonPackages
       ++ [
         # Custom packages from PyPI
-        customPackages.claudesync
         customPackages.deepgram-sdk
         customPackages.fal-client
+        customPackages.llm
         customPackages.llm-anthropic
         customPackages.llm-cmd
         customPackages.llm-cmd-comp
@@ -63,6 +62,16 @@
         customPackages.llm-ollama
         customPackages.llm-perplexity
       ]
+      ++ (
+        if (pkgs.stdenv.isDarwin && pkgs.stdenv.isAarch64)
+        then [
+          customPackages.mlx
+          customPackages.mlx-lm
+          customPackages.llm-mlx
+        ]
+        else [
+        ]
+      )
   );
 in
   pythonWithPackages

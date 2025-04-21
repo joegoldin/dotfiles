@@ -23,6 +23,17 @@ source "$TEMP_DIR/venv/bin/activate"
 echo "Installing pip-tools..."
 pip install pip-tools >/dev/null 2>&1
 
+# Install all packages at once to ensure version compatibility
+echo "Installing all packages to resolve dependencies..."
+for PACKAGE_NAME in "$@"; do
+  echo "  Installing $PACKAGE_NAME..."
+  pip install "$PACKAGE_NAME" || {
+    echo "Error: Failed to install ${PACKAGE_NAME}. Exiting."
+    deactivate
+    exit 1
+  }
+done
+
 # Function to check if URL exists
 check_url() {
   if command -v curl &>/dev/null; then
@@ -78,22 +89,63 @@ find_package_url() {
     # Check if the API returned valid JSON
     if echo "$api_response" | jq empty 2>/dev/null; then
       
-      # Try to extract sdist URL
-      local download_url=$(echo "$api_response" | jq -r '.urls[] | select(.packagetype=="sdist") | .url' | head -1)
+      # Try to find Python 3.12 compatible wheel or sdist
+      local download_url=""
       
+      # For macOS, prioritize wheels with the highest macOS version number
+      if [[ "$OSTYPE" == "darwin"* ]]; then
+        # Extract all macOS wheel URLs and their versions
+        local mac_wheels=$(echo "$api_response" | jq -r '.urls[] | select(.packagetype=="bdist_wheel") | select(.filename | contains("macosx")) | .url')
+        local best_url=""
+        local best_major=0
+        local best_minor=0
+        
+        while read -r url; do
+          if [ -n "$url" ]; then
+            # Extract macOS version from filename (e.g., macosx_14_0 -> 14.0)
+            if [[ "$url" =~ macosx_([0-9]+)_([0-9]+) ]]; then
+              local major="${BASH_REMATCH[1]}"
+              local minor="${BASH_REMATCH[2]}"
+              
+              # Check if this is a Python 3.12 wheel or a universal wheel
+              if [[ "$url" =~ cp312 ]] || [[ "$url" =~ py3 ]]; then
+                # If it's a higher macOS version, use it
+                if [ "$major" -gt "$best_major" ] || ([ "$major" -eq "$best_major" ] && [ "$minor" -gt "$best_minor" ]); then
+                  best_major="$major"
+                  best_minor="$minor"
+                  best_url="$url"
+                fi
+              fi
+            fi
+          fi
+        done <<< "$mac_wheels"
+        
+        if [ -n "$best_url" ]; then
+          download_url="$best_url"
+        fi
+      fi
+      
+      # If not macOS or no macOS wheels found, try to find Python 3.12 specific wheel
+      if [ -z "$download_url" ]; then
+        download_url=$(echo "$api_response" | jq -r '.urls[] | select(.packagetype=="bdist_wheel") | select(.filename | contains("cp312")) | .url' | head -1)
+      fi
+      
+      # If no Python 3.12 specific wheel, try to find any wheel that's compatible with 3.12
+      if [ -z "$download_url" ]; then
+        # Look for wheels with py3 tag (compatible with Python 3.x)
+        download_url=$(echo "$api_response" | jq -r '.urls[] | select(.packagetype=="bdist_wheel") | select(.python_version | contains("py3")) | .url' | head -1)
+      fi
+      
+      # If no Python 3.12 compatible wheel, look for sdist
+      if [ -z "$download_url" ]; then
+        download_url=$(echo "$api_response" | jq -r '.urls[] | select(.packagetype=="sdist") | .url' | head -1)
+      fi
+      
+      # If we found a URL, verify it and return it
       if [ -n "$download_url" ]; then
         if check_url "$download_url"; then
           echo "$download_url"
           return 0
-        fi
-      else
-        # Try wheel if sdist is not available
-        download_url=$(echo "$api_response" | jq -r '.urls[] | .url' | head -1)
-        if [ -n "$download_url" ]; then
-          if check_url "$download_url"; then
-            echo "$download_url"
-            return 0
-          fi
         fi
       fi
     fi
@@ -139,9 +191,9 @@ nix_prefetch_sha256() {
     # Use --quiet to minimize output
     local result=$(nix-prefetch-url --quiet "$url" 2>/dev/null)
     if [ $? -eq 0 ] && [ -n "$result" ]; then
-      # Convert to base64 format if nix-hash is available
-      if command -v nix-hash &>/dev/null; then
-        echo "\"sha256-$(nix-hash --type sha256 --to-base64 "$result")\""
+      # Convert to base64 format if nix hash command is available
+      if command -v nix &>/dev/null && nix hash --help &>/dev/null; then
+        echo "\"sha256-$(nix hash convert --hash-algo sha256 --to sri "$result" | cut -d- -f2)\""
         return 0
       else
         echo "\"$result\""
@@ -157,10 +209,10 @@ nix_prefetch_sha256() {
 file_sha256() {
   local file=$1
   
-  if command -v nix-hash &>/dev/null; then
-    # Best option: Use nix-hash directly
-    local base64=$(nix-hash --type sha256 --to-base64 "$file")
-    echo "\"sha256-$base64\""
+  if command -v nix &>/dev/null && nix hash --help &>/dev/null; then
+    # Best option: Use new nix hash command
+    local sri=$(nix hash file "$file" 2>/dev/null)
+    echo "\"$sri\""
     return 0
   elif command -v sha256sum &>/dev/null; then
     # Use sha256sum
@@ -271,59 +323,79 @@ check_license_text() {
 # Function to detect package format and required build inputs
 detect_package_format() {
   local package_dir=$1
+  local package_url=$2
   local extract_dir="$package_dir/extract"
   local source_tarball="$package_dir/source.tgz"
   local format="setuptools"
   local build_inputs=""
   
+  # Check if it's a wheel file
+  if [[ "$package_url" == *.whl ]]; then
+    format="wheel"
+    build_inputs=""  # No build inputs needed for wheel format
+    echo "format=$format"
+    echo "build_inputs=$build_inputs"
+    return 0
+  fi
+  
   mkdir -p "$extract_dir"
   
   # Extract the tarball
   if [ -f "$source_tarball" ]; then
-    tar -xzf "$source_tarball" -C "$extract_dir" --strip-components=1 2>/dev/null || true
-    
-    # Look for packaging files
-    if [ -f "$extract_dir/pyproject.toml" ]; then
-      format="pyproject"
-      build_inputs="    nativeBuildInputs = with pythonBase.pkgs; [
-      setuptools
-      wheel"
-      
-      # Check for specific build systems
-      if grep -q "poetry" "$extract_dir/pyproject.toml" 2>/dev/null; then
-        build_inputs="${build_inputs}
-      poetry-core"
-      elif grep -q "hatchling" "$extract_dir/pyproject.toml" 2>/dev/null; then
-        build_inputs="${build_inputs}
-      hatchling"
-      elif grep -q "pdm" "$extract_dir/pyproject.toml" 2>/dev/null; then
-        build_inputs="${build_inputs}
-      pdm-backend"
-      elif grep -q "flit" "$extract_dir/pyproject.toml" 2>/dev/null; then
-        build_inputs="${build_inputs}
-      flit-core"
-      elif grep -q "maturin" "$extract_dir/pyproject.toml" 2>/dev/null; then
-        build_inputs="${build_inputs}
-      maturin"
-      elif grep -q "setuptools_scm" "$extract_dir/pyproject.toml" 2>/dev/null; then
-        build_inputs="${build_inputs}
-      setuptools-scm"
-      elif grep -q "setuptools-scm" "$extract_dir/pyproject.toml" 2>/dev/null; then
-        build_inputs="${build_inputs}
-      setuptools-scm"
-      fi
-      
-      build_inputs="${build_inputs}
-    ];"
+    if [[ "$package_url" == *.whl ]]; then
+      # For wheel files, we don't need to extract
+      format="wheel"
+      build_inputs=""
     else
-      # Check for setup.py
-      if [ ! -f "$extract_dir/setup.py" ]; then
-        # If neither pyproject.toml nor setup.py exist, try a safer option
+      # For tarballs, extract and analyze
+      tar -xzf "$source_tarball" -C "$extract_dir" --strip-components=1 2>/dev/null || {
+        # If tar fails, it might be a zip file (some packages on PyPI use zip)
+        unzip -q "$source_tarball" -d "$extract_dir" 2>/dev/null || true
+      }
+      
+      # Look for packaging files
+      if [ -f "$extract_dir/pyproject.toml" ]; then
         format="pyproject"
         build_inputs="    nativeBuildInputs = with pythonBase.pkgs; [
       setuptools
+      wheel"
+        
+        # Check for specific build systems
+        if grep -q "poetry" "$extract_dir/pyproject.toml" 2>/dev/null; then
+          build_inputs="${build_inputs}
+      poetry-core"
+        elif grep -q "hatchling" "$extract_dir/pyproject.toml" 2>/dev/null; then
+          build_inputs="${build_inputs}
+      hatchling"
+        elif grep -q "pdm" "$extract_dir/pyproject.toml" 2>/dev/null; then
+          build_inputs="${build_inputs}
+      pdm-backend"
+        elif grep -q "flit" "$extract_dir/pyproject.toml" 2>/dev/null; then
+          build_inputs="${build_inputs}
+      flit-core"
+        elif grep -q "maturin" "$extract_dir/pyproject.toml" 2>/dev/null; then
+          build_inputs="${build_inputs}
+      maturin"
+        elif grep -q "setuptools_scm" "$extract_dir/pyproject.toml" 2>/dev/null; then
+          build_inputs="${build_inputs}
+      setuptools-scm"
+        elif grep -q "setuptools-scm" "$extract_dir/pyproject.toml" 2>/dev/null; then
+          build_inputs="${build_inputs}
+      setuptools-scm"
+        fi
+        
+        build_inputs="${build_inputs}
+    ];"
+      else
+        # Check for setup.py
+        if [ ! -f "$extract_dir/setup.py" ]; then
+          # If neither pyproject.toml nor setup.py exist, try a safer option
+          format="pyproject"
+          build_inputs="    nativeBuildInputs = with pythonBase.pkgs; [
+      setuptools
       wheel
     ];"
+        fi
       fi
     fi
   fi
@@ -361,7 +433,7 @@ detect_license() {
         
         # Then try the license field directly
         local license_field=$(echo "$api_response" | jq -r '.info.license' 2>/dev/null)
-        if [ -n "$license_field" ] && [ "$license_field" != "UNKNOWN" ]; then
+        if [ -n "$license_field" ] && [ "$license_field" != "UNKNOWN" ] && [ "$license_field" != "null" ]; then
           echo "  Found license field: $license_field" >&2
           license_info=$(check_license_text "$license_field")
           if [ -n "$license_info" ]; then
@@ -433,23 +505,24 @@ detect_license() {
   return 0
 }
 
+# Array to store all package definitions
+declare -a PACKAGE_DEFINITIONS
+
+# Dictionary to keep track of which packages we're processing
+declare -A LOCAL_PACKAGES
+
+# Get all package names to process
+for pkg in "$@"; do
+  LOCAL_PACKAGES["$pkg"]=1
+done
+
 # Process each package
 for PACKAGE_NAME in "$@"; do
   echo "Processing package: $PACKAGE_NAME"
   
-  # Create a separate Python venv for each package to avoid conflicts
+  # Create a directory for the package
   PACKAGE_DIR="$TEMP_DIR/${PACKAGE_NAME}"
   mkdir -p "$PACKAGE_DIR"
-  python3 -m venv "$PACKAGE_DIR/venv"
-  source "$PACKAGE_DIR/venv/bin/activate"
-  
-  # Install the package to get its metadata
-  echo "  Installing package to extract metadata..."
-  pip install "$PACKAGE_NAME" >/dev/null 2>&1 || {
-    echo "  Error: Failed to install ${PACKAGE_NAME}. Skipping."
-    deactivate
-    continue
-  }
   
   # Get package information
   VERSION=$(pip show "$PACKAGE_NAME" | grep "^Version:" | cut -d ' ' -f 2)
@@ -480,7 +553,7 @@ for PACKAGE_NAME in "$@"; do
   
   # Detect package format
   echo "  Detecting package format..."
-  FORMAT_INFO=$(detect_package_format "$PACKAGE_DIR")
+  FORMAT_INFO=$(detect_package_format "$PACKAGE_DIR" "$PACKAGE_URL")
   PACKAGE_FORMAT=$(echo "$FORMAT_INFO" | grep "format=" | cut -d= -f2)
   BUILD_INPUTS=$(echo "$FORMAT_INFO" | grep -A10 "build_inputs=" | cut -d= -f2-)
   
@@ -498,64 +571,106 @@ for PACKAGE_NAME in "$@"; do
   
   # Format dependencies for Nix
   NIX_DEPS=""
+  INTERNAL_DEPS=""
+  EXTERNAL_DEPS=""
   if [ -n "$DEPS" ]; then
     for DEP in $DEPS; do
       if [ -n "$DEP" ]; then
         # Convert package name to Nix format (hyphens, lowercase)
         NIX_DEP=$(echo "$DEP" | tr '_' '-' | tr '[:upper:]' '[:lower:]')
-        # Add properly indented dependency without \n
-        NIX_DEPS="${NIX_DEPS}      ${NIX_DEP}"$'\n'
+        
+        # Check if this is one of our local packages
+        if [ "${LOCAL_PACKAGES[$DEP]}" = "1" ]; then
+          # Reference local package
+          INTERNAL_DEPS="${INTERNAL_DEPS}        pythonPackages.${NIX_DEP}"$'\n'
+        else
+          # Reference standard nixpkgs package
+          EXTERNAL_DEPS="${EXTERNAL_DEPS}        ${NIX_DEP}"$'\n'
+        fi
       fi
     done
   fi
   
-  # Generate the Nix package definition
+  # Combine dependencies properly
+  if [ -n "$EXTERNAL_DEPS" ] && [ -n "$INTERNAL_DEPS" ]; then
+    NIX_DEPS="with pythonBase.pkgs; [
+${EXTERNAL_DEPS}      ] ++ [
+${INTERNAL_DEPS}      ]"
+  elif [ -n "$EXTERNAL_DEPS" ]; then
+    NIX_DEPS="with pythonBase.pkgs; [
+${EXTERNAL_DEPS}      ]"
+  elif [ -n "$INTERNAL_DEPS" ]; then
+    NIX_DEPS="[
+${INTERNAL_DEPS}      ]"
+  else
+    NIX_DEPS="[]"
+  fi
+  
   # Generate the Nix package definition
   CLEANED_PACKAGE_NAME=$(echo "$PACKAGE_NAME" | tr '_' '-')
-  cat << EOF > "$PACKAGE_DIR/${PACKAGE_NAME}.nix"
-  ${CLEANED_PACKAGE_NAME} = pythonBase.pkgs.buildPythonPackage rec {
-    pname = "${CLEANED_PACKAGE_NAME}";
-    version = "${VERSION}";
-    format = "${PACKAGE_FORMAT}";
+  
+  PACKAGE_DEF="    ${CLEANED_PACKAGE_NAME} = pythonBase.pkgs.buildPythonPackage rec {
+      pname = \"${CLEANED_PACKAGE_NAME}\";
+      version = \"${VERSION}\";
+      format = \"${PACKAGE_FORMAT}\";
 
-    src = pkgs.fetchurl {
-      url = "${PACKAGE_URL}";
-      sha256 = ${SHA256};
-    };
+      src = pkgs.fetchurl {
+        url = \"${PACKAGE_URL}\";
+        sha256 = ${SHA256};
+      };
 
 ${BUILD_INPUTS:+${BUILD_INPUTS}
-}    # Dependencies
-    propagatedBuildInputs = with pythonBase.pkgs; [
-${NIX_DEPS:-      # No dependencies}
-    ];
+}      # Dependencies
+      propagatedBuildInputs = ${NIX_DEPS};
 
-    # Disable tests - enable if you have specific test dependencies
-    doCheck = false;
+      # Disable tests - enable if you have specific test dependencies
+      doCheck = false;
 
-    # Basic import check
-    pythonImportsCheck = [ "${PACKAGE_NAME//-/_}" ];
+      # Basic import check
+      pythonImportsCheck = [ \"${PACKAGE_NAME//-/_}\" ];
 
-    meta = with lib; {
-      description = "${DESCRIPTION:-Python package: ${PACKAGE_NAME}}";
-      homepage = "${HOMEPAGE:-https://pypi.org/project/${PACKAGE_NAME}/}";
-      license = ${LICENSE};
-    };
-  };
-
-EOF
+      meta = with lib; {
+        description = \"${DESCRIPTION:-Python package: ${PACKAGE_NAME}}\";
+        homepage = \"${HOMEPAGE:-https://pypi.org/project/${PACKAGE_NAME}/}\";
+        license = ${LICENSE};
+      };
+    };"
   
-  # Deactivate the venv for this package
-  deactivate
-  
-  # Save the output to a file
-  cp "$PACKAGE_DIR/${PACKAGE_NAME}.nix" "./${PACKAGE_NAME}-pypi.nix"
+  # Add to array of definitions
+  PACKAGE_DEFINITIONS+=("$PACKAGE_DEF")
 done
 
-# Combined definitions
-cat $(ls *-pypi.nix) > custom-pypi-packages.nix
-rm -rf *-pypi.nix
-echo "Combined definitions saved to custom-pypi-packages.nix"
+# Create the final Nix file with proper structure
+cat > custom-pypi-packages.nix << 'EOF'
+{
+  pkgs,
+  lib,
+  pythonBase,
+  unstable,
+  ...
+}:
+let
+  # Define all packages in a recursive attribute set
+  pythonPackages = rec {
+EOF
+
+# Add all package definitions
+for def in "${PACKAGE_DEFINITIONS[@]}"; do
+  echo "$def" >> custom-pypi-packages.nix
+  echo >> custom-pypi-packages.nix
+done
+
+# Close the structure
+cat >> custom-pypi-packages.nix << 'EOF'
+  };
+in
+pythonPackages
+EOF
+
+# Clean up - deactivate virtual environment
+deactivate
 
 # Final cleanup
 echo
+echo "Generated custom-pypi-packages.nix with self-referencing package structure"
 echo "Script completed successfully!"

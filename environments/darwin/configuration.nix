@@ -92,6 +92,7 @@
     jdk
     wget
     agenix.packages.${pkgs.system}.default
+    # darwin.xcode_16_3  # TODO: enable this when available in nixpkgs
   ];
 
   nixpkgs.flake = {
