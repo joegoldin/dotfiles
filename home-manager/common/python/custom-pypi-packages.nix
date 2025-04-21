@@ -4,8 +4,7 @@
   pythonBase,
   unstable,
   ...
-}:
-let
+}: let
   # Define all packages in a recursive attribute set
   pythonPackages = rec {
     fal-client = pythonBase.pkgs.buildPythonPackage rec {
@@ -73,7 +72,7 @@ let
       doCheck = false;
 
       # Basic import check
-      pythonImportsCheck = [ "llm" ];
+      pythonImportsCheck = ["llm"];
 
       meta = with lib; {
         description = "CLI utility and Python library for interacting with Large Language Models from organizations like OpenAI, Anthropic and Gemini plus local models installed on your own machine.";
@@ -321,15 +320,17 @@ let
       };
 
       # Dependencies
-      propagatedBuildInputs = with pythonBase.pkgs; [
-        jinja2
-        numpy
-        protobuf
-        pyyaml
-        transformers
-      ] ++ [
-        pythonPackages.mlx
-      ];
+      propagatedBuildInputs = with pythonBase.pkgs;
+        [
+          jinja2
+          numpy
+          protobuf
+          pyyaml
+          transformers
+        ]
+        ++ [
+          pythonPackages.mlx
+        ];
 
       # Disable tests - enable if you have specific test dependencies
       doCheck = false;
@@ -354,10 +355,10 @@ let
         sha256 = "sha256-nKJIuWpwmfwU0L1DlTogLek3wlpxwq65BqYBvSgFynI=";
       };
 
-    nativeBuildInputs = with pythonBase.pkgs; [
-      setuptools
-      wheel
-    ];
+      nativeBuildInputs = with pythonBase.pkgs; [
+        setuptools
+        wheel
+      ];
       # Dependencies
       propagatedBuildInputs = [
         pythonPackages.llm
@@ -485,4 +486,4 @@ let
     };
   };
 in
-pythonPackages
+  pythonPackages
