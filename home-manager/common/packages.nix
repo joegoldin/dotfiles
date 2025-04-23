@@ -69,6 +69,7 @@
       yq-go # yaml processer https://github.com/mikefarah/yq
       zellij
       zip
+      zlib
       zstd
     ];
 
