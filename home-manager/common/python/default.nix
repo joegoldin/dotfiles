@@ -29,6 +29,7 @@
       setuptools
       tabulate
       wheel
+      zlib-ng
     ]
     ++ (
       if (pkgs.stdenv.isDarwin && pkgs.stdenv.isAarch64)
