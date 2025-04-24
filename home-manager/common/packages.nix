@@ -17,7 +17,7 @@
       comma
       coreutils
       cowsay
-      devenv
+      unstable.devenv
       direnv
       elixir_1_18
       erlang_27
