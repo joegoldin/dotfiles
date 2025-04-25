@@ -217,7 +217,6 @@
 
   # Standard node packages from nixpkgs
   nixNodePackages = with pkgs.nodePackages; [
-    autoprefixer
     nodejs
     postcss
     postcss-cli

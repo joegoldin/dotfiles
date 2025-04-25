@@ -53,6 +53,8 @@
       openring
       p7zip
       pinentry-curses
+      playwright-driver
+      playwright-driver.browsers
       pre-commit
       pueue
       (import ./python {inherit pkgs lib unstable;})

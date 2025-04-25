@@ -24,6 +24,7 @@
       ollama
       openai
       pip
+      playwright
       requests
       scikit-learn
       setuptools
