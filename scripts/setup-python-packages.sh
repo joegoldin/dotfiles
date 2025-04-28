@@ -770,6 +770,8 @@ fi
 # Clean up - deactivate virtual environment
 deactivate
 
+just lint
+
 echo
 echo "Script completed successfully!"
 echo "✅ Added ${#NEW_PACKAGE_DEFINITIONS[@]} new package(s) to custom-pypi-packages.nix"
