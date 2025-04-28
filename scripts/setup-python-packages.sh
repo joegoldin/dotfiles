@@ -31,10 +31,13 @@ pip install pip-tools >/dev/null 2>&1
 
 # Install all packages at once to ensure version compatibility
 echo "Installing all packages to resolve dependencies..."
-for PACKAGE_NAME in "$@"; do
-  echo "  Installing $PACKAGE_NAME..."
-  pip install "$PACKAGE_NAME" || {
-    echo "Error: Failed to install ${PACKAGE_NAME}. Exiting."
+for FULL_PACKAGE_NAME in "$@"; do
+  # Extract base package name (strip extras)
+  BASE_PACKAGE_NAME=$(echo "$FULL_PACKAGE_NAME" | sed -E 's/\[.*\]$//')
+  
+  echo "  Installing $FULL_PACKAGE_NAME..."
+  pip install "$FULL_PACKAGE_NAME" || {
+    echo "Error: Failed to install ${FULL_PACKAGE_NAME}. Exiting."
     deactivate
     exit 1
   }
@@ -545,35 +548,42 @@ declare -A LOCAL_PACKAGES
 
 # Get all package names to process
 for pkg in "$@"; do
-  LOCAL_PACKAGES["$pkg"]=1
+  # Extract base package name (strip extras)
+  BASE_PKG=$(echo "$pkg" | sed -E 's/\[.*\]$//')
+  LOCAL_PACKAGES["$BASE_PKG"]=1
 done
 
 # Process each package
-for PACKAGE_NAME in "$@"; do
-  echo "Processing package: $PACKAGE_NAME"
+for FULL_PACKAGE_NAME in "$@"; do
+  echo "Processing package: $FULL_PACKAGE_NAME"
+  
+  # Extract base package name (without extras) for package info
+  BASE_PACKAGE_NAME=$(echo "$FULL_PACKAGE_NAME" | sed -E 's/\[.*\]$//')
+  # Extract extras if present
+  EXTRAS=$(echo "$FULL_PACKAGE_NAME" | grep -o '\[.*\]' || echo "")
   
   # Check if package already exists
-  if package_exists "$PACKAGE_NAME"; then
-    echo "  Package $PACKAGE_NAME already exists in $PKG_FILE, skipping definition generation."
+  if package_exists "$BASE_PACKAGE_NAME"; then
+    echo "  Package $BASE_PACKAGE_NAME already exists in $PKG_FILE, skipping definition generation."
   else
     # Create a directory for the package
-    PACKAGE_DIR="$TEMP_DIR/${PACKAGE_NAME}"
+    PACKAGE_DIR="$TEMP_DIR/${BASE_PACKAGE_NAME}"
     mkdir -p "$PACKAGE_DIR"
     
     # Get package information
-    VERSION=$(pip show "$PACKAGE_NAME" | grep "^Version:" | cut -d ' ' -f 2)
+    VERSION=$(pip show "$BASE_PACKAGE_NAME" | grep "^Version:" | cut -d ' ' -f 2)
     echo "  Version: $VERSION"
     
     # Get dependencies
-    DEPS=$(pip show "$PACKAGE_NAME" | grep "Requires" | cut -d ':' -f 2- | tr ',' '\n' | sed 's/^ *//' | sort)
+    DEPS=$(pip show "$BASE_PACKAGE_NAME" | grep "Requires" | cut -d ':' -f 2- | tr ',' '\n' | sed 's/^ *//' | sort)
     
     # Get description and homepage
-    DESCRIPTION=$(pip show "$PACKAGE_NAME" | grep "Summary" | cut -d ':' -f 2- | sed 's/^ *//' | sed 's/"/\\"/g')
-    HOMEPAGE=$(pip show "$PACKAGE_NAME" | grep "Home-page" | cut -d ':' -f 2- | sed 's/^ *//' | sed 's/"/\\"/g')
+    DESCRIPTION=$(pip show "$BASE_PACKAGE_NAME" | grep "Summary" | cut -d ':' -f 2- | sed 's/^ *//' | sed 's/"/\\"/g')
+    HOMEPAGE=$(pip show "$BASE_PACKAGE_NAME" | grep "Home-page" | cut -d ':' -f 2- | sed 's/^ *//' | sed 's/"/\\"/g')
     
     # Find the correct package URL
     echo "  Finding package URL..."
-    PACKAGE_URL=$(find_package_url "$PACKAGE_NAME" "$VERSION")
+    PACKAGE_URL=$(find_package_url "$BASE_PACKAGE_NAME" "$VERSION")
     echo "  Package URL: $PACKAGE_URL"
     URL_STATUS=$?
     
@@ -597,7 +607,7 @@ for PACKAGE_NAME in "$@"; do
     
     # Detect license
     echo "  Detecting license..."
-    LICENSE=$(detect_license "$PACKAGE_NAME" "$PACKAGE_DIR")
+    LICENSE=$(detect_license "$BASE_PACKAGE_NAME" "$PACKAGE_DIR")
     echo "  License: $LICENSE"
     
     # Get the SHA256 hash with detailed output to see what's happening
@@ -643,12 +653,47 @@ ${INTERNAL_DEPS}      ]"
     fi
     
     # Generate the Nix package definition
-    CLEANED_PACKAGE_NAME=$(echo "$PACKAGE_NAME" | tr '_' '-')
+    CLEANED_PACKAGE_NAME=$(echo "$BASE_PACKAGE_NAME" | tr '_' '-')
+    
+    # Add the extras if present to the import check
+    IMPORT_MODULE="${BASE_PACKAGE_NAME//-/_}"
+    
+    # Try to determine the correct import module name using importlib.metadata
+    echo "  Testing import module name..."
+    PYTHON_CODE="
+import sys
+import importlib.metadata
+
+# Get the mapping of modules to package names
+pkg_map = importlib.metadata.packages_distributions()
+
+# Our package name
+package_name = \"${BASE_PACKAGE_NAME}\"
+package_name_normalized = package_name.lower().replace('-', '_')
+
+# First, look for direct match
+for module, packages in pkg_map.items():
+    if package_name in packages or package_name.lower() in [p.lower() for p in packages]:
+        print(module)
+        sys.exit(0)
+
+# If no direct match, try with normalized name
+for module, packages in pkg_map.items():
+    if any(p.lower().replace('-', '_') == package_name_normalized for p in packages):
+        print(module)
+        sys.exit(0)
+
+# If still no match, use default
+print(\"${IMPORT_MODULE}\")
+"
+    
+    TESTED_IMPORT_MODULE=$(python -c "$PYTHON_CODE" 2>/dev/null || echo "$IMPORT_MODULE")
+    echo "  Using import module: $TESTED_IMPORT_MODULE"
     
     PACKAGE_DEF="    ${CLEANED_PACKAGE_NAME} = pythonBase.pkgs.buildPythonPackage rec {
       pname = \"${CLEANED_PACKAGE_NAME}\";
       version = \"${VERSION}\";
-      format = \"${PACKAGE_FORMAT}\";
+      format = \"${PACKAGE_FORMAT}\";${EXTRAS_ATTR}
 
       src = pkgs.fetchurl {
         url = \"${PACKAGE_URL}\";
@@ -663,7 +708,7 @@ ${BUILD_INPUTS:+${BUILD_INPUTS}
       doCheck = false;
 
       # Basic import check
-      pythonImportsCheck = [ \"${PACKAGE_NAME//-/_}\" ];
+      pythonImportsCheck = [ \"${TESTED_IMPORT_MODULE}\" ];
 
       meta = with lib; {
         description = \"${DESCRIPTION:-Python package: ${PACKAGE_NAME}}\";
@@ -677,11 +722,12 @@ ${BUILD_INPUTS:+${BUILD_INPUTS}
   fi
   
   # Check if the package needs to be added to default.nix
-  if ! package_in_default "$PACKAGE_NAME"; then
-    CLEANED_PACKAGE_NAME=$(echo "$PACKAGE_NAME" | tr '_' '-')
+  # For default.nix we should use the FULL_PACKAGE_NAME
+  if ! package_in_default "$BASE_PACKAGE_NAME"; then
+    CLEANED_PACKAGE_NAME=$(echo "$BASE_PACKAGE_NAME" | tr '_' '-')
     PACKAGES_FOR_DEFAULT+=("$CLEANED_PACKAGE_NAME")
   else
-    echo "  Package $PACKAGE_NAME already in default.nix, skipping."
+    echo "  Package $BASE_PACKAGE_NAME already in default.nix, skipping."
   fi
 done
 

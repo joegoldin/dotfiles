@@ -521,6 +521,38 @@
         license = licenses.mit;
       };
     };
+    scrapfly-sdk = pythonBase.pkgs.buildPythonPackage rec {
+      pname = "scrapfly-sdk";
+      version = "0.8.21";
+      format = "setuptools";
+
+      src = pkgs.fetchurl {
+        url = "https://files.pythonhosted.org/packages/source/s/scrapfly-sdk/scrapfly-sdk-0.8.21.tar.gz";
+        sha256 = "sha256-c4DL65SG9WY9/GL7WENzK/KA8fX57Mah6qBx6307Uvw=";
+      };
+
+      # Dependencies
+      propagatedBuildInputs = with pythonBase.pkgs; [
+        backoff
+        decorator
+        loguru
+        python-dateutil
+        requests
+        urllib3
+      ];
+
+      # Disable tests - enable if you have specific test dependencies
+      doCheck = false;
+
+      # Basic import check
+      pythonImportsCheck = ["scrapfly"];
+
+      meta = with lib; {
+        description = "Scrapfly SDK for Scrapfly";
+        homepage = "https://github.com/scrapfly/python-sdk";
+        license = licenses.mit;
+      };
+    };
   };
 in
   pythonPackages
