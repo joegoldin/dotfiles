@@ -347,12 +347,12 @@
 
     llm-mlx = pythonBase.pkgs.buildPythonPackage rec {
       pname = "llm-mlx";
-      version = "0.3";
+      version = "0.4";
       format = "pyproject";
 
       src = pkgs.fetchurl {
-        url = "https://files.pythonhosted.org/packages/source/l/llm_mlx/llm_mlx-0.3.tar.gz";
-        sha256 = "sha256-nKJIuWpwmfwU0L1DlTogLek3wlpxwq65BqYBvSgFynI=";
+        url = "https://files.pythonhosted.org/packages/source/l/llm_mlx/llm_mlx-0.4.tar.gz";
+        sha256 = "sha256-7jsfsgPJvxj+aks52Kh4eilnQpECuq9R822AkKmyV7o=";
       };
 
       nativeBuildInputs = with pythonBase.pkgs; [
@@ -414,12 +414,12 @@
 
     llm-perplexity = pythonBase.pkgs.buildPythonPackage rec {
       pname = "llm-perplexity";
-      version = "2025.2.3";
+      version = "2025.4.1";
       format = "pyproject";
 
       src = pkgs.fetchurl {
-        url = "https://files.pythonhosted.org/packages/source/l/llm_perplexity/llm_perplexity-2025.2.3.tar.gz";
-        sha256 = "sha256-pu89viJqhRiCLyBZx+FFMVKRUmEx8kbcalPBzz/Jxj8=";
+        url = "https://files.pythonhosted.org/packages/source/l/llm_perplexity/llm_perplexity-2025.4.1.tar.gz";
+        sha256 = "sha256-l/0Rbhg36NqQqkB+MLKUi8kjuMoH847Qdl0tHX97XSU=";
       };
 
       nativeBuildInputs = with pythonBase.pkgs; [
@@ -447,12 +447,12 @@
 
     deepgram-sdk = pythonBase.pkgs.buildPythonPackage rec {
       pname = "deepgram-sdk";
-      version = "3.10.1";
+      version = "3.11.0";
       format = "pyproject";
 
       src = pkgs.fetchurl {
-        url = "https://files.pythonhosted.org/packages/source/d/deepgram_sdk/deepgram_sdk-3.10.1.tar.gz";
-        sha256 = "sha256-JDhOn/6lvxsvi7MFw0txvra4xayg9V0BnryfUGr5L9A=";
+        url = "https://files.pythonhosted.org/packages/source/d/deepgram_sdk/deepgram_sdk-3.11.0.tar.gz";
+        sha256 = "sha256-2SkUmufe0RPlc26HpRAlI7rm6IID1b/DCOuwHniioDI=";
       };
 
       nativeBuildInputs = with pythonBase.pkgs; [
