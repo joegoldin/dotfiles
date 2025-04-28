@@ -16,6 +16,8 @@
       black
       brotli
       cryptography
+      fake-useragent
+      faker
       flake8
       flask
       isort
@@ -28,6 +30,8 @@
       playwright-stealth
       requests
       scikit-learn
+      scrapy
+      scrapy-fake-useragent
       setuptools
       tabulate
       wheel
@@ -65,6 +69,7 @@
         customPackages.llm-ollama
         customPackages.llm-perplexity
         customPackages.lmstudio
+        customPackages.scrapfly-sdk
       ]
       ++ (
         if (pkgs.stdenv.isDarwin && pkgs.stdenv.isAarch64)
