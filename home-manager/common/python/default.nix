@@ -13,18 +13,25 @@
   nixPythonPackages = with pythonBase.pkgs;
     [
       anthropic
+      beautifulsoup4
       black
       brotli
+      brotlipy
+      colorama
       cryptography
+      extruct
       fake-useragent
       faker
       flake8
       flask
       isort
       jupyter
+      lxml
+      msgpack
       numpy
       ollama
       openai
+      pdoc3
       pip
       playwright
       playwright-stealth
@@ -32,7 +39,9 @@
       scikit-learn
       scrapy
       scrapy-fake-useragent
+      sentry-sdk
       setuptools
+      soupsieve
       tabulate
       wheel
       zlib-ng
