@@ -155,7 +155,7 @@ for pkg in $PACKAGES; do
 done
 
 echo "✅ Successfully updated packages in $PKG_FILE with latest versions"
-git add "$PKG_FILE"
+git add "$FULL_PKG_PATH"
 
 # Automatically build the updated configuration
 echo "🔨 Building updated configuration..."
