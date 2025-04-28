@@ -108,7 +108,11 @@ build-bastion-fast:
 
 [linux]
 build fast='': system-info
-  @just {{ if shell('uname -r') =~ "WSL" { "build-wsl" } else { "build-bastion" } }} {{fast}}
+  @if [[ "{{fast}}" != "" && "{{fast}}" != "-f" && "{{fast}}" != "--fast" ]]; then \
+    echo "❌ Error: Invalid 'fast' parameter '{{fast}}'. Valid options are: empty, '-f', or '--fast'"; \
+    exit 1; \
+  fi
+  @just {{ if shell('uname -r') =~ "WSL" { "build-wsl" } else { "build-bastion" } }} {{ if fast == "-f" { "--fast" } else { fast } }}
 
 system-info:
   @echo "🖥️  This is an {{arch()}} machine on {{os()}}"
