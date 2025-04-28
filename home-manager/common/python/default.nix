@@ -25,6 +25,7 @@
       openai
       pip
       playwright
+      playwright-stealth
       requests
       scikit-learn
       setuptools
