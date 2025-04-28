@@ -157,22 +157,27 @@ done
 echo "✅ Successfully updated packages in $PKG_FILE with latest versions"
 git add "$FULL_PKG_PATH"
 
-# Automatically build the updated configuration
-echo "🔨 Building updated configuration..."
-cd "$SCRIPT_DIR/.."
-JUST_YES=true just build --fast
+# Check if --no-build flag was passed
+if [[ ! "$@" =~ "--no-build" ]]; then
+  # Automatically build the updated configuration
+  echo "🔨 Building updated configuration..."
+  cd "$SCRIPT_DIR/.."
+  JUST_YES=true just build --fast
 
-# If build succeeded, commit and push changes
-if [ $? -eq 0 ]; then
-  echo "✅ Build completed successfully!"
-  
-  git commit -m "Update Python packages to latest versions"
-  echo "✅ Changes committed!"
-  
-  git push
-  echo "✅ Changes pushed!"
+  # If build succeeded, commit and push changes
+  if [ $? -eq 0 ]; then
+    echo "✅ Build completed successfully!"
+    
+    git commit -m "Update Python packages to latest versions"
+    echo "✅ Changes committed!"
+    
+    git push
+    echo "✅ Changes pushed!"
+  else
+    echo "❌ Build failed. Changes are not committed."
+  fi
 else
-  echo "❌ Build failed. Changes are not committed."
+  echo "🔄 Skipping build, --no-build flag was passed"
 fi
 
 echo "Done! 🎉"

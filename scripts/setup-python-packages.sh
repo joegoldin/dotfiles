@@ -10,6 +10,12 @@ if [ $# -eq 0 ]; then
   exit 1
 fi
 
+# Get the script directory and set paths
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+PKG_FILE="../home-manager/common/python/custom-pypi-packages.nix"
+FULL_PKG_PATH="$SCRIPT_DIR/$PKG_FILE"
+DEFAULT_NIX_PATH="$SCRIPT_DIR/../home-manager/common/python/default.nix"
+
 # Create a temporary directory
 TEMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TEMP_DIR"' EXIT
@@ -505,8 +511,34 @@ detect_license() {
   return 0
 }
 
-# Array to store all package definitions
-declare -a PACKAGE_DEFINITIONS
+# Function to check if a package already exists in custom-pypi-packages.nix
+package_exists() {
+  local package_name="$1"
+  local cleaned_name=$(echo "$package_name" | tr '_' '-')
+  
+  if grep -q "    ${cleaned_name} = pythonBase\.pkgs\.buildPythonPackage" "$FULL_PKG_PATH"; then
+    return 0  # Package exists
+  else
+    return 1  # Package doesn't exist
+  fi
+}
+
+# Check if package is already in default.nix
+package_in_default() {
+  local package_name="$1"
+  local cleaned_name=$(echo "$package_name" | tr '_' '-')
+  
+  if grep -q "customPackages\.${cleaned_name}" "$DEFAULT_NIX_PATH"; then
+    return 0  # Package is in default.nix
+  else
+    return 1  # Package is not in default.nix
+  fi
+}
+
+# Array to store all new package definitions
+declare -a NEW_PACKAGE_DEFINITIONS
+# Array to store package names for default.nix
+declare -a PACKAGES_FOR_DEFAULT
 
 # Dictionary to keep track of which packages we're processing
 declare -A LOCAL_PACKAGES
@@ -520,96 +552,100 @@ done
 for PACKAGE_NAME in "$@"; do
   echo "Processing package: $PACKAGE_NAME"
   
-  # Create a directory for the package
-  PACKAGE_DIR="$TEMP_DIR/${PACKAGE_NAME}"
-  mkdir -p "$PACKAGE_DIR"
-  
-  # Get package information
-  VERSION=$(pip show "$PACKAGE_NAME" | grep "^Version:" | cut -d ' ' -f 2)
-  echo "  Version: $VERSION"
-  
-  # Get dependencies
-  DEPS=$(pip show "$PACKAGE_NAME" | grep "Requires" | cut -d ':' -f 2- | tr ',' '\n' | sed 's/^ *//' | sort)
-  
-  # Get description and homepage
-  DESCRIPTION=$(pip show "$PACKAGE_NAME" | grep "Summary" | cut -d ':' -f 2- | sed 's/^ *//' | sed 's/"/\\"/g')
-  HOMEPAGE=$(pip show "$PACKAGE_NAME" | grep "Home-page" | cut -d ':' -f 2- | sed 's/^ *//' | sed 's/"/\\"/g')
-  
-  # Find the correct package URL
-  echo "  Finding package URL..."
-  PACKAGE_URL=$(find_package_url "$PACKAGE_NAME" "$VERSION")
-  echo "  Package URL: $PACKAGE_URL"
-  URL_STATUS=$?
-  
-  if [ $URL_STATUS -ne 0 ]; then
-    echo "  Warning: Could not verify URL exists: $PACKAGE_URL"
+  # Check if package already exists
+  if package_exists "$PACKAGE_NAME"; then
+    echo "  Package $PACKAGE_NAME already exists in $PKG_FILE, skipping definition generation."
   else
-    echo "  URL verified: $PACKAGE_URL"
-  fi
-  
-  # Download the package source to detect format and license
-  echo "  Downloading package source for format and license detection..."
-  download_file "$PACKAGE_URL" "$PACKAGE_DIR/source.tgz"
-  
-  # Detect package format
-  echo "  Detecting package format..."
-  FORMAT_INFO=$(detect_package_format "$PACKAGE_DIR" "$PACKAGE_URL")
-  PACKAGE_FORMAT=$(echo "$FORMAT_INFO" | grep "format=" | cut -d= -f2)
-  BUILD_INPUTS=$(echo "$FORMAT_INFO" | grep -A10 "build_inputs=" | cut -d= -f2-)
-  
-  echo "  Package format: $PACKAGE_FORMAT"
-  
-  # Detect license
-  echo "  Detecting license..."
-  LICENSE=$(detect_license "$PACKAGE_NAME" "$PACKAGE_DIR")
-  echo "  License: $LICENSE"
-  
-  # Get the SHA256 hash with detailed output to see what's happening
-  echo "  Calculating SHA256 hash for $PACKAGE_URL..."
-  SHA256=$(get_sha256 "$PACKAGE_URL")
-  HASH_STATUS=$?
-  
-  # Format dependencies for Nix
-  NIX_DEPS=""
-  INTERNAL_DEPS=""
-  EXTERNAL_DEPS=""
-  if [ -n "$DEPS" ]; then
-    for DEP in $DEPS; do
-      if [ -n "$DEP" ]; then
-        # Convert package name to Nix format (hyphens, lowercase)
-        NIX_DEP=$(echo "$DEP" | tr '_' '-' | tr '[:upper:]' '[:lower:]')
-        
-        # Check if this is one of our local packages
-        if [ "${LOCAL_PACKAGES[$DEP]}" = "1" ]; then
-          # Reference local package
-          INTERNAL_DEPS="${INTERNAL_DEPS}        pythonPackages.${NIX_DEP}"$'\n'
-        else
-          # Reference standard nixpkgs package
-          EXTERNAL_DEPS="${EXTERNAL_DEPS}        ${NIX_DEP}"$'\n'
+    # Create a directory for the package
+    PACKAGE_DIR="$TEMP_DIR/${PACKAGE_NAME}"
+    mkdir -p "$PACKAGE_DIR"
+    
+    # Get package information
+    VERSION=$(pip show "$PACKAGE_NAME" | grep "^Version:" | cut -d ' ' -f 2)
+    echo "  Version: $VERSION"
+    
+    # Get dependencies
+    DEPS=$(pip show "$PACKAGE_NAME" | grep "Requires" | cut -d ':' -f 2- | tr ',' '\n' | sed 's/^ *//' | sort)
+    
+    # Get description and homepage
+    DESCRIPTION=$(pip show "$PACKAGE_NAME" | grep "Summary" | cut -d ':' -f 2- | sed 's/^ *//' | sed 's/"/\\"/g')
+    HOMEPAGE=$(pip show "$PACKAGE_NAME" | grep "Home-page" | cut -d ':' -f 2- | sed 's/^ *//' | sed 's/"/\\"/g')
+    
+    # Find the correct package URL
+    echo "  Finding package URL..."
+    PACKAGE_URL=$(find_package_url "$PACKAGE_NAME" "$VERSION")
+    echo "  Package URL: $PACKAGE_URL"
+    URL_STATUS=$?
+    
+    if [ $URL_STATUS -ne 0 ]; then
+      echo "  Warning: Could not verify URL exists: $PACKAGE_URL"
+    else
+      echo "  URL verified: $PACKAGE_URL"
+    fi
+    
+    # Download the package source to detect format and license
+    echo "  Downloading package source for format and license detection..."
+    download_file "$PACKAGE_URL" "$PACKAGE_DIR/source.tgz"
+    
+    # Detect package format
+    echo "  Detecting package format..."
+    FORMAT_INFO=$(detect_package_format "$PACKAGE_DIR" "$PACKAGE_URL")
+    PACKAGE_FORMAT=$(echo "$FORMAT_INFO" | grep "format=" | cut -d= -f2)
+    BUILD_INPUTS=$(echo "$FORMAT_INFO" | grep -A10 "build_inputs=" | cut -d= -f2-)
+    
+    echo "  Package format: $PACKAGE_FORMAT"
+    
+    # Detect license
+    echo "  Detecting license..."
+    LICENSE=$(detect_license "$PACKAGE_NAME" "$PACKAGE_DIR")
+    echo "  License: $LICENSE"
+    
+    # Get the SHA256 hash with detailed output to see what's happening
+    echo "  Calculating SHA256 hash for $PACKAGE_URL..."
+    SHA256=$(get_sha256 "$PACKAGE_URL")
+    HASH_STATUS=$?
+    
+    # Format dependencies for Nix
+    NIX_DEPS=""
+    INTERNAL_DEPS=""
+    EXTERNAL_DEPS=""
+    if [ -n "$DEPS" ]; then
+      for DEP in $DEPS; do
+        if [ -n "$DEP" ]; then
+          # Convert package name to Nix format (hyphens, lowercase)
+          NIX_DEP=$(echo "$DEP" | tr '_' '-' | tr '[:upper:]' '[:lower:]')
+          
+          # Check if this is one of our local packages
+          if [ "${LOCAL_PACKAGES[$DEP]}" = "1" ]; then
+            # Reference local package
+            INTERNAL_DEPS="${INTERNAL_DEPS}        pythonPackages.${NIX_DEP}"$'\n'
+          else
+            # Reference standard nixpkgs package
+            EXTERNAL_DEPS="${EXTERNAL_DEPS}        ${NIX_DEP}"$'\n'
+          fi
         fi
-      fi
-    done
-  fi
-  
-  # Combine dependencies properly
-  if [ -n "$EXTERNAL_DEPS" ] && [ -n "$INTERNAL_DEPS" ]; then
-    NIX_DEPS="with pythonBase.pkgs; [
+      done
+    fi
+    
+    # Combine dependencies properly
+    if [ -n "$EXTERNAL_DEPS" ] && [ -n "$INTERNAL_DEPS" ]; then
+      NIX_DEPS="with pythonBase.pkgs; [
 ${EXTERNAL_DEPS}      ] ++ [
 ${INTERNAL_DEPS}      ]"
-  elif [ -n "$EXTERNAL_DEPS" ]; then
-    NIX_DEPS="with pythonBase.pkgs; [
+    elif [ -n "$EXTERNAL_DEPS" ]; then
+      NIX_DEPS="with pythonBase.pkgs; [
 ${EXTERNAL_DEPS}      ]"
-  elif [ -n "$INTERNAL_DEPS" ]; then
-    NIX_DEPS="[
+    elif [ -n "$INTERNAL_DEPS" ]; then
+      NIX_DEPS="[
 ${INTERNAL_DEPS}      ]"
-  else
-    NIX_DEPS="[]"
-  fi
-  
-  # Generate the Nix package definition
-  CLEANED_PACKAGE_NAME=$(echo "$PACKAGE_NAME" | tr '_' '-')
-  
-  PACKAGE_DEF="    ${CLEANED_PACKAGE_NAME} = pythonBase.pkgs.buildPythonPackage rec {
+    else
+      NIX_DEPS="[]"
+    fi
+    
+    # Generate the Nix package definition
+    CLEANED_PACKAGE_NAME=$(echo "$PACKAGE_NAME" | tr '_' '-')
+    
+    PACKAGE_DEF="    ${CLEANED_PACKAGE_NAME} = pythonBase.pkgs.buildPythonPackage rec {
       pname = \"${CLEANED_PACKAGE_NAME}\";
       version = \"${VERSION}\";
       format = \"${PACKAGE_FORMAT}\";
@@ -635,42 +671,111 @@ ${BUILD_INPUTS:+${BUILD_INPUTS}
         license = ${LICENSE};
       };
     };"
+    
+    # Add to array of definitions
+    NEW_PACKAGE_DEFINITIONS+=("$PACKAGE_DEF")
+  fi
   
-  # Add to array of definitions
-  PACKAGE_DEFINITIONS+=("$PACKAGE_DEF")
+  # Check if the package needs to be added to default.nix
+  if ! package_in_default "$PACKAGE_NAME"; then
+    CLEANED_PACKAGE_NAME=$(echo "$PACKAGE_NAME" | tr '_' '-')
+    PACKAGES_FOR_DEFAULT+=("$CLEANED_PACKAGE_NAME")
+  else
+    echo "  Package $PACKAGE_NAME already in default.nix, skipping."
+  fi
 done
 
-# Create the final Nix file with proper structure
-cat > custom-pypi-packages.nix << 'EOF'
-{
-  pkgs,
-  lib,
-  pythonBase,
-  unstable,
-  ...
-}:
-let
-  # Define all packages in a recursive attribute set
-  pythonPackages = rec {
-EOF
+# If we have new package definitions, append them to the existing file
+if [ ${#NEW_PACKAGE_DEFINITIONS[@]} -gt 0 ]; then
+  echo "Adding ${#NEW_PACKAGE_DEFINITIONS[@]} new package definition(s) to $PKG_FILE..."
+  
+  # Create a temporary file
+  TEMP_FILE="$TEMP_DIR/custom-pypi-packages.nix.tmp"
+  
+  # Find the position to insert new packages (before the closing structure)
+  END_POSITION=$(grep -n "^  };" "$FULL_PKG_PATH" | head -1 | cut -d':' -f1)
+  
+  if [ -z "$END_POSITION" ]; then
+    echo "Error: Could not find the end of package definitions in $PKG_FILE"
+    exit 1
+  fi
+  
+  # Copy the file up to the insertion point
+  head -n $(($END_POSITION - 1)) "$FULL_PKG_PATH" > "$TEMP_FILE"
+  
+  # Add new package definitions
+  for def in "${NEW_PACKAGE_DEFINITIONS[@]}"; do
+    echo "$def" >> "$TEMP_FILE"
+    echo >> "$TEMP_FILE"
+  done
+  
+  # Add the closing structure
+  echo "  };" >> "$TEMP_FILE"
+  echo "in" >> "$TEMP_FILE"
+  echo "pythonPackages" >> "$TEMP_FILE"
+  
+  # Replace the original file
+  mv "$TEMP_FILE" "$FULL_PKG_PATH"
+  echo "Successfully updated $PKG_FILE with new package definitions."
+fi
 
-# Add all package definitions
-for def in "${PACKAGE_DEFINITIONS[@]}"; do
-  echo "$def" >> custom-pypi-packages.nix
-  echo >> custom-pypi-packages.nix
-done
-
-# Close the structure
-cat >> custom-pypi-packages.nix << 'EOF'
-  };
-in
-pythonPackages
-EOF
+# If we have packages to add to default.nix, update it
+if [ ${#PACKAGES_FOR_DEFAULT[@]} -gt 0 ]; then
+  echo "Updating default.nix to include ${#PACKAGES_FOR_DEFAULT[@]} new package(s)..."
+  
+  # Create a temporary file
+  TEMP_FILE="$TEMP_DIR/default.nix.tmp"
+  
+  # Find the start of the custom packages section
+  SECTION_START=$(grep -n "# Custom packages from PyPI" "$DEFAULT_NIX_PATH" | head -1 | cut -d':' -f1)
+  
+  if [ -z "$SECTION_START" ]; then
+    echo "Error: Could not find the custom packages section in default.nix"
+    exit 1
+  fi
+  
+  # Find the end of the custom packages section (next closing bracket)
+  SECTION_END_OFFSET=$(tail -n +$SECTION_START "$DEFAULT_NIX_PATH" | grep -n "      ]" | head -1 | cut -d':' -f1)
+  if [ -z "$SECTION_END_OFFSET" ]; then
+    echo "Error: Could not find the end of custom packages section"
+    exit 1
+  fi
+  SECTION_END=$((SECTION_START + SECTION_END_OFFSET - 1))
+  
+  # Extract current custom packages
+  CURRENT_PACKAGES=$(sed -n "$((SECTION_START+1)),$((SECTION_END-1))p" "$DEFAULT_NIX_PATH" | grep "customPackages\." | sed 's/^[[:space:]]*customPackages\.\([a-zA-Z0-9_-]\+\).*/\1/')
+  
+  # Combine current and new packages, then sort them
+  ALL_PACKAGES=("$CURRENT_PACKAGES" "${PACKAGES_FOR_DEFAULT[@]}")
+  SORTED_PACKAGES=($(echo "${ALL_PACKAGES[@]}" | tr ' ' '\n' | sort -u))
+  
+  # Write file up to custom packages section
+  sed -n "1,$((SECTION_START))p" "$DEFAULT_NIX_PATH" > "$TEMP_FILE"
+  
+  # Write packages in alphabetical order
+  for pkg in "${SORTED_PACKAGES[@]}"; do
+    if [ -n "$pkg" ]; then
+      echo "        customPackages.${pkg}" >> "$TEMP_FILE"
+    fi
+  done
+  
+  # Write rest of file
+  sed -n "$((SECTION_END)),\$p" "$DEFAULT_NIX_PATH" >> "$TEMP_FILE"
+  
+  # Replace the original file
+  mv "$TEMP_FILE" "$DEFAULT_NIX_PATH"
+  echo "Successfully updated default.nix with new packages in alphabetical order."
+fi
 
 # Clean up - deactivate virtual environment
 deactivate
 
-# Final cleanup
 echo
-echo "Generated custom-pypi-packages.nix with self-referencing package structure"
 echo "Script completed successfully!"
+echo "✅ Added ${#NEW_PACKAGE_DEFINITIONS[@]} new package(s) to custom-pypi-packages.nix"
+echo "✅ Added ${#PACKAGES_FOR_DEFAULT[@]} new package(s) to default.nix"
+
+# Git operations if changes were made
+if [ ${#NEW_PACKAGE_DEFINITIONS[@]} -gt 0 ] || [ ${#PACKAGES_FOR_DEFAULT[@]} -gt 0 ]; then
+  git add "$FULL_PKG_PATH" "$DEFAULT_NIX_PATH"
+fi
