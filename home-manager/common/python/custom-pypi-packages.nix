@@ -484,6 +484,43 @@
         license = licenses.mit;
       };
     };
+    lmstudio = pythonBase.pkgs.buildPythonPackage rec {
+      pname = "lmstudio";
+      version = "1.3.0";
+      format = "pyproject";
+
+      src = pkgs.fetchurl {
+        url = "https://files.pythonhosted.org/packages/source/l/lmstudio/lmstudio-1.3.0.tar.gz";
+        sha256 = "sha256-y6IdnHsOcd16bhjwT7ajW0n14K+x/DSmraVCvEKvKB0=";
+      };
+
+    nativeBuildInputs = with pythonBase.pkgs; [
+      setuptools
+      wheel
+      pdm-backend
+    ];
+      # Dependencies
+      propagatedBuildInputs = with pythonBase.pkgs; [
+        anyio
+        httpx
+        httpx-ws
+        msgspec
+        typing-extensions
+      ];
+
+      # Disable tests - enable if you have specific test dependencies
+      doCheck = false;
+
+      # Basic import check
+      pythonImportsCheck = [ "lmstudio" ];
+
+      meta = with lib; {
+        description = "LM Studio Python SDK";
+        homepage = "https://github.com/lmstudio-ai/lmstudio-sdk-python";
+        license = licenses.mit;
+      };
+    };
+
   };
 in
-  pythonPackages
+pythonPackages

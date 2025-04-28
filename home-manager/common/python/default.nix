@@ -70,6 +70,7 @@
           customPackages.mlx
           customPackages.mlx-lm
           customPackages.llm-mlx
+        customPackages.lmstudio
         ]
         else [
         ]
