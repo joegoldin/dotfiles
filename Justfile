@@ -20,9 +20,15 @@ flake-update:
   @echo "✅  Flake updated!"
 
 [unix]
+setup-python-packages packages='':
+  @echo "🔄  Setting up Python packages..."
+  @scripts/setup-python-packages.sh {{packages}}
+  @echo "✅  Python packages setup!"
+
+[unix]
 update-python-packages:
   @echo "🔄  Updating Python packages..."
-  @scripts/update-python-packages.sh
+  @scripts/update-python-packages.sh --no-build
   @echo "✅  Python packages updated!"
 
 [unix]

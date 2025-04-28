@@ -63,6 +63,7 @@
         customPackages.llm-grok
         customPackages.llm-ollama
         customPackages.llm-perplexity
+        customPackages.lmstudio
       ]
       ++ (
         if (pkgs.stdenv.isDarwin && pkgs.stdenv.isAarch64)
@@ -70,7 +71,6 @@
           customPackages.mlx
           customPackages.mlx-lm
           customPackages.llm-mlx
-        customPackages.lmstudio
         ]
         else [
         ]
