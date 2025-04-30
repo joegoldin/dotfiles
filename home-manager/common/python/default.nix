@@ -32,6 +32,7 @@
       ollama
       openai
       pdoc3
+      pandas
       pip
       playwright
       playwright-stealth
