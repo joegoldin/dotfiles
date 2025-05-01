@@ -2,7 +2,11 @@
   pkgs,
   lib,
   ...
-}: {
+}: let
+  unstable = pkgs.unstable;
+  nodeModule = import ./node.nix {inherit pkgs lib unstable;};
+  pythonModule = import ./python {inherit pkgs lib unstable;};
+in {
   home.packages = with pkgs;
     lib.flatten [
       act
@@ -49,7 +53,7 @@
       nmap
       nnn # terminal file manager
       nix-your-shell
-      (import ./node.nix {inherit pkgs lib;})
+      nodeModule.packages
       openring
       p7zip
       pinentry-curses
@@ -57,8 +61,8 @@
       playwright-driver.browsers
       pre-commit
       pueue
-      (import ./python {inherit pkgs lib unstable;})
-      ripgrep # recursivel searches directories for a regex pattern
+      pythonModule.packages
+      ripgrep # recursively searches directories for a regex pattern
       rustup
       socat # replacement of openbsd-netcat
       tesseract
