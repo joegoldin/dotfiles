@@ -21,7 +21,7 @@
 
     # You can also split up your configuration and import pieces of it here:
     ./fish
-    ./packages.nix
+    (import ./packages.nix {inherit pkgs lib config;})
     ./git.nix
     ./starship.nix
     ./ssh.nix
