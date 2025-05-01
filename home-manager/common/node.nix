@@ -11,6 +11,7 @@
     version,
     sha256,
     isESM ? null,
+    extraInstallPhase ? "",
   }: let
     # Parse the package name to handle scoped packages
     packageInfo = let
@@ -202,6 +203,9 @@
                     fi
                   done
                 fi
+
+                # Run any extra installation steps
+                ${extraInstallPhase}
       '';
 
       # Skip standard fixup phases
@@ -226,7 +230,7 @@
 
   # Custom npm packages with specific versions and hashes
   customNpmPackages = [
-    # Claude Code - with automatic ES module detection
+    # Better SQLite3 - build first as it's a dependency for Claude Code
     (buildNpmPackage {
       name = "better-sqlite3";
       version = "11.9.1";
@@ -234,13 +238,30 @@
       # isESM automatically detected
     })
 
-    # Claude Code - with automatic ES module detection
-    (buildNpmPackage {
-      name = "@anthropic-ai/claude-code";
-      version = "0.2.97";
-      sha256 = "sha256-Lzrg+iXg0CZEiI5ONxXhkwv2wo6EOdl1NmjcgPmY7dA=";
-      isESM = true; # Explicitly set for claude-code since we know it's an ES module
-    })
+    # Claude Code - with better-sqlite3 dependency
+    (
+      let
+        betterSqlite = builtins.head customNpmPackages;
+      in
+        buildNpmPackage {
+          name = "@anthropic-ai/claude-code";
+          version = "0.2.97";
+          sha256 = "sha256-Lzrg+iXg0CZEiI5ONxXhkwv2wo6EOdl1NmjcgPmY7dA=";
+          isESM = true; # Explicitly set for claude-code since we know it's an ES module
+
+          # Add extra install steps to link the dependency
+          extraInstallPhase = ''
+            ln -s ${betterSqlite}/lib/node_modules/better-sqlite3 $out/lib/node_modules/
+
+            # Modify NODE_PATH in the wrapper scripts to include the node_modules directory
+            for bin_file in $out/bin/*; do
+              if [ -f "$bin_file" ]; then
+                sed -i '/export NODE_OPTIONS/a export NODE_PATH="$out/lib/node_modules:$NODE_PATH"' "$bin_file"
+              fi
+            done
+          '';
+        }
+    )
 
     # Example of additional packages
     # (buildNpmPackage {
