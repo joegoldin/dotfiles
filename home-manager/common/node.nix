@@ -229,8 +229,8 @@
     # Claude Code - with automatic ES module detection
     (buildNpmPackage {
       name = "@anthropic-ai/claude-code";
-      version = "0.2.9";
-      sha256 = "sha256-/WBysiuds6ZwwSSUFDr+sGHgRYCyFhH6bEai+XxHsYw=";
+      version = "0.2.97";
+      sha256 = "sha256-Lzrg+iXg0CZEiI5ONxXhkwv2wo6EOdl1NmjcgPmY7dA=";
       isESM = true; # Explicitly set for claude-code since we know it's an ES module
     })
 
