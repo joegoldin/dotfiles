@@ -10,9 +10,9 @@ FULL_PKG_PATH="$SCRIPT_DIR/$PKG_FILE"
 echo "🔍 Extracting current Node packages from $PKG_FILE..."
 
 # Extract package names and versions from the Nix file
-# This extracts lines with name = "package-name" and corresponding version = "x.y.z"
-# Ignore commented out lines (those with # before name =)
-PACKAGES=$(grep -E 'name = "[@a-zA-Z0-9_/-]+' "$FULL_PKG_PATH" | grep -v '^\s*#' | sed -E 's/.*name = "([^"]+)".*/\1/')
+# This extracts packages from the npmPackages array in the new format
+# Ignore commented out lines and the unified-node-environment
+PACKAGES=$(grep -E '\s+name = "[@a-zA-Z0-9_/-]+";' "$FULL_PKG_PATH" | grep -v '^\s*#' | sed -E 's/.*name = "([^"]+)";.*/\1/' | grep -v 'unified-node-environment')
 
 if [ -z "$PACKAGES" ]; then
   echo "❌ Error: No packages found in $PKG_FILE"
@@ -54,19 +54,19 @@ for pkg in $PACKAGES; do
   fi
   
   # Extract the current version from the original file
-  # Find the section for this package
-  START_LINE=$(grep -n "name = \"$pkg\";" "$FULL_PKG_PATH" | grep -v '^\s*#' | cut -d':' -f1)
+  # Find the package in the npmPackages array
+  PKG_BLOCK_START=$(grep -n "name = \"$pkg\";" "$FULL_PKG_PATH" | grep -v '^\s*#' | head -1 | cut -d':' -f1)
   
-  if [ -z "$START_LINE" ]; then
+  if [ -z "$PKG_BLOCK_START" ]; then
     echo "⚠️ Warning: Package $pkg not found in $PKG_FILE, skipping."
     continue
   fi
   
-  # Look for version string in the next 5 lines
-  END_SEARCH=$((START_LINE + 5))
-  OLD_VERSION=$(sed -n "${START_LINE},${END_SEARCH}p" "$FULL_PKG_PATH" | grep -E 'version = "[^"]+"' | head -1 | sed -E 's/.*version = "([^"]+)".*/\1/')
+  # Look for version string in the surrounding lines
+  PKG_BLOCK_END=$((PKG_BLOCK_START + 10))
+  OLD_VERSION=$(sed -n "${PKG_BLOCK_START},${PKG_BLOCK_END}p" "$FULL_PKG_PATH" | grep -E 'version = "[^"]+"' | head -1 | sed -E 's/.*version = "([^"]+)".*/\1/')
   
-  # Check if OLD_VERSION is empty and set a default value
+  # Check if OLD_VERSION is empty
   if [ -z "$OLD_VERSION" ]; then
     echo "⚠️ Warning: Could not determine current version for $pkg, skipping."
     continue
@@ -110,49 +110,61 @@ for pkg in $PACKAGES; do
     continue
   fi
   
-  # Find the package block start and end
-  # Use exact package name match with word boundaries instead of regex patterns
-  # First find the line with the package name
-  PKG_LINE=$(grep -n "name = \"$pkg\";" "$FULL_PKG_PATH" | grep -v '^\s*#' | head -1 | cut -d':' -f1)
-  
-  if [ -z "$PKG_LINE" ]; then
-    echo "⚠️ Warning: Could not find line with package name: $pkg, skipping."
-    continue
-  fi
-  
-  # Now search backwards for the buildNpmPackage line
-  PKG_START_LINE=$PKG_LINE
-  while [ $PKG_START_LINE -gt 1 ]; do
-    PKG_START_LINE=$((PKG_START_LINE - 1))
-    LINE=$(sed -n "${PKG_START_LINE}p" "$FULL_PKG_PATH")
-    if [[ "$LINE" =~ "buildNpmPackage" ]]; then
+  # Find the beginning and end of the package block
+  # Search for the opening { before the package name line
+  BLOCK_START=$PKG_BLOCK_START
+  while [ $BLOCK_START -gt 1 ]; do
+    BLOCK_START=$((BLOCK_START - 1))
+    LINE=$(sed -n "${BLOCK_START}p" "$FULL_PKG_PATH")
+    if [[ "$LINE" =~ \{$ ]]; then
       break
     fi
   done
   
-  if [ $PKG_START_LINE -le 1 ]; then
+  if [ $BLOCK_START -le 1 ]; then
     echo "⚠️ Warning: Could not find start of package block for $pkg, skipping."
     continue
   fi
   
-  # Find end of package block (next closing parenthesis after the start line)
-  # Search for the closing parenthesis (}) at the beginning of a line 
-  # followed by another ) character
-  END_LINE=$PKG_LINE
-  MAX_SEARCH_LINES=50  # Limit how far we search to avoid going too far
+  # Find the end of the package block (next closing brace)
+  BLOCK_END=$PKG_BLOCK_START
+  MAX_SEARCH_LINES=20
   LINES_SEARCHED=0
   
   while [ $LINES_SEARCHED -lt $MAX_SEARCH_LINES ]; do
-    END_LINE=$((END_LINE + 1))
+    BLOCK_END=$((BLOCK_END + 1))
     LINES_SEARCHED=$((LINES_SEARCHED + 1))
-    LINE=$(sed -n "${END_LINE}p" "$FULL_PKG_PATH")
-    if [[ "$LINE" =~ ^[[:space:]]*\}[[:space:]]*\)[[:space:]]*$ ]]; then
+    LINE=$(sed -n "${BLOCK_END}p" "$FULL_PKG_PATH")
+    # Look for a line that contains a closing brace, possibly followed by other characters
+    if [[ "$LINE" =~ ^\s*\} ]]; then
       break
     fi
-    if [ $END_LINE -ge $(wc -l < "$FULL_PKG_PATH") ]; then
+    if [ $BLOCK_END -ge $(wc -l < "$FULL_PKG_PATH") ]; then
       break
     fi
   done
+  
+  # If we couldn't find the end in a reasonable number of lines, increase the search range
+  if [ $LINES_SEARCHED -ge $MAX_SEARCH_LINES ]; then
+    # Try with a larger search range
+    MAX_SEARCH_LINES=50
+    LINES_SEARCHED=0
+    BLOCK_END=$PKG_BLOCK_START
+    
+    while [ $LINES_SEARCHED -lt $MAX_SEARCH_LINES ]; do
+      BLOCK_END=$((BLOCK_END + 1))
+      LINES_SEARCHED=$((LINES_SEARCHED + 1))
+      LINE=$(sed -n "${BLOCK_END}p" "$FULL_PKG_PATH")
+      # More permissive regex - look for any line containing a closing brace
+      if [[ "$LINE" =~ \} ]]; then
+        echo "   Found end of block with extended search"
+        break
+      fi
+      if [ $BLOCK_END -ge $(wc -l < "$FULL_PKG_PATH") ]; then
+        break
+      fi
+    done
+  fi
   
   if [ $LINES_SEARCHED -ge $MAX_SEARCH_LINES ]; then
     echo "⚠️ Warning: Could not find end of package block within reasonable distance for $pkg, skipping."
@@ -163,10 +175,10 @@ for pkg in $PACKAGES; do
   TEMP_FILE="$WORK_DIR/temp_file.nix"
   
   # Update the version and SHA256 hash
-  head -n $((PKG_START_LINE - 1)) "$FULL_PKG_PATH" > "$TEMP_FILE"
+  head -n $((BLOCK_START - 1)) "$FULL_PKG_PATH" > "$TEMP_FILE"
   
   # Get the section to modify
-  SECTION=$(sed -n "${PKG_START_LINE},${END_LINE}p" "$FULL_PKG_PATH")
+  SECTION=$(sed -n "${BLOCK_START},${BLOCK_END}p" "$FULL_PKG_PATH")
   
   # Update version and sha256 using @ as delimiter to avoid conflicts with URL slashes
   UPDATED_SECTION=$(echo "$SECTION" | 
@@ -174,7 +186,7 @@ for pkg in $PACKAGES; do
     sed -E "s@(sha256 = \")[^\"]+(\";)@\1${SHA256}\2@")
   
   echo "$UPDATED_SECTION" >> "$TEMP_FILE"
-  tail -n +$((END_LINE + 1)) "$FULL_PKG_PATH" >> "$TEMP_FILE"
+  tail -n +$((BLOCK_END + 1)) "$FULL_PKG_PATH" >> "$TEMP_FILE"
   
   # Replace the original file
   mv "$TEMP_FILE" "$FULL_PKG_PATH"
