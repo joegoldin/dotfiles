@@ -1,4 +1,25 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  config,
+  ...
+}: let
+  # Import custom packages from node configuration
+  customNodePackages = import ../node/custom-node-packages.nix {
+    inherit pkgs config;
+    lib = pkgs.lib;
+    nodejs = pkgs.nodejs_22;
+    unstable = pkgs.unstable or pkgs;
+  };
+
+  # Generate fish env variable settings for node packages
+  nodeEnvVars = pkgs.lib.concatStringsSep "\n" (pkgs.lib.concatMap (pkg: 
+    if pkg ? env then
+      pkgs.lib.mapAttrsToList (name: value: 
+        ''set -Ux ${name} "${value}"''
+      ) pkg.env
+    else []
+  ) customNodePackages.directNpmPackages);
+in {
   interactiveShellInit = ''
     set -Ux Z_CMD "j"
     set -Ux nvm_default_version lts
@@ -10,6 +31,12 @@
     direnv hook fish | source
 
     fish_add_path $HOME/.cargo/bin
+
+    fish_add_path $HOME/.npm-global/bin
+    set -Ux NODE_PATH "${config.home.profileDirectory}/lib/node_modules:$HOME/.npm-global/lib/node_modules"
+
+    # Set Node package environment variables
+    ${nodeEnvVars}
 
     # from https://github.com/CGamesPlay/llm-cmd-comp/blob/main/share/llm-cmd-comp.fish
     bind \e\\ __llm_cmdcomp

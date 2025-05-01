@@ -21,7 +21,7 @@ in {
   ];
 
   home.packages =
-    (import ../common/packages.nix {inherit pkgs lib;}).home.packages
+    (import ../common/packages.nix {inherit pkgs lib config;}).home.packages
     ++ (with pkgs; [
       # macos only packages
       shopt-script

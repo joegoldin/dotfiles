@@ -1,10 +1,11 @@
 {
   pkgs,
   lib,
+  config,
   ...
 }: let
   unstable = pkgs.unstable;
-  nodeModule = import ./node.nix {inherit pkgs lib unstable;};
+  nodeModule = import ./node {inherit pkgs lib unstable config;};
   pythonModule = import ./python {inherit pkgs lib unstable;};
 in {
   home.packages = with pkgs;
@@ -78,6 +79,11 @@ in {
       zlib
       zstd
     ];
+
+  home.activation.nodePreInstall = nodeModule.nodePreInstall;
+  home.activation.nodeSetupGlobal = nodeModule.nodeSetupGlobal;
+  home.activation.nodePostInstall = nodeModule.nodePostInstall;
+  home.activation.pythonPostInstall = pythonModule.pythonPostInstall;
 
   programs = {
     # skim provides a single executable: sk.
