@@ -92,5 +92,6 @@
         ]
       )
   );
-in
-  pythonWithPackages
+in {
+  packages = pythonWithPackages;
+}
