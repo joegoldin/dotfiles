@@ -228,6 +228,14 @@
   customNpmPackages = [
     # Claude Code - with automatic ES module detection
     (buildNpmPackage {
+      name = "better-sqlite3";
+      version = "11.9.1";
+      sha256 = "sha256-zOpKIXPRPzBGfqBgaFHh8oIDAZhHendnm4SYSERUErs=";
+      # isESM automatically detected
+    })
+
+    # Claude Code - with automatic ES module detection
+    (buildNpmPackage {
       name = "@anthropic-ai/claude-code";
       version = "0.2.97";
       sha256 = "sha256-Lzrg+iXg0CZEiI5ONxXhkwv2wo6EOdl1NmjcgPmY7dA=";

@@ -32,6 +32,12 @@ update-python-packages:
   @echo "✅  Python packages updated!"
 
 [unix]
+update-node-packages:
+  @echo "🔄  Updating Node packages..."
+  @scripts/update-node-packages.sh
+  @echo "✅  Node packages updated!"
+
+[unix]
 update-cursor-server:
   @echo "🔄  Updating Cursor server Linux..."
   @scripts/update-cursor-server-linux.fish
@@ -44,7 +50,6 @@ nix-gc:
   @nix-store --gc
   @echo "✅  Garbage collected!"
 
-[confirm]
 [private]
 build-macos fast='':
   @echo "🔨  Building Nix config for macOS 🍎"
@@ -74,7 +79,6 @@ save-launchpad:
 build fast='': system-info
   @just build-macos {{fast}}
 
-[confirm]
 [private]
 build-wsl fast='':
   @echo "🔨  Building Nix config for WSL 🪟"
@@ -90,7 +94,6 @@ build-wsl-fast:
   @sudo nixos-rebuild --flake .#joe-wsl switch
   @echo "✅  Built for WSL!"
 
-[confirm]
 [private]
 build-bastion fast='':
   @echo "🔨  Building Nix config for NixOS on Oracle Cloud 🐧"
