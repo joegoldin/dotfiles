@@ -6,7 +6,7 @@
 }: {
   programs.fish = {
     enable = true;
-    interactiveShellInit = (import ./init.nix {inherit pkgs;}).interactiveShellInit;
+    interactiveShellInit = (import ./init.nix {inherit pkgs config;}).interactiveShellInit;
     functions = import ./functions.nix;
     plugins = (import ./plugins.nix {inherit pkgs;}).plugins;
     shellAbbrs = (import ./aliases.nix {inherit lib config;}).shellAbbrs;

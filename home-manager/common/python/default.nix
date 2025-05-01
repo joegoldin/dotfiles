@@ -94,4 +94,19 @@
   );
 in {
   packages = pythonWithPackages;
+
+  # Add Home Manager activation script to run node post-install commands
+  pythonPostInstall = lib.hm.dag.entryAfter ["installPackages"] ''
+    echo "Running Python package post-installation tasks..."
+    
+    # Changed to use a direct iteration over the packages with non-empty postInstallCommands
+    ${lib.concatStringsSep "\n" (lib.filter (cmd: cmd != "") (map (pkg: 
+      if pkg ? postInstallCommands && pkg.postInstallCommands != ""
+      then ''
+        echo "Running post-install configuration for ${pkg.pname}..."
+        run ${pkg.postInstallCommands}
+      ''
+      else ""
+    ) (lib.attrValues customPackages)))}
+  '';
 }
