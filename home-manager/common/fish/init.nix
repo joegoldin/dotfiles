@@ -12,13 +12,17 @@
   };
 
   # Generate fish env variable settings for node packages
-  nodeEnvVars = pkgs.lib.concatStringsSep "\n" (pkgs.lib.concatMap (pkg: 
-    if pkg ? env then
-      pkgs.lib.mapAttrsToList (name: value: 
-        ''set -Ux ${name} "${value}"''
-      ) pkg.env
-    else []
-  ) customNodePackages.directNpmPackages);
+  nodeEnvVars = pkgs.lib.concatStringsSep "\n" (pkgs.lib.concatMap (
+      pkg:
+        if pkg ? env
+        then
+          pkgs.lib.mapAttrsToList (
+            name: value: ''set -Ux ${name} "${value}"''
+          )
+          pkg.env
+        else []
+    )
+    customNodePackages.directNpmPackages);
 in {
   interactiveShellInit = ''
     set -Ux Z_CMD "j"
