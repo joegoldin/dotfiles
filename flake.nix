@@ -48,6 +48,12 @@
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # plasma-manager for KDE configuration
+    plasma-manager = {
+      url = "github:nix-community/plasma-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
   };
 
   nixConfig = {
@@ -71,6 +77,7 @@
     brew-api,
     disko,
     agenix,
+    plasma-manager,
     ...
   } @ inputs: let
     inherit (self) outputs;
@@ -174,6 +181,31 @@
             };
             age.identityPaths = ["/home/joe/.ssh/id_ed25519"];
           })
+        ];
+      };
+
+      # Desktop NixOS configuration
+      joe-desktop = nixpkgs.lib.nixosSystem {
+        specialArgs =
+          commonSpecialArgs
+          // {
+            hostname = "joe-desktop";
+          };
+        modules = [
+          # > Our main nixos configuration <
+          ./environments/nixos
+          home-manager.nixosModules.home-manager
+          ({specialArgs, ...}: {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = specialArgs;
+            home-manager.backupFileExtension = "backup"; # enable moving existing files
+            home-manager.sharedModules = [
+              plasma-manager.homeManagerModules.plasma-manager
+            ];
+            home-manager.users.${specialArgs.username} = import ./home-manager/kde;
+          })
+          agenix.nixosModules.default
         ];
       };
     };

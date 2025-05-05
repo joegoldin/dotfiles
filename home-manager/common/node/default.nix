@@ -34,10 +34,10 @@ in {
 
     # Set npm global prefix
     ${config.home.profileDirectory}/bin/npm set prefix ~/.npm-global
-    
+
     # Ensure npm will always use this prefix for global installs
     ${config.home.profileDirectory}/bin/npm config set global true
-    
+
     # Add npm global bin to PATH if not already present
     if [[ ":$PATH:" != *":$HOME/.npm-global/bin:"* ]]; then
       export PATH="$HOME/.npm-global/bin:$PATH"
@@ -49,15 +49,19 @@ in {
     ${pkgs.fish}/bin/fish -c "set -Ux NODE_PATH \"${config.home.profileDirectory}/lib/node_modules:$HOME/.npm-global/lib/node_modules\""
 
     # Export Node package environment variables
-    ${lib.concatStringsSep "\n" (lib.concatMap (pkg: 
-      if pkg ? env then
-        lib.mapAttrsToList (name: value: 
-          ''echo "Exporting ${name}=${value} for ${pkg.name}..."
-            export ${name}="${value}"
-            ${pkgs.fish}/bin/fish -c "set -Ux ${name} ${value}"''
-        ) pkg.env
-      else []
-    ) customNodePackages.directNpmPackages)}
+    ${lib.concatStringsSep "\n" (lib.concatMap (
+        pkg:
+          if pkg ? env
+          then
+            lib.mapAttrsToList (
+              name: value: ''                echo "Exporting ${name}=${value} for ${pkg.name}..."
+                            export ${name}="${value}"
+                            ${pkgs.fish}/bin/fish -c "set -Ux ${name} ${value}"''
+            )
+            pkg.env
+          else []
+      )
+      customNodePackages.directNpmPackages)}
   '';
 
   # This runs after packages are installed - we'll use two separate systems:
@@ -71,15 +75,17 @@ in {
   # This runs after modules are installed to execute any package-specific commands
   nodePostInstall = lib.hm.dag.entryAfter ["nodeSetupGlobal"] ''
     echo "Running Node.js package post-installation tasks..."
-    
+
     # Run post-install commands for the packages from npmPackages
-    ${lib.concatStringsSep "\n" (lib.filter (cmd: cmd != "") (map (pkg: 
-      if pkg ? postInstallCommands && pkg.postInstallCommands != ""
-      then ''
-        echo "Running post-install configuration for ${pkg.name}..."
-        run ${pkg.postInstallCommands}
-      ''
-      else ""
-    ) customNodePackages.npmPackages))}
+    ${lib.concatStringsSep "\n" (lib.filter (cmd: cmd != "") (map (
+        pkg:
+          if pkg ? postInstallCommands && pkg.postInstallCommands != ""
+          then ''
+            echo "Running post-install configuration for ${pkg.name}..."
+            run ${pkg.postInstallCommands}
+          ''
+          else ""
+      )
+      customNodePackages.npmPackages))}
   '';
 }
