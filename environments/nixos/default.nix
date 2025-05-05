@@ -12,6 +12,7 @@
 }: {
   imports = [
     ./configuration.nix
-    # ./hardware-configuration.nix # TODO generate this
+    ./hardware-configuration.nix
+    ./joe-desktop.nix
   ];
 }

@@ -9,7 +9,7 @@ lint:
   @echo "✅  Nix config linted!"
 
 [unix]
-check-system:
+check:
   @echo "🔍  Checking Nix config for current system..."
   @NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 NIXPKGS_ALLOW_UNFREE=1 NIXPKGS_ALLOW_BROKEN=1 nix --extra-experimental-features 'nix-command flakes' flake check --impure
 
