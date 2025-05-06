@@ -45,6 +45,8 @@
       soupsieve
       tabulate
       wheel
+      wxpython
+      xcffib
       zlib-ng
     ]
     ++ (
@@ -80,6 +82,7 @@
         customPackages.llm-perplexity
         customPackages.lmstudio
         customPackages.scrapfly-sdk
+        customPackages.system-hotkey
       ]
       ++ (
         if (pkgs.stdenv.isDarwin && pkgs.stdenv.isAarch64)
@@ -89,6 +92,7 @@
           customPackages.llm-mlx
         ]
         else [
+          customPackages.superpaper
         ]
       )
   );
