@@ -7,6 +7,7 @@
 }: {
   imports = [
     ../common
+    ../common/firefox
   ];
 
   programs.plasma = {
