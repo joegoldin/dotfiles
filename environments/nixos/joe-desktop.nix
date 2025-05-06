@@ -61,18 +61,19 @@
     unstable.displaylink
 
     # System utils
+    glxinfo
     gparted
     htop
-    glxinfo
     pciutils
     usbutils
 
     # KDE specific packages for Plasma 6
-    kdePackages.kate
     kdePackages.ark
-    kdePackages.spectacle
     kdePackages.dolphin
+    kdePackages.kate
     kdePackages.konsole
+    kdePackages.kzones
+    kdePackages.spectacle
   ];
 
   # Enable flatpak
