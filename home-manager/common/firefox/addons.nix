@@ -33,6 +33,7 @@ in {
       (extension "kagi-search-for-firefox" "search@kagi.com")
       (extension "enhancer-for-youtube" "enhancerforyoutube@maximerf.addons.mozilla.org")
       (extension "1password-x-password-manager" "{d634138d-c276-4fc8-924b-40a0ea21d284}")
+      (extension "w2g" "{6ea0a676-b3ef-48aa-b23d-24c8876945fb}")
     ]);
     # To add additional extensions, find it on addons.mozilla.org, find
     # the short ID in the url (like https://addons.mozilla.org/en-US/firefox/addon/!SHORT_ID!/)
