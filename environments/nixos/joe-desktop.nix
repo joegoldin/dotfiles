@@ -7,12 +7,16 @@
   ...
 }: {
   # Enable X11/Wayland and KDE Plasma 6 desktop environment
+  services.displayManager.sddm.enable = true;
   services.xserver = {
     enable = true;
-    displayManager.sddm.enable = true;
-    # Disable Plasma 5
-    # desktopManager.plasma5.enable = true;
+    displayManager.sessionCommands = ''
+      ${lib.getBin pkgs.xorg.xrandr}/bin/xrandr --setprovideroutputsource 2 0
+    '';
+    videoDrivers = ["displaylink" "modesetting"];
   };
+
+  systemd.services.dlm.wantedBy = ["multi-user.target"];
 
   # Enable Plasma 6
   services.desktopManager.plasma6.enable = true;
@@ -24,7 +28,6 @@
   };
 
   # Enable sound with PipeWire (recommended for Plasma 6)
-  sound.enable = true;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -37,10 +40,9 @@
   hardware.pulseaudio.enable = false;
 
   # Enable OpenGL
-  hardware.opengl = {
+  hardware.graphics = {
     enable = true;
-    driSupport = true;
-    driSupport32Bit = true;
+    enable32Bit = true;
   };
 
   # Enable bluetooth
@@ -55,16 +57,15 @@
 
   # Additional system packages
   environment.systemPackages = with pkgs; [
+    # Drivers
+    unstable.displaylink
+
     # System utils
     gparted
     htop
     glxinfo
     pciutils
     usbutils
-
-    # Basic GUI apps
-    firefox
-    vlc
 
     # KDE specific packages for Plasma 6
     kdePackages.kate

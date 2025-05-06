@@ -14,14 +14,9 @@
 
     # Workspace appearance
     workspace = {
-      theme = {
-        name = "breeze-dark";
-        colorScheme = "BreezeDark";
-        icons = "breeze-dark";
-        cursors = "Breeze_Snow";
-      };
-      # Replace with actual path to wallpaper after installation
-      wallpaper = "${pkgs.kdePackages.plasma-workspace-wallpapers}/share/wallpapers/Patak/contents/images/5120x2880.png";
+      theme = "breeze-dark";
+      # Managed by superpaper
+      # wallpaper = "${pkgs.kdePackages.plasma-workspace-wallpapers}/share/wallpapers/Patak/contents/images/5120x2880.png";
       lookAndFeel = "org.kde.breezedark.desktop";
       clickItemTo = "select"; # Options are "select" or "open"
     };

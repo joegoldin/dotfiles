@@ -16,15 +16,6 @@
     ../common/cursor-server-linux.nix
   ];
 
-  home.packages =
-    (import ../common/packages.nix {inherit pkgs lib config;}).home.packages
-    ++ (with pkgs; [
-      # nixos only packages
-      tailscale
-      cloudflared
-      inotify-tools
-    ]);
-
   # lorri for nix-shell
   services.lorri.enable = true;
 
