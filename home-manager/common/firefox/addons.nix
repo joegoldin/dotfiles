@@ -55,17 +55,19 @@ in {
         externalLists = lib.concatStringsSep "\n" importedLists;
       };
       selectedFilterLists = [
-        "CZE-0"
         "adguard-generic"
         "adguard-annoyance"
         "adguard-social"
         "adguard-spyware-url"
         "easylist"
         "easyprivacy"
+        "fanboy-cookiemonster"
         "https://github.com/DandelionSprout/adfilt/raw/master/LegitimateURLShortener.txt"
         "plowe-0"
+        "ublock-annoyances"
         "ublock-abuse"
         "ublock-badware"
+        "ublock-cookies-easylist"
         "ublock-filters"
         "ublock-privacy"
         "ublock-quick-fixes"
