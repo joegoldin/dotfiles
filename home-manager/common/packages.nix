@@ -16,11 +16,13 @@
     inotify-tools
     unstable.jellyfin-media-player
     unstable.parsec-bin
+    slack
     steam
     unstable.streamcontroller
     sublime-merge
     tailscale
     vlc
+    zoom-us
   ];
 
   macosPackages = with pkgs; [
