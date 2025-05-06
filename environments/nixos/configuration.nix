@@ -15,6 +15,9 @@
   system.stateVersion = "${stateVersion}";
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
   nixpkgs = {
     overlays = [
       outputs.overlays.additions

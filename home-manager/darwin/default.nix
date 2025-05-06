@@ -20,13 +20,6 @@ in {
     ../common
   ];
 
-  home.packages =
-    (import ../common/packages.nix {inherit pkgs lib config;}).home.packages
-    ++ (with pkgs; [
-      # macos only packages
-      shopt-script
-      iterm2-terminal-integration
-    ]);
   programs.fish.interactiveShellInit = lib.strings.concatStrings [
     (import ../common/fish/init.nix {inherit pkgs;}).interactiveShellInit
     initConfigAdditions
