@@ -11,11 +11,15 @@
   # System-specific package sets
   nixosPackages = with pkgs; [
     cloudflared
+    code-cursor
     discord
-    firefox
     inotify-tools
-    tailscale
+    unstable.jellyfin-media-player
+    unstable.parsec-bin
     steam
+    unstable.streamcontroller
+    sublime-merge
+    tailscale
     vlc
   ];
 
