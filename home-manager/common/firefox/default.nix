@@ -57,7 +57,7 @@ in {
 			"3rdparty" = addons."3rdparty";
 
 			FirefoxHome = {
-				Search = false;
+				Search = true;
 				TopSites = true;
 				SponsoredTopSites = false;
 				Highlights = true;
@@ -147,12 +147,12 @@ in {
 			SanitizeOnShutdown = {
 				Cache = true;
 				Cookies = false;
-				Downloads = true;
+				Downloads = false;
 				FormData = true;
 				History = false;
 				Sessions = false;
 				SiteSettings = false;
-				OfflineApps = true;
+				OfflineApps = false;
 				Locked = true;
 			};
 			SearchBar = "combined";
@@ -202,6 +202,9 @@ in {
 
 		profiles.Default = {
 			settings = {
+			# Startup with previous session
+			"browser.startup.page" = 3;
+
 			# Enable letterboxing
 			"privacy.resistFingerprinting.letterboxing" = true;
 
