@@ -72,7 +72,6 @@
     kdePackages.dolphin
     kdePackages.kate
     kdePackages.konsole
-    kdePackages.kzones
     kdePackages.spectacle
   ];
 
