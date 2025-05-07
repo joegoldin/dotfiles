@@ -133,9 +133,9 @@ in {
       else []
     );
 
-  #  home.activation.nodePreInstall = nodeModule.nodePreInstall;
-  #  home.activation.nodeSetupGlobal = nodeModule.nodeSetupGlobal;
-  #  home.activation.nodePostInstall = nodeModule.nodePostInstall;
+  home.activation.nodePreInstall = nodeModule.nodePreInstall;
+  home.activation.nodeSetupGlobal = nodeModule.nodeSetupGlobal;
+  home.activation.nodePostInstall = nodeModule.nodePostInstall;
   home.activation.pythonPostInstall = pythonModule.pythonPostInstall;
 
   programs = {

@@ -29,6 +29,9 @@ in {
 
   # This runs before packages are installed to set up npm's global prefix
   nodePreInstall = lib.hm.dag.entryBefore ["installPackages"] ''
+    # Put grc on path via nix pkg
+    export PATH="$PATH:${pkgs.grc}/bin"
+
     # Create npm global directory if it doesn't exist
     mkdir -p ~/.npm-global
 
