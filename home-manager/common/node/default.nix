@@ -41,11 +41,9 @@ in {
     # Ensure npm will always use this prefix for global installs
     ${config.home.profileDirectory}/bin/npm config set global true
 
-    # Add npm global bin to PATH if not already present
-    if [[ ":$PATH:" != *":$HOME/.npm-global/bin:"* ]]; then
-      export PATH="$HOME/.npm-global/bin:$PATH"
-      ${pkgs.fish}/bin/fish -c "fish_add_path $HOME/.npm-global/bin"
-    fi
+    # Add npm global bin to PATH
+    export PATH="$HOME/.npm-global/bin:$PATH"
+    ${pkgs.fish}/bin/fish -c "set -Ux PATH $HOME/.npm-global/bin:$PATH"
 
     # Set NODE_PATH to include Nix-installed node modules
     export NODE_PATH="${config.home.profileDirectory}/lib/node_modules:$HOME/.npm-global/lib/node_modules"
