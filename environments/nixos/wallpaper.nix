@@ -1,8 +1,11 @@
-{ config, lib, pkgs, username, ... }:
-
-with lib;
-
-let
+{
+  config,
+  lib,
+  pkgs,
+  username,
+  ...
+}:
+with lib; let
   cfg = config.services.wallpaper;
   scriptPath = "${config.users.users.${username}.home}/dotfiles/scripts/set-wallpaper.py";
   wallpaperDirs = [
@@ -12,7 +15,7 @@ let
   uid = config.users.users.${username}.uid;
 in {
   systemd.timers."set-wallpaper" = {
-    wantedBy = [ "timers.target" ];
+    wantedBy = ["timers.target"];
     timerConfig = {
       OnBootSec = "60m";
       OnUnitActiveSec = "60m";
@@ -23,10 +26,10 @@ in {
   systemd.services."set-wallpaper" = {
     script = ''
       set -eu
-      
+
       # Create a temporary .Xauthority file
       XAUTH_TMP=$(mktemp)
-      
+
       # Find and copy the most recent xauth file
       XAUTH_FILE=$(ls -t /run/user/${toString uid}/xauth_* 2>/dev/null | head -n1)
       if [ -n "$XAUTH_FILE" ]; then
@@ -35,11 +38,11 @@ in {
         echo "No xauth file found"
         exit 1
       fi
-      
+
       export XAUTHORITY="$XAUTH_TMP"
-      
-      ${pkgs.python3.withPackages (ps: [ ps.dbus-python ps.pillow ])}/bin/python3 ${scriptPath} ${lib.concatStringsSep " " wallpaperDirs}
-      
+
+      ${pkgs.python3.withPackages (ps: [ps.dbus-python ps.pillow])}/bin/python3 ${scriptPath} ${lib.concatStringsSep " " wallpaperDirs}
+
       # Clean up
       rm -f "$XAUTH_TMP"
     '';
@@ -53,4 +56,4 @@ in {
       ];
     };
   };
-} 
+}

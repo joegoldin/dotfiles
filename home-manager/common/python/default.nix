@@ -111,7 +111,6 @@
       ln -s ${pythonWithPackages}/bin/python3 usr/bin/python3
     '';
   };
-
 in {
   packages = pythonWithPackages;
   fhs = pythonFHSEnv;
