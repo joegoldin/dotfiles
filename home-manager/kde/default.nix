@@ -255,10 +255,6 @@
       "mediacontrol"."playpausemedia" = "Media Play";
       "mediacontrol"."previousmedia" = "Media Previous";
       "mediacontrol"."stopmedia" = "Media Stop";
-      "org.kde.spectacle.desktop"."ActiveWindowScreenShot" = "Meta+Shift+4";
-      "org.kde.spectacle.desktop"."CurrentMonitorScreenShot" = "Meta+Shift+5";
-      "org.kde.spectacle.desktop"."FullScreenScreenShot" = "Meta+Shift+6";
-      "org.kde.spectacle.desktop"."RectangularRegionScreenShot" = "Meta+Shift+3";
       "org_kde_powerdevil"."Decrease Keyboard Brightness" = "Keyboard Brightness Down";
       "org_kde_powerdevil"."Decrease Screen Brightness" = "Monitor Brightness Down";
       "org_kde_powerdevil"."Decrease Screen Brightness Small" = "Shift+Monitor Brightness Down";
@@ -272,9 +268,6 @@
       "org_kde_powerdevil"."Toggle Keyboard Backlight" = "Keyboard Light On/Off";
       "org_kde_powerdevil"."Turn Off Screen" = [];
       "org_kde_powerdevil"."powerProfile" = ["Battery" "Meta+B,Battery" "Meta+B,Switch Power Profile"];
-      "plasma-manager-commands.desktop"."launch-browser" = "Meta+B,,launch-browser";
-      "plasma-manager-commands.desktop"."launch-filemanager" = "Meta+E,,launch-filemanager";
-      "plasma-manager-commands.desktop"."launch-konsole" = "Meta+Return,,launch-konsole";
       "plasmashell"."activate application launcher" = ["Meta" "Alt+F1,Meta" "Alt+F1,Activate Application Launcher"];
       "plasmashell"."activate task manager entry 1" = "none,Meta+1,Activate Task Manager Entry 1";
       "plasmashell"."activate task manager entry 10" = "none,Meta+0,Activate Task Manager Entry 10";
@@ -434,10 +427,10 @@
     # Configure spectacle screenshots
     spectacle = {
       shortcuts = {
-        captureRectangularRegion = "Control+Alt+Shift+3";
-        captureActiveWindow = "Control+Alt+Shift+4";
-        captureCurrentMonitor = "Control+Alt+Shift+5";
-        captureEntireDesktop = "Control+Alt+Shift+6";
+        captureRectangularRegion = "Control+#";
+        captureActiveWindow = "Control+$";
+        captureCurrentMonitor = "Control+%";
+        captureEntireDesktop = "Control+^";
       };
     };
   };
