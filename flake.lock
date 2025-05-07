@@ -110,6 +110,29 @@
         "type": "github"
       }
     },
+    "claude-desktop": {
+      "inputs": {
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1746097297,
+        "narHash": "sha256-5p+V4mfNhVqDBsGdxIEQzigJh34Nwdhb/6pN+tQ8Vio=",
+        "owner": "k3d3",
+        "repo": "claude-desktop-linux-flake",
+        "rev": "83401cf9c8a45458ba102dc9753a51be405162b9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "k3d3",
+        "repo": "claude-desktop-linux-flake",
+        "type": "github"
+      }
+    },
     "darwin": {
       "inputs": {
         "nixpkgs": [
@@ -851,6 +874,7 @@
         "agenix": "agenix",
         "brew-api": "brew-api",
         "brew-nix": "brew-nix",
+        "claude-desktop": "claude-desktop",
         "devenv": "devenv",
         "disko": "disko",
         "flake-utils": "flake-utils",

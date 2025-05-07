@@ -16,7 +16,7 @@
     # Workspace appearance
     workspace = {
       theme = "breeze-dark";
-      # Managed by superpaper
+      # Managed by custom script via systemd timer
       # wallpaper = "${pkgs.kdePackages.plasma-workspace-wallpapers}/share/wallpapers/Patak/contents/images/5120x2880.png";
       lookAndFeel = "org.kde.breezedark.desktop";
       clickItemTo = "select"; # Options are "select" or "open"

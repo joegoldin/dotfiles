@@ -4,6 +4,7 @@
   config,
   pkgs,
   lib,
+  username,
   ...
 }: {
   # Enable X11/Wayland and KDE Plasma 6 desktop environment
