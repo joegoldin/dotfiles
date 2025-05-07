@@ -79,10 +79,10 @@ in {
     # Run post-install commands for the packages from npmPackages
     ${lib.concatStringsSep "\n" (lib.filter (cmd: cmd != "") (map (
         pkg:
-          if pkg ? postInstallCommands && pkg.postInstallCommands != ""
+          if pkg ? postInstall && pkg.postInstall != ""
           then ''
             echo "Running post-install configuration for ${pkg.name}..."
-            run ${pkg.postInstallCommands}
+            run ${pkg.postInstall}
           ''
           else ""
       )

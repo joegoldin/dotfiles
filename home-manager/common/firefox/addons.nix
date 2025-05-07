@@ -1,21 +1,20 @@
-{ lib, ... }:
-
-let
+{lib, ...}: let
   inherit (lib) mkForce;
 in {
   # Can be used to restrict domains per extension:
-    # "restricted_domains": [
-    # 	"TEST_BLOCKED_DOMAIN"
-    # ]
-  ExtensionSettings = with builtins;
-    let extension = shortId: uuid: {
+  # "restricted_domains": [
+  # 	"TEST_BLOCKED_DOMAIN"
+  # ]
+  ExtensionSettings = with builtins; let
+    extension = shortId: uuid: {
       name = uuid;
       value = {
         install_url = "https://addons.mozilla.org/en-US/firefox/downloads/latest/${shortId}/latest.xpi";
         installation_mode = "force_installed";
       };
     };
-    in listToAttrs ([
+  in
+    listToAttrs [
       # Default block rule
       {
         name = "*";
@@ -34,12 +33,13 @@ in {
       (extension "enhancer-for-youtube" "enhancerforyoutube@maximerf.addons.mozilla.org")
       (extension "1password-x-password-manager" "{d634138d-c276-4fc8-924b-40a0ea21d284}")
       (extension "w2g" "{6ea0a676-b3ef-48aa-b23d-24c8876945fb}")
-    ]);
-    # To add additional extensions, find it on addons.mozilla.org, find
-    # the short ID in the url (like https://addons.mozilla.org/en-US/firefox/addon/!SHORT_ID!/)
-    # Then, download the XPI by filling it in to the install_url template, unzip it,
-    # run `jq .browser_specific_settings.gecko.id manifest.json` or
-    # `jq .applications.gecko.id manifest.json` to get the UUID
+      (extension "mal-sync" "{c84d89d9-a826-4015-957b-affebd9eb603}")
+    ];
+  # To add additional extensions, find it on addons.mozilla.org, find
+  # the short ID in the url (like https://addons.mozilla.org/en-US/firefox/addon/!SHORT_ID!/)
+  # Then, download the XPI by filling it in to the install_url template, unzip it,
+  # run `jq .browser_specific_settings.gecko.id manifest.json` or
+  # `jq .applications.gecko.id manifest.json` to get the UUID
 
   "3rdparty".Extensions = {
     # https://github.com/gorhill/uBlock/blob/master/platform/common/managed_storage.json
@@ -77,4 +77,4 @@ in {
       ];
     };
   };
-} 
+}

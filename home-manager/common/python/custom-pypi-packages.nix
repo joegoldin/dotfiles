@@ -553,38 +553,6 @@
         license = licenses.mit;
       };
     };
-    superpaper = pythonBase.pkgs.buildPythonPackage rec {
-      pname = "superpaper";
-      version = "2.2.1";
-      format = "setuptools";
-
-      src = pkgs.fetchurl {
-        url = "https://files.pythonhosted.org/packages/source/s/superpaper/superpaper-2.2.1.tar.gz";
-        sha256 = "sha256-3/ciKMgjCY1zdQL1/JPr+GKN6i2OE/WwXGR5R8n2prc=";
-      };
-
-      # Dependencies
-      propagatedBuildInputs = with pythonBase.pkgs; [
-        numpy
-        pillow
-        screeninfo
-        xcffib
-        xpybutil
-        wxpython
-      ];
-
-      # Disable tests - enable if you have specific test dependencies
-      doCheck = false;
-
-      # Basic import check
-      pythonImportsCheck = ["superpaper"];
-
-      meta = with lib; {
-        description = "Cross-platform wallpaper manager that focuses on multi-monitor support. Features include ppi corrections, keyboard shortcuts, slideshow.";
-        homepage = "https://github.com/hhannine/superpaper";
-        license = licenses.mit;
-      };
-    };
     system-hotkey = pythonBase.pkgs.buildPythonPackage rec {
       pname = "system-hotkey";
       version = "1.0.3";
