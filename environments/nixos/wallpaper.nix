@@ -51,12 +51,6 @@ in {
         "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/${toString uid}/bus"
         "PATH=${pkgs.xorg.xrandr}/bin:${pkgs.coreutils}/bin:${pkgs.xorg.xauth}/bin"
       ];
-      Path = [
-        "${pkgs.xorg.xrandr}/bin"
-        "${pkgs.coreutils}/bin"
-        "${pkgs.xorg.xauth}/bin"
-        "${pkgs.imagemagick}/bin"
-      ];
     };
   };
 } 
