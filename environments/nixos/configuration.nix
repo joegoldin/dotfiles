@@ -58,6 +58,7 @@
 
   users.users = {
     "${username}" = {
+      uid = 1000;
       shell = pkgs.fish;
       # You can set an initial password for your user.
       # If you do, you can skip setting a root password by passing '--no-root-passwd' to nixos-install.

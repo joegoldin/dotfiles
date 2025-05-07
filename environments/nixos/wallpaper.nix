@@ -4,41 +4,58 @@ with lib;
 
 let
   cfg = config.services.wallpaper;
-  wallpaperScript = pkgs.writeScriptBin "set-wallpaper" ''
-    #!${pkgs.bash}/bin/bash
-    WALLPAPER_DIR="${cfg.wallpaperDir}"
-    SCRIPT_PATH="${config.users.users.${username}.home}/dotfiles/scripts/set-wallpaper.sh"
-    MONITOR_MAPPING='${builtins.toJSON cfg.monitorMapping}'
-    
-    # Get a random image from the wallpaper directory
-    RANDOM_IMAGE=$(find "$WALLPAPER_DIR" -maxdepth 999 -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \) | shuf -n 1)
-    
-    if [ -n "$RANDOM_IMAGE" ]; then
-      MONITOR_MAPPING="$MONITOR_MAPPING" "$SCRIPT_PATH" "$RANDOM_IMAGE"
-    else
-      echo "No images found in $WALLPAPER_DIR"
-      exit 1
-    fi
-  '';
+  scriptPath = "${config.users.users.${username}.home}/dotfiles/scripts/set-wallpaper.py";
+  wallpaperDirs = [
+    "${config.users.users.${username}.home}/Pictures/Wallpaper"
+    "${config.users.users.${username}.home}/Pictures/Backgrounds"
+  ];
+  uid = config.users.users.${username}.uid;
 in {
-  options.services.wallpaper = {
-    enable = mkEnableOption "wallpaper service";
-    wallpaperDir = mkOption {
-      type = types.path;
-      description = "Directory containing wallpaper images";
-    };
-    monitorMapping = mkOption {
-      type = types.attrsOf types.int;
-      description = "Mapping of monitor names to screen numbers";
-      default = {};
+  systemd.timers."set-wallpaper" = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnBootSec = "60m";
+      OnUnitActiveSec = "60m";
+      Unit = "set-wallpaper.service";
     };
   };
 
-  config = mkIf cfg.enable {
-    services.cron = {
-      enable = true;
-      systemCronJobs = [
-        "0 * * * * ${config.users.users.${username}.home}/.nix-profile/bin/set-wallpaper"
+  systemd.services."set-wallpaper" = {
+    script = ''
+      set -eu
+      
+      # Create a temporary .Xauthority file
+      XAUTH_TMP=$(mktemp)
+      
+      # Find and copy the most recent xauth file
+      XAUTH_FILE=$(ls -t /run/user/${toString uid}/xauth_* 2>/dev/null | head -n1)
+      if [ -n "$XAUTH_FILE" ]; then
+        cp "$XAUTH_FILE" "$XAUTH_TMP"
+      else
+        echo "No xauth file found"
+        exit 1
+      fi
+      
+      export XAUTHORITY="$XAUTH_TMP"
+      
+      ${pkgs.python3.withPackages (ps: [ ps.dbus-python ps.pillow ])}/bin/python3 ${scriptPath} ${lib.concatStringsSep " " wallpaperDirs}
+      
+      # Clean up
+      rm -f "$XAUTH_TMP"
+    '';
+    serviceConfig = {
+      Type = "oneshot";
+      User = username;
+      Environment = [
+        "DISPLAY=:0"
+        "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/${toString uid}/bus"
+        "PATH=${pkgs.xorg.xrandr}/bin:${pkgs.coreutils}/bin:${pkgs.xorg.xauth}/bin"
+      ];
+      Path = [
+        "${pkgs.xorg.xrandr}/bin"
+        "${pkgs.coreutils}/bin"
+        "${pkgs.xorg.xauth}/bin"
+        "${pkgs.imagemagick}/bin"
       ];
     };
   };
