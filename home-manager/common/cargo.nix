@@ -8,8 +8,8 @@
       pname = "litra-rs";
       version = "v2.2.0";
 
-      buildInputs = with pkgs; [ openssl systemd ];
-      nativeBuildInputs = with pkgs; [ pkg-config ];
+      buildInputs = with pkgs; [openssl systemd];
+      nativeBuildInputs = with pkgs; [pkg-config];
 
       src = pkgs.fetchFromGitHub {
         owner = "timrogers";
@@ -23,8 +23,8 @@
       pname = "litra-autotoggle";
       version = "v0.6.1";
 
-      buildInputs = with pkgs; [ openssl systemd ];
-      nativeBuildInputs = with pkgs; [ pkg-config ];
+      buildInputs = with pkgs; [openssl systemd];
+      nativeBuildInputs = with pkgs; [pkg-config];
 
       src = pkgs.fetchFromGitHub {
         owner = "timrogers";
@@ -35,4 +35,4 @@
       cargoHash = "sha256-hg65H6kALuHbRpiT6CZKP3aBTSLoN0xDEf5QBVfyrq8=";
     };
   };
-} 
+}
