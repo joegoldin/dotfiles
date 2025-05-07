@@ -7,6 +7,9 @@
   username,
   ...
 }: {
+
+  # TODO: Add litra-autotoggle as a service to systemd
+
   # Enable X11/Wayland and KDE Plasma 6 desktop environment
   services.displayManager.sddm.enable = true;
   services.xserver = {
