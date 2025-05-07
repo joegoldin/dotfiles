@@ -25,7 +25,6 @@
       unstable.jellyfin-media-player
       cargoModule.packages.litra
       cargoModule.packages.litra-autotoggle
-      unstable.notion-app
       unstable.obsidian
       unstable.parsec-bin
       unstable.slack
