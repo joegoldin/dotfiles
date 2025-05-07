@@ -10,6 +10,7 @@
   nodeModule = import ./node {inherit pkgs lib unstable config;};
   pythonModule = import ./python {inherit pkgs lib unstable;};
   appImagePackages = import ./appimage.nix {inherit pkgs;};
+  cargoModule = import ./cargo.nix {inherit pkgs lib;};
 
   # System-specific package sets
   nixosPackages = with pkgs;
@@ -22,6 +23,8 @@
       unstable.discord
       inotify-tools
       unstable.jellyfin-media-player
+      cargoModule.packages.litra
+      cargoModule.packages.litra-autotoggle
       unstable.obsidian
       unstable.parsec-bin
       unstable.slack
