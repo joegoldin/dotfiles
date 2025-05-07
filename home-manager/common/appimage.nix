@@ -1,4 +1,4 @@
-{ pkgs }: let
+{pkgs}: let
   # superpaper = pkgs.appimageTools.wrapType2 {
   #   pname = "superpaper";
   #   version = "2.2.1";
@@ -9,4 +9,4 @@
   # };
 in [
   # superpaper
-] 
+]

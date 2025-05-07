@@ -12,12 +12,14 @@
     # });
 
     howdy = prev.howdy.overrideAttrs (oldAttrs: {
-      patches = (oldAttrs.patches or []) ++ [
-        (final.fetchpatch {
-          url = "https://patch-diff.githubusercontent.com/raw/NixOS/nixpkgs/pull/216245.patch";
-          hash = "sha256-0N8xyCConfOfCNzSnoCHGlCSv6GQfpUQIwb/W5eQA0U=";
-        })
-      ];
+      patches =
+        (oldAttrs.patches or [])
+        ++ [
+          (final.fetchpatch {
+            url = "https://patch-diff.githubusercontent.com/raw/NixOS/nixpkgs/pull/216245.patch";
+            hash = "sha256-0N8xyCConfOfCNzSnoCHGlCSv6GQfpUQIwb/W5eQA0U=";
+          })
+        ];
     });
   };
 
