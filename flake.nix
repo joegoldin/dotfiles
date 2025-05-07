@@ -58,6 +58,12 @@
     affinity-nix = {
       url = "github:mrshmllow/affinity-nix";
     };
+    # claude desktop
+    claude-desktop = {
+      url = "github:k3d3/claude-desktop-linux-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
   };
 
   nixConfig = {
@@ -83,6 +89,7 @@
     agenix,
     plasma-manager,
     affinity-nix,
+    claude-desktop,
     ...
   } @ inputs: let
     inherit (self) outputs;
@@ -212,7 +219,6 @@
             home-manager.users.${specialArgs.username} = import ./home-manager/kde;
           })
           agenix.nixosModules.default
-          # {home-manager.packages = [affinity-nix.packages.x86_64-linux.photo];}
         ];
       };
     };

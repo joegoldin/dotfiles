@@ -19,6 +19,7 @@
       brotlipy
       colorama
       cryptography
+      dbus-python
       extruct
       fake-useragent
       faker
@@ -40,6 +41,7 @@
       scikit-learn
       scrapy
       scrapy-fake-useragent
+      screeninfo
       sentry-sdk
       setuptools
       soupsieve

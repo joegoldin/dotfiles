@@ -2,6 +2,8 @@
   pkgs,
   lib,
   config,
+  affinity-nix,
+  claude-desktop,
   ...
 }: let
   unstable = pkgs.unstable;
@@ -12,6 +14,8 @@
   # System-specific package sets
   nixosPackages = with pkgs;
     lib.optionals (pkgs.stdenv.hostPlatform.isx86_64) [
+      # affinity-nix.packages.x86_64-linux.photo
+      claude-desktop.packages.x86_64-linux.claude-desktop
       unstable.cloudflared
       unstable.code-cursor
       unstable.davinci-resolve
