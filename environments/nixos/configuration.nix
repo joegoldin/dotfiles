@@ -105,10 +105,4 @@
       PasswordAuthentication = false;
     };
   };
-
-  # ld for wsl for vscode server
-  programs.nix-ld = {
-    enable = true;
-    package = pkgs.nix-ld-rs;
-  };
 }

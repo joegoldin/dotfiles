@@ -5,10 +5,29 @@
 set -e
 
 if [ $# -eq 0 ]; then
-  echo "Usage: $0 package1 package2 ..."
+  echo "Usage: $0 [--fhs package_name] package1 package2 ..."
   echo "Example: $0 requests numpy pandas"
+  echo "Example with FHS: $0 --fhs superpaper requests numpy"
   exit 1
 fi
+
+# Parse arguments for FHS packages
+declare -A FHS_PACKAGES
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --fhs)
+      if [ -z "$2" ]; then
+        echo "Error: --fhs requires a package name"
+        exit 1
+      fi
+      FHS_PACKAGES["$2"]=1
+      shift 2
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
 
 # Get the script directory and set paths
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -690,7 +709,57 @@ print(\"${IMPORT_MODULE}\")
     TESTED_IMPORT_MODULE=$(python -c "$PYTHON_CODE" 2>/dev/null || echo "$IMPORT_MODULE")
     echo "  Using import module: $TESTED_IMPORT_MODULE"
     
-    PACKAGE_DEF="    ${CLEANED_PACKAGE_NAME} = pythonBase.pkgs.buildPythonPackage rec {
+    if [ "${FHS_PACKAGES[$BASE_PACKAGE_NAME]}" = "1" ]; then
+      # FHS version of package definition
+      PACKAGE_DEF="    ${CLEANED_PACKAGE_NAME} = let
+      fhsEnv = pkgs.buildFHSEnv {
+        name = \"build-${CLEANED_PACKAGE_NAME}\";
+        targetPkgs = pkgs: [
+          pythonBase
+        ];
+        runScript = \"bash\";
+        extraBuildCommands = '''
+          mkdir -p usr/bin
+          ln -s \${pythonBase}/bin/python usr/bin/python
+          ln -s \${pythonBase}/bin/python3 usr/bin/python3
+        ''';
+      };
+    in pythonBase.pkgs.buildPythonPackage rec {
+      pname = \"${CLEANED_PACKAGE_NAME}\";
+      version = \"${VERSION}\";
+      format = \"${PACKAGE_FORMAT}\";${EXTRAS_ATTR}
+
+      src = pkgs.fetchurl {
+        url = \"${PACKAGE_URL}\";
+        sha256 = ${SHA256};
+      };
+
+      nativeBuildInputs = with pythonBase.pkgs; [
+        fhsEnv
+      ];
+
+      # Dependencies
+      propagatedBuildInputs = ${NIX_DEPS};
+
+      preBuild = '''
+        build-${CLEANED_PACKAGE_NAME} bash -c \"python setup.py build\"
+      ''';
+
+      # Disable tests - enable if you have specific test dependencies
+      doCheck = false;
+
+      # Basic import check
+      pythonImportsCheck = [ \"${TESTED_IMPORT_MODULE}\" ];
+
+      meta = with lib; {
+        description = \"${DESCRIPTION:-Python package: ${PACKAGE_NAME}}\";
+        homepage = \"${HOMEPAGE:-https://pypi.org/project/${PACKAGE_NAME}/}\";
+        license = ${LICENSE};
+      };
+    };"
+    else
+      # Regular package definition (existing code)
+      PACKAGE_DEF="    ${CLEANED_PACKAGE_NAME} = pythonBase.pkgs.buildPythonPackage rec {
       pname = \"${CLEANED_PACKAGE_NAME}\";
       version = \"${VERSION}\";
       format = \"${PACKAGE_FORMAT}\";${EXTRAS_ATTR}
@@ -716,6 +785,7 @@ ${BUILD_INPUTS:+${BUILD_INPUTS}
         license = ${LICENSE};
       };
     };"
+    fi
     
     # Add to array of definitions
     NEW_PACKAGE_DEFINITIONS+=("$PACKAGE_DEF")
