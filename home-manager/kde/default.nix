@@ -40,7 +40,7 @@
 
     # Shortcuts
     shortcuts = {
-      "ActivityManager"."switch-to-activity-aa47102b-a33c-407f-8039-dbf5985eb3e6" = [ ];
+      "ActivityManager"."switch-to-activity-aa47102b-a33c-407f-8039-dbf5985eb3e6" = [];
       "KDE Keyboard Layout Switcher"."Switch to Last-Used Keyboard Layout" = "Meta+Alt+L";
       "KDE Keyboard Layout Switcher"."Switch to Next Keyboard Layout" = "Meta+Alt+K";
       "kaccess"."Toggle Screen Reader On and Off" = "Meta+Alt+S";
@@ -64,14 +64,14 @@
       "ksmserver"."Reboot Without Confirmation" = "none,,Reboot Without Confirmation";
       "ksmserver"."Shut Down" = "none,,Shut Down";
       "kwin"."Activate Window Demanding Attention" = "Meta+Ctrl+A";
-      "kwin"."Cycle Overview" = [ ];
-      "kwin"."Cycle Overview Opposite" = [ ];
+      "kwin"."Cycle Overview" = [];
+      "kwin"."Cycle Overview Opposite" = [];
       "kwin"."Decrease Opacity" = "none,,Decrease Opacity of Active Window by 5%";
       "kwin"."Edit Tiles" = "Meta+T";
       "kwin"."Expose" = "Ctrl+F9";
       "kwin"."ExposeAll" = ["Ctrl+F10" "Launch (C),Ctrl+F10" "Launch (C),Toggle Present Windows (All desktops)"];
       "kwin"."ExposeClass" = "Ctrl+F7";
-      "kwin"."ExposeClassCurrentDesktop" = [ ];
+      "kwin"."ExposeClassCurrentDesktop" = [];
       "kwin"."Grid View" = "Meta+G";
       "kwin"."Increase Opacity" = "none,,Increase Opacity of Active Window by 5%";
       "kwin"."KZones: Activate layout 1" = "Meta+Num+1,none,KZones: Activate layout 1";
@@ -85,9 +85,9 @@
       "kwin"."KZones: Activate layout 9" = "Meta+Num+9,none,KZones: Activate layout 9";
       "kwin"."KZones: Cycle layouts" = "Ctrl+Alt+D,none,KZones: Cycle layouts";
       "kwin"."KZones: Cycle layouts (reversed)" = "Ctrl+Alt+Shift+D,none,KZones: Cycle layouts (reversed)";
-      "kwin"."KZones: Move active window down" = [ ];
-      "kwin"."KZones: Move active window left" = [ ];
-      "kwin"."KZones: Move active window right" = [ ];
+      "kwin"."KZones: Move active window down" = [];
+      "kwin"."KZones: Move active window left" = [];
+      "kwin"."KZones: Move active window right" = [];
       "kwin"."KZones: Move active window to next zone" = "Ctrl+Alt+Right,none,KZones: Move active window to next zone";
       "kwin"."KZones: Move active window to previous zone" = "Ctrl+Alt+Left,none,KZones: Move active window to previous zone";
       "kwin"."KZones: Move active window to zone 1" = "Ctrl+Alt+Num+1,none,KZones: Move active window to zone 1";
@@ -99,20 +99,20 @@
       "kwin"."KZones: Move active window to zone 7" = "Ctrl+Alt+Num+7,none,KZones: Move active window to zone 7";
       "kwin"."KZones: Move active window to zone 8" = "Ctrl+Alt+Num+8,none,KZones: Move active window to zone 8";
       "kwin"."KZones: Move active window to zone 9" = "Ctrl+Alt+Num+9,none,KZones: Move active window to zone 9";
-      "kwin"."KZones: Move active window up" = [ ];
+      "kwin"."KZones: Move active window up" = [];
       "kwin"."KZones: Snap active window" = "Meta+Shift+Space,none,KZones: Snap active window";
       "kwin"."KZones: Snap all windows" = "Meta+Space,none,KZones: Snap all windows";
       "kwin"."KZones: Switch to next window in current zone" = "Ctrl+Alt+Up,none,KZones: Switch to next window in current zone";
       "kwin"."KZones: Switch to previous window in current zone" = "Ctrl+Alt+Down,none,KZones: Switch to previous window in current zone";
       "kwin"."KZones: Toggle zone overlay" = "Ctrl+Alt+C,none,KZones: Toggle zone overlay";
       "kwin"."Kill Window" = "Meta+Ctrl+Esc";
-      "kwin"."Move Tablet to Next Output" = [ ];
+      "kwin"."Move Tablet to Next Output" = [];
       "kwin"."MoveMouseToCenter" = "Meta+F6";
       "kwin"."MoveMouseToFocus" = "Meta+F5";
-      "kwin"."MoveZoomDown" = [ ];
-      "kwin"."MoveZoomLeft" = [ ];
-      "kwin"."MoveZoomRight" = [ ];
-      "kwin"."MoveZoomUp" = [ ];
+      "kwin"."MoveZoomDown" = [];
+      "kwin"."MoveZoomLeft" = [];
+      "kwin"."MoveZoomRight" = [];
+      "kwin"."MoveZoomUp" = [];
       "kwin"."Overview" = "Meta+W";
       "kwin"."Setup Window Shortcut" = "none,,Setup Window Shortcut";
       "kwin"."Show Desktop" = "Meta+D";
@@ -160,7 +160,7 @@
       "kwin"."Switch to Screen Below" = "none,,Switch to Screen Below";
       "kwin"."Switch to Screen to the Left" = "none,,Switch to Screen to the Left";
       "kwin"."Switch to Screen to the Right" = "none,,Switch to Screen to the Right";
-      "kwin"."Toggle Night Color" = [ ];
+      "kwin"."Toggle Night Color" = [];
       "kwin"."Toggle Present Windows (All desktops)" = "Meta+Tab";
       "kwin"."Toggle Window Raise/Lower" = "none,,Toggle Window Raise/Lower";
       "kwin"."Walk Through Windows" = "Alt+Tab";
@@ -270,7 +270,7 @@
       "org_kde_powerdevil"."PowerOff" = "Power Off";
       "org_kde_powerdevil"."Sleep" = "Sleep";
       "org_kde_powerdevil"."Toggle Keyboard Backlight" = "Keyboard Light On/Off";
-      "org_kde_powerdevil"."Turn Off Screen" = [ ];
+      "org_kde_powerdevil"."Turn Off Screen" = [];
       "org_kde_powerdevil"."powerProfile" = ["Battery" "Meta+B,Battery" "Meta+B,Switch Power Profile"];
       "plasma-manager-commands.desktop"."launch-browser" = "Meta+B,,launch-browser";
       "plasma-manager-commands.desktop"."launch-filemanager" = "Meta+E,,launch-filemanager";
@@ -302,7 +302,7 @@
       "plasmashell"."switch to next activity" = "none,,Switch to Next Activity";
       "plasmashell"."switch to previous activity" = "none,,Switch to Previous Activity";
       "plasmashell"."toggle do not disturb" = "none,,Toggle do not disturb";
-      "services/org.kde.dolphin.desktop"."_launch" = [ ];
+      "services/org.kde.dolphin.desktop"."_launch" = [];
       "services/plasma-manager-commands.desktop"."launch-filemanager" = "Meta+E";
       "services/plasma-manager-commands.desktop"."launch-konsole" = "Meta+Return";
     };
