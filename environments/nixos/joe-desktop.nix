@@ -13,10 +13,19 @@
     displayManager.sessionCommands = ''
       ${lib.getBin pkgs.xorg.xrandr}/bin/xrandr --setprovideroutputsource 2 0
     '';
-    videoDrivers = ["displaylink" "modesetting"];
+    videoDrivers = ["amdgpu" "displaylink" "modesetting"];
   };
 
   systemd.services.dlm.wantedBy = ["multi-user.target"];
+
+  # "Most software has the HIP libraries hard-coded. You can work around it on NixOS by using:"
+  systemd.tmpfiles.rules = [
+    "L+    /opt/rocm/hip   -    -    -     -    ${pkgs.rocmPackages.clr}"
+  ];
+
+  hardware.graphics.extraPackages = with pkgs; [
+    rocmPackages.clr.icd
+  ];
 
   # Enable Plasma 6
   services.desktopManager.plasma6.enable = true;
@@ -61,6 +70,7 @@
     unstable.displaylink
 
     # System utils
+    clinfo
     glxinfo
     gparted
     htop

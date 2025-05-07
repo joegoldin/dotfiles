@@ -54,6 +54,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
+    # affinity apps
+    affinity-nix = {
+      url = "github:mrshmllow/affinity-nix";
+    };
   };
 
   nixConfig = {
@@ -78,6 +82,7 @@
     disko,
     agenix,
     plasma-manager,
+    affinity-nix,
     ...
   } @ inputs: let
     inherit (self) outputs;
@@ -190,6 +195,7 @@
           commonSpecialArgs
           // {
             hostname = "joe-desktop";
+            inherit inputs;
           };
         modules = [
           # > Our main nixos configuration <
@@ -206,6 +212,7 @@
             home-manager.users.${specialArgs.username} = import ./home-manager/kde;
           })
           agenix.nixosModules.default
+          # {home-manager.packages = [affinity-nix.packages.x86_64-linux.photo];}
         ];
       };
     };

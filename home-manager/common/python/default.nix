@@ -96,20 +96,37 @@
         ]
       )
   );
+
+  # Create an FHS environment for Python
+  pythonFHSEnv = pkgs.buildFHSEnv {
+    name = "python-fhs-env";
+    targetPkgs = pkgs: [
+      pythonWithPackages
+    ];
+    runScript = "bash";
+    extraBuildCommands = ''
+      # Create standard Python symlinks
+      mkdir -p usr/bin
+      ln -s ${pythonWithPackages}/bin/python usr/bin/python
+      ln -s ${pythonWithPackages}/bin/python3 usr/bin/python3
+    '';
+  };
+
 in {
   packages = pythonWithPackages;
+  fhs = pythonFHSEnv;
 
-  # Add Home Manager activation script to run node post-install commands
+  # Add Home Manager activation script to run post-install commands
   pythonPostInstall = lib.hm.dag.entryAfter ["installPackages"] ''
     echo "Running Python package post-installation tasks..."
 
-    # Changed to use a direct iteration over the packages with non-empty postInstallCommands
+    # Changed to use a direct iteration over the packages with non-empty postInstall
     ${lib.concatStringsSep "\n" (lib.filter (cmd: cmd != "") (map (
       pkg:
-        if pkg ? postInstallCommands && pkg.postInstallCommands != ""
+        if pkg ? postInstall && pkg.postInstall != ""
         then ''
           echo "Running post-install configuration for ${pkg.pname}..."
-          run ${pkg.postInstallCommands}
+          run ${pkg.postInstall}
         ''
         else ""
     ) (lib.attrValues customPackages)))}
