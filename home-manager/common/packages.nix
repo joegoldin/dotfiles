@@ -7,6 +7,7 @@
   unstable = pkgs.unstable;
   nodeModule = import ./node {inherit pkgs lib unstable config;};
   pythonModule = import ./python {inherit pkgs lib unstable;};
+  appImagePackages = import ./appimage.nix { inherit pkgs; };
 
   # System-specific package sets
   nixosPackages = with pkgs;
@@ -26,7 +27,7 @@
       unstable.tailscale
       vlc
       unstable.zoom-us
-    ];
+    ] ++ appImagePackages;
 
   macosPackages = with pkgs; [
     shopt-script
@@ -43,6 +44,7 @@
       pkgs.unstable.aider-chat
       aria2 # A lightweight multi-protocol & multi-source command-line download utility
       awscli2
+      bc
       bfg-repo-cleaner
       bun
       cachix

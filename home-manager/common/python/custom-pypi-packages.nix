@@ -553,38 +553,6 @@
         license = licenses.mit;
       };
     };
-    system-hotkey = pythonBase.pkgs.buildPythonPackage rec {
-      pname = "system-hotkey";
-      version = "1.0.3";
-      format = "wheel";
-
-      src = pkgs.fetchurl {
-        url = "https://files.pythonhosted.org/packages/65/b6/45b821fad7be5d43f99ed1e0c69e7e9116fd69c450ba164aad42c714fe68/system_hotkey-1.0.3-py3-none-any.whl";
-        sha256 = "sha256-WKGBwB+ENorOJdOM0Rnp7/qg6P3KtMazrJ3wzEocqog=";
-      };
-
-      # Dependencies
-      propagatedBuildInputs = with pythonBase.pkgs; [
-        numpy
-        pillow
-        screeninfo
-        xcffib
-        xpybutil
-        wxpython
-      ];
-
-      # Disable tests - enable if you have specific test dependencies
-      doCheck = false;
-
-      # Basic import check
-      pythonImportsCheck = ["system_hotkey"];
-
-      meta = with lib; {
-        description = "System wide hotkeys";
-        homepage = "https://github.com/hhannine/system_hotkey310";
-        license = licenses.mit;
-      };
-    };
   };
 in
   pythonPackages
