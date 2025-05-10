@@ -16,6 +16,7 @@
   nixosPackages = with pkgs;
     lib.optionals (pkgs.stdenv.hostPlatform.isx86_64) [
       # affinity-nix.packages.x86_64-linux.photo
+      unstable.android-studio-full
       claude-desktop.packages.x86_64-linux.claude-desktop
       unstable.cloudflared
       unstable.code-cursor
