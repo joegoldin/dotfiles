@@ -26,7 +26,17 @@ in {
   system.stateVersion = "${stateVersion}";
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
-  boot.loader.systemd-boot.enable = true;
+  # Lanzaboote currently replaces the systemd-boot module.
+  # This setting is usually set to true in configuration.nix
+  # generated at installation time. So we force it to false
+  # for now.
+  boot.loader.systemd-boot.enable = lib.mkForce false;
+
+  boot.lanzaboote = {
+    enable = true;
+    pkiBundle = "/var/lib/sbctl";
+  };
+
   boot.loader.efi.canTouchEfiVariables = true;
 
   nixpkgs = {
@@ -92,9 +102,10 @@ in {
   };
 
   environment.systemPackages = with pkgs; [
-    git
-    wget
     agenix.packages.${pkgs.system}.default
+    git
+    unstable.sbctl
+    wget
   ];
 
   programs._1password.enable = true;

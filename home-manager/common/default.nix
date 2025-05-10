@@ -26,7 +26,6 @@
     (import ./packages.nix {inherit pkgs lib config affinity-nix claude-desktop;})
     ./git.nix
     ./starship.nix
-    ./ssh.nix
   ];
 
   # Enable home-manager
