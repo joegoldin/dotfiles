@@ -57,12 +57,23 @@
     # affinity apps
     affinity-nix = {
       url = "github:mrshmllow/affinity-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     # claude desktop
     claude-desktop = {
       url = "github:k3d3/claude-desktop-linux-flake";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
+    };
+    # for mkWindowsApp
+    erosanix = {
+      url = "github:emmanuelrosa/erosanix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # for secure boot
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote/v0.4.2";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -90,6 +101,8 @@
     plasma-manager,
     affinity-nix,
     claude-desktop,
+    erosanix,
+    lanzaboote,
     ...
   } @ inputs: let
     inherit (self) outputs;
@@ -108,6 +121,7 @@
     additionalPackages = eachSystem (system: {
       # devenv-up = self.devShells.${system}.default.config.procfileScript;
     });
+    mkWindowsApp = erosanix.mkWindowsApp;
   in {
     # Your custom packages
     # Accessible through 'nix build', 'nix shell', etc
@@ -181,7 +195,7 @@
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = specialArgs;
             home-manager.backupFileExtension = "backup"; # enable moving existing files
-            home-manager.users.${specialArgs.username} = import ./home-manager/nixos;
+            home-manager.users.${specialArgs.username} = import ./home-manager/oracle;
           })
           agenix.nixosModules.default
           ({specialArgs, ...}: {
@@ -202,7 +216,7 @@
           commonSpecialArgs
           // {
             hostname = "joe-desktop";
-            inherit inputs;
+            inherit inputs mkWindowsApp;
           };
         modules = [
           # > Our main nixos configuration <
@@ -216,9 +230,11 @@
             home-manager.sharedModules = [
               plasma-manager.homeManagerModules.plasma-manager
             ];
-            home-manager.users.${specialArgs.username} = import ./home-manager/kde;
+            home-manager.users.${specialArgs.username} = import ./home-manager/nixos;
           })
           agenix.nixosModules.default
+          erosanix.nixosModules.mkwindowsapp-gc
+          lanzaboote.nixosModules.lanzaboote
         ];
       };
     };
