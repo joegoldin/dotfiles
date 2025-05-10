@@ -6,8 +6,15 @@
   lib,
   username,
   ...
-}: {
+}: let
+  fonts = import ./fonts {inherit pkgs lib;};
+in {
   # TODO: Add litra-autotoggle as a service to systemd
+
+  # ssh with 1password
+  environment.sessionVariables = {
+    SSH_AUTH_SOCK = "/home/${username}/.1password/agent.sock";
+  };
 
   # Enable X11/Wayland and KDE Plasma 6 desktop environment
   services.displayManager.sddm.enable = true;
@@ -86,6 +93,9 @@
     kdePackages.kate
     kdePackages.konsole
     kdePackages.spectacle
+
+    # Fonts
+    fonts.berkeley-mono-nerd-font
   ];
 
   # Enable flatpak
