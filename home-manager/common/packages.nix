@@ -35,6 +35,7 @@
       sublime-merge
       unstable.tailscale
       vlc
+      unstable.waveterm
       unstable.zoom-us
     ]
     ++ appImagePackages;
