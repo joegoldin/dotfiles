@@ -23,7 +23,7 @@ in {
       DisableAppUpdate = true;
       DisableFeedbackCommands = true;
       DisableBuiltinPDFViewer = true; # Considered a security liability
-      DisableFirefoxStudies = true;
+      # DisableFirefoxStudies = true; # required to allow studies to enable firefox labs :(, and I want auto PiP
       DisableFirefoxAccounts = true; # Disable Firefox Sync
       DisableFirefoxScreenshots = false;
       DisableForgetButton = false; # Thing that can wipe history for X time, handled differently
@@ -34,7 +34,7 @@ in {
       DisableSystemAddonUpdate = true; # Do not allow addon updates
       DisplayMenuBar = "default-off"; # Whether to show the menu bar
       DisablePocket = true;
-      DisableTelemetry = true;
+      # DisableTelemetry = true; # required to allow telemetry to enable firefox labs :(, and I want auto PiP
       DisableFormHistory = true;
       DisablePasswordReveal = true;
       DontCheckDefaultBrowser = true;

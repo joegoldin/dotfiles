@@ -9,7 +9,7 @@
   unstable = pkgs.unstable;
   nodeModule = import ./node {inherit pkgs lib unstable config;};
   pythonModule = import ./python {inherit pkgs lib unstable;};
-  appImagePackages = import ./appimage.nix {inherit pkgs;};
+  appImagePackages = import ./appimages.nix {inherit pkgs;};
   cargoModule = import ./cargo.nix {inherit pkgs lib;};
 
   # System-specific package sets
@@ -22,6 +22,7 @@
       unstable.code-cursor
       unstable.davinci-resolve
       unstable.discord
+      # extraterm
       inotify-tools
       unstable.jellyfin-media-player
       cargoModule.packages.litra
