@@ -1,0 +1,6 @@
+{
+  "autoupdate:channel": "none",
+  "telemetry:enabled": false,
+  "term:fontsize": 14,
+  "term:fontfamily": "TX02 Nerd Font"
+}
