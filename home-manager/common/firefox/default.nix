@@ -23,7 +23,7 @@ in {
       DisableAppUpdate = true;
       DisableFeedbackCommands = true;
       DisableBuiltinPDFViewer = true; # Considered a security liability
-      # DisableFirefoxStudies = true; # required to allow studies to enable firefox labs :(, and I want auto PiP
+      DisableFirefoxStudies = true;
       DisableFirefoxAccounts = true; # Disable Firefox Sync
       DisableFirefoxScreenshots = false;
       DisableForgetButton = false; # Thing that can wipe history for X time, handled differently
@@ -34,7 +34,7 @@ in {
       DisableSystemAddonUpdate = true; # Do not allow addon updates
       DisplayMenuBar = "default-off"; # Whether to show the menu bar
       DisablePocket = true;
-      # DisableTelemetry = true; # required to allow telemetry to enable firefox labs :(, and I want auto PiP
+      DisableTelemetry = true;
       DisableFormHistory = true;
       DisablePasswordReveal = true;
       DontCheckDefaultBrowser = true;
@@ -237,6 +237,12 @@ in {
         "privacy.resistFingerprinting" = true;
 
         "signon.management.page.breach-alerts.enabled" = false; # Disable firefox password checking against a breach database
+
+        "media.videocontrols.picture-in-picture.enabled" = true;
+        "media.videocontrols.picture-in-picture.enable-when-switching-tabs.enabled" = true;
+        "media.videocontrols.picture-in-picture.video-toggle.first-seen-secs" = 1746510487;
+        "media.videocontrols.picture-in-picture.video-toggle.has-used" = true;
+        "media.videocontrols.picture-in-picture.video-toggle.enabled" = true;
       };
     };
   };
