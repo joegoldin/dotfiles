@@ -7,6 +7,6 @@
   #     hash = "sha256-0xkIJL3c5FesUbUOb1LAdkjkmbapD+uEsfeoc88kDzU=";
   #   };
   # };
-in [ 
+in [
   # extraterm
 ]

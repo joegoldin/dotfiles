@@ -389,32 +389,42 @@
 
   # Define yarn2nix packages to install from GitHub
   yarnFromGitHubPackages = [
-    {
-      name = "extraterm";
-      owner = "sedwards2009";
-      repo = "extraterm";
-      rev = "v0.81.0";
-      sha256 = "sha256-H5aP7inGaUXD1SUyijsaaR5qki6yIzaq71MYPaoNSxo=";
-      yarnHash = "sha256-4I7hrcxdl1sjRXXq7/Ggg6UlJnxwNJbTF1nAeF6iIBY=";
-      missingHashesHash = "sha256-v46ENvN0pT+vcQiSnH1bquSMzpvu9WmnNrGeNmqA2/Y=";
-    }
+    # {
+    #   name = "extraterm";
+    #   owner = "sedwards2009";
+    #   repo = "extraterm";
+    #   rev = "v0.81.0";
+    #   sha256 = "sha256-H5aP7inGaUXD1SUyijsaaR5qki6yIzaq71MYPaoNSxo=";
+    #   yarnHash = "sha256-COQKq1MIr/tQBxLQKwE215Xm8wih0W2pjVuxYQYDrvo=";
+    #   missingHashesHash = "sha256-v46ENvN0pT+vcQiSnH1bquSMzpvu9WmnNrGeNmqA2/Y=";
+    # }
   ];
 
   # Function to build a yarn package from GitHub
-  buildYarnPackageFromGitHub = { 
-    name, 
-    owner, 
-    repo, 
-    rev, 
-    sha256, 
+  buildYarnPackageFromGitHub = {
+    name,
+    owner,
+    repo,
+    rev,
+    sha256,
     yarnHash,
     missingHashesHash,
     buildPhase ? "",
     installPhase ? "",
-    extraArgs ? {}
+    extraArgs ? {},
   }: let
-    source = pkgs.fetchFromGitHub {
-      inherit owner repo rev sha256;
+    source = pkgs.stdenv.mkDerivation {
+      name = "${name}-source-${rev}";
+      src = pkgs.fetchFromGitHub {
+        inherit owner repo rev sha256;
+      };
+
+      # buildPhase = ''
+      # '';
+
+      installPhase = ''
+        cp -r . $out
+      '';
     };
 
     yarnLockFile = "${source}/yarn.lock";
@@ -423,41 +433,25 @@
     # Generate missing-hashes.json for this package
     missingHashesFile = pkgs.stdenv.mkDerivation {
       name = "missing-hashes-${name}-${rev}-243}";
-    
+
       src = source;
-      
+
       # Reference the yarn lock file
       inherit source yarnLockFile;
-      
-      buildInputs = with pkgs.unstable; [ nodejs yarn-berry yarn-berry_3.yarn-berry-fetcher ];
-      
-      nativeBuildInputs = with pkgs.unstable; [ nodejs yarn-berry yarn-berry_3.yarn-berry-fetcher ];
-      
+
+      buildInputs = with pkgs.unstable; [nodejs yarn-berry yarn-berry_3.yarn-berry-fetcher];
+
+      nativeBuildInputs = with pkgs.unstable; [nodejs yarn-berry yarn-berry_3.yarn-berry-fetcher];
+
       buildPhase = ''
-        pwd
-        ls -lat
-        export HOME=$(pwd)
-        mkdir -p $HOME/.npm-global
-        npm set prefix $HOME/.npm-global
-        echo "Installing 7zip-bin@5.1.1 using npm..."
-        npm config set strict-ssl=false
-        npm install -g 7zip-bin@5.1.1
-        # yarn add 7zip-bin@5.1.1
-        # yarn global add 7zip-bin@5.1.1
-        # echo "Building ${name}..."
-        # yarn run build
-        # echo "Installing dependencies for ${name}..."
-        # yarn install
-        echo "Installing missing-hashes for ${name}..."
         yarn-berry-fetcher missing-hashes $yarnLockFile > missing-hashes.json
-        npm config set strict-ssl=true
       '';
-      
+
       installPhase = ''
         mkdir -p $out
         cp missing-hashes.json $out
       '';
-      
+
       # Fixed-output derivation settings
       outputHashAlgo = "sha256";
       outputHashMode = "recursive";
@@ -465,49 +459,57 @@
     };
 
     missingHashesFilePath = "${missingHashesFile}/missing-hashes.json";
-    
+
     offlineCache = pkgs.unstable.yarn-berry_3.fetchYarnBerryDeps {
       yarnLock = yarnLockFile;
       hash = yarnHash;
       missingHashes = missingHashesFilePath;
     };
-  in 
-    pkgs.mkYarnPackage (extraArgs // {
-      pname = name;
-      version = rev;
-      src = source;
+  in
+    pkgs.mkYarnPackage (extraArgs
+      // {
+        pname = name;
+        version = rev;
+        src = source;
 
-      nativeBuildInputs = [
-        nodejs
-        pkgs.unstable.yarn-berry_3.yarnBerryConfigHook
-      ];
-      
-      inherit offlineCache;
-      missingHashes = missingHashesFilePath;
-      packageJSON = packageJSON;
-      
-      # Use custom build phase if provided
-      buildPhase = if buildPhase != "" then buildPhase else null;
-      
-      # Use custom install phase if provided
-      installPhase = if installPhase != "" then installPhase else null;
-    });
+        nativeBuildInputs = [
+          nodejs
+          pkgs.unstable.yarn-berry_3.yarnBerryConfigHook
+        ];
+
+        inherit offlineCache;
+        missingHashes = missingHashesFilePath;
+        packageJSON = packageJSON;
+
+        # Use custom build phase if provided
+        buildPhase =
+          if buildPhase != ""
+          then buildPhase
+          else null;
+
+        # Use custom install phase if provided
+        installPhase =
+          if installPhase != ""
+          then installPhase
+          else null;
+      });
 
   # Build all yarn packages from GitHub
-  yarnFromGitHubDerivations = 
-    lib.listToAttrs (map (pkg: 
-      lib.nameValuePair pkg.name (buildYarnPackageFromGitHub pkg)
-    ) yarnFromGitHubPackages);
-
+  yarnFromGitHubDerivations = lib.listToAttrs (map (
+      pkg:
+        lib.nameValuePair pkg.name (buildYarnPackageFromGitHub pkg)
+    )
+    yarnFromGitHubPackages);
 in {
   # Export all systems - the caller can choose which to use
-  inherit 
-    npmPackages 
-    unifiedNodeEnv 
-    npmActivationScript 
-    directNpmPackages 
-    directNpmInstallScript 
-    yarnFromGitHubPackages 
+  inherit
+    npmPackages
+    unifiedNodeEnv
+    npmActivationScript
+    directNpmPackages
+    directNpmInstallScript
+    yarnFromGitHubPackages
     yarnFromGitHubDerivations
-    buildYarnPackageFromGitHub;
+    buildYarnPackageFromGitHub
+    ;
 }
