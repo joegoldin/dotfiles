@@ -70,6 +70,8 @@ in {
 
   # Enable printing
   services.printing.enable = true;
+  services.samba.enable = true;
+  services.printing.drivers = with pkgs; [gutenprint hplip hplipWithPlugin];
 
   # Enable firmware updates
   services.fwupd.enable = true;
@@ -93,6 +95,7 @@ in {
     kdePackages.kate
     kdePackages.konsole
     kdePackages.spectacle
+    kdotool
 
     # Fonts
     fonts.berkeley-mono-nerd-font
