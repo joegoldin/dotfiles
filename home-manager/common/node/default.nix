@@ -21,8 +21,11 @@
     inherit pkgs lib nodejs unstable config;
   };
 
+  # Build yarn packages from GitHub
+  yarnFromGitHubPackages = builtins.attrValues customNodePackages.yarnFromGitHubDerivations;
+
   # All packages together - include both standard packages and our custom environment
-  allPackages = standardNodePackages ++ [customNodePackages.unifiedNodeEnv];
+  allPackages = standardNodePackages ++ [customNodePackages.unifiedNodeEnv] ++ yarnFromGitHubPackages;
 in {
   # Return an attrset with both packages and metadata
   packages = allPackages;
@@ -88,5 +91,17 @@ in {
           else ""
       )
       customNodePackages.npmPackages))}
+
+    # Run post-install commands for yarn GitHub packages if they have any
+    ${lib.concatStringsSep "\n" (lib.filter (cmd: cmd != "") (map (
+        pkg:
+          if pkg ? postInstall && pkg.postInstall != ""
+          then ''
+            echo "Running post-install configuration for GitHub yarn package ${pkg.name}..."
+            run ${pkg.postInstall}
+          ''
+          else ""
+      )
+      customNodePackages.yarnFromGitHubPackages))}
   '';
 }

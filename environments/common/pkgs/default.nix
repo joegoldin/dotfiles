@@ -92,4 +92,37 @@ pkgs: {
       pluginsDir
       ;
   };
+
+  # extraterm = pkgs.stdenv.mkDerivation rec {
+  #   pname = "extraterm";
+  #   version = "0.81.0";
+    
+  #   src = pkgs.fetchFromGitHub {
+  #     owner = "sedwards2009";
+  #     repo = "extraterm";
+  #     rev = "v${version}";
+  #     sha256 = "sha256-H5aP7inGaUXD1SUyijsaaR5qki6yIzaq71MYPaoNSxo=";
+  #   };
+    
+  #   nativeBuildInputs = [ pkgs.yarn pkgs.nodejs ];
+    
+  #   buildInputs = [ pkgs.yarn pkgs.nodejs ];
+    
+  #   buildPhase = ''
+  #     export HOME=$PWD
+  #     ${pkgs.yarn}/bin/yarn install
+  #     ${pkgs.yarn}/bin/yarn run build
+  #   '';
+    
+  #   installPhase = ''
+  #     mkdir -p $out/bin $out/share/applications $out/lib
+      
+  #     cp -r dist $out/lib/
+  #     cp extraterm $out/bin/
+  #     cp extraterm.desktop $out/share/applications/
+  #     sed -i 's|Exec=.*|Exec=$out/bin/extraterm|' $out/share/applications/extraterm.desktop
+      
+  #     chmod +x $out/bin/extraterm
+  #   '';
+  # };
 }
