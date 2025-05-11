@@ -86,6 +86,7 @@ in {
     glxinfo
     gparted
     htop
+    ntfs3g
     pciutils
     usbutils
 

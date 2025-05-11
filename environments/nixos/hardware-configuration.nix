@@ -16,6 +16,7 @@
   boot.initrd.kernelModules = ["amdgpu"];
   boot.kernelModules = ["kvm-intel"];
   boot.extraModulePackages = [];
+  boot.supportedFilesystems = ["ntfs"];
 
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/358cc07b-c6f6-4067-a363-3ac1ee415a7c";
@@ -26,6 +27,30 @@
     device = "/dev/disk/by-uuid/922C-3B83";
     fsType = "vfat";
     options = ["fmask=0077" "dmask=0077"];
+  };
+
+  fileSystems."/mnt/windows" = {
+    device = "/dev/nvme0n1p3";
+    fsType = "ntfs-3g";
+    options = ["rw" "uid=1000"];
+  };
+
+  fileSystems."/mnt/windows-2" = {
+    device = "/dev/nvme4n1p2";
+    fsType = "ntfs-3g";
+    options = ["rw" "uid=1000"];
+  };
+
+  fileSystems."/mnt/data" = {
+    device = "/dev/nvme1n1p2";
+    fsType = "ntfs-3g";
+    options = ["rw" "uid=1000"];
+  };
+
+  fileSystems."/mnt/data-2" = {
+    device = "/dev/nvme3n1p2";
+    fsType = "ntfs-3g";
+    options = ["rw" "uid=1000"];
   };
 
   swapDevices = [];
