@@ -1,7 +1,7 @@
 {
   pkgs,
   lib,
-  nodejs,
+  nodejs_22,
   unstable,
   config,
   ...
@@ -104,7 +104,7 @@
 
     # Dependencies
     buildInputs = [
-      nodejs
+      nodejs_22
       pkgs.jq
       pkgs.gnugrep
     ];
@@ -204,7 +204,7 @@
           #!/usr/bin/env bash
           export NODE_OPTIONS="--experimental-modules --experimental-specifier-resolution=node \$${NODE_OPTIONS:+:NODE_OPTIONS}"
           export NODE_PATH="$out/lib/node_modules:\$NODE_PATH"
-          exec ${nodejs}/bin/node "$BIN_SOURCE" "\$@"
+          exec ${nodejs_22}/bin/node "$BIN_SOURCE" "\$@"
           EOF
                                 chmod +x "$BIN_TARGET"
                                 echo "Created ESM wrapper for $bin_name"
@@ -242,7 +242,7 @@
           #!/usr/bin/env bash
           export NODE_OPTIONS="--experimental-modules --experimental-specifier-resolution=node \$${NODE_OPTIONS:+:NODE_OPTIONS}"
           export NODE_PATH="$out/lib/node_modules:\$NODE_PATH"
-          exec ${nodejs}/bin/node "$BIN_SOURCE" "\$@"
+          exec ${nodejs_22}/bin/node "$BIN_SOURCE" "\$@"
           EOF
                               chmod +x "$BIN_TARGET"
                               echo "Created ESM wrapper for $bin_name"
@@ -316,7 +316,7 @@
         fi
 
         # Link all binaries to the npm global bin directory
-        for bin in "$NODE_ENV_PATH/bin/"*; do
+        for bin in "${nodejs_22}/bin/"*; do
           if [ -f "$bin" ] && [ -x "$bin" ]; then
             binname=$(basename "$bin")
             echo "Linking binary: $binname"
@@ -371,7 +371,7 @@
           then "export ${envVars}"
           else ""
         }
-        ${config.home.profileDirectory}/bin/npm install -g ${packageSpec} --prefix ~/.npm-global
+        ${nodejs_22}/bin/npm install -g ${packageSpec} --prefix ~/.npm-global
         ${postInstall}
       '')
       directNpmPackages;
@@ -381,7 +381,7 @@
     mkdir -p ~/.npm-global/bin ~/.npm-global/lib/node_modules
 
     # Make sure node is available in PATH
-    export PATH="${nodejs}/bin:$PATH"
+    export PATH="${nodejs_22}/bin:$PATH"
 
     # Install packages directly via npm
     ${installCommands}
@@ -439,9 +439,9 @@
       # Reference the yarn lock file
       inherit source yarnLockFile;
 
-      buildInputs = with pkgs.unstable; [nodejs yarn-berry yarn-berry_3.yarn-berry-fetcher];
+      buildInputs = with pkgs.unstable; [nodejs_22 yarn-berry_3 yarn-berry_3.yarn-berry-fetcher];
 
-      nativeBuildInputs = with pkgs.unstable; [nodejs yarn-berry yarn-berry_3.yarn-berry-fetcher];
+      nativeBuildInputs = with pkgs.unstable; [nodejs_22 yarn-berry_3 yarn-berry_3.yarn-berry-fetcher];
 
       buildPhase = ''
         yarn-berry-fetcher missing-hashes $yarnLockFile > missing-hashes.json
@@ -473,7 +473,7 @@
         src = source;
 
         nativeBuildInputs = [
-          nodejs
+          nodejs_22
           pkgs.unstable.yarn-berry_3.yarnBerryConfigHook
         ];
 

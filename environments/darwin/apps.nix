@@ -127,7 +127,6 @@
       "wget"
       "xcbeautify"
       "xcode-build-server"
-      "yarn"
     ];
 
     # `brew install --cask`
