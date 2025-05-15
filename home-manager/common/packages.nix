@@ -52,7 +52,6 @@
   commonPackages = with pkgs;
     lib.flatten [
       act
-      pkgs.unstable.aider-chat
       aria2 # A lightweight multi-protocol & multi-source command-line download utility
       awscli2
       bc

@@ -41,14 +41,12 @@
       scikit-learn
       scrapy
       scrapy-fake-useragent
-      screeninfo
       sentry-sdk
       setuptools
       soupsieve
       tabulate
       wheel
       wxpython
-      xcffib
       zlib-ng
     ]
     ++ (
@@ -62,6 +60,8 @@
         with pythonBase.pkgs; [
           torch
           torchvision
+          screeninfo
+          xcffib
         ]
     );
 

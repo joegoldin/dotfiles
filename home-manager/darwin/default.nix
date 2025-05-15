@@ -21,7 +21,7 @@ in {
   ];
 
   programs.fish.interactiveShellInit = lib.strings.concatStrings [
-    (import ../common/fish/init.nix {inherit pkgs;}).interactiveShellInit
+    (import ../common/fish/init.nix {inherit pkgs config;}).interactiveShellInit
     initConfigAdditions
   ];
 
