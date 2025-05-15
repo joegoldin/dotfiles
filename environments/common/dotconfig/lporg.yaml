@@ -93,14 +93,12 @@ apps:
         - CrossOver
         - Cryptomator
         - Cursor
-        - DaisyDisk
         - Developer
         - Discord
         - Docker
         - Figma
         - Gemini
         - Google Chrome
-        - HiDock
         - HTTPie
         - Immersed
         - iTerm
@@ -109,10 +107,10 @@ apps:
         - Meta Quest Remote Desktop
         - Modern CSV
         - Monodraw
-    - number: 3
-      items:
         - Mountain Duck
         - Notion
+    - number: 3
+      items:
         - Obsidian
         - Orion
         - Parallels Desktop
@@ -145,20 +143,19 @@ apps:
                 - Autodesk Fusion Service Utility
                 - Barrier
                 - Contact Sheets
-                - DisplayLink Manager
+                - DaisyDisk
                 - DevCleaner
+                - DisplayLink Manager
                 - Flycut
+                - HiDock
                 - Ice
                 - iTermAI
                 - Jump Desktop Connect
-                - LuLu
                 - Mac Mouse Fix
                 - Make Calendar
                 - Peek
-                - Rectangle Pro
                 - Remove Autodesk Fusion
                 - RocketSim
-                - Shottr
                 - SoundSource
                 - Stats
                 - Steam Support Center
@@ -185,6 +182,7 @@ dock_items:
     - /System/Applications/VoiceMemos.app
     - /Applications/iTerm.app
     - /Applications/Cursor.app
+    - /Applications/Android Studio.app
     - /Applications/Xcode.app
     - /Applications/A Companion for SwiftUI.app
     - /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
