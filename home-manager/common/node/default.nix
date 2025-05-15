@@ -8,9 +8,11 @@
   nodejs_22 = unstable.nodejs_22;
 
   # Standard node packages from nixpkgs
-  standardNodePackages = with unstable.nodePackages; [
+  standardNodePackages = [
+    unstable.marp-cli
+    unstable.nodePackages.fx
     unstable.nodejs_22
-    unstable.postcss
+    unstable.nodePackages.postcss
     unstable.wrangler
     unstable.yarn-berry_3
   ];
