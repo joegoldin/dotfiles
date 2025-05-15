@@ -7,7 +7,7 @@
   customNodePackages = import ../node/custom-node-packages.nix {
     inherit pkgs config;
     lib = pkgs.lib;
-    nodejs = pkgs.nodejs_22;
+    nodejs_22 = pkgs.unstable.nodejs_22;
     unstable = pkgs.unstable or pkgs;
   };
 

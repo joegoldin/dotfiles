@@ -35,6 +35,7 @@
   nix = let
     flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
   in {
+    enable = true;
     settings = {
       experimental-features = ["nix-command" "flakes"];
       nix-path = config.nix.nixPath;
@@ -53,12 +54,9 @@
 
     registry = lib.mapAttrs (_: flake: {inherit flake;}) flakeInputs;
     nixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
-    configureBuildUsers = true;
   };
 
   ids.uids.nixbld = lib.mkForce 350;
-
-  services.nix-daemon.enable = true;
 
   networking.hostName = hostname;
 

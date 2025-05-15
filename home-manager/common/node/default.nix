@@ -5,20 +5,19 @@
   config,
   ...
 }: let
-  nodejs = pkgs.nodejs_22;
+  nodejs_22 = unstable.nodejs_22;
 
   # Standard node packages from nixpkgs
-  standardNodePackages = with pkgs.nodePackages; [
-    nodejs
-    postcss
-    postcss-cli
-    wrangler
-    yarn
+  standardNodePackages = with unstable.nodePackages; [
+    unstable.nodejs_22
+    unstable.postcss
+    unstable.wrangler
+    unstable.yarn-berry_3
   ];
 
   # Import custom packages from separate file
   customNodePackages = import ./custom-node-packages.nix {
-    inherit pkgs lib nodejs unstable config;
+    inherit pkgs lib nodejs_22 unstable config;
   };
 
   # Build yarn packages from GitHub
@@ -39,10 +38,10 @@ in {
     mkdir -p ~/.npm-global
 
     # Set npm global prefix
-    ${config.home.profileDirectory}/bin/npm set prefix ~/.npm-global
+    ${nodejs_22}/bin/npm set prefix ~/.npm-global
 
     # Ensure npm will always use this prefix for global installs
-    ${config.home.profileDirectory}/bin/npm config set global true
+    ${nodejs_22}/bin/npm config set global true
 
     # Add npm global bin to PATH
     export PATH="$HOME/.npm-global/bin:$PATH"
