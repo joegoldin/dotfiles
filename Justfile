@@ -73,6 +73,7 @@ nix-gc:
   @echo "🧹  Garbage collecting nix..."
   @nix-env --delete-generations 14d
   @nix-store --gc
+  @nix-collect-garbage -d
   @echo "✅  Garbage collected!"
 
 [private]
