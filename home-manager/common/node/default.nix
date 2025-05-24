@@ -13,7 +13,7 @@
     unstable.nodePackages.fx
     unstable.nodejs_22
     unstable.nodePackages.postcss
-    unstable.wrangler
+#    unstable.wrangler
     unstable.yarn-berry_3
   ];
 

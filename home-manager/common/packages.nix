@@ -20,7 +20,7 @@
       claude-desktop.packages.x86_64-linux.claude-desktop
       unstable.cloudflared
       unstable.code-cursor
-      unstable.davinci-resolve
+#      unstable.davinci-resolve
       unstable.discord
       # extraterm
       inotify-tools
