@@ -43,6 +43,7 @@
       ACompanionForSwiftUI = 1485436674;
       AppleDeveloper = 640199958;
       LocalSend = 1661733229;
+      DavinciResolve = 571213070;
     };
 
     taps = [
