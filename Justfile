@@ -80,13 +80,15 @@ nix-gc:
 build-macos fast='':
   @echo "🔨  Building Nix config for macOS 🍎"
   @{{ if fast != "--fast" { "just lint flake-update" } else { "echo \"🚀 Fast mode, skipping checks...\"" } }}
-  @nix --extra-experimental-features 'nix-command flakes' run nix-darwin -- switch --flake .#Joes-MacBook-Pro --show-trace
+  # @sudo nix --extra-experimental-features 'nix-command flakes' run nix-darwin -- switch --flake .#Joes-MacBook-Pro --show-trace
+  @sudo darwin-rebuild switch --flake .#Joes-MacBook-Pro --show-trace
   @echo "✅  Built for macOS!"
 
 [macos]
 build-macos-fast:
   @echo "🔨  Building Nix config for macOS 🍎 (fast mode)"
-  @nix --extra-experimental-features 'nix-command flakes' run nix-darwin -- switch --flake .#Joes-MacBook-Pro --show-trace
+  # @sudo nix --extra-experimental-features 'nix-command flakes' run nix-darwin -- switch --flake .#Joes-MacBook-Pro --show-trace
+  @sudo darwin-rebuild switch --flake .#Joes-MacBook-Pro --show-trace
   @echo "✅  Built for macOS!"
 
 [macos]
