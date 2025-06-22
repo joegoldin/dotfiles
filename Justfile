@@ -92,6 +92,12 @@ build-macos-fast:
   @echo "✅  Built for macOS!"
 
 [macos]
+build-macos-initial:
+  @echo "🔨  Building Nix config for macOS 🍎 (fast mode)"
+  @sudo nix --extra-experimental-features 'nix-command flakes' run nix-darwin -- switch --flake .#Joes-MacBook-Pro --show-trace
+  @echo "✅  Built for macOS!"
+
+[macos]
 organize-launchpad:
   @echo "🔨  Organizing Launchpad..."
   @lporg load --config $(pwd)/environments/common/dotconfig/lporg.yaml --yes --no-backup
