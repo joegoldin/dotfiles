@@ -169,6 +169,7 @@
       "proton-mail"
       "proxyman"
       "roon"
+      "runjs"
       "sf-symbols"
       "silhouette-studio"
       "slack"
