@@ -41,6 +41,9 @@
         claude config set -g autoUpdaterStatus disabled
       '';
     }
+    {
+      name = "@google/gemini-cli";
+    }
   ];
 
   # Helper for parsing package name info
