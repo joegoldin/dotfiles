@@ -72,6 +72,7 @@ apps:
                 - Chess
                 - Feedback Assistant
                 - Passwords
+                - Magnifier
     - number: 2
       items:
         - 1Password
@@ -87,12 +88,12 @@ apps:
         - BambuStudio
         - Blender
         - ChatGPT
-        - Claude
         - A Companion for SwiftUI
         - Creative Cloud
         - CrossOver
         - Cryptomator
         - Cursor
+        - DaVinci Resolve
         - Developer
         - Discord
         - Docker
@@ -108,9 +109,10 @@ apps:
         - Modern CSV
         - Monodraw
         - Mountain Duck
-        - Notion
+        - Claude
     - number: 3
       items:
+        - Notion
         - Obsidian
         - Orion
         - Parallels Desktop
@@ -119,6 +121,8 @@ apps:
         - Postico 2
         - Proton Mail
         - Proxyman
+        - PyCharm
+        - Razer Synapse
         - Roon
         - Rosetta Stone Learn Languages
         - SF Symbols
@@ -163,11 +167,24 @@ apps:
                 - TomatoBar
                 - Virtual Desktop Updater
                 - Web Gallery
+        - Games
+        - Apps
+        - Journal
+        - Phone
+        - Xcode-beta
+        - Click2Minimize
+        - RunJS
+        - ccusage-macos-menubar
+        - AdobeCleanUpUtility
+        - AdobeGCClient
+    - number: 4
+      items:
+        - Clop
 widgets:
   pages: []
 dock_items:
   apps:
-    - /System/Applications/Launchpad.app
+    - /System/Applications/Apps.app
     - /System/Applications/Messages.app
     - /Applications/Orion.app
     - /Applications/Discord.app
@@ -180,23 +197,26 @@ dock_items:
     - /Applications/Roon.app
     - /System/Applications/Photos.app
     - /System/Applications/VoiceMemos.app
+    - /Applications/DaVinci Resolve.app
     - /Applications/iTerm.app
     - /Applications/Cursor.app
     - /Applications/Android Studio.app
-    - /Applications/Xcode.app
+    - /Applications/PyCharm.app
     - /Applications/A Companion for SwiftUI.app
-    - /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
+    - /Applications/Xcode-beta.app
+    - /Applications/Xcode-beta.app/Contents/Developer/Applications/Simulator.app
     - /Applications/Proxyman.app
     - /System/Applications/iPhone Mirroring.app
     - /Applications/HTTPie.app
-    - /Applications/Claude.app
     - /Applications/ChatGPT.app
     - /Users/joe/Applications/Orion/WebApps/Gemini.app
+    - /Applications/Claude.app
     - /Users/joe/Applications/Orion/WebApps/TypingMind.app
     - /Applications/Sublime Text.app
     - /Applications/Sublime Merge.app
-    - /Users/joe/Parallels/Windows 11.pvm/Windows 11.app
+    - /Applications/RunJS.app
     - /Applications/Parsec.app
+    - /Users/joe/Parallels/Windows 11.pvm/Windows 11.app
     - /System/Applications/System Settings.app
   others:
     - path: ~/Downloads
