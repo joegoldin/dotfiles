@@ -99,6 +99,7 @@
       "lporg"
       "mas"
       "mysql"
+      "neilberkman/clippy/clippy"
       "neofetch"
       "okteto"
       "ollama"
