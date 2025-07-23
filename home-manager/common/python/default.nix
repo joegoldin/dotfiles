@@ -45,6 +45,7 @@
       setuptools
       soupsieve
       tabulate
+      watchdog
       wheel
       wxpython
       zlib-ng
