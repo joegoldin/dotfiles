@@ -7,7 +7,7 @@
   ...
 }: let
   unstable = pkgs.unstable;
-  nodeModule = import ./node {inherit pkgs lib unstable config;};
+  # nodeModule = import ./node {inherit pkgs lib unstable config;};
   pythonModule = import ./python {inherit pkgs lib unstable;};
   appImagePackages = import ./appimages.nix {inherit pkgs;};
   cargoModule = import ./cargo.nix {inherit pkgs lib;};
@@ -59,6 +59,7 @@
       bun
       cachix
       caddy
+      unstable.claude-code
       clojure
       comma
       coreutils
@@ -92,10 +93,14 @@
       lazydocker
       leiningen
       nix
+      nix-your-shell
       nmap
       nnn # terminal file manager
-      nix-your-shell
-      nodeModule.packages
+      unstable.marp-cli
+      unstable.nodePackages.fx
+      unstable.nodejs_22
+      unstable.nodePackages.postcss
+      # nodeModule.packages
       openring
       p7zip
       pinentry-curses
@@ -114,6 +119,7 @@
       wget
       which
       xz
+      unstable.yarn-berry_3
       yq-go # yaml processer https://github.com/mikefarah/yq
       zellij
       zip
@@ -139,9 +145,9 @@ in {
       else []
     );
 
-  home.activation.nodePreInstall = nodeModule.nodePreInstall;
-  home.activation.nodeSetupGlobal = nodeModule.nodeSetupGlobal;
-  home.activation.nodePostInstall = nodeModule.nodePostInstall;
+  # home.activation.nodePreInstall = nodeModule.nodePreInstall;
+  # home.activation.nodeSetupGlobal = nodeModule.nodeSetupGlobal;
+  # home.activation.nodePostInstall = nodeModule.nodePostInstall;
   home.activation.pythonPostInstall = pythonModule.pythonPostInstall;
 
   programs = {
