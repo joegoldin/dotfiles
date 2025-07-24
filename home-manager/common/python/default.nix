@@ -32,7 +32,7 @@
       numpy
       ollama
       openai
-      pdoc3
+      # pdoc3
       pandas
       pip
       playwright
@@ -40,7 +40,7 @@
       requests
       scikit-learn
       scrapy
-      scrapy-fake-useragent
+      # scrapy-fake-useragent
       sentry-sdk
       setuptools
       soupsieve
@@ -74,15 +74,15 @@
         # Custom packages from PyPI
         customPackages.deepgram-sdk
         customPackages.fal-client
-        customPackages.llm
-        customPackages.llm-anthropic
-        customPackages.llm-cmd
-        customPackages.llm-cmd-comp
-        customPackages.llm-deepseek
-        customPackages.llm-gemini
-        customPackages.llm-grok
-        customPackages.llm-ollama
-        customPackages.llm-perplexity
+        # customPackages.llm
+        # customPackages.llm-anthropic
+        # customPackages.llm-cmd
+        # customPackages.llm-cmd-comp
+        # customPackages.llm-deepseek
+        # customPackages.llm-gemini
+        # customPackages.llm-grok
+        # customPackages.llm-ollama
+        # customPackages.llm-perplexity
         customPackages.lmstudio
         customPackages.scrapfly-sdk
       ]
@@ -90,8 +90,8 @@
         if (pkgs.stdenv.isDarwin && pkgs.stdenv.isAarch64)
         then [
           customPackages.mlx
-          customPackages.mlx-lm
-          customPackages.llm-mlx
+          # customPackages.mlx-lm
+          # customPackages.llm-mlx
         ]
         else [
         ]
