@@ -36,11 +36,12 @@ in {
 
     fish_add_path $HOME/.cargo/bin
 
-    fish_add_path $HOME/.npm-global/bin
-    set -Ux NODE_PATH "${config.home.profileDirectory}/lib/node_modules:$HOME/.npm-global/lib/node_modules"
+    # Disabling custom npm global packages for now
+    # fish_add_path $HOME/.npm-global/bin
+    # set -Ux NODE_PATH "${config.home.profileDirectory}/lib/node_modules:$HOME/.npm-global/lib/node_modules"
 
     # Set Node package environment variables
-    ${nodeEnvVars}
+    # ${nodeEnvVars}
 
     # from https://github.com/CGamesPlay/llm-cmd-comp/blob/main/share/llm-cmd-comp.fish
     bind \e\\ __llm_cmdcomp
