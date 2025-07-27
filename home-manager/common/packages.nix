@@ -22,6 +22,7 @@
       unstable.code-cursor
       #      unstable.davinci-resolve
       unstable.discord
+      unstable.dumbpipe
       # extraterm
       inotify-tools
       unstable.jellyfin-media-player
