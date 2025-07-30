@@ -83,6 +83,7 @@
       gnused
       gnutar
       grc
+      unstable.gum
       httpie
       helm-with-plugins
       helmfile-with-plugins
