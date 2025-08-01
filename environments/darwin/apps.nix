@@ -152,7 +152,7 @@
       "daisydisk"
       "discord"
       "displaylink"
-      "docker"
+      "docker-desktop"
       "figma"
       "google-chrome"
       "hidock"
