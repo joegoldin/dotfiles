@@ -115,7 +115,9 @@
       rustup
       socat # replacement of openbsd-netcat
       tesseract
+      tmux
       tree
+      typescript
       unstable.just
       unzip
       wget
