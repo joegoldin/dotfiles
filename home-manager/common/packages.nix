@@ -92,6 +92,7 @@
       jq # A lightweight and flexible command-line JSON processor
       k9s
       kubectl
+      kubent
       lazydocker
       leiningen
       nix
@@ -108,6 +109,7 @@
       pinentry-curses
       playwright-driver
       playwright-driver.browsers
+      popeye
       pre-commit
       pueue
       pythonModule.packages
@@ -120,6 +122,7 @@
       typescript
       unstable.just
       unzip
+      watch
       wget
       which
       xz
