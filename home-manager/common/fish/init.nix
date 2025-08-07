@@ -36,9 +36,9 @@ in {
 
     fish_add_path $HOME/.cargo/bin
 
-    # Disabling custom npm global packages for now
-    # fish_add_path $HOME/.npm-global/bin
-    # set -Ux NODE_PATH "${config.home.profileDirectory}/lib/node_modules:$HOME/.npm-global/lib/node_modules"
+    # Add npm global path at the end of PATH for lower priority
+    fish_add_path -a $HOME/.npm-global/bin
+    set -Ux NODE_PATH "${config.home.profileDirectory}/lib/node_modules:$HOME/.npm-global/lib/node_modules"
 
     # Set Node package environment variables
     # ${nodeEnvVars}
