@@ -97,6 +97,7 @@
       "kubectx"
       "lporg"
       "mas"
+      "msty"
       "mysql"
       "neilberkman/clippy/clippy"
       "neofetch"
