@@ -13,7 +13,9 @@
 }: let
   initConfigAdditions = ''
     eval $(/opt/homebrew/bin/brew shellenv)
-    source ${pkgs.iterm2-terminal-integration}/bin/iterm2_shell_integration.fish
+    if test "$TERM_PROGRAM" = "iTerm.app"
+      source ${pkgs.iterm2-terminal-integration}/bin/iterm2_shell_integration.fish
+    end
   '';
 in {
   imports = [
