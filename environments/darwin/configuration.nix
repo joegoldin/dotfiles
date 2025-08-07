@@ -13,6 +13,7 @@
   imports = [
     ./system.nix
     ./apps.nix
+    ./homebrew.nix
   ];
   system.stateVersion = 5;
 

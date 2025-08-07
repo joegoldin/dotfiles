@@ -44,6 +44,74 @@
       url = "github:BatteredBunny/brew-api";
       flake = false;
     };
+    # nix-homebrew
+    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
+    # Homebrew taps
+    homebrew-core = {
+      url = "github:homebrew/homebrew-core";
+      flake = false;
+    };
+    homebrew-cask = {
+      url = "github:homebrew/homebrew-cask";
+      flake = false;
+    };
+    homebrew-services = {
+      url = "github:homebrew/homebrew-services";
+      flake = false;
+    };
+    homebrew-bundle = {
+      url = "github:homebrew/homebrew-bundle";
+      flake = false;
+    };
+    # Additional taps
+    homebrew-argoproj = {
+      url = "github:argoproj/homebrew-tap";
+      flake = false;
+    };
+    homebrew-assemblyai = {
+      url = "github:assemblyai/homebrew-assemblyai";
+      flake = false;
+    };
+    homebrew-k9s = {
+      url = "github:derailed/homebrew-k9s";
+      flake = false;
+    };
+    homebrew-ibigio = {
+      url = "github:ibigio/homebrew-tap";
+      flake = false;
+    };
+    homebrew-vd = {
+      url = "github:saulpw/homebrew-vd";
+      flake = false;
+    };
+    homebrew-ocr = {
+      url = "github:schappim/homebrew-ocr";
+      flake = false;
+    };
+    homebrew-skip = {
+      url = "github:skiptools/homebrew-skip";
+      flake = false;
+    };
+    homebrew-txn2 = {
+      url = "github:txn2/homebrew-tap";
+      flake = false;
+    };
+    homebrew-versent = {
+      url = "github:versent/homebrew-taps";
+      flake = false;
+    };
+    homebrew-blacktop = {
+      url = "github:blacktop/homebrew-tap";
+      flake = false;
+    };
+    homebrew-cirruslabs = {
+      url = "github:cirruslabs/homebrew-cli";
+      flake = false;
+    };
+    homebrew-neilberkman = {
+      url = "github:neilberkman/homebrew-clippy";
+      flake = false;
+    };
     #disko
     disko = {
       url = "github:nix-community/disko";
@@ -102,6 +170,23 @@
     pre-commit-hooks,
     brew-nix,
     brew-api,
+    nix-homebrew,
+    homebrew-core,
+    homebrew-cask,
+    homebrew-services,
+    homebrew-bundle,
+    homebrew-argoproj,
+    homebrew-assemblyai,
+    homebrew-k9s,
+    homebrew-ibigio,
+    homebrew-vd,
+    homebrew-ocr,
+    homebrew-skip,
+    homebrew-txn2,
+    homebrew-versent,
+    homebrew-blacktop,
+    homebrew-cirruslabs,
+    homebrew-neilberkman,
     disko,
     agenix,
     plasma-manager,
@@ -260,6 +345,7 @@
         modules = [
           # > Our main darwin configuration <
           ./environments/darwin
+          nix-homebrew.darwinModules.nix-homebrew
           home-manager.darwinModules.home-manager
           ({specialArgs, ...}: {
             home-manager.useGlobalPkgs = true;
