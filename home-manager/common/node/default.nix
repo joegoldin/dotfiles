@@ -45,9 +45,7 @@ in {
     # Ensure npm will always use this prefix for global installs
     ${nodejs_22}/bin/npm config set global true
 
-    # Add npm global bin to PATH
-    export PATH="$HOME/.npm-global/bin:$PATH"
-    ${pkgs.fish}/bin/fish -c "set -Ux PATH $HOME/.npm-global/bin:$PATH"
+    # PATH is now handled in fish config to ensure proper priority
 
     # Set NODE_PATH to include Nix-installed node modules
     export NODE_PATH="${config.home.profileDirectory}/lib/node_modules:$HOME/.npm-global/lib/node_modules"
