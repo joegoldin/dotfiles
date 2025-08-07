@@ -179,6 +179,7 @@
       "sublime-merge"
       "sublime-text"
       "tomatobar"
+      "warp"
       "zoom"
     ];
   };
