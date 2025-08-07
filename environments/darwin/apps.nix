@@ -19,9 +19,9 @@
     enable = true;
 
     onActivation = {
-      autoUpdate = false;
+      autoUpdate = true;
       # 'zap': uninstalls all formulae(and related files) not listed here.
-      cleanup = "zap";
+      cleanup = "none";
     };
 
     # Applications to install from Mac App Store using mas.
