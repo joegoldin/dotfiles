@@ -4,18 +4,10 @@
       name = "z";
       src = z.src;
     } # jethrokuan/z
-    {
-      name = "tide";
-      src = tide.src;
-    } # jorgebucaran/tide
-    {
-      name = "autopair";
-      src = autopair.src;
-    } # jorgebucaran/autopair
-    {
-      name = "puffer";
-      src = puffer.src;
-    } # nickeb96/puffer-fish
+    # {
+    #   name = "autopair";
+    #   src = autopair.src;
+    # } # jorgebucaran/autopair
     {
       name = "colored-man-pages";
       src = colored-man-pages.src;
