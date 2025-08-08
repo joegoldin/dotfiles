@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{pkgs, lib, ...}: {
   programs.starship = {
     enable = true;
 
@@ -229,10 +229,6 @@
       zig = {
         format = "\\[[$symbol($version)]($style)\\]";
       };
-
-      # line_break = {
-      #   disabled = true;
-      # };
     };
   };
 }
