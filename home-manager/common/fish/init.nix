@@ -37,9 +37,17 @@ in {
     fish_add_path $HOME/.cargo/bin
 
     # Remove npm-global from PATH first, then add it at the end for lower priority
-    set -e fish_user_paths[(contains -i $HOME/.npm-global/bin $fish_user_paths)]
+    if set -q fish_user_paths
+        set -l index (contains -i $HOME/.npm-global/bin $fish_user_paths)
+        if test -n "$index"
+            set -e fish_user_paths[$index]
+        end
+        set -l npx_index (contains -i $HOME/.npm/_npx/bin $fish_user_paths)
+        if test -n "$npx_index"
+            set -e fish_user_paths[$npx_index]
+        end
+    end
     fish_add_path -a $HOME/.npm-global/bin
-    set -e fish_user_paths[(contains -i $HOME/.npm/_npx/bin $fish_user_paths)]
     fish_add_path -a $HOME/.npm/_npx/bin
     set -Ux NODE_PATH "${config.home.profileDirectory}/lib/node_modules:$HOME/.npm-global/lib/node_modules"
     set -Ux NPM_CONFIG_PREFIX "$HOME/.npm-global"
