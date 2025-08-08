@@ -30,18 +30,6 @@
       name = "better-sqlite3";
     }
     {
-      name = "@anthropic-ai/claude-code";
-      # specify env variables to set for this package
-      env = {
-        DISABLE_AUTOUPDATER = "1";
-        DISABLE_TELEMETRY = "1";
-        DISABLE_ERROR_REPORTING = "1";
-      };
-      postInstall = ''
-        claude config set -g autoUpdaterStatus disabled
-      '';
-    }
-    {
       name = "@google/gemini-cli";
     }
   ];
