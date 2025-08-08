@@ -60,5 +60,9 @@ in {
     end
 
     ${pkgs.nix-your-shell}/bin/nix-your-shell fish | source
+
+    # Custom key bindings for history expansion (replacing puffer-fish plugin)
+    bind ! __expand_bang # Expands ! to previous command
+    bind . __expand_lastarg # Expands !. to last argument
   '';
 }
