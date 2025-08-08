@@ -16,6 +16,11 @@
   # lorri for nix-shell
   services.lorri.enable = true;
 
+  # WSL-specific starship configuration
+  # programs.starship.settings.line_break = {
+  #   disabled = true;
+  # };
+
   programs.git.extraConfig.gpg.ssh.program = "op-ssh-sign-wsl";
   programs.git.extraConfig.core.sshCommand = "ssh.exe";
   home.shellAliases = {
