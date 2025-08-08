@@ -230,9 +230,9 @@
         format = "\\[[$symbol($version)]($style)\\]";
       };
 
-      line_break = {
-        disabled = true;
-      };
+      # line_break = {
+      #   disabled = true;
+      # };
     };
   };
 }
