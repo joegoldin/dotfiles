@@ -229,6 +229,10 @@
       zig = {
         format = "\\[[$symbol($version)]($style)\\]";
       };
+
+      line_break = {
+        disabled = true;
+      };
     };
   };
 }
