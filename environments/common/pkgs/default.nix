@@ -13,24 +13,6 @@ pkgs: {
     vendorHash = "sha256-sudsPObEyUJklAAc3ZX7TM3KRkTE0sZRM8EctpmUb+E=";
   };
 
-  cursor-server-linux = pkgs.stdenv.mkDerivation rec {
-    pname = "cursor-server-linux";
-    version = "1.0.0";
-    commit = "53b99ce608cba35127ae3a050c1738a959750860";
-    sha256 = "118j60ywkkncwfyzg8vyfslqpsjwg3zmpwmvzqykdagcx9cw8gc1";
-
-    src = pkgs.fetchurl {
-      url = "https://cursor.blob.core.windows.net/remote-releases/${version}-${commit}/vscode-reh-linux-x64.tar.gz";
-      sha256 = "118j60ywkkncwfyzg8vyfslqpsjwg3zmpwmvzqykdagcx9cw8gc1";
-    };
-
-    installPhase = ''
-      outDir=$out/cursor-server-linux/${sha256}
-      mkdir -p $outDir
-      tar -xzvf $src -C $outDir
-    '';
-  };
-
   google-chrome-stable = pkgs.writeShellScriptBin "google-chrome" ''
     exec -a $0 ${pkgs.google-chrome}/bin/google-chrome-stable $@
   '';
