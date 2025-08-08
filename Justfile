@@ -63,12 +63,6 @@ update-node-packages:
   @echo "✅  Node packages updated!"
 
 [unix]
-update-cursor-server:
-  @echo "🔄  Updating Cursor server Linux..."
-  @scripts/update-cursor-server-linux.fish
-  @echo "✅  Cursor server updated!"
-
-[unix]
 nix-gc:
   @echo "🧹  Garbage collecting nix..."
   @nix-env --delete-generations 14d

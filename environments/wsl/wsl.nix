@@ -17,6 +17,9 @@
     wslConf.network.generateHosts = false;
     defaultUser = "${username}";
     startMenuLaunchers = true;
+    
+    # Wrap binaries for Cursor remote development
+    wrapBinSh = true;
 
     # Enable integration with Docker Desktop (needs to be installed)
     docker-desktop.enable = false; # false but it works!
@@ -30,6 +33,11 @@
       {src = "${busybox}/bin/addgroup";}
       {src = "${su}/bin/groupadd";}
       {src = "${su}/bin/usermod";}
+      # Wrapped bash for Cursor remote development
+      {
+        name = "bash";
+        src = config.wsl.binShExe;
+      }
     ];
   };
   virtualisation.docker = {
