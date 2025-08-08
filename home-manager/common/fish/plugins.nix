@@ -4,10 +4,6 @@
       name = "z";
       src = z.src;
     } # jethrokuan/z
-    # {
-    #   name = "autopair";
-    #   src = autopair.src;
-    # } # jorgebucaran/autopair
     {
       name = "colored-man-pages";
       src = colored-man-pages.src;
