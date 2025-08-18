@@ -26,8 +26,8 @@
       # extraterm
       inotify-tools
       unstable.jellyfin-media-player
-#      cargoModule.packages.litra
-#      cargoModule.packages.litra-autotoggle
+      #      cargoModule.packages.litra
+      #      cargoModule.packages.litra-autotoggle
       unstable.obsidian
       unstable.parsec-bin
       unstable.slack
