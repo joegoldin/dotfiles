@@ -141,6 +141,7 @@
       "chatgpt"
       "chromedriver"
       "claude"
+      "claudia"
       "crossover"
       "cryptomator"
       "cursor"

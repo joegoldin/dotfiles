@@ -17,7 +17,7 @@
     wslConf.network.generateHosts = false;
     defaultUser = "${username}";
     startMenuLaunchers = true;
-    
+
     # Wrap binaries for Cursor remote development
     wrapBinSh = true;
 
