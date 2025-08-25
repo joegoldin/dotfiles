@@ -77,6 +77,7 @@
       gh
       git
       gitleaks
+      git-stack
       glow # markdown previewer in terminal
       gnumake
       gnupg
