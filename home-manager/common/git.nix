@@ -52,11 +52,19 @@
       cm = "commit -m";
       ca = "commit -am";
       dc = "diff --cached";
-      amend = "commit --amend -m";
+      # amend = "commit --amend -m";
 
       # aliases for submodule
       update = "submodule update --init --recursive";
       foreach = "submodule foreach";
+
+      # git-stack aliases
+      sync = "stack sync";
+      next = "stack next";
+      prev = "stack prev";
+      reword = "stack reword";
+      amend = "stack amend";
+      run = "stack run";
     };
   };
 }
