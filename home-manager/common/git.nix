@@ -30,10 +30,9 @@
     # ];
 
     extraConfig = {
-      init.defaultBranch = "main";
-      push.autoSetupRemote = true;
-      pull.rebase = true;
       init.defaultBranch = lib.mkDefault "main";
+      push.autoSetupRemote = lib.mkDefault true;
+      pull.rebase = lib.mkDefault true;
       push.autoSetupRemote = lib.mkDefault true;
       rerere.enabled = lib.mkDefault true;
 
