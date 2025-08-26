@@ -33,10 +33,21 @@ in {
     ga = "git add";
     gp = "git push";
     gc = "git commit";
+    gcm = "git commit -m";
     gd = "git diff";
     gf = "git fetch";
     gl = "git log";
     gs = "git status";
+    # git-stack aliases
+    gss = "git stack sync";
+    gnext = "git stack next";
+    gprev = "git stack prev";
+    greword = "git stack reword";
+    gamend = "git stack amend";
+    grs = "git rs";
+    gps = "git ps";
+    grb = "git rbs";
+    graps = "git sync && git rs && git ps";
 
     s = mkIf hasSpecialisationCli "specialisation";
 
