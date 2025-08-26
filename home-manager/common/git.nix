@@ -60,14 +60,18 @@
 
       # git-stack aliases
       sync = "stack sync";
+      ss = "stack sync";
       next = "stack next";
       prev = "stack prev";
       reword = "stack reword";
       amend = "stack amend";
       run = "stack run";
       restack = "stack --repair";
+      rs = "stack --repair";
       pushstack = "stack --push";
+      ps = "stack --push";
       rebasestack = "stack --rebase";
+      rbs = "stack --rebase";
     };
   };
 }
