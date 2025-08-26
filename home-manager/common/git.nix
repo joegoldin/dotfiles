@@ -33,6 +33,21 @@
       init.defaultBranch = "main";
       push.autoSetupRemote = true;
       pull.rebase = true;
+      init.defaultBranch = lib.mkDefault "main";
+      push.autoSetupRemote = lib.mkDefault true;
+      rerere.enabled = lib.mkDefault true;
+
+      column.ui = lib.mkDefault "auto";
+      branch.sort = lib.mkDefault "-committerdate";
+      tag.sort = lib.mkDefault "version:refname";
+
+      diff.algorithm = lib.mkDefault "histogram";
+      diff.colorMoved = lib.mkDefault "plain";
+      diff.mnemonicPrefix = lib.mkDefault true;
+      diff.renames = lib.mkDefault true;
+
+      help.autocorrect = lib.mkDefault "prompt";
+      commit.verbose = lib.mkDefault true;
     };
 
     delta = {
