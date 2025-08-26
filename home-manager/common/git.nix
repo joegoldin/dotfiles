@@ -65,6 +65,9 @@
       reword = "stack reword";
       amend = "stack amend";
       run = "stack run";
+      restack = "stack --repair";
+      pushstack = "stack --push";
+      rebasestack = "stack --rebase";
     };
   };
 }
