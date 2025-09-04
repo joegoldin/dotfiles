@@ -54,6 +54,7 @@
     lib.flatten [
       act
       aria2 # A lightweight multi-protocol & multi-source command-line download utility
+      unstable.asciinema_3
       awscli2
       bc
       bfg-repo-cleaner
