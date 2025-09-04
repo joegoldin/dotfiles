@@ -59,7 +59,6 @@
     # `brew install`
     brews = [
       "act"
-      "asciinema"
       "asdf"
       "assemblyai/assemblyai/assemblyai"
       "autoconf@2.69"
