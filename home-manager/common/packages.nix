@@ -3,7 +3,6 @@
   lib,
   config,
   affinity-nix,
-  claude-desktop,
   ...
 }: let
   unstable = pkgs.unstable;
@@ -17,7 +16,6 @@
     lib.optionals (pkgs.stdenv.hostPlatform.isx86_64) [
       # affinity-nix.packages.x86_64-linux.photo
       unstable.android-studio-full
-      claude-desktop.packages.x86_64-linux.claude-desktop
       unstable.cloudflared
       unstable.code-cursor
       #      unstable.davinci-resolve
