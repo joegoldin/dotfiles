@@ -133,12 +133,6 @@
       url = "github:mrshmllow/affinity-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # claude desktop
-    claude-desktop = {
-      url = "github:k3d3/claude-desktop-linux-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
-    };
     # for mkWindowsApp
     erosanix = {
       url = "github:emmanuelrosa/erosanix";
@@ -191,7 +185,6 @@
     agenix,
     plasma-manager,
     affinity-nix,
-    claude-desktop,
     erosanix,
     lanzaboote,
     ...
