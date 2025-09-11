@@ -75,6 +75,7 @@
       "docutils"
       "entr"
       "expat"
+      "fastlane"
       "flyctl"
       "fontforge"
       "gh"
