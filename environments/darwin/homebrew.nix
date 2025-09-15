@@ -149,6 +149,7 @@
       "displaylink"
       "docker-desktop"
       "figma"
+      "gitbutler"
       "google-chrome"
       "hidock"
       "httpie"
