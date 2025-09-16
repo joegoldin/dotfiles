@@ -3,6 +3,7 @@
   lib,
   config,
   affinity-nix,
+  nix-ai-tools,
   ...
 }: let
   unstable = pkgs.unstable;
@@ -18,6 +19,7 @@
       unstable.android-studio-full
       unstable.cloudflared
       unstable.code-cursor
+      nix-ai-tools.packages.x86_64-linux.codex
       #      unstable.davinci-resolve
       unstable.discord
       unstable.dumbpipe
