@@ -143,6 +143,8 @@
       url = "github:nix-community/lanzaboote/v0.4.2";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # for codex
+    nix-ai-tools.url = "github:numtide/nix-ai-tools";
   };
 
   nixConfig = {
@@ -187,6 +189,7 @@
     affinity-nix,
     erosanix,
     lanzaboote,
+    nix-ai-tools,
     ...
   } @ inputs: let
     inherit (self) outputs;
