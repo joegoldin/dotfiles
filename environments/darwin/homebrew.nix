@@ -67,6 +67,7 @@
       "cirruslabs/cli/sshpass"
       "cloudflared"
       "cmake"
+      "codex"
       "croc"
       "derailed/k9s/k9s"
       "dive"
