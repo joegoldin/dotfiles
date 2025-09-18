@@ -29,9 +29,6 @@
     {
       name = "better-sqlite3";
     }
-    {
-      name = "@google/gemini-cli";
-    }
   ];
 
   # Helper for parsing package name info

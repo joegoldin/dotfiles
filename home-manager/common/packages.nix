@@ -19,7 +19,7 @@
       unstable.android-studio-full
       unstable.cloudflared
       unstable.code-cursor
-      nix-ai-tools.packages.x86_64-linux.codex
+      # nix-ai-tools.packages.x86_64-linux.codex # disabled after s1ngularity attack
       #      unstable.davinci-resolve
       unstable.discord
       unstable.dumbpipe
@@ -61,7 +61,7 @@
       bun
       cachix
       caddy
-      unstable.claude-code
+      # unstable.claude-code # disabled after s1ngularity attack
       clojure
       comma
       coreutils

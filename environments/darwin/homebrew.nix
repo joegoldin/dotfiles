@@ -67,7 +67,7 @@
       "cirruslabs/cli/sshpass"
       "cloudflared"
       "cmake"
-      "codex"
+      # "codex" # disabled after s1ngularity attack
       "croc"
       "derailed/k9s/k9s"
       "dive"
