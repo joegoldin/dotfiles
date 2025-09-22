@@ -9,7 +9,7 @@
   #
   ##########################################################################
 
-  environment.variables.EDITOR = "cursor";
+  environment.variables.EDITOR = "zed";
 
   # Mac App Store apps configuration
   # Homebrew packages and configuration are managed in homebrew.nix
