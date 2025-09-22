@@ -92,7 +92,6 @@ apps:
         - Creative Cloud
         - CrossOver
         - Cryptomator
-        - Cursor
         - DaVinci Resolve
         - Developer
         - Discord
@@ -199,7 +198,6 @@ dock_items:
     - /System/Applications/VoiceMemos.app
     - /Applications/DaVinci Resolve.app
     - /Applications/iTerm.app
-    - /Applications/Cursor.app
     - /Applications/Android Studio.app
     - /Applications/PyCharm.app
     - /Applications/A Companion for SwiftUI.app
