@@ -7,7 +7,6 @@
   ...
 }: let
   unstable = pkgs.unstable;
-  # nodeModule = import ./node {inherit pkgs lib unstable config;};
   pythonModule = import ./python {inherit pkgs lib unstable;};
   appImagePackages = import ./appimages.nix {inherit pkgs;};
   cargoModule = import ./cargo.nix {inherit pkgs lib;};
@@ -18,7 +17,6 @@
       # affinity-nix.packages.x86_64-linux.photo
       unstable.android-studio-full
       unstable.cloudflared
-      unstable.code-cursor
       # nix-ai-tools.packages.x86_64-linux.codex # disabled after s1ngularity attack
       #      unstable.davinci-resolve
       unstable.discord
@@ -102,10 +100,6 @@
       nmap
       nnn # terminal file manager
       unstable.marp-cli
-      unstable.nodePackages.fx
-      unstable.nodejs_22
-      unstable.nodePackages.postcss
-      # nodeModule.packages
       openring
       p7zip
       pinentry-curses
@@ -154,9 +148,6 @@ in {
       else []
     );
 
-  # home.activation.nodePreInstall = nodeModule.nodePreInstall;
-  # home.activation.nodeSetupGlobal = nodeModule.nodeSetupGlobal;
-  # home.activation.nodePostInstall = nodeModule.nodePostInstall;
   home.activation.pythonPostInstall = pythonModule.pythonPostInstall;
 
   programs = {

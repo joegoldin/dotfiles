@@ -144,7 +144,6 @@
       "claude"
       "crossover"
       "cryptomator"
-      "cursor"
       "daisydisk"
       "discord"
       "displaylink"
@@ -159,6 +158,7 @@
       "jordanbaird-ice"
       "jump-desktop-connect"
       "mac-mouse-fix"
+      "macsyzones"
       "modern-csv"
       "monodraw"
       "mountain-duck"
@@ -182,6 +182,7 @@
       "sublime-text"
       "tomatobar"
       "warp"
+      "zed"
       "zoom"
     ];
   };
