@@ -77,6 +77,7 @@
       git
       gitleaks
       git-stack
+      git-worktree-switcher
       glow # markdown previewer in terminal
       gnumake
       gnupg
