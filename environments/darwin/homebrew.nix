@@ -148,6 +148,7 @@
       "discord"
       "displaylink"
       "docker-desktop"
+      "fantastical"
       "figma"
       "gitbutler"
       "google-chrome"
