@@ -169,7 +169,6 @@
       "orion"
       "parsec"
       "postico"
-      "proton-mail"
       "proxyman"
       "roon"
       "runjs"

@@ -3,7 +3,6 @@
   config,
   ...
 }: let
-
 in {
   interactiveShellInit = ''
     set -Ux Z_CMD "j"

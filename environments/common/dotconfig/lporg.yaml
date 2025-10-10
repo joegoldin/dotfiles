@@ -118,7 +118,6 @@ apps:
         - Parsec
         - Patterns
         - Postico 2
-        - Proton Mail
         - Proxyman
         - PyCharm
         - Razer Synapse
@@ -187,7 +186,6 @@ dock_items:
     - /System/Applications/Messages.app
     - /Applications/Orion.app
     - /Applications/Discord.app
-    - /Applications/Proton Mail.app
     - /Applications/Slack.app
     - /Applications/zoom.us.app
     - /Applications/Obsidian.app
