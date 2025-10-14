@@ -59,7 +59,7 @@
       bun
       cachix
       caddy
-      # unstable.claude-code # disabled after s1ngularity attack
+      unstable.claude-code
       clojure
       comma
       coreutils
