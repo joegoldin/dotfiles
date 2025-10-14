@@ -315,7 +315,7 @@
             home-manager.extraSpecialArgs = specialArgs;
             home-manager.backupFileExtension = "backup"; # enable moving existing files
             home-manager.sharedModules = [
-              plasma-manager.homeManagerModules.plasma-manager
+              plasma-manager.homeModules.plasma-manager
             ];
             home-manager.users.${specialArgs.username} = import ./home-manager/nixos;
           })
