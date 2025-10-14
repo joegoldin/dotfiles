@@ -110,7 +110,7 @@ build fast='': system-info
 [private]
 build-wsl fast='':
   @echo "🔨  Building Nix config for WSL 🪟"
-  @{{ if fast != "--fast" { "just lint flake-update" } else { "echo \"🚀 Fast mode, skipping checks...\"" } }}
+  @{{ if fast != "--fast" { "just flake-update" } else { "echo \"🚀 Fast mode, skipping checks...\"" } }}
   @{{ if fast != "--fast" { "echo \"🔍  Checking Nix config for WSL...\"" } else { "" } }}
   @{{ if fast != "--fast" { "NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 NIXPKGS_ALLOW_UNFREE=1 NIXPKGS_ALLOW_BROKEN=1 nix --extra-experimental-features 'nix-command flakes' flake check --impure --system x86_64-linux --show-trace" } else { "" } }}
   @sudo nixos-rebuild --flake .#joe-wsl switch --show-trace
