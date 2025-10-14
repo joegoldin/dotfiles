@@ -56,7 +56,7 @@ in {
     jack.enable = true;
   };
   # Disable PulseAudio as it conflicts with PipeWire
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
 
   # Enable OpenGL
   hardware.graphics = {
