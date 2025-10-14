@@ -70,10 +70,10 @@
     fsType = "9p";
   };
 
-  fileSystems."/mnt/d" = {
-    device = "D:\134";
-    fsType = "9p";
-  };
+  # fileSystems."/mnt/d" = {
+  #   device = "D:\134";
+  #   fsType = "9p";
+  # };
 
   swapDevices = [
     {device = "/dev/disk/by-uuid/26624da5-1cb6-47a1-a442-ed16f315174a";}
