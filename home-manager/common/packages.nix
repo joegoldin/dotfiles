@@ -23,7 +23,7 @@
       unstable.dumbpipe
       # extraterm
       inotify-tools
-      unstable.jellyfin-media-player
+      # unstable.jellyfin-media-player
       #      cargoModule.packages.litra
       #      cargoModule.packages.litra-autotoggle
       unstable.obsidian
