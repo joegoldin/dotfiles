@@ -43,7 +43,7 @@ in {
   # Enable XDG desktop portal for better application integration
   xdg.portal = {
     enable = true;
-    extraPortals = [pkgs.xdg-desktop-portal-kde];
+    extraPortals = [pkgs.kdePackages.xdg-desktop-portal-kde];
   };
 
   # Enable sound with PipeWire (recommended for Plasma 6)
