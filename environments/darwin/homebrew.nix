@@ -170,6 +170,7 @@
       "parsec"
       "postico"
       "proxyman"
+      "rocket"
       "roon"
       "runjs"
       "sf-symbols"
