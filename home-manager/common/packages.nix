@@ -45,6 +45,8 @@
   ];
 
   wslPackages = with pkgs; [
+    openssl
+    openssl.dev
   ];
 
   # Common packages for all systems
