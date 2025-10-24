@@ -119,8 +119,10 @@
       tmux
       tree
       typescript
+      ungoogled-chromium
       unstable.just
       unzip
+      uv
       watch
       wget
       which
