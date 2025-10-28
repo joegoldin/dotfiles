@@ -1,0 +1,12 @@
+#!/usr/bin/env fish
+
+if test (uname) = Darwin
+    # Heavily modified from [this script][0], licensed under the MIT License.
+    # [0]: https://github.com/morgant/tools-osx/blob/71c2db389c48cee8d03931eeb083cfc68158f7ed/src/trash#L293-L311
+    for arg in $argv
+        set file (realpath $arg)
+        /usr/bin/osascript -e "tell application \"Finder\" to delete POSIX file \"$file\"" >/dev/null
+    end
+else
+    gio trash $argv
+end

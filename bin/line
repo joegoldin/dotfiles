@@ -1,0 +1,3 @@
+#!/usr/bin/env fish
+
+head -n $argv[1] | tail -n 1

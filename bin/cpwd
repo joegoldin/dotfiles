@@ -1,0 +1,3 @@
+#!/usr/bin/env fish
+
+pwd | tr -d '\n' | copy

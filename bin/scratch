@@ -1,0 +1,5 @@
+#!/usr/bin/env fish
+
+set file (mktemp)
+echo "Editing $file"
+exec $EDITOR $file
