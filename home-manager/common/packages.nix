@@ -112,6 +112,7 @@
       pre-commit
       pueue
       pythonModule.packages
+      reptyr
       ripgrep # recursively searches directories for a regex pattern
       rustup
       socat # replacement of openbsd-netcat
