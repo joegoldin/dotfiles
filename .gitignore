@@ -1,3 +1,4 @@
+# devenv
 .devenv# Devenv
 .devenv*
 devenv.local.nix
@@ -8,5 +9,7 @@ devenv.local.nix
 # pre-commit
 .pre-commit-config.yaml
 
-# claudesync
-.claudesync
+# Byte-compiled / optimized / DLL Python files
+__pycache__/
+*.py[codz]
+*$py.class

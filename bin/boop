@@ -1,9 +1,9 @@
-boop () {
-  local last="$?"
-  if [[ "$last" == '0' ]]; then
+#!/usr/bin/env fish
+
+set last $status
+if test $last -eq 0
     sfx good
-  else
+else
     sfx bad
-  fi
-  $(exit "$last")
-}
+end
+exit $last
