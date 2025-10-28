@@ -130,6 +130,7 @@
       xz
       unstable.yarn-berry_3
       yq-go # yaml processer https://github.com/mikefarah/yq
+      yt-dlp
       zellij
       zip
       zlib

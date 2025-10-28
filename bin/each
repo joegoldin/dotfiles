@@ -7,11 +7,12 @@ import sys
 
 
 def eprint(*args):
+    """Print to stderr."""
     print(*args, file=sys.stderr)
 
 
 def parse_args():
-    # TODO: How is Unicode handled with these arguments?
+    """Parse command line arguments."""
     parser = argparse.ArgumentParser(
         description="Run each line through a command. An easier `xargs`.",
     )
@@ -26,14 +27,16 @@ def parse_args():
 
 
 def delimiters_to_re(delimiters):
+    """Convert list of delimiters to a compiled regex pattern."""
     escaped = map(re.escape, delimiters)
     re_str = "|".join(escaped)
     return re.compile(re_str)
 
 
-def run(command, command_arg):
-    command = subprocess.run(
-        command.replace("{}", shlex.quote(command_arg)),
+def run(command_template, command_arg):
+    """Run the command with the given argument substituted for {}."""
+    result = subprocess.run(
+        command_template.replace("{}", shlex.quote(command_arg)),
         stdin=sys.stdin,
         stdout=sys.stdout,
         stderr=sys.stderr,
@@ -41,18 +44,17 @@ def run(command, command_arg):
         text=False,
         check=False,
     )
-    if command.returncode != 0:
-        sys.exit(command.returncode)
+    if result.returncode != 0:
+        sys.exit(result.returncode)
 
 
 def main():
+    """Main entry point."""
     args = parse_args()
 
-    # TODO: Read other delimiters in `parse_args`
     delimiters = ["\n", "\r"]
     delimiters_re = delimiters_to_re(delimiters)
 
-    # TODO: Don't read everything into memory
     all_stdin = sys.stdin.read()
     command_args = delimiters_re.split(all_stdin)
 
@@ -60,7 +62,7 @@ def main():
         if command_arg == "":
             continue
         run(
-            command=args.command,
+            command_template=args.command,
             command_arg=command_arg,
         )
 
