@@ -1,33 +1,39 @@
-#!/usr/bin/env ruby
-require 'date'
-require 'json'
+#!/usr/bin/env python3
+import subprocess
+import sys
+import json
+from datetime import datetime
 
-def exec(*args)
-  begin
-    pid = spawn(*args)
-  rescue Errno::ENOENT
-    return false
-  end
-  return Process.wait2(pid)[1].exited?
-end
+def try_exec(*args):
+    """Try to execute a command. Return True if successful, False otherwise."""
+    try:
+        result = subprocess.run(args, capture_output=True)
+        return result.returncode == 0
+    except FileNotFoundError:
+        return False
 
-def notify(title, description)
-  return if exec('notify-send', '--expire-time=5000', title, description)
+def notify(title, description):
+    # Try notify-send (Linux)
+    if try_exec('notify-send', '--expire-time=5000', title, description):
+        return
 
-  js = "
-  var app = Application.currentApplication()
-  app.includeStandardAdditions = true
-  app.displayNotification(#{JSON.generate(description)}, {
-    withTitle: #{JSON.generate(title)},
-  })
-  "
-  return if exec('osascript', '-l', 'JavaScript', '-e', js)
+    # Try osascript (macOS)
+    js = f"""
+    var app = Application.currentApplication()
+    app.includeStandardAdditions = true
+    app.displayNotification({json.dumps(description)}, {{
+        withTitle: {json.dumps(title)},
+    }})
+    """
+    if try_exec('osascript', '-l', 'JavaScript', '-e', js):
+        return
 
-  $stderr.puts("can't send notifications")
-  exit(1)
-end
+    # If nothing worked
+    print("can't send notifications", file=sys.stderr)
+    sys.exit(1)
 
-title = ARGV[0] || "Notification"
-description = ARGV[1] || DateTime.now.iso8601
+if __name__ == '__main__':
+    title = sys.argv[1] if len(sys.argv) > 1 else "Notification"
+    description = sys.argv[2] if len(sys.argv) > 2 else datetime.now().isoformat()
 
-notify(title, description)
+    notify(title, description)
