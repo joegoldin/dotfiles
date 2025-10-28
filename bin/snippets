@@ -1,0 +1,14 @@
+#!/usr/bin/env fish
+
+if test (count $argv) -ne 1
+    echo 'must pass exactly 1 argument' >&2
+    exit 1
+end
+
+set -q XDG_CONFIG_HOME; or set XDG_CONFIG_HOME $HOME/.config
+set path "$XDG_CONFIG_HOME/evanhahn-snippets/$argv[1]"
+
+if not cat $path 2>/dev/null
+    echo "no snippet found at $path" >&2
+    exit 1
+end

@@ -1,0 +1,11 @@
+#!/usr/bin/env fish
+
+set process_list (ps -eo 'pid command')
+if test (count $argv) -gt 0
+    set process_list (echo $process_list | grep -Fiw $argv)
+end
+
+echo $process_list | \
+    grep -Fv (status current-filename) | \
+    grep -Fv grep | \
+    env GREP_COLORS='mt=00;35' grep -E --colour=auto '^\s*[[:digit:]]+'
