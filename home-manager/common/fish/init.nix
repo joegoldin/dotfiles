@@ -14,6 +14,7 @@ in {
 
     direnv hook fish | source
 
+    fish_add_path $HOME/.local/bin
     fish_add_path $HOME/.cargo/bin
 
     # Remove npm-global from PATH first, then add it at the end for lower priority

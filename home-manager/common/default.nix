@@ -44,4 +44,10 @@
     source = ../../environments/common/dotconfig;
     recursive = true;
   };
+
+  # symlink bin folder
+  home.file.".local/bin" = {
+    source = ../../bin;
+    recursive = true;
+  };
 }
