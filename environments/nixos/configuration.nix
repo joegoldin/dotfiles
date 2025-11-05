@@ -102,7 +102,7 @@ in {
   };
 
   environment.systemPackages = with pkgs; [
-    agenix.packages.${pkgs.system}.default
+    agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
     git
     unstable.sbctl
     wget
