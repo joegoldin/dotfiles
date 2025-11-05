@@ -90,7 +90,7 @@
     git
     jdk
     wget
-    agenix.packages.${pkgs.system}.default
+    agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
     # darwin.xcode_16_3  # TODO: enable this when available in nixpkgs
   ];
 
