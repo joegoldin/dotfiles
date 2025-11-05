@@ -28,11 +28,13 @@
       #      cargoModule.packages.litra-autotoggle
       unstable.obsidian
       unstable.parsec-bin
+      reptyr
       unstable.slack
       unstable.steam
       unstable.streamcontroller
       sublime-merge
       unstable.tailscale
+      ungoogled-chromium
       vlc
       unstable.waveterm
       unstable.zoom-us
@@ -95,6 +97,7 @@
       jq # A lightweight and flexible command-line JSON processor
       k9s
       kubectl
+      kubectx
       kubent
       lazydocker
       leiningen
@@ -112,7 +115,6 @@
       pre-commit
       pueue
       pythonModule.packages
-      reptyr
       ripgrep # recursively searches directories for a regex pattern
       rustup
       socat # replacement of openbsd-netcat
@@ -120,7 +122,6 @@
       tmux
       tree
       typescript
-      ungoogled-chromium
       unstable.just
       unzip
       uv
