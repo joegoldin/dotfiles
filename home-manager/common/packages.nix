@@ -122,6 +122,7 @@
       tesseract
       tmux
       tree
+      trippy
       typescript
       unstable.just
       unzip
