@@ -109,6 +109,7 @@
       openring
       p7zip
       pinentry-curses
+      pipenv
       playwright-driver
       playwright-driver.browsers
       popeye
