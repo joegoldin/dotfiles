@@ -59,6 +59,7 @@ pkgs: {
       helm-diff
       helm-s3
       helm-git
+      helm-unittest
     ];
   };
   helmfile-with-plugins = pkgs.helmfile-wrapped.override {
@@ -69,6 +70,7 @@ pkgs: {
           helm-diff
           helm-s3
           helm-git
+          helm-unittest
         ];
       })
       pluginsDir
