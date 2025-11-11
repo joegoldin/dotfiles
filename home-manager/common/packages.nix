@@ -91,6 +91,8 @@
       unstable.gum
       httpie
       helm-with-plugins
+      helm-ls
+      helm-docs
       helmfile-with-plugins
       unstable.hugo
       imagemagick
