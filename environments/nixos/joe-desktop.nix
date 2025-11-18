@@ -83,7 +83,7 @@ in {
 
     # System utils
     clinfo
-    glxinfo
+    mesa-demos # replaces glxinfo
     gparted
     htop
     ntfs3g
