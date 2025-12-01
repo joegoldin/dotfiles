@@ -215,7 +215,12 @@
       };
 
       time = {
+        disabled = false;
         format = "\\[[$time]($style)\\]";
+        use_12hr = false;
+        utc_time_offset = "local";
+        time_format = "%T";
+        time_range = "-";
       };
 
       username = {
