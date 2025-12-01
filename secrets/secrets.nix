@@ -7,4 +7,6 @@ let
 in {
   "cf.json.age".publicKeys = users ++ systems;
   "raspi-printer-wlan.age".publicKeys = users;
+  "atuin_session.age".publicKeys = users;
+  "atuin_key.age".publicKeys = users;
 }

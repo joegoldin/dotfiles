@@ -12,4 +12,6 @@
     shellAbbrs = (import ./aliases.nix {inherit lib config;}).shellAbbrs;
     shellAliases = (import ./aliases.nix {inherit lib config;}).shellAliases;
   };
+
+  programs.atuin = import ./atuin.nix {inherit pkgs config;};
 }
