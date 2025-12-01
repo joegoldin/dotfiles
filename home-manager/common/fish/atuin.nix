@@ -12,6 +12,6 @@
     sync_address = "https://atuin.joegold.in";
     search_mode = "fuzzy";
     enter_accept = true;
-    inline_height = 40;
+    inline_height = 20;
   };
 }
