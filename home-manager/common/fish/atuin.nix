@@ -11,5 +11,7 @@
     sync_frequency = "5m";
     sync_address = "***REMOVED***";
     search_mode = "fuzzy";
+    enter_accept = true;
+    inline_height = 40;
   };
 }
