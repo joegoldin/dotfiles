@@ -2,8 +2,7 @@
   pkgs,
   config,
   ...
-}: let
-in {
+}: {
   interactiveShellInit = ''
     set -Ux Z_CMD "j"
     set -Ux nvm_default_version lts
@@ -51,5 +50,18 @@ in {
     # Custom key bindings for history expansion (replacing puffer-fish plugin)
     bind ! __expand_bang # Expands ! to previous command
     bind . __expand_lastarg # Expands !. to last argument
+
+    # fish-refresh-prompt-on-cmd configuration
+    # Refreshes prompt when entering command to show accurate time/git status
+
+    # Time prompt customization (shown on right when command is entered)
+    set -g rpoc_time_color yellow
+    set -g rpoc_time_prefix 'at '
+    set -g rpoc_time_prefix_color normal
+
+    # Command duration customization (shown after long-running commands)
+    set -g rpoc_cmd_duration_min_ms 3000
+    set -g rpoc_cmd_duration_color yellow
+    set -g rpoc_cmd_duration_prefix '⏱ took '
   '';
 }
