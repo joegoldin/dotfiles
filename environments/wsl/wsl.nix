@@ -8,8 +8,11 @@
   hostname,
   stateVersion,
   agenix,
+  dotfiles-assets,
   ...
-}: {
+}: let
+  fonts = import ../common/fonts {inherit pkgs lib dotfiles-assets;};
+in {
   wsl = {
     enable = true;
     wslConf.automount.root = "/mnt";
@@ -117,6 +120,10 @@
     git
     wget
     agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
+  ];
+
+  fonts.packages = with pkgs; [
+    fonts.berkeley-mono-nerd-font
   ];
 
   programs._1password.enable = true;
