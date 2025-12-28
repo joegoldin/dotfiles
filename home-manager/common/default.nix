@@ -25,6 +25,7 @@
     ./fish
     (import ./packages.nix {inherit pkgs lib config affinity-nix nix-ai-tools;})
     ./git.nix
+    ./ghostty.nix
     ./starship.nix
   ];
 

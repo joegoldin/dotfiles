@@ -15,7 +15,7 @@
   nixosPackages = with pkgs;
     lib.optionals (pkgs.stdenv.hostPlatform.isx86_64) [
       # affinity-nix.packages.x86_64-linux.photo
-      unstable.android-studio-full
+      # unstable.android-studio-full
       unstable.cloudflared
       # nix-ai-tools.packages.x86_64-linux.codex # disabled after s1ngularity attack
       #      unstable.davinci-resolve
@@ -78,6 +78,7 @@
       fzf # A command-line fuzzy finder
       gawk
       gh
+      ghostty
       git
       gitleaks
       git-stack
@@ -119,7 +120,7 @@
       pueue
       pythonModule.packages
       ripgrep # recursively searches directories for a regex pattern
-      rustup
+      # rustup
       socat # replacement of openbsd-netcat
       stripe-cli
       tesseract

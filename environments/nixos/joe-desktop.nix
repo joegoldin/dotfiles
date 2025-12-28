@@ -5,9 +5,10 @@
   pkgs,
   lib,
   username,
+  dotfiles-assets,
   ...
 }: let
-  fonts = import ./fonts {inherit pkgs lib;};
+  fonts = import ../common/fonts {inherit pkgs lib dotfiles-assets;};
 in {
   # TODO: Add litra-autotoggle as a service to systemd
 
@@ -97,8 +98,10 @@ in {
     kdePackages.konsole
     kdePackages.spectacle
     kdotool
+  ];
 
-    # Fonts
+  # Fonts
+  fonts.packages = with pkgs; [
     fonts.berkeley-mono-nerd-font
   ];
 
