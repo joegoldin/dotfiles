@@ -331,9 +331,9 @@
     # Custom hotkeys
     hotkeys.commands = {
       "launch-konsole" = {
-        name = "Launch Kitty";
+        name = "Launch Ghostty";
         key = "Meta+Return";
-        command = "kitty";
+        command = "ghostty";
       };
       "launch-browser" = {
         name = "Launch Firefox";
