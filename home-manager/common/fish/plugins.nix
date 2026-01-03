@@ -11,6 +11,15 @@
       };
     }
     {
+      name = "fish-ai";
+      src = pkgs.fetchFromGitHub {
+        owner = "realiserad";
+        repo = "fish-ai";
+        rev = "0193ac2f30a01939bb221ba6830bbea0e3271a3c";
+        hash = "sha256-AQ5RbpnnSuX7z8kMrrjgHhS4StARu2BJVWz3V+RvQvo=";
+      };
+    }
+    {
       name = "z";
       src = z.src;
     } # jethrokuan/z
