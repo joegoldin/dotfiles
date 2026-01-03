@@ -13,10 +13,10 @@
     {
       name = "fish-ai";
       src = pkgs.fetchFromGitHub {
-        owner = "realiserad";
+        owner = "joegoldin";
         repo = "fish-ai";
-        rev = "0193ac2f30a01939bb221ba6830bbea0e3271a3c";
-        hash = "sha256-AQ5RbpnnSuX7z8kMrrjgHhS4StARu2BJVWz3V+RvQvo=";
+        rev = "4b39b8aa04341322d3f9a1c11a14ca5800b71d28";
+        hash = "sha256-E3/uRDNwn3tlXaUBKCGdPaWh93QNxF3cjZxplzYAgIo=";
       };
     }
     {
