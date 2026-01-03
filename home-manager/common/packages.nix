@@ -10,6 +10,7 @@
   pythonModule = import ./python {inherit pkgs lib unstable;};
   appImagePackages = import ./appimages.nix {inherit pkgs;};
   cargoModule = import ./cargo.nix {inherit pkgs lib;};
+  goModule = import ./go.nix {inherit pkgs lib;};
 
   # System-specific package sets
   nixosPackages = with pkgs;
@@ -63,6 +64,7 @@
       cachix
       caddy
       unstable.claude-code
+      goModule.packages.claude-squad
       clojure
       comma
       coreutils
