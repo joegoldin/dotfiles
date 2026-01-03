@@ -36,7 +36,6 @@
       unstable.tailscale
       ungoogled-chromium
       vlc
-      unstable.waveterm
       unstable.zoom-us
     ]
     ++ appImagePackages;
