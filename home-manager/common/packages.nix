@@ -49,6 +49,7 @@
   wslPackages = with pkgs; [
     openssl
     openssl.dev
+    wsl-open
   ];
 
   # Common packages for all systems
@@ -135,6 +136,7 @@
       watch
       wget
       which
+      xdg-utils
       xz
       unstable.yarn-berry_3
       yq-go # yaml processer https://github.com/mikefarah/yq
