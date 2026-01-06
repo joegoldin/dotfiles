@@ -6,16 +6,16 @@
   packages = {
     claude-squad = pkgs.buildGoModule rec {
       pname = "claude-squad";
-      version = "1.0.14";
+      version = "1.0.15-joe";
 
       src = pkgs.fetchFromGitHub {
-        owner = "smtg-ai";
+        owner = "joegoldin";
         repo = "claude-squad";
         rev = "v${version}";
-        hash = "sha256-zh4vhZMtKbNT3MxNr18Q/3XC0AecFf5tOYIRT1aFk38=";
+        hash = "sha256-/X12CBL0yCSvGrueZ2fnFOdLRVXKx2bqjsQhdevvmUM=";
       };
 
-      vendorHash = "sha256-BduH6Vu+p5iFe1N5svZRsb9QuFlhf7usBjMsOtRn2nQ=";
+      vendorHash = "sha256-/mRyrcbQJpvX1aQttWSsRygcXqZCjJP0iIv9TWji8C8=";
 
       # Tests require git in PATH and a full git environment
       doCheck = false;
@@ -30,8 +30,8 @@
 
       meta = with lib; {
         description = "Manage multiple AI terminal agents like Claude Code, Aider, Codex across separate workspaces";
-        homepage = "https://github.com/smtg-ai/claude-squad";
-        license = licenses.mit;
+        homepage = "https://github.com/joegoldin/claude-squad";
+        license = licenses.agpl3Only;
         mainProgram = "claude-squad";
       };
     };
