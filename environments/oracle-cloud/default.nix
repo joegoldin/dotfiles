@@ -15,5 +15,6 @@
     ./disk-config.nix
     ./hardware-configuration.nix
     ./oracle-cloud.nix
+    ./pelican.nix
   ];
 }

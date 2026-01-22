@@ -20,6 +20,9 @@
     tunnels = {
       "dd9aada3-d855-47fd-b782-f5314c2bb81e" = {
         credentialsFile = config.age.secrets.cf.path;
+        ingress = {
+          "REDACTED_DOMAIN" = "http://localhost:80";
+        };
         default = "http_status:404";
       };
     };

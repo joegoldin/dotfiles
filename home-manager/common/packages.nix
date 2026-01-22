@@ -18,6 +18,7 @@
     lib.optionals (pkgs.stdenv.hostPlatform.isx86_64) [
       # affinity-nix.packages.x86_64-linux.photo
       # unstable.android-studio-full
+      goModule.packages.claude-squad
       unstable.cloudflared
       # nix-ai-tools.packages.x86_64-linux.codex # disabled after s1ngularity attack
       #      unstable.davinci-resolve
@@ -66,7 +67,6 @@
       cachix
       caddy
       unstable.claude-code
-      goModule.packages.claude-squad
       clojure
       comma
       coreutils

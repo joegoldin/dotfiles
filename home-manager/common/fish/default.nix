@@ -15,9 +15,11 @@
 
   programs.atuin = import ./atuin.nix {inherit pkgs config;};
 
-  home.activation.fishAiPostInstall = lib.hm.dag.entryAfter ["installPackages"] ''
-    export PATH="${lib.makeBinPath [pkgs.python3 pkgs.grc pkgs.git pkgs.uv]}:$PATH"
-    echo "Running fish-ai installation..."
-    run ${pkgs.fish}/bin/fish -c '_fish_ai_install'
-  '';
+  home.activation.fishAiPostInstall = lib.mkIf (pkgs.stdenv.hostPlatform.system == "x86_64-linux") (
+    lib.hm.dag.entryAfter ["installPackages"] ''
+      export PATH="${lib.makeBinPath [pkgs.python3 pkgs.grc pkgs.git pkgs.uv]}:$PATH"
+      echo "Running fish-ai installation..."
+      run ${pkgs.fish}/bin/fish -c '_fish_ai_install'
+    ''
+  );
 }
