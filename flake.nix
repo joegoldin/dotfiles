@@ -150,6 +150,11 @@
       url = "git+file:assets";
       flake = false;
     };
+    # pelican panel (game server management)
+    pelican = {
+      url = "github:Hythera/nix-pelican";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   nixConfig = {
@@ -196,6 +201,7 @@
     lanzaboote,
     nix-ai-tools,
     dotfiles-assets,
+    pelican,
     ...
   } @ inputs: let
     inherit (self) outputs;
@@ -280,6 +286,8 @@
           };
         modules = [
           disko.nixosModules.disko
+          pelican.nixosModules.default
+          {nixpkgs.overlays = [pelican.overlays.default];}
           # > Our main nixos configuration <
           ./environments/oracle-cloud
           home-manager.nixosModules.home-manager
