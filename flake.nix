@@ -152,7 +152,7 @@
     };
     # pelican panel (game server management)
     pelican = {
-      url = "github:Hythera/nix-pelican";
+      url = "github:joegoldin/nix-pelican";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
