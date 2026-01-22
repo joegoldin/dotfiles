@@ -49,6 +49,11 @@
   # Docker is required for Wings
   virtualisation.docker.enable = true;
 
+  # Open firewall ports for Wings API, SFTP, and game servers
+  networking.firewall.allowedTCPPorts = [8080 2022];
+  networking.firewall.allowedTCPPortRanges = [{from = 25565; to = 25665;}];
+  networking.firewall.allowedUDPPortRanges = [{from = 25565; to = 25665;}];
+
   # Ensure pelican directories exist
   system.activationScripts.pelicanDirs = ''
     mkdir -p /home/joe/pelican-mounts
