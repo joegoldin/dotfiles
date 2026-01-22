@@ -150,6 +150,16 @@
       url = "git+file:assets";
       flake = false;
     };
+    # superpowers (Claude Code skills)
+    superpowers = {
+      url = "github:obra/superpowers";
+      flake = false;
+    };
+    # claude-nix (Claude Code configuration library)
+    claude-nix = {
+      url = "github:joegoldin/claude-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # pelican panel (game server management)
     pelican = {
       url = "github:joegoldin/nix-pelican";
@@ -201,6 +211,8 @@
     lanzaboote,
     nix-ai-tools,
     dotfiles-assets,
+    superpowers,
+    claude-nix,
     pelican,
     ...
   } @ inputs: let
