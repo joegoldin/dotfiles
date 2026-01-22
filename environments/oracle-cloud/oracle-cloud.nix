@@ -22,6 +22,7 @@
         credentialsFile = config.age.secrets.cf.path;
         ingress = {
           "REDACTED_DOMAIN" = "http://localhost:80";
+          "REDACTED_DOMAIN" = "http://localhost:8080";
         };
         default = "http_status:404";
       };
