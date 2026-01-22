@@ -42,17 +42,19 @@
     allowedMounts = ["/home/joe/pelican-mounts"];
     system.sftp = {
       host = "0.0.0.0";
-      port = 2023;
+      port = 2022;
     };
   };
 
   # Docker is required for Wings
   virtualisation.docker.enable = true;
 
-  # Ensure pelican mounts directory exists
-  system.activationScripts.pelicanMounts = ''
+  # Ensure pelican directories exist
+  system.activationScripts.pelicanDirs = ''
     mkdir -p /home/joe/pelican-mounts
     chown joe:users /home/joe/pelican-mounts
+    mkdir -p /etc/pelican
+    chown pelican-wings:pelican-wings /etc/pelican
   '';
 
   # Secrets for Pelican (create these with agenix)
