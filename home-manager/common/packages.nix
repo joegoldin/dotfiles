@@ -66,7 +66,7 @@
       bun
       cachix
       caddy
-      unstable.claude-code
+      # claude-code is provided by ./claude module with plugins
       clojure
       comma
       coreutils
