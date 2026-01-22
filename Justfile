@@ -119,7 +119,7 @@ build-wsl fast='':
 [private]
 build-wsl-fast:
   @echo "🔨  Building Nix config for WSL 🪟 (fast mode)"
-  @sudo nixos-rebuild --flake .#joe-wsl switch --show-trace
+  @sudo nixos-rebuild --flake .#joe-wsl switch
   @echo "✅  Built for WSL!"
 
 [private]

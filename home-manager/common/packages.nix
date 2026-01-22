@@ -11,6 +11,7 @@
   appImagePackages = import ./appimages.nix {inherit pkgs;};
   cargoModule = import ./cargo.nix {inherit pkgs lib;};
   goModule = import ./go.nix {inherit pkgs lib;};
+  spritesModule = import ./sprites.nix {inherit pkgs lib;};
 
   # System-specific package sets
   nixosPackages = with pkgs;
@@ -124,6 +125,7 @@
       ripgrep # recursively searches directories for a regex pattern
       # rustup
       socat # replacement of openbsd-netcat
+      spritesModule.packages.sprite
       stripe-cli
       tesseract
       tmux
