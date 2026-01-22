@@ -1,4 +1,9 @@
 # Pelican Panel and Wings configuration
+#
+# Create admin user:
+#   cd /var/lib/pelican-panel
+#   nix-shell -p php --run "sudo -u pelican-panel php /nix/store/*pelican-panel*/artisan p:user:make"
+#
 {
   config,
   lib,
@@ -7,6 +12,12 @@
 }: {
   # Fix missing group for redis
   users.groups.redis-pelican-panel = {};
+
+  # Ensure pelican services wait for agenix secrets
+  systemd.services.pelican-panel-setup.after = ["agenix.service"];
+  systemd.services.pelican-panel-setup.wants = ["agenix.service"];
+  systemd.services.pelican-wings-setup.after = ["agenix.service"];
+  systemd.services.pelican-wings-setup.wants = ["agenix.service"];
 
   # PANEL - Game server management web interface
   services.pelican.panel = {
@@ -42,23 +53,23 @@
   age.secrets = {
     pelican-app-key = {
       file = ../../secrets/pelican-app-key.age;
-      mode = "400";
+      mode = "0644";
     };
     pelican-db-password = {
       file = ../../secrets/pelican-db-password.age;
-      mode = "400";
+      mode = "0644";
     };
     pelican-redis-password = {
       file = ../../secrets/pelican-redis-password.age;
-      mode = "400";
+      mode = "0644";
     };
     pelican-token-id = {
       file = ../../secrets/pelican-token-id.age;
-      mode = "400";
+      mode = "0644";
     };
     pelican-token = {
       file = ../../secrets/pelican-token.age;
-      mode = "400";
+      mode = "0644";
     };
   };
 }
