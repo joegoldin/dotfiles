@@ -9,7 +9,7 @@
   sources = {
     x86_64-linux = {
       url = "https://sprites-binaries.t3.storage.dev/client/v${version}/sprite-linux-amd64.tar.gz";
-      hash = "sha256-4AVjv/ZWM4QYmOJFz9/ky1w3cO9Vc93TqrRWhrZ1F84=";
+      hash = "sha256-4AVjv/ZWM4QYmOJFz9/ky1w3cO9Vc93Tq0Voa2dRfP4=";
     };
     aarch64-linux = {
       url = "https://sprites-binaries.t3.storage.dev/client/v${version}/sprite-linux-arm64.tar.gz";
