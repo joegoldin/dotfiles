@@ -34,16 +34,26 @@
   # WINGS - Game server daemon (runs containers)
   services.pelican.wings = {
     enable = true;
-    openFirewall = true;
+    openFirewall = true; # Opens API (8080) and SFTP (2022) ports
     uuid = "dab990d7-ea48-498a-846c-d4afe46cee1e";
     remote = "https://REDACTED_DOMAIN";
     tokenIdFile = config.age.secrets.pelican-token-id.path;
     tokenFile = config.age.secrets.pelican-token.path;
     allowedMounts = ["/home/joe/pelican-mounts"];
+    system.sftp = {
+      host = "0.0.0.0";
+      port = 2023;
+    };
   };
 
   # Docker is required for Wings
   virtualisation.docker.enable = true;
+
+  # Ensure pelican mounts directory exists
+  system.activationScripts.pelicanMounts = ''
+    mkdir -p /home/joe/pelican-mounts
+    chown joe:users /home/joe/pelican-mounts
+  '';
 
   # Secrets for Pelican (create these with agenix)
   # Generate secrets:
