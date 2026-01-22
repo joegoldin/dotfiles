@@ -22,6 +22,7 @@
         credentialsFile = config.age.secrets.cf.path;
         ingress = {
           "pelican.turnin.quest" = "http://localhost:80";
+          "wings.turnin.quest" = "http://localhost:8080";
         };
         default = "http_status:404";
       };
