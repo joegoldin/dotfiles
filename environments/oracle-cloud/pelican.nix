@@ -35,7 +35,7 @@
   services.pelican.wings = {
     enable = true;
     openFirewall = true;
-    uuid = "your-node-uuid"; # TODO: Get this from the panel after creating a node
+    uuid = "dab990d7-ea48-498a-846c-d4afe46cee1e";
     remote = "https://REDACTED_DOMAIN";
     tokenIdFile = config.age.secrets.pelican-token-id.path;
     tokenFile = config.age.secrets.pelican-token.path;
