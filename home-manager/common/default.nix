@@ -27,6 +27,7 @@
     ./git.nix
     ./ghostty.nix
     ./starship.nix
+    ./claude
   ];
 
   # Enable home-manager
