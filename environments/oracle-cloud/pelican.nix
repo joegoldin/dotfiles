@@ -39,6 +39,7 @@
     remote = "https://pelican.turnin.quest";
     tokenIdFile = config.age.secrets.pelican-token-id.path;
     tokenFile = config.age.secrets.pelican-token.path;
+    allowedMounts = ["/home/joe/pelican-mounts"];
   };
 
   # Docker is required for Wings
