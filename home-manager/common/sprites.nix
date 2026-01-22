@@ -13,7 +13,7 @@
     };
     aarch64-linux = {
       url = "https://sprites-binaries.t3.storage.dev/client/v${version}/sprite-linux-arm64.tar.gz";
-      hash = "sha256-PECd9HjRFNLMfVBEvNZhyU1JsRdwOY2hoZo53KrhB30=";
+      hash = "sha256-PECd9HjRFNLMfVBEvNZhyU1JsRdwOY2hmaOdyq4Qd9Y=";
     };
     x86_64-darwin = {
       url = "https://sprites-binaries.t3.storage.dev/client/v${version}/sprite-darwin-amd64.tar.gz";
