@@ -9,4 +9,9 @@ in {
   "raspi-printer-wlan.age".publicKeys = users;
   "atuin_session.age".publicKeys = users;
   "atuin_key.age".publicKeys = users;
+  "pelican-app-key.age".publicKeys = users ++ systems;
+  "pelican-db-password.age".publicKeys = users ++ systems;
+  "pelican-redis-password.age".publicKeys = users ++ systems;
+  "pelican-token-id.age".publicKeys = users ++ systems;
+  "pelican-token.age".publicKeys = users ++ systems;
 }
