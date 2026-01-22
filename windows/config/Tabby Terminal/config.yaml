@@ -1,0 +1,459 @@
+version: 7
+profiles:
+  - type: local
+    name: CMD
+    icon: >-
+      <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+      class="svg-inline--fa fa-windows fa-w-14 fa-2x" data-icon="windows"
+      data-prefix="fab" focusable="false" role="img" viewBox="0 0 448 512"><path
+      fill="#0ff" stroke="none" stroke-width="1" d="M0
+      93.7l183.6-25.3v177.4H0V93.7zm0 324.6l183.6 25.3V268.4H0v149.9zm203.8
+      28L448 480V268.4H203.8v177.9zm0-380.6v180.1H448V32L203.8
+      65.7z"></path></svg>
+    options:
+      command: cmd.exe
+      args:
+        - /k
+        - >-
+          C:\Users\Joe\AppData\Local\Programs\Tabby\resources\extras\clink\clink_x64.exe
+        - inject
+      env:
+        WT_SESSION: '0'
+    id: local:custom:CMD:5eef8382-1e0c-460f-9b9f-e9bc8aa80c87
+    group: db64a582-d8cd-4037-80f2-3914061af592
+  - type: local
+    name: Git Bash
+    icon: >-
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 113.925
+      113.923"><defs><clipPath id="aaaaaaaa"><path d="M0
+      0h2183.73v912H0V0z"></path></clipPath><clipPath id="bbbbbbbb"><path
+      d="M230.892 51.977L181.15 2.238a7.336 7.336 0 00-10.375 0l-10.328 10.33
+      13.102 13.102c3.046-1.028 6.537-.339 8.964 2.089a8.72 8.72 0 012.07
+      9.02l12.627 12.627c3.055-1.053 6.58-.373 9.02 2.07a8.727 8.727 0 010
+      12.346 8.729 8.729 0 01-12.349 0 8.734 8.734 0 01-1.9-9.494L180.204
+      42.55v30.99a8.806 8.806 0 012.309 1.652c3.41 3.409 3.41 8.933 0
+      12.347-3.411 3.41-8.938 3.41-12.346 0-3.41-3.414-3.41-8.938 0-12.347a8.735
+      8.735 0 012.859-1.905V42.009a8.636 8.636 0 01-2.859-1.905 8.728 8.728 0
+      01-1.88-9.544L155.37 17.642l-34.106 34.105a7.339 7.339 0 000 10.378l49.742
+      49.74a7.338 7.338 0 0010.376 0l49.509-49.51a7.341 7.341 0 000-10.378"
+      fill="#f03c2e"></path></clipPath></defs><g transform="translate(-119.116
+      -.075)" clip-path="url(#bbbbbbbb)"><path
+      d="M230.435-10.813l-49.742-49.739a7.336 7.336 0 00-10.374 0l-49.51
+      49.51a7.339 7.339 0 000 10.378l49.741 49.738a7.338 7.338 0 0010.376
+      0l49.51-49.508a7.341 7.341 0 000-10.379" fill="#ff8080"></path><path
+      d="M293.393 51.928L243.65 2.188a7.336 7.336 0 00-10.375 0c-16.502
+      16.505-33.006 33.007-49.51 49.51a7.339 7.339 0 000 10.378l49.742
+      49.739a7.338 7.338 0 0010.376 0l49.509-49.509a7.341 7.341 0 000-10.378"
+      fill="#8dd35f"></path><path d="M167.436 51.52L117.693 1.783a7.336 7.336 0
+      00-10.374 0l-49.51 49.509a7.339 7.339 0 000 10.378l49.741 49.74a7.338
+      7.338 0 0010.376-.001l49.51-49.508a7.341 7.341 0 000-10.38"
+      fill="#80b3ff"></path><path d="M230.13 114.117l-49.743-49.739a7.336 7.336
+      0 00-10.374 0l-49.51 49.51a7.339 7.339 0 000 10.378l49.741 49.738a7.338
+      7.338 0 0010.376 0l49.51-49.508a7.341 7.341 0 000-10.379"
+      fill="#ffe680"></path></g></svg>
+    options:
+      command: C:\Program Files\Git\bin\bash.exe
+      args:
+        - '--login'
+        - '-i'
+      env:
+        WT_SESSION: 0
+    id: local:custom:Git-Bash:bcbe2859-7678-4924-8d27-39df41bd24bc
+    group: db64a582-d8cd-4037-80f2-3914061af592
+  - type: local
+    name: NixOS
+    icon: >-
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><path
+      fill="#7EBAE4" d="M50.732 43.771L20.525 96.428l-7.052-12.033
+      8.14-14.103-16.167-.042L2 64.237l3.519-6.15 23.013.073 8.27-14.352
+      13.93-.037zm2.318 42.094l60.409.003-6.827 12.164-16.205-.045 8.047
+      14.115-3.45
+      6.01-7.05.008-11.445-20.097-16.483-.034-6.996-12.124zm35.16-23.074l-30.202-52.66L71.888
+      10l8.063 14.148 8.12-14.072 6.897.002 3.532 6.143-11.57 20.024 8.213
+      14.386-6.933 12.16z" clip-rule="evenodd" fill-rule="evenodd"/><path
+      fill="#5277C3" d="M39.831 65.463l30.202 52.66-13.88.131-8.063-14.148-8.12
+      14.072-6.897-.002-3.532-6.143 11.57-20.024-8.213-14.386
+      6.933-12.16zm35.08-23.207l-60.409-.003L21.33 30.09l16.204.045-8.047-14.115
+      3.45-6.01 7.051-.01 11.444 20.097 16.484.034 6.996 12.124zm2.357
+      42.216l30.207-52.658 7.052 12.034-8.141 14.102 16.168.043L126
+      64.006l-3.519 6.15-23.013-.073-8.27 14.352-13.93.037z" clip-rule="evenodd"
+      fill-rule="evenodd"/></svg>
+    options:
+      command: C:\Windows\system32\wsl.exe
+      args:
+        - '~'
+        - '-d'
+        - NixOS
+      env:
+        TERM: xterm-color
+        COLORTERM: truecolor
+      cwd: ''
+    id: local:custom:NixOS:c9afa5f7-5ee7-45a1-a706-5f57b6d2650a
+    group: 4ee75ac4-3b00-40e4-9bee-94d5ecb61892
+  - type: local
+    name: PowerShell
+    icon: >-
+      <svg viewBox="0 0 120 90.001"
+      xmlns="http://www.w3.org/2000/svg"><linearGradient id="1652546273"
+      x1="95.267" x2="26.7" y1="91.926" y2="30.68"
+      gradientTransform="translate(-4.002 -19)"
+      gradientUnits="userSpaceOnUse"><stop stop-color="#A9C8FF"
+      offset="0"></stop><stop stop-color="#C7E6FF"
+      offset="1"></stop></linearGradient><path d="M5.03 90c-1.632
+      0-3.045-.638-3.977-1.798-.952-1.185-1.28-2.814-.896-4.47L18.143
+      5.821C18.897 2.557 22.06 0 25.347 0h89.623c1.634 0 3.047.638 3.978
+      1.798.952 1.184 1.279 2.814.896 4.47l-17.986 77.911c-.753 3.264-3.917
+      5.822-7.203 5.822H5.03z" clip-rule="evenodd" fill="url(#1652546273)"
+      fill-rule="evenodd" opacity=".8"></path><g transform="translate(-4.002
+      -19)"><linearGradient id="1652546298" x1="26.585" x2="93.585" y1="30.778"
+      y2="90.278" gradientUnits="userSpaceOnUse"><stop stop-color="#2D4664"
+      offset="0"></stop><stop stop-color="#29405B" offset=".169"></stop><stop
+      stop-color="#1E2F43" offset=".445"></stop><stop stop-color="#0C131B"
+      offset=".79"></stop><stop offset="1"></stop></linearGradient><path
+      d="M118.5 20H29.634c-2.769 0-5.53 2.259-6.168 5.045l-17.834 77.91C4.995
+      105.742 6.722 108 9.491 108h88.865c2.769 0 5.53-2.258
+      6.168-5.045l17.834-77.911c.638-2.785-1.09-5.044-3.858-5.044z"
+      clip-rule="evenodd" fill="url(#1652546298)"
+      fill-rule="evenodd"></path></g><g clip-rule="evenodd"
+      fill-rule="evenodd"><path d="M60.163 68.558h21.613c2.513 0 4.55 2.125 4.55
+      4.746s-2.037 4.747-4.55 4.747H60.163c-2.513 0-4.55-2.125-4.55-4.747
+      0-2.621 2.037-4.746 4.55-4.746zM74.182 47.455c-.372.749-1.144 1.575-2.509
+      2.534L31.56 78.798c-2.19 1.591-5.334
+      1.001-7.021-1.319s-1.28-5.49.91-7.082l36.173-26.194v-.538L38.894
+      19.487c-1.854-1.972-1.661-5.161.431-7.124 2.092-1.962 5.29-1.954
+      7.144.018L73.74 41.393c1.548 1.647 1.663 4.141.442 6.062z"
+      fill="#2c5591"></path><path d="M73.182 46.455c-.372.749-1.144 1.575-2.509
+      2.534L30.56 77.798c-2.19 1.591-5.334
+      1.001-7.021-1.319s-1.28-5.49.91-7.082l36.173-26.194v-.538L37.894
+      18.487c-1.854-1.972-1.661-5.161.431-7.124 2.092-1.962 5.29-1.954
+      7.144.018L72.74 40.393c1.548 1.647 1.663 4.141.442 6.062zM59.548
+      68h21.613c2.513 0 4.55 2.015 4.55 4.5s-2.037 4.5-4.55 4.5H59.548c-2.513
+      0-4.55-2.015-4.55-4.5s2.037-4.5 4.55-4.5z" fill="#fff"></path></g></svg>
+    options:
+      command: C:\Program Files\PowerShell\7\pwsh.exe
+      args:
+        - '-nologo'
+      env:
+        WT_SESSION: 0
+    id: local:custom:PowerShell:2c80c1bf-ba70-4b3e-bfdb-e8636d28a99e
+    group: db64a582-d8cd-4037-80f2-3914061af592
+  - type: local
+    name: Ubuntu 24.04
+    icon: >-
+      <?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo,
+      www.svgrepo.com, Generator: SVG Repo Mixer Tools --> <svg width="800px"
+      height="800px" viewBox="0 0 32 32" fill="none"
+      xmlns="http://www.w3.org/2000/svg"> <path d="M30 16C30 23.728 23.735 30 16
+      30C8.265 30 2 23.728 2 16C2 8.265 8.265 2 16 2C23.735 2 30 8.265 30 16Z"
+      fill="#E95420"/> <path d="M6.82154 14.1563C5.81185 14.1563 5 14.9865 5
+      16.0035C5 17.0205 5.81867 17.8507 6.82154 17.8507C7.82442 17.8507 8.64309
+      17.0205 8.64309 16.0035C8.64309 14.9795 7.82442 14.1563 6.82154
+      14.1563ZM19.8316 22.5482C18.9583 23.0602 18.665 24.1879 19.163
+      25.0734C19.6679 25.959 20.7799 26.2634 21.6531 25.7514C22.5264 25.2395
+      22.8197 24.1118 22.3217 23.2262C21.8101 22.3476 20.698 22.0432 19.8316
+      22.5482ZM10.7785 16.0035C10.7785 14.177 11.6722 12.565 13.0434
+      11.5896L11.7131 9.32725C10.1167 10.4065 8.93645 12.06 8.43842
+      13.9902C9.01149 14.4676 9.37989 15.194 9.37989 16.0035C9.37989 16.8129
+      9.01149 17.5393 8.43842 18.0167C8.92962 19.9469 10.1167 21.6004 11.7131
+      22.6797L13.0434 20.4174C11.6722 19.4419 10.7785 17.8299 10.7785
+      16.0035ZM16.0998 10.6071C18.8833 10.6071 21.1619 12.7657 21.4007
+      15.5261L24 15.4846C23.8704 13.4506 22.9971 11.6241 21.6463 10.282C20.9504
+      10.5449 20.1522 10.5034 19.4632 10.1021C18.7673 9.69393 18.3375 9.01593
+      18.2147 8.26875C17.5393 8.08195 16.8298 7.97817 16.0998 7.97817C14.8377
+      7.97817 13.6506 8.27566 12.5932 8.80838L13.8621 11.1053C14.5375 10.787
+      15.3016 10.6071 16.0998 10.6071ZM16.0998 21.3998C15.3016 21.3998 14.5375
+      21.2199 13.8553 20.9017L12.5864 23.1985C13.6438 23.7313 14.8377 24.0287
+      16.093 24.0287C16.823 24.0287 17.5325 23.925 18.2079 23.7382C18.3239
+      22.9979 18.7605 22.313 19.4564 21.9048C20.1454 21.4966 20.9504 21.462
+      21.6395 21.7249C22.9835 20.3828 23.8636 18.5563 23.9932 16.5223L21.3939
+      16.4808C21.1619 19.2343 18.8833 21.3998 16.0998 21.3998ZM19.8248
+      9.45178C20.698 9.96374 21.8101 9.65933 22.3149 8.77378C22.8197 7.88824
+      22.5196 6.76054 21.6463 6.24859C20.7731 5.73663 19.661 6.04104 19.1562
+      6.92659C18.6582 7.81213 18.9583 8.93983 19.8248 9.45178Z" fill="white"/>
+      </svg>
+    options:
+      command: C:\Windows\system32\wsl.exe
+      args:
+        - '~'
+        - '-d'
+        - Ubuntu-24.04
+      env:
+        TERM: xterm-color
+        COLORTERM: truecolor
+      cwd: ''
+    id: local:custom:Ubuntu-24.04:18b09d6e-3bd5-40bc-8197-79acf661b3ca
+    group: 4ee75ac4-3b00-40e4-9bee-94d5ecb61892
+groups:
+  - id: 4ee75ac4-3b00-40e4-9bee-94d5ecb61892
+    name: WSL
+  - id: db64a582-d8cd-4037-80f2-3914061af592
+    name: Windows
+configSync:
+  parts: {}
+hotkeys:
+  toggle-window: []
+  copy-current-path: []
+  ctrl-c:
+    - Ctrl-C
+  copy:
+    - Ctrl-Shift-C
+  paste:
+    - Ctrl-Shift-V
+    - Shift-Insert
+  select-all:
+    - Ctrl-Shift-A
+  clear: []
+  zoom-in:
+    - Ctrl-=
+    - Ctrl-Shift-=
+  zoom-out:
+    - Ctrl--
+    - Ctrl-Shift--
+  reset-zoom:
+    - Ctrl-0
+  home:
+    - Home
+  end:
+    - End
+  previous-word:
+    - Ctrl-Left
+  next-word:
+    - Ctrl-Right
+  delete-previous-word:
+    - Ctrl-Backspace
+  delete-line:
+    - Ctrl-Shift-Backspace
+  delete-next-word:
+    - Ctrl-Delete
+  search:
+    - Ctrl-Shift-F
+  pane-focus-all:
+    - Ctrl-Shift-I
+  focus-all-tabs:
+    - Ctrl-Alt-Shift-I
+  scroll-to-top:
+    - Ctrl-PageUp
+  scroll-page-up:
+    - Alt-PageUp
+  scroll-up:
+    - Ctrl-Shift-Up
+  scroll-down:
+    - Ctrl-Shift-Down
+  scroll-page-down:
+    - Alt-PageDown
+  scroll-to-bottom:
+    - Ctrl-PageDown
+  restart-telnet-session: []
+  restart-ssh-session: []
+  launch-winscp: []
+  settings-tab: {}
+  settings:
+    - Ctrl-,
+  serial:
+    - Alt-K
+  restart-serial-session: []
+  new-tab:
+    - Ctrl-Shift-T
+  new-window:
+    - Ctrl-Shift-N
+  profile: {}
+  profile-selectors: {}
+  group-selectors: {}
+  toggle-fullscreen:
+    - F11
+    - Alt-Enter
+  close-tab:
+    - Ctrl-Shift-W
+  reopen-tab:
+    - Ctrl-Shift-Z
+  toggle-last-tab: []
+  rename-tab:
+    - Ctrl-Shift-R
+  next-tab:
+    - Ctrl-Shift-Right
+    - Ctrl-Tab
+  previous-tab:
+    - Ctrl-Shift-Left
+    - Ctrl-Shift-Tab
+  move-tab-left:
+    - Ctrl-Shift-PageUp
+  move-tab-right:
+    - Ctrl-Shift-PageDown
+  rearrange-panes:
+    - Ctrl-Shift
+  duplicate-tab: []
+  restart-tab: []
+  reconnect-tab: []
+  disconnect-tab: []
+  explode-tab:
+    - Ctrl-Shift-.
+  combine-tabs:
+    - Ctrl-Shift-,
+  tab-1:
+    - Alt-1
+  tab-2:
+    - Alt-2
+  tab-3:
+    - Alt-3
+  tab-4:
+    - Alt-4
+  tab-5:
+    - Alt-5
+  tab-6:
+    - Alt-6
+  tab-7:
+    - Alt-7
+  tab-8:
+    - Alt-8
+  tab-9:
+    - Alt-9
+  tab-10:
+    - Alt-0
+  tab-11: []
+  tab-12: []
+  tab-13: []
+  tab-14: []
+  tab-15: []
+  tab-16: []
+  tab-17: []
+  tab-18: []
+  tab-19: []
+  tab-20: []
+  split-right:
+    - Ctrl-Shift-S
+  split-bottom:
+    - Ctrl-Shift-D
+  split-left: []
+  split-top: []
+  pane-nav-right:
+    - Ctrl-Alt-Right
+  pane-nav-down:
+    - Ctrl-Alt-Down
+  pane-nav-up:
+    - Ctrl-Alt-Up
+  pane-nav-left:
+    - Ctrl-Alt-Left
+  pane-nav-previous:
+    - Ctrl-Alt-[
+  pane-nav-next:
+    - Ctrl-Alt-]
+  pane-nav-1: []
+  pane-nav-2: []
+  pane-nav-3: []
+  pane-nav-4: []
+  pane-nav-5: []
+  pane-nav-6: []
+  pane-nav-7: []
+  pane-nav-8: []
+  pane-nav-9: []
+  pane-maximize:
+    - Ctrl-Alt-Enter
+  close-pane: []
+  pane-increase-vertical: []
+  pane-decrease-vertical: []
+  pane-increase-horizontal: []
+  pane-decrease-horizontal: []
+  switch-profile:
+    - Ctrl-Alt-T
+  profile-selector:
+    - Ctrl-Shift-E
+  command-selector:
+    - Ctrl-Shift-P
+terminal:
+  searchOptions: {}
+  colorScheme:
+    name: Gruvbox Dark
+    foreground: '#e6d4a3'
+    background: '#1e1e1e'
+    cursor: '#bbbbbb'
+    colors:
+      - '#161819'
+      - '#f73028'
+      - '#aab01e'
+      - '#f7b125'
+      - '#719586'
+      - '#c77089'
+      - '#7db669'
+      - '#faefbb'
+      - '#7f7061'
+      - '#be0f17'
+      - '#868715'
+      - '#cc881a'
+      - '#377375'
+      - '#a04b73'
+      - '#578e57'
+      - '#e6d4a3'
+  font: BerkeleyMono Nerd Font Mono
+  ligatures: true
+  profile: local:custom:NixOS:c9afa5f7-5ee7-45a1-a706-5f57b6d2650a
+  customColorSchemes: []
+  scrollbackLines: 1000000
+  bell: visual
+  lightColorScheme:
+    name: Tabby Default Light
+    foreground: '#4d4d4c'
+    background: '#ffffff'
+    cursor: '#4d4d4c'
+    colors:
+      - '#000000'
+      - '#c82829'
+      - '#718c00'
+      - '#eab700'
+      - '#4271ae'
+      - '#8959a8'
+      - '#3e999f'
+      - '#ffffff'
+      - '#000000'
+      - '#c82829'
+      - '#718c00'
+      - '#eab700'
+      - '#4271ae'
+      - '#8959a8'
+      - '#3e999f'
+      - '#ffffff'
+  hideTabIndex: true
+  showTabProfileIcon: true
+  hideTabOptionsButton: true
+ssh: {}
+clickableLinks: {}
+accessibility: {}
+appearance:
+  vibrancyType: fluent
+  lastTabClosesWindow: true
+hacks: {}
+providerBlacklist: []
+commandBlacklist: []
+enableAnalytics: false
+enableWelcomeTab: false
+pluginBlacklist: []
+enableAutomaticUpdates: false
+profileDefaults:
+  ssh:
+    disableDynamicTitle: true
+profileBlacklist:
+  - socket:template
+  - serial:template
+  - serial:port-COM4
+  - serial:port-COM8
+  - serial:port-COM3
+  - serial:port-COM7
+  - telnet:template
+  - local:wsl
+  - local:wsl-docker-desktop
+  - local:msys2-clang64
+  - local:msys2-msys
+  - local:msys2-ucrt64
+  - local:default
+  - local:powershell
+  - local:cmd
+  - >-
+    openssh-config:5471c0ea1138b36ca95ec490351fc4e543031af0d4281574230542af35eb8a0c
+  - >-
+    openssh-config:d042d4f13ef03bdd4d12e4a8b2a44b93938c8540872c23f2f2d9f9ce98940938
+  - local:wsl-NixOS
+  - local:wsl-Ubuntu-2404
+  - local:msys2-mingw64
+  - local:git-bash
+  - local:powershell-core
+  - ssh:template
+  - local:clink
