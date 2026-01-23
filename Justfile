@@ -41,8 +41,14 @@ check: system-info
 [unix]
 flake-update:
   @echo "🔄  Updating flake..."
-  @nix --extra-experimental-features 'nix-command flakes' flake update
+  @nix --extra-experimental-features 'nix-command flakes' flake update --option access-tokens "github.com=$(gh auth token)"
   @echo "✅  Flake updated!"
+
+[unix]
+update-pins dry_run='':
+  @echo "🔄  Updating pinned flake inputs..."
+  @{{ if dry_run == "--dry-run" { "DRY_RUN=true" } else { "" } }} scripts/update-flake-pins.sh
+  @echo "✅  Pins updated!"
 
 [unix]
 setup-python-packages packages='':
