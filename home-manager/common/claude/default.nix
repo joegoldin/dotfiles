@@ -7,9 +7,8 @@
 }:
 
 let
-  # Get claude-nix library for current system
-  system = pkgs.stdenv.hostPlatform.system;
-  claudeLib = inputs.claude-nix.lib.${system};
+  # Get claude-nix library with unstable pkgs (for latest claude-code)
+  claudeLib = import "${inputs.claude-nix}/lib" { pkgs = pkgs.unstable; };
 
   # WSL-compatible notify-send wrapper (detects wsl-notify-send.exe at runtime)
   notifySendWrapper = pkgs.writeShellScriptBin "notify-send" ''
