@@ -21,7 +21,7 @@
     };
     aarch64-darwin = {
       url = "https://sprites-binaries.t3.storage.dev/client/v${version}/sprite-darwin-arm64.tar.gz";
-      hash = "sha256-HyEHGQF0S9BaKp80jZ8NzcwgtUFGrmbJyzcJbCJJTs8=";
+      hash = "sha256-HyEHGQF0S9BaKp80jZ8NzcwgtUFGrmycs5cJbCJJTs8=";
     };
   };
 
