@@ -33,7 +33,7 @@
       ACompanionForSwiftUI = 1485436674;
       AppleDeveloper = 640199958;
       DavinciResolve = 571213070;
-      Streamyfin = 6593660679;
+      Infuse = 1136220934;
     };
   };
 }
