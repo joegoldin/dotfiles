@@ -9,6 +9,7 @@
   username,
   homeDirectory,
   stateVersion,
+  dotfiles-assets,
   ...
 }: let
   initConfigAdditions = ''
@@ -17,9 +18,14 @@
       source ${pkgs.iterm2-terminal-integration}/bin/iterm2_shell_integration.fish
     end
   '';
+  fonts = import ../../environments/common/fonts {inherit pkgs lib dotfiles-assets;};
 in {
   imports = [
     ../common
+  ];
+
+  home.packages = with pkgs; [
+    fonts.berkeley-mono-nerd-font
   ];
 
   programs.fish.interactiveShellInit = lib.strings.concatStrings [
