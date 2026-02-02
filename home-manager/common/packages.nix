@@ -25,6 +25,7 @@
       unstable.discord
       unstable.dumbpipe
       # extraterm
+      unstable.ghostty
       inotify-tools
       # unstable.jellyfin-media-player
       #      cargoModule.packages.litra
@@ -81,7 +82,6 @@
       fzf # A command-line fuzzy finder
       gawk
       gh
-      ghostty
       git
       gitleaks
       git-stack
