@@ -374,7 +374,7 @@
               ./home-manager/darwin
             ];
           })
-          agenix.nixosModules.default
+          agenix.darwinModules.default
         ];
       };
     };
