@@ -183,6 +183,7 @@
       "sublime-merge"
       "sublime-text"
       "tomatobar"
+      "typora"
       "zed"
       "zoom"
     ];
