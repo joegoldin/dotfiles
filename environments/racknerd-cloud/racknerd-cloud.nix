@@ -15,6 +15,9 @@
   # Set your time zone.
   time.timeZone = "America/Los_Angeles";
 
+  # Enable passwordless sudo for wheel group
+  security.sudo.wheelNeedsPassword = false;
+
   programs.ssh.startAgent = true;
 
   services.tailscale.enable = true;
