@@ -161,6 +161,11 @@
       url = "github:joegoldin/nix-pelican?rev=900716d90d01a27666d65c9c112acde4c725ae9f";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # nix-rosetta-builder for fast x86_64-linux builds on Apple Silicon
+    nix-rosetta-builder = {
+      url = "github:cpick/nix-rosetta-builder?rev=ebb7162a975074fb570a2c3ac02bc543ff2e9df4";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   nixConfig = {
@@ -210,6 +215,7 @@
     superpowers,
     claude-nix,
     pelican,
+    nix-rosetta-builder,
     ...
   } @ inputs: let
     inherit (self) outputs;
@@ -319,6 +325,28 @@
         ];
       };
 
+      racknerd-cloud-agent = nixpkgs.lib.nixosSystem {
+        specialArgs =
+          commonSpecialArgs
+          // {
+            hostname = "racknerd-cloud-agent";
+          };
+        modules = [
+          disko.nixosModules.disko
+          # > Our main nixos configuration <
+          ./environments/racknerd-cloud
+          home-manager.nixosModules.home-manager
+          ({specialArgs, ...}: {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = specialArgs;
+            home-manager.backupFileExtension = "backup"; # enable moving existing files
+            home-manager.users.${specialArgs.username} = import ./home-manager/racknerd;
+          })
+          agenix.nixosModules.default
+        ];
+      };
+
       # Desktop NixOS configuration
       joe-desktop = nixpkgs.lib.nixosSystem {
         specialArgs =
@@ -364,6 +392,8 @@
           # > Our main darwin configuration <
           ./environments/darwin
           nix-homebrew.darwinModules.nix-homebrew
+          # Rosetta-based Linux builder for fast x86_64-linux builds on Apple Silicon
+          nix-rosetta-builder.darwinModules.default
           home-manager.darwinModules.home-manager
           ({specialArgs, ...}: {
             home-manager.useGlobalPkgs = true;
@@ -375,6 +405,15 @@
             ];
           })
           agenix.darwinModules.default
+          {
+            # Standard linux-builder (used for initial bootstrap, now replaced by rosetta-builder)
+            # nix.linux-builder.enable = true;
+
+            # Rosetta-based builder: faster x86_64-linux builds using Rosetta 2
+            # onDemand: VM starts only when needed and powers off when idle
+            nix-rosetta-builder.enable = true;
+            nix-rosetta-builder.onDemand = true;
+          }
         ];
       };
     };
