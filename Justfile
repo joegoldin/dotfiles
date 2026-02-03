@@ -143,6 +143,12 @@ build-bastion-fast:
   @sudo nixos-rebuild --flake .#oracle-cloud-bastion switch --show-trace
   @echo "✅  Built for NixOS on Oracle Cloud!"
 
+[unix]
+deploy-racknerd IP:
+  @echo "🚀  Deploying Nix config to RackNerd VPS..."
+  @, nixos-anywhere --flake .#racknerd-cloud-agent --build-on local joe@{{IP}}
+  @echo "✅  Deployed to RackNerd VPS!"
+
 [private]
 build-nixos fast='':
   @echo "🔨  Building Nix config for NixOS 🐧"
