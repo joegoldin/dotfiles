@@ -7,13 +7,22 @@
   username,
   ...
 }: {
+  # Caddy reverse proxy for HTTPS access to Happy Server
+  services.caddy = {
+    enable = true;
+    virtualHosts."REDACTED_DOMAIN:3006" = {
+      extraConfig = ''
+        reverse_proxy localhost:3005
+      '';
+    };
+  };
   # PostgreSQL database for happy-server
   services.postgresql = {
     enable = true;
     package = pkgs.postgresql_15;
-    # Listen on localhost and docker bridge for container access
+    # Listen on all interfaces (secured by authentication rules)
     settings = {
-      listen_addresses = lib.mkForce "127.0.0.1,172.17.0.1";
+      listen_addresses = lib.mkForce "*";
     };
     ensureDatabases = ["happy"];
     ensureUsers = [
@@ -22,9 +31,18 @@
         ensureDBOwnership = true;
       }
     ];
-    # Allow docker containers to connect
-    authentication = lib.mkAfter ''
+    # Allow docker containers to connect, deny everything else
+    authentication = lib.mkForce ''
+      # Allow local unix socket connections
+      local all all trust
+      # Allow localhost connections
+      host all all 127.0.0.1/32 trust
+      host all all ::1/128 trust
+      # Allow Docker bridge connections for happy database
       host happy happy 172.17.0.0/16 trust
+      # Deny all other connections
+      host all all 0.0.0.0/0 reject
+      host all all ::/0 reject
     '';
   };
 
@@ -45,14 +63,16 @@
         "60 10000"
       ];
       maxmemory-policy = "noeviction";
+      # Disable protected mode to allow Docker container connections
+      protected-mode = "no";
     };
   };
 
   # MinIO S3-compatible storage for happy-server
   services.minio = {
     enable = true;
-    listenAddress = "127.0.0.1:9000 172.17.0.1:9000";
-    consoleAddress = "127.0.0.1:9001";
+    listenAddress = ":9000"; # Listen on all interfaces on port 9000
+    consoleAddress = ":9001"; # Console on all interfaces on port 9001
     rootCredentialsFile = pkgs.writeText "minio-credentials" ''
       MINIO_ROOT_USER=minioadmin
       MINIO_ROOT_PASSWORD=minioadmin
@@ -65,19 +85,41 @@
     description = "Create happy bucket in MinIO";
     after = ["minio.service"];
     wantedBy = ["multi-user.target"];
+    path = with pkgs; [ coreutils glibc.bin ]; # Add getent to PATH
+    environment = {
+      HOME = "/var/lib/minio";
+      MC_CONFIG_DIR = "/var/lib/minio/.mc";
+    };
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
       ExecStart = pkgs.writeShellScript "minio-setup" ''
+        set -e
+
         # Wait for MinIO to be ready
-        until ${pkgs.curl}/bin/curl -f http://127.0.0.1:9000/minio/health/live 2>/dev/null; do
-          sleep 1
+        echo "Waiting for MinIO to be ready..."
+        for i in {1..30}; do
+          if ${pkgs.curl}/bin/curl -f http://127.0.0.1:9000/minio/health/live 2>/dev/null; then
+            break
+          fi
+          echo "Attempt $i/30: MinIO not ready yet..."
+          sleep 2
         done
 
+        # Create .mc directory
+        mkdir -p /var/lib/minio/.mc
+
         # Create bucket if it doesn't exist
+        echo "Setting up MinIO alias..."
         ${pkgs.minio-client}/bin/mc alias set local http://127.0.0.1:9000 minioadmin minioadmin
-        ${pkgs.minio-client}/bin/mc mb local/happy --ignore-existing
-        ${pkgs.minio-client}/bin/mc anonymous set download local/happy
+
+        echo "Creating bucket..."
+        ${pkgs.minio-client}/bin/mc mb local/happy --ignore-existing || true
+
+        echo "Setting bucket policy..."
+        ${pkgs.minio-client}/bin/mc anonymous set download local/happy || true
+
+        echo "MinIO setup complete!"
       '';
     };
   };
@@ -90,7 +132,8 @@
         # We'll build this image manually on the server
         image = "happy-server:latest";
         ports = [
-          "127.0.0.1:3005:3005" # Bind to localhost (accessible via Tailscale)
+          "0.0.0.0:3000:3000" # Bind to all interfaces (protected by firewall, accessible via Tailscale)
+          "0.0.0.0:3005:3005" # Bind to all interfaces (protected by firewall, accessible via Tailscale)
         ];
         environment = {
           NODE_ENV = "production";
