@@ -64,4 +64,30 @@ pkgs: {
       pluginsDir
       ;
   };
+
+  happy-cli = pkgs.buildNpmPackage rec {
+    pname = "happy-coder";
+    version = "unstable-2025-02-04";
+
+    src = pkgs.fetchFromGitHub {
+      owner = "slopus";
+      repo = "happy";
+      rev = "main";
+      sha256 = "sha256-11flg55wjmpm2b4wr4dx8yp2n6gd65h71lhrdpxrr19qncz1ijx1";
+    };
+
+    sourceRoot = "${src.name}/packages/happy-cli";
+
+    npmDepsHash = pkgs.lib.fakeSha256;
+
+    # The build script in package.json
+    npmBuildScript = "build";
+
+    meta = with pkgs.lib; {
+      description = "Mobile and Web client for Claude Code and Codex";
+      homepage = "https://github.com/slopus/happy";
+      license = licenses.mit;
+      maintainers = [];
+    };
+  };
 }

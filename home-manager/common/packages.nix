@@ -67,8 +67,9 @@
       caddy
       # claude-code is provided by ./claude module with plugins
       clojure
-      llm-agents.codex
+      codex
       comma
+      # happy-cli  # TODO: Fix npmDepsHash before enabling
       coreutils
       cowsay
       unstable.devenv
