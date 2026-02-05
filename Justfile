@@ -149,6 +149,12 @@ deploy-racknerd IP:
   @, nixos-anywhere --flake .#racknerd-cloud-agent --build-on local joe@{{IP}}
   @echo "✅  Deployed to RackNerd VPS!"
 
+[unix]
+rebuild-racknerd:
+  @echo "🔨  Rebuilding NixOS on RackNerd VPS..."
+  @sudo nixos-rebuild switch --flake .#racknerd-cloud-agent
+  @echo "✅  Rebuilt RackNerd VPS!"
+
 [private]
 build-nixos fast='':
   @echo "🔨  Building Nix config for NixOS 🐧"
