@@ -28,6 +28,10 @@ in {
     fonts.berkeley-mono-nerd-font
   ];
 
+  home.sessionVariables = {
+    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
+  };
+
   programs.fish.interactiveShellInit = lib.strings.concatStrings [
     (import ../common/fish/init.nix {inherit pkgs config;}).interactiveShellInit
     initConfigAdditions
