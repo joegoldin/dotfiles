@@ -80,21 +80,19 @@ nix-gc:
 build-macos fast='':
   @echo "🔨  Building Nix config for macOS 🍎"
   @{{ if fast != "--fast" { "just lint flake-update" } else { "echo \"🚀 Fast mode, skipping checks...\"" } }}
-  # @sudo nix --extra-experimental-features 'nix-command flakes' run nix-darwin -- switch --flake .#Joes-MacBook-Pro --show-trace
-  @sudo darwin-rebuild switch --flake .#Joes-MacBook-Pro
+  sudo darwin-rebuild switch --flake .#Joes-MacBook-Pro
   @echo "✅  Built for macOS!"
 
 [macos]
 build-macos-fast:
   @echo "🔨  Building Nix config for macOS 🍎 (fast mode)"
-  # @sudo nix --extra-experimental-features 'nix-command flakes' run nix-darwin -- switch --flake .#Joes-MacBook-Pro --show-trace
-  @sudo darwin-rebuild switch --flake .#Joes-MacBook-Pro
+  sudo darwin-rebuild switch --flake .#Joes-MacBook-Pro
   @echo "✅  Built for macOS!"
 
 [macos]
 build-macos-initial:
   @echo "🔨  Building Nix config for macOS 🍎 (fast mode)"
-  @sudo nix --extra-experimental-features 'nix-command flakes' run nix-darwin -- switch --flake .#Joes-MacBook-Pro
+  sudo nix --extra-experimental-features 'nix-command flakes' run nix-darwin -- switch --flake .#Joes-MacBook-Pro
   @echo "✅  Built for macOS!"
 
 [macos]
@@ -119,13 +117,13 @@ build-wsl fast='':
   @{{ if fast != "--fast" { "just flake-update" } else { "echo \"🚀 Fast mode, skipping checks...\"" } }}
   @{{ if fast != "--fast" { "echo \"🔍  Checking Nix config for WSL...\"" } else { "" } }}
   @{{ if fast != "--fast" { "NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 NIXPKGS_ALLOW_UNFREE=1 NIXPKGS_ALLOW_BROKEN=1 nix --extra-experimental-features 'nix-command flakes' flake check --impure --system x86_64-linux --show-trace" } else { "" } }}
-  @sudo nixos-rebuild --flake .#joe-wsl switch
+  sudo nixos-rebuild --flake .#joe-wsl switch
   @echo "✅  Built for WSL!"
 
 [private]
 build-wsl-fast:
   @echo "🔨  Building Nix config for WSL 🪟 (fast mode)"
-  @sudo nixos-rebuild --flake .#joe-wsl switch
+  sudo nixos-rebuild --flake .#joe-wsl switch
   @echo "✅  Built for WSL!"
 
 [private]
@@ -134,25 +132,25 @@ build-bastion fast='':
   @{{ if fast != "--fast" { "just lint flake-update" } else { "echo \"🚀 Fast mode, skipping checks...\"" } }}
   @{{ if fast != "--fast" { "echo \"🔍  Checking Nix config for Oracle Cloud...\"" } else { "" } }}
   @{{ if fast != "--fast" { "NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 NIXPKGS_ALLOW_UNFREE=1 NIXPKGS_ALLOW_BROKEN=1 nix --extra-experimental-features 'nix-command flakes' flake check --impure --system aarch64-linux --show-trace" } else { "" } }}
-  @sudo nixos-rebuild --flake .#oracle-cloud-bastion switch
+  sudo nixos-rebuild --flake .#oracle-cloud-bastion switch
   @echo "✅  Built for NixOS on Oracle Cloud!"
 
 [private]
 build-bastion-fast:
   @echo "🔨  Building Nix config for NixOS on Oracle Cloud 🐧 (fast mode)"
-  @sudo nixos-rebuild --flake .#oracle-cloud-bastion switch
+  sudo nixos-rebuild --flake .#oracle-cloud-bastion switch
   @echo "✅  Built for NixOS on Oracle Cloud!"
 
 [unix]
 deploy-racknerd IP:
   @echo "🚀  Deploying Nix config to RackNerd VPS..."
-  @, nixos-anywhere --flake .#racknerd-cloud-agent --build-on local joe@{{IP}}
+  , nixos-anywhere --flake .#racknerd-cloud-agent --build-on local joe@{{IP}}
   @echo "✅  Deployed to RackNerd VPS!"
 
 [unix]
 rebuild-racknerd:
   @echo "🔨  Rebuilding NixOS on RackNerd VPS..."
-  @sudo nixos-rebuild switch --flake .#racknerd-cloud-agent
+  sudo nixos-rebuild switch --flake .#racknerd-cloud-agent
   @echo "✅  Rebuilt RackNerd VPS!"
 
 [private]
@@ -161,13 +159,13 @@ build-nixos fast='':
   @{{ if fast != "--fast" { "just lint flake-update" } else { "echo \"🚀 Fast mode, skipping checks...\"" } }}
   @{{ if fast != "--fast" { "echo \"🔍  Checking Nix config for NixOS...\"" } else { "" } }}
   @{{ if fast != "--fast" { "NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 NIXPKGS_ALLOW_UNFREE=1 NIXPKGS_ALLOW_BROKEN=1 nix --extra-experimental-features 'nix-command flakes' flake check --impure --system x86_64-linux --show-trace" } else { "" } }}
-  @sudo nixos-rebuild --flake .#joe-desktop switch
+  sudo nixos-rebuild --flake .#joe-desktop switch
   @echo "✅  Built for NixOS!"
 
 [private]
 build-nixos-fast:
   @echo "🔨  Building Nix config for NixOS 🐧 (fast mode)"
-  @sudo nixos-rebuild --flake .#nixos switch
+  sudo nixos-rebuild --flake .#nixos switch
   @echo "✅  Built for NixOS!"
 
 [linux]
