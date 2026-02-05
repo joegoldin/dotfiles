@@ -7,8 +7,12 @@
 }:
 
 let
-  # Get claude-nix library with unstable pkgs (for latest claude-code)
-  claudeLib = import "${inputs.claude-nix}/lib" { pkgs = pkgs.unstable; };
+  # Get claude-nix library but override it to use claude-code from llm-agents
+  claudeLib = import "${inputs.claude-nix}/lib" {
+    pkgs = pkgs // {
+      claude-code = pkgs.claude-code;  # Override with llm-agents version
+    };
+  };
 
   # WSL-compatible notify-send wrapper (detects wsl-notify-send.exe at runtime)
   notifySendWrapper = pkgs.writeShellScriptBin "notify-send" ''
