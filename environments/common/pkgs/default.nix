@@ -65,29 +65,44 @@ pkgs: {
       ;
   };
 
-  happy-cli = pkgs.buildNpmPackage rec {
+  happy-cli = pkgs.stdenv.mkDerivation (finalAttrs: {
     pname = "happy-coder";
-    version = "unstable-2025-02-04";
+    version = "0.14.0-0";
 
     src = pkgs.fetchFromGitHub {
       owner = "slopus";
-      repo = "happy";
-      rev = "main";
-      sha256 = "sha256-11flg55wjmpm2b4wr4dx8yp2n6gd65h71lhrdpxrr19qncz1ijx1";
+      repo = "happy-cli";
+      tag = "v${finalAttrs.version}";
+      hash = "sha256-kEYgo+n1qv+jJ9GvqiwJtf6JSA2xSkLMEbvuY/b7Gdk=";
     };
 
-    sourceRoot = "${src.name}/packages/happy-cli";
+    yarnOfflineCache = pkgs.fetchYarnDeps {
+      yarnLock = "${finalAttrs.src}/yarn.lock";
+      hash = "sha256-DlUUAj5b47KFhUBsftLjxYJJxyCxW9/xfp3WUCCClDY=";
+    };
 
-    npmDepsHash = pkgs.lib.fakeSha256;
+    nativeBuildInputs = [
+      pkgs.nodejs
+      pkgs.yarnConfigHook
+      pkgs.yarnBuildHook
+      pkgs.yarnInstallHook
+      pkgs.makeWrapper
+    ];
 
-    # The build script in package.json
-    npmBuildScript = "build";
+    postInstall = ''
+      wrapProgram $out/bin/happy \
+        --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.nodejs ]}
+      wrapProgram $out/bin/happy-mcp \
+        --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.nodejs ]}
+    '';
 
     meta = with pkgs.lib; {
-      description = "Mobile and Web client for Claude Code and Codex";
-      homepage = "https://github.com/slopus/happy";
+      description = "Mobile and web client wrapper for Claude Code and Codex with end-to-end encryption";
+      homepage = "https://github.com/slopus/happy-cli";
+      changelog = "https://github.com/slopus/happy-cli/releases/tag/v${finalAttrs.version}";
       license = licenses.mit;
       maintainers = [];
+      mainProgram = "happy";
     };
-  };
+  });
 }

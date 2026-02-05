@@ -69,7 +69,7 @@
       clojure
       codex
       comma
-      happy-cli  # TODO: Fix npmDepsHash before enabling
+      happy-cli
       coreutils
       cowsay
       unstable.devenv
