@@ -3,7 +3,6 @@
   lib,
   config,
   affinity-nix,
-  nix-ai-tools,
   ...
 }: let
   unstable = pkgs.unstable;
@@ -20,7 +19,6 @@
       # unstable.android-studio-full
       goModule.packages.claude-squad
       unstable.cloudflared
-      # nix-ai-tools.packages.x86_64-linux.codex # disabled after s1ngularity attack
       #      unstable.davinci-resolve
       unstable.discord
       unstable.dumbpipe
@@ -69,6 +67,7 @@
       caddy
       # claude-code is provided by ./claude module with plugins
       clojure
+      llm-agents.codex
       comma
       coreutils
       cowsay
