@@ -32,4 +32,7 @@
       config.android_sdk.accept_license = true;
     };
   };
+
+  # LLM agent packages (claude-code, codex, gemini-cli) available as pkgs.llm-agents.*
+  llm-agents-packages = inputs.llm-agents.overlays.default;
 }

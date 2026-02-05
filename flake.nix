@@ -144,8 +144,8 @@
       url = "github:nix-community/lanzaboote/v0.4.2";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # for codex
-    nix-ai-tools.url = "github:numtide/nix-ai-tools?rev=18f8e4fe64975970057c7f4cc5531a3aff938805";
+    # LLM agent tools (claude-code, codex, gemini-cli)
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=a23961fc90c59a0cd7f4886c0bcc0efd796a8287";
     # superpowers (Claude Code skills)
     superpowers = {
       url = "github:obra/superpowers?ref=v4.0.3";
@@ -210,7 +210,7 @@
     affinity-nix,
     erosanix,
     lanzaboote,
-    nix-ai-tools,
+    llm-agents,
     dotfiles-assets,
     superpowers,
     claude-nix,

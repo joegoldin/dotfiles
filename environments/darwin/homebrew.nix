@@ -67,7 +67,6 @@
       "cirruslabs/cli/sshpass"
       "cloudflared"
       "cmake"
-      # "codex" # disabled after s1ngularity attack
       "croc"
       "derailed/k9s/k9s"
       "dive"
@@ -143,6 +142,7 @@
       "chatgpt"
       "chromedriver"
       "claude"
+      "codex-app"
       "crossover"
       "cryptomator"
       "daisydisk"
