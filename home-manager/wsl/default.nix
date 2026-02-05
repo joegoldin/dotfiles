@@ -13,6 +13,10 @@
     ../common
   ];
 
+  home.sessionVariables = {
+    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
+  };
+
   # lorri for nix-shell
   services.lorri.enable = true;
 
