@@ -107,8 +107,10 @@
       kubent
       lazydocker
       leiningen
+      nil
       nix
       nix-your-shell
+      nixd
       nmap
       nnn # terminal file manager
       unstable.marp-cli
