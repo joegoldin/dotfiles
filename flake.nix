@@ -320,7 +320,7 @@
               owner = specialArgs.username;
               group = "users";
             };
-            age.identityPaths = ["/home/joe/.ssh/id_ed25519"];
+            age.identityPaths = ["/home/${specialArgs.username}/.ssh/id_rsa"];
           })
         ];
       };
@@ -344,6 +344,15 @@
             home-manager.users.${specialArgs.username} = import ./home-manager/racknerd;
           })
           agenix.nixosModules.default
+          ({specialArgs, ...}: {
+            age.secrets.happy-secrets = {
+              file = ./secrets/happy-secrets.env.age;
+              mode = "400";
+              owner = "root";
+              group = "root";
+            };
+            age.identityPaths = ["/home/${specialArgs.username}/.ssh/id_ed25519"];
+          })
         ];
       };
 

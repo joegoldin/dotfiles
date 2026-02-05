@@ -15,5 +15,6 @@
     ./disk-config.nix
     ./hardware-configuration.nix
     ./racknerd-cloud.nix
+    ./services.nix
   ];
 }
