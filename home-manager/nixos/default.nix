@@ -40,6 +40,9 @@
         identityAgent = "\"/home/${username}/.1password/agent.sock\"";
       };
     };
+    extraConfig = ''
+      IdentityAgent "/home/${username}/.1password/agent.sock"
+    '';
   };
 
   programs.plasma = {
