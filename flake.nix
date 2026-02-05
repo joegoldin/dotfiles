@@ -351,7 +351,7 @@
               owner = "root";
               group = "root";
             };
-            age.identityPaths = ["/home/${specialArgs.username}/.ssh/id_ed25519"];
+            age.identityPaths = ["/home/${specialArgs.username}/.ssh/id_rsa"];
           })
         ];
       };
