@@ -34,10 +34,12 @@
   # ssh with 1password
   programs.ssh = {
     enable = true;
-    # extraConfig = lib.mkOrder 100 ''
-    extraConfig = ''
-      IdentityAgent "/home/${username}/.1password/agent.sock"
-    '';
+    enableDefaultConfig = false;
+    matchBlocks = {
+      "*" = {
+        identityAgent = "\"/home/${username}/.1password/agent.sock\"";
+      };
+    };
   };
 
   programs.plasma = {
