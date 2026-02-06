@@ -7,11 +7,14 @@
 }:
 
 let
-  # Get claude-nix library but override it to use claude-code from llm-agents
+  # Get the latest claude-code from llm-agents
+  claude-code-latest = pkgs.llm-agents.claude-code;
+
+  # Get claude-nix library with explicitly overridden claude-code
   claudeLib = import "${inputs.claude-nix}/lib" {
-    pkgs = pkgs.unstable // {
-      claude-code = pkgs.llm-agents.claude-code;  # Override with llm-agents version
-    };
+    pkgs = pkgs.extend (final: prev: {
+      claude-code = claude-code-latest;
+    });
   };
 
   # WSL-compatible notify-send wrapper (detects wsl-notify-send.exe at runtime)
@@ -58,16 +61,20 @@ let
   ];
 
   # Wrap an upstream skill
-  wrapSkill = name: pkgs.runCommand "skill-${name}" { } ''
-    mkdir -p $out/skills/${name}
-    cp -r ${inputs.superpowers}/skills/${name}/* $out/skills/${name}/
-  '';
+  wrapSkill =
+    name:
+    pkgs.runCommand "skill-${name}" { } ''
+      mkdir -p $out/skills/${name}
+      cp -r ${inputs.superpowers}/skills/${name}/* $out/skills/${name}/
+    '';
 
   # Local skills (modified or custom)
-  localSkill = name: pkgs.runCommand "skill-${name}" { } ''
-    mkdir -p $out/skills/${name}
-    cp -r ${./skills}/${name}/* $out/skills/${name}/
-  '';
+  localSkill =
+    name:
+    pkgs.runCommand "skill-${name}" { } ''
+      mkdir -p $out/skills/${name}
+      cp -r ${./skills}/${name}/* $out/skills/${name}/
+    '';
 
   # All skill derivations
   superpowersSkillDerivations = (map wrapSkill skillNames) ++ [
@@ -117,7 +124,7 @@ let
     ];
   };
 
-  # Create wrapped claude binary with plugins using mkClaude
+  # Create wrapped claude binary with plugins using mkClaude (uses pkgsWithLatestClaude.claude-code)
   claudeWithPlugins = claudeLib.mkClaude {
     plugins = [
       superpowersPluginComplete
