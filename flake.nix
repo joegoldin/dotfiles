@@ -145,7 +145,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, gemini-cli)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=a23961fc90c59a0cd7f4886c0bcc0efd796a8287";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=398181e94b91ad081fad17d9b5eab140411d6a29";
     # superpowers (Claude Code skills)
     superpowers = {
       url = "github:obra/superpowers?ref=v4.0.3";

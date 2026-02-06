@@ -9,8 +9,8 @@
 let
   # Get claude-nix library but override it to use claude-code from llm-agents
   claudeLib = import "${inputs.claude-nix}/lib" {
-    pkgs = pkgs // {
-      claude-code = pkgs.claude-code;  # Override with llm-agents version
+    pkgs = pkgs.unstable // {
+      claude-code = pkgs.llm-agents.claude-code;  # Override with llm-agents version
     };
   };
 
