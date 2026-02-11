@@ -29,7 +29,7 @@
     clipboard-write = "allow";
     clipboard-trim-trailing-spaces = true;
     clipboard-paste-protection = true;
-    scrollback-limit = 100000;
+    scrollback-limit = 1000000000;
     shell-integration = "fish";
     shell-integration-features = "cursor,sudo,title";
     background-opacity = 0.95;

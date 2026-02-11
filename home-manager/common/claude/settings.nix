@@ -1,6 +1,13 @@
 { lib, codeNotify }:
 
 {
+  attribution = {
+    commit = "";
+    pr = "";
+  };
+
+  cleanupPeriodDays = 14;
+
   env = {
     DISABLE_AUTOUPDATER = "1";
   };
@@ -26,7 +33,10 @@
       "Skill(executing-plans)"
       "Skill(subagent-driven-development)"
     ];
-    deny = [ ];
+    deny = [
+      "Read(./.env)"
+      "Read(./.env.*)"
+    ];
     defaultMode = "acceptEdits";
   };
 
@@ -70,4 +80,8 @@
   enabledPlugins = { };
 
   alwaysThinkingEnabled = true;
+
+  showTurnDuration = true;
+
+  spinnerTipsEnabled = false;
 }
