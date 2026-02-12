@@ -17,6 +17,7 @@
     if test "$TERM_PROGRAM" = "iTerm.app"
       source ${pkgs.iterm2-terminal-integration}/bin/iterm2_shell_integration.fish
     end
+    fish_add_path -a /Applications/Obsidian.app/Contents/MacOS
   '';
   fonts = import ../../environments/common/fonts {inherit pkgs lib dotfiles-assets;};
 in {
