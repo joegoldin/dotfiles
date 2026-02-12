@@ -79,6 +79,7 @@ let
   # All skill derivations
   superpowersSkillDerivations = (map wrapSkill skillNames) ++ [
     (localSkill "executing-plans")
+    (localSkill "obsidian-cli")
   ];
 
   # Copy hooks from superpowers (includes session-start hook)
