@@ -16,3 +16,7 @@ secrets/domains.nix
 __pycache__/
 *.py[codz]
 *$py.class
+
+# macOS
+.DS_Store
+.Trash
