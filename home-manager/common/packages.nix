@@ -81,7 +81,7 @@
       flyctl
       fzf # A command-line fuzzy finder
       gawk
-      gh
+      # gh is managed by programs.gh in gh.nix
       git
       gitleaks
       git-stack

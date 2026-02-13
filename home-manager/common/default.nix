@@ -23,6 +23,7 @@
     # You can also split up your configuration and import pieces of it here:
     ./fish
     (import ./packages.nix {inherit pkgs lib config affinity-nix;})
+    ./gh.nix
     ./git.nix
     ./ghostty.nix
     ./starship.nix
