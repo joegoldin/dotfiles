@@ -1,3 +1,6 @@
 [submodule "assets"]
 	path = assets
 	url = git@github.com:joegoldin/dotfiles-assets.git
+[submodule "secrets"]
+	path = secrets
+	url = git@github.com:joegoldin/dotfiles-secrets.git
