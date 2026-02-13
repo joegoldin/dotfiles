@@ -78,6 +78,7 @@ let
 
   # All skill derivations
   superpowersSkillDerivations = (map wrapSkill skillNames) ++ [
+    (localSkill "claude-nix-config")
     (localSkill "executing-plans")
     (localSkill "gh-pr-review")
     (localSkill "obsidian-cli")
@@ -87,16 +88,17 @@ let
   prReviewCommand = claudeLib.mkCommand {
     name = "pr-review";
     description = "Fetch and analyze inline PR review comments for the current branch";
+    allowed-tools = ["Bash" "Read" "Glob" "Grep" "Skill"];
   } ''
-    Use the gh-pr-review skill for this task.
+    Invoke the gh-pr-review skill, then fetch and analyze inline PR review comments for the current branch.
 
-    Fetch and analyze the inline PR review comments for the current branch.
-
-    1. Run `ghreview --raw` to get the full review JSON (includes code context by default)
-    2. Summarize each reviewer's feedback
-    3. List all unresolved comments grouped by file, with the referenced code and the reviewer's concern
-    4. Categorize feedback (bugs, security, performance, style, architecture, questions)
-    5. Propose a prioritized plan to address the comments
+    Steps:
+    1. Use the Skill tool to load the gh-pr-review skill
+    2. Run `ghreview --raw` to get the full review JSON (includes code context by default)
+    3. Summarize each reviewer's feedback
+    4. List all unresolved comments grouped by file, with the referenced code and the reviewer's concern
+    5. Categorize feedback (bugs, security, performance, style, architecture, questions)
+    6. Propose a prioritized plan to address the comments
 
     If there are thread replies, note which comments already have responses and which are unanswered.
 
