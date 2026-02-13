@@ -159,6 +159,57 @@
     echo "$output" | pbcopy
   '';
 
+  ghreview = ''
+    # Wrapper for gh-pr-review with auto-detection of repo and PR
+    #
+    # Auto-detects repo and PR number from current directory/branch.
+    # All arguments are passed through to gh pr-review.
+    #
+    # Usage:
+    #   gh_review review view [--reviewer login] [--unresolved]
+    #   gh_review threads list [--unresolved] [--mine]
+    #   gh_review threads resolve --thread-id ID
+    #   gh_review comments reply --thread-id ID --body "msg"
+    #   gh_review review --start
+    #   gh_review review --submit --review-id ID --event EVENT --body "msg"
+    #
+    # Override auto-detection with -R owner/repo and/or trailing PR number.
+
+    set -l extra_args
+
+    # Auto-detect repo unless -R is already provided
+    if not contains -- -R $argv
+      set -l repo (gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null)
+      if test -z "$repo"
+        echo "Error: Could not detect repository. Use -R owner/repo" >&2
+        return 1
+      end
+      set extra_args -R $repo
+    end
+
+    # Check if last arg is a PR number (bare integer, not a flag value)
+    set -l has_pr false
+    if test (count $argv) -gt 0
+      if string match -qr '^\d+$' -- $argv[-1]
+        if test (count $argv) -lt 2; or not string match -qr '^--(tail|line|start-line)$' -- $argv[-2]
+          set has_pr true
+        end
+      end
+    end
+
+    # Auto-detect PR number if not provided
+    if not $has_pr
+      set -l pr_number (gh pr view --json number -q .number 2>/dev/null)
+      if test -z "$pr_number"
+        echo "Error: Could not detect PR. Checkout a branch with an associated PR" >&2
+        return 1
+      end
+      set extra_args $extra_args $pr_number
+    end
+
+    gh pr-review $argv $extra_args
+  '';
+
   # Custom history expansion functions (replacing puffer-fish plugin)
   __expand_bang = ''
     switch (commandline -t)
