@@ -169,7 +169,7 @@
     #   --no-bots    Exclude bot authors (login ending in [bot]) from output
     #
     # Repo and PR auto-detected from current directory/branch.
-    # Override with -R owner/repo and/or trailing PR number.
+    # Override with -R owner/repo and/or --pr NUMBER.
     #
     # Examples:
     #   ghreview review view
@@ -204,24 +204,14 @@
       set extra_args -R $repo
     end
 
-    # Check if last arg is a PR number (bare integer, not a flag value)
-    set -l has_pr false
-    if test (count $pass_args) -gt 0
-      if string match -qr '^\d+$' -- $pass_args[-1]
-        if test (count $pass_args) -lt 2; or not string match -qr '^--(tail|line|start-line)$' -- $pass_args[-2]
-          set has_pr true
-        end
-      end
-    end
-
-    # Auto-detect PR if not provided
-    if not $has_pr
+    # Auto-detect PR unless --pr already provided
+    if not contains -- --pr $pass_args
       set -l pr_number (gh pr view --json number -q .number 2>/dev/null)
       if test -z "$pr_number"
         echo "Error: Could not detect PR. Checkout a branch with an associated PR" >&2
         return 1
       end
-      set extra_args $extra_args $pr_number
+      set extra_args $extra_args --pr $pr_number
     end
 
     # Execute and optionally filter bot authors
