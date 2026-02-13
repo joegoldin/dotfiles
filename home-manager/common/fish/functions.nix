@@ -160,28 +160,32 @@
   '';
 
   ghreview = ''
-    # Wrapper for gh-pr-review with auto-detection and bot filtering
+    # Wrapper for gh-pr-review with auto-detection, bot filtering, and code context
     #
     # Usage:
-    #   ghreview [--no-bots] <subcommand> [args...]
+    #   ghreview [flags] [subcommand] [args...]
     #
     # Custom flags:
     #   --no-bots    Exclude bot authors (login ending in [bot]) from output
     #   --raw        Output raw JSON (skip jq pretty-printing)
+    #   --code       Inject source code context into each comment
     #
     # Repo and PR auto-detected from current directory/branch.
     # Override with -R owner/repo and/or --pr NUMBER.
+    # Defaults to 'review view' if no subcommand given.
     #
     # Examples:
-    #   ghreview review view
+    #   ghreview
+    #   ghreview --code
+    #   ghreview --no-bots --code
     #   ghreview review view --unresolved --reviewer octocat
-    #   ghreview --no-bots review view
     #   ghreview threads list --mine
     #   ghreview threads resolve --thread-id PRRT_xxx
     #   ghreview comments reply --thread-id PRRT_xxx --body "fixed"
 
     set -l no_bots false
     set -l raw false
+    set -l with_code false
     set -l pass_args
 
     # Parse custom flags, pass everything else through
@@ -191,6 +195,8 @@
           set no_bots true
         case '--raw'
           set raw true
+        case '--code'
+          set with_code true
         case '*'
           set -a pass_args $arg
       end
@@ -223,18 +229,45 @@
       set extra_args $extra_args --pr $pr_number
     end
 
-    # Execute, optionally filter bots, and pretty-print by default
-    if $no_bots
-      if $raw
-        gh pr-review $pass_args $extra_args | jq -c 'walk(if type == "array" then map(select(if .author_login? then (.author_login | test("\\[bot\\]$") | not) else true end)) else . end)'
-      else
-        gh pr-review $pass_args $extra_args | jq 'walk(if type == "array" then map(select(if .author_login? then (.author_login | test("\\[bot\\]$") | not) else true end)) else . end)'
+    # Run command to temp file for pipeline processing
+    set -l tmpfile (mktemp)
+    gh pr-review $pass_args $extra_args > $tmpfile
+
+    # Enrich with source code context if --code
+    if $with_code
+      set -l ctxfile (mktemp)
+      echo -n > $ctxfile
+      for loc in (jq -r '[.reviews[]?.comments[]? | select(.path and .line) | "\(.path):\(.line)"] | unique[]' $tmpfile)
+        set -l parts (string split ':' -- $loc)
+        set -l file $parts[1]
+        set -l line_num $parts[2]
+        if test -f "$file"
+          set -l ctx_start (math "max(1, $line_num - 3)")
+          set -l ctx_end (math "$line_num + 3")
+          sed -n "$ctx_start,$ctx_end"p "$file" | awk -v n=$ctx_start '{printf "%d: %s\n", NR+n-1, $0}' | jq -Rs --arg key "$loc" '{($key): .}' >> $ctxfile
+        end
       end
-    else if $raw
-      gh pr-review $pass_args $extra_args
-    else
-      gh pr-review $pass_args $extra_args | jq .
+      set -l ctxlookup (mktemp)
+      jq -s 'add // {}' $ctxfile > $ctxlookup
+      jq --slurpfile ctx $ctxlookup 'if .reviews then .reviews |= [.[] | if .comments then .comments |= [.[] | if .path and .line then . + {code_context: ($ctx[0]["\(.path):\(.line)"] // null)} else . end] else . end] else . end' $tmpfile > "$tmpfile.tmp"
+      mv "$tmpfile.tmp" $tmpfile
+      rm -f $ctxfile $ctxlookup
     end
+
+    # Filter bots if --no-bots
+    if $no_bots
+      jq 'walk(if type == "array" then map(select(if .author_login? then (.author_login | test("\\[bot\\]$") | not) else true end)) else . end)' $tmpfile > "$tmpfile.tmp"
+      mv "$tmpfile.tmp" $tmpfile
+    end
+
+    # Output: pretty-print unless --raw
+    if $raw
+      cat $tmpfile
+    else
+      jq . $tmpfile
+    end
+
+    rm -f $tmpfile
   '';
 
   # Custom history expansion functions (replacing puffer-fish plugin)
