@@ -5,7 +5,7 @@
 #   nix-shell -p php --run "sudo -u pelican-panel php /nix/store/*pelican-panel*/artisan p:user:make"
 #
 let
-  domains = import ../../secrets/domains.nix;
+  domains = import ../../../secrets/domains.nix;
 in
 {
   config,
@@ -73,23 +73,23 @@ in
   #   Token ID & Token: Get these from the panel after creating a node
   age.secrets = {
     pelican-app-key = {
-      file = ../../secrets/pelican-app-key.age;
+      file = ../../../secrets/pelican-app-key.age;
       mode = "0644";
     };
     pelican-db-password = {
-      file = ../../secrets/pelican-db-password.age;
+      file = ../../../secrets/pelican-db-password.age;
       mode = "0644";
     };
     pelican-redis-password = {
-      file = ../../secrets/pelican-redis-password.age;
+      file = ../../../secrets/pelican-redis-password.age;
       mode = "0644";
     };
     pelican-token-id = {
-      file = ../../secrets/pelican-token-id.age;
+      file = ../../../secrets/pelican-token-id.age;
       mode = "0644";
     };
     pelican-token = {
-      file = ../../secrets/pelican-token.age;
+      file = ../../../secrets/pelican-token.age;
       mode = "0644";
     };
   };

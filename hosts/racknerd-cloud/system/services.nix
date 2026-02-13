@@ -1,7 +1,7 @@
 # Services configuration for RackNerd VPS
 # Runs happy-server (handy), happy-redis, and PostgreSQL - accessible only via Tailscale
 let
-  domains = import ../../secrets/domains.nix;
+  domains = import ../../../secrets/domains.nix;
 in
 {
   config,

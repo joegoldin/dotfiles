@@ -1,4 +1,4 @@
-# This is your home-manager configuration file
+# This is your home-manager configuration file for headless servers
 # Use this to configure your home environment (it replaces ~/.config/nixpkgs/home.nix)
 {
   inputs,
@@ -12,14 +12,19 @@
   ...
 }: {
   imports = [
-    ../common
+    ../../common/home
   ];
+
+  # Disable ghostty for headless server
+  programs.ghostty.enable = lib.mkForce false;
+
+  # Disable fish-ai installation for headless server
+  home.activation.fishAiPostInstall = lib.mkForce (lib.hm.dag.entryAnywhere "");
 
   # lorri for nix-shell
   services.lorri.enable = true;
 
   # gnupg gpg stuff
-  services.gnome-keyring.enable = true;
   programs.gpg.enable = true;
   services.gpg-agent = {
     enable = true;

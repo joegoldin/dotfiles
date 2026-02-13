@@ -239,7 +239,7 @@ ssh joe@<racknerd-tailscale-ip> 'sudo systemctl restart docker-happy-server'
 
 ## Firewall Configuration
 
-The RackNerd firewall (`environments/racknerd-cloud/racknerd-cloud.nix:31-37`) is configured to:
+The RackNerd firewall (`hosts/racknerd-cloud/system/racknerd-cloud.nix:31-37`) is configured to:
 
 - **Allow**: SSH (port 22) from public internet
 - **Allow**: HTTP (port 80) for ACME/Let's Encrypt certificate challenges
@@ -325,10 +325,10 @@ Happy Server is a lightweight relay that:
 
 ## File Locations
 
-- Service config: `environments/racknerd-cloud/services.nix`
+- Service config: `hosts/racknerd-cloud/system/services.nix`
 - Secrets template: `secrets/happy-secrets.env.example`
 - Encrypted secrets: `secrets/happy-secrets.env.age`
 - Secrets mapping: `secrets/secrets.nix`
-- Main config: `environments/racknerd-cloud/racknerd-cloud.nix`
+- Main config: `hosts/racknerd-cloud/system/racknerd-cloud.nix`
 - Redis data: `/var/lib/redis-happy` (on server)
 - PostgreSQL data: `/var/lib/postgresql` (on server)

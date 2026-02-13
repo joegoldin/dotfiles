@@ -230,7 +230,7 @@
         inherit inputs outputs useremail stateVersion username hostname homeDirectory dotfiles-assets;
       };
     eachSystem = nixpkgs.lib.genAttrs (import systems);
-    basePackages = eachSystem (system: import ./environments/common/pkgs nixpkgs.legacyPackages.${system});
+    basePackages = eachSystem (system: import ./hosts/common/system/pkgs nixpkgs.legacyPackages.${system});
     additionalPackages = eachSystem (system: {
       # devenv-up = self.devShells.${system}.default.config.procfileScript;
     });
@@ -242,7 +242,7 @@
     formatter = eachSystem (system: nixpkgs.legacyPackages.${system}.alejandra);
 
     # Your custom packages and modifications, exported as overlays
-    overlays = import ./environments/common/overlays {inherit inputs;};
+    overlays = import ./hosts/common/system/overlays {inherit inputs;};
 
     checks = eachSystem (system: {
       pre-commit-check = pre-commit-hooks.lib.${system}.run {
@@ -279,14 +279,14 @@
         modules = [
           nixos-wsl.nixosModules.default
           # > Our main nixos configuration <
-          ./environments/wsl
+          ./hosts/wsl/system
           home-manager.nixosModules.home-manager
           ({specialArgs, ...}: {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = specialArgs;
             home-manager.backupFileExtension = "backup"; # enable moving existing files
-            home-manager.users.${specialArgs.username} = import ./home-manager/wsl;
+            home-manager.users.${specialArgs.username} = import ./hosts/wsl/home;
           })
           agenix.nixosModules.default
         ];
@@ -303,14 +303,14 @@
           pelican.nixosModules.default
           {nixpkgs.overlays = [pelican.overlays.default];}
           # > Our main nixos configuration <
-          ./environments/oracle-cloud
+          ./hosts/oracle-cloud/system
           home-manager.nixosModules.home-manager
           ({specialArgs, ...}: {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = specialArgs;
             home-manager.backupFileExtension = "backup"; # enable moving existing files
-            home-manager.users.${specialArgs.username} = import ./home-manager/oracle;
+            home-manager.users.${specialArgs.username} = import ./hosts/oracle-cloud/home;
           })
           agenix.nixosModules.default
           ({specialArgs, ...}: {
@@ -334,14 +334,14 @@
         modules = [
           disko.nixosModules.disko
           # > Our main nixos configuration <
-          ./environments/racknerd-cloud
+          ./hosts/racknerd-cloud/system
           home-manager.nixosModules.home-manager
           ({specialArgs, ...}: {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = specialArgs;
             home-manager.backupFileExtension = "backup"; # enable moving existing files
-            home-manager.users.${specialArgs.username} = import ./home-manager/racknerd;
+            home-manager.users.${specialArgs.username} = import ./hosts/racknerd-cloud/home;
           })
           agenix.nixosModules.default
           ({specialArgs, ...}: {
@@ -366,7 +366,7 @@
           };
         modules = [
           # > Our main nixos configuration <
-          ./environments/nixos
+          ./hosts/nixos/system
           home-manager.nixosModules.home-manager
           ({specialArgs, ...}: {
             home-manager.useGlobalPkgs = true;
@@ -376,7 +376,7 @@
             home-manager.sharedModules = [
               plasma-manager.homeModules.plasma-manager
             ];
-            home-manager.users.${specialArgs.username} = import ./home-manager/nixos;
+            home-manager.users.${specialArgs.username} = import ./hosts/nixos/home;
           })
           agenix.nixosModules.default
           erosanix.nixosModules.mkwindowsapp-gc
@@ -399,7 +399,7 @@
           };
         modules = [
           # > Our main darwin configuration <
-          ./environments/darwin
+          ./hosts/darwin/system
           nix-homebrew.darwinModules.nix-homebrew
           # Rosetta-based Linux builder for fast x86_64-linux builds on Apple Silicon
           nix-rosetta-builder.darwinModules.default
@@ -410,7 +410,7 @@
             home-manager.extraSpecialArgs = specialArgs;
             home-manager.backupFileExtension = "backup"; # enable moving existing files
             home-manager.users.joe.imports = [
-              ./home-manager/darwin
+              ./hosts/darwin/home
             ];
           })
           agenix.darwinModules.default
