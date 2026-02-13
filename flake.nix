@@ -279,7 +279,7 @@
         modules = [
           nixos-wsl.nixosModules.default
           # > Our main nixos configuration <
-          ./hosts/wsl/system
+          ./hosts/wsl
           home-manager.nixosModules.home-manager
           ({specialArgs, ...}: {
             home-manager.useGlobalPkgs = true;
@@ -303,7 +303,7 @@
           pelican.nixosModules.default
           {nixpkgs.overlays = [pelican.overlays.default];}
           # > Our main nixos configuration <
-          ./hosts/oracle-cloud/system
+          ./hosts/oracle-cloud
           home-manager.nixosModules.home-manager
           ({specialArgs, ...}: {
             home-manager.useGlobalPkgs = true;
@@ -334,7 +334,7 @@
         modules = [
           disko.nixosModules.disko
           # > Our main nixos configuration <
-          ./hosts/racknerd-cloud/system
+          ./hosts/racknerd-cloud
           home-manager.nixosModules.home-manager
           ({specialArgs, ...}: {
             home-manager.useGlobalPkgs = true;
@@ -366,7 +366,7 @@
           };
         modules = [
           # > Our main nixos configuration <
-          ./hosts/nixos/system
+          ./hosts/nixos
           home-manager.nixosModules.home-manager
           ({specialArgs, ...}: {
             home-manager.useGlobalPkgs = true;
@@ -399,7 +399,7 @@
           };
         modules = [
           # > Our main darwin configuration <
-          ./hosts/darwin/system
+          ./hosts/darwin
           nix-homebrew.darwinModules.nix-homebrew
           # Rosetta-based Linux builder for fast x86_64-linux builds on Apple Silicon
           nix-rosetta-builder.darwinModules.default
