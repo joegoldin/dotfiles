@@ -238,11 +238,22 @@
     set -l tmpfile (mktemp)
     gh pr-review $pass_args $extra_args > $tmpfile
 
+    # Detect output type: "reviews" (review view), "threads" (threads list), or "other"
+    set -l output_type (jq -r 'if type == "object" and .reviews then "reviews" else if type == "array" and length > 0 and (.[0] | has("threadId")) then "threads" else "other" end end' $tmpfile)
+
     # Enrich with source code context if --code
-    if $with_code
+    if $with_code; and test "$output_type" != other
       set -l ctxfile (mktemp)
       echo -n > $ctxfile
-      for loc in (jq -r '[.reviews[]?.comments[]? | select(.path and .line) | "\(.path):\(.line)"] | unique[]' $tmpfile)
+
+      # Extract path:line pairs depending on output type
+      if test "$output_type" = reviews
+        set -l locs (jq -r '[.reviews[]?.comments[]? | select(.path and .line) | "\(.path):\(.line)"] | unique[]' $tmpfile)
+      else
+        set -l locs (jq -r '[.[]? | select(.path and .line) | "\(.path):\(.line)"] | unique[]' $tmpfile)
+      end
+
+      for loc in $locs
         set -l parts (string split ':' -- $loc)
         set -l file $parts[1]
         set -l line_num $parts[2]
@@ -252,21 +263,27 @@
           sed -n "$ctx_start,$ctx_end"p "$file" | awk -v n=$ctx_start '{printf "%d: %s\n", NR+n-1, $0}' | jq -Rs --arg key "$loc" '{($key): .}' >> $ctxfile
         end
       end
+
       set -l ctxlookup (mktemp)
       jq -s 'add // {}' $ctxfile > $ctxlookup
-      jq --slurpfile ctx $ctxlookup 'if .reviews then .reviews |= [.[] | if .comments then .comments |= [.[] | if .path and .line then . + {code_context: ($ctx[0]["\(.path):\(.line)"] // null)} else . end] else . end] else . end' $tmpfile > "$tmpfile.tmp"
+
+      if test "$output_type" = reviews
+        jq --slurpfile ctx $ctxlookup '.reviews |= [.[] | if .comments then .comments |= [.[] | if .path and .line then . + {code_context: ($ctx[0]["\(.path):\(.line)"] // null)} else . end] else . end]' $tmpfile > "$tmpfile.tmp"
+      else
+        jq --slurpfile ctx $ctxlookup '[.[] | if .path and .line then . + {code_context: ($ctx[0]["\(.path):\(.line)"] // null)} else . end]' $tmpfile > "$tmpfile.tmp"
+      end
       mv "$tmpfile.tmp" $tmpfile
       rm -f $ctxfile $ctxlookup
     end
 
-    # Filter bots if --no-bots
-    if $no_bots
+    # Filter bots if --no-bots (reviews output has author_login)
+    if $no_bots; and test "$output_type" = reviews
       jq 'walk(if type == "array" then map(select(if .author_login? then (.author_login | test("\\[bot\\]$") | not) else true end)) else . end)' $tmpfile > "$tmpfile.tmp"
       mv "$tmpfile.tmp" $tmpfile
     end
 
     # Output
-    if $pretty
+    if $pretty; and test "$output_type" = reviews
       jq -r '
         [.reviews[]? | select((.body and (.body | length > 0)) or (.comments and (.comments | length > 0)))] |
         map(
@@ -290,6 +307,18 @@
             ] | join("\n\n---\n\n"))
           else "" end)
         ) | join("\n\n===\n\n")
+      ' $tmpfile
+    else if $pretty; and test "$output_type" = threads
+      jq -r '
+        map(
+          "### `" + .path + ":" + (.line | tostring) + "` — " + .threadId +
+          (if .isResolved then " ✅" else "" end) +
+          (if .isOutdated then " ~~outdated~~" else "" end) +
+          (if .code_context then
+            "\n\n```" + (.path | split(".") | last) + "\n" + (.code_context | rtrimstr("\n")) + "\n```"
+          else "" end) +
+          "\n\nUpdated: " + (.updatedAt | split("T") | .[0])
+        ) | join("\n\n---\n\n")
       ' $tmpfile
     else if $raw
       cat $tmpfile
