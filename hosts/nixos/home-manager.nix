@@ -7,8 +7,8 @@
   ...
 }: {
   imports = [
-    ../../common/home
-    ../../common/home/firefox
+    ../common/home
+    ../common/home/firefox
   ];
 
   # TODO: git signing with 1password

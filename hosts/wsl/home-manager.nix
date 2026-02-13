@@ -10,7 +10,7 @@
   ...
 }: {
   imports = [
-    ../../common/home
+    ../common/home
   ];
 
   home.sessionVariables = {
