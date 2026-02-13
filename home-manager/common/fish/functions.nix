@@ -168,7 +168,8 @@
     # Custom flags:
     #   --no-bots    Exclude bot authors (login ending in [bot]) from output
     #   --raw        Output raw JSON (skip jq pretty-printing)
-    #   --code       Inject source code context into each comment
+    #   --no-code    Skip injecting source code context into comments
+    #   --pretty     Render as readable markdown instead of JSON
     #
     # Repo and PR auto-detected from current directory/branch.
     # Override with -R owner/repo and/or --pr NUMBER.
@@ -176,8 +177,9 @@
     #
     # Examples:
     #   ghreview
-    #   ghreview --code
-    #   ghreview --no-bots --code
+    #   ghreview --pretty
+    #   ghreview --pretty --no-bots
+    #   ghreview --no-code
     #   ghreview review view --unresolved --reviewer octocat
     #   ghreview threads list --mine
     #   ghreview threads resolve --thread-id PRRT_xxx
@@ -185,7 +187,8 @@
 
     set -l no_bots false
     set -l raw false
-    set -l with_code false
+    set -l with_code true
+    set -l pretty false
     set -l pass_args
 
     # Parse custom flags, pass everything else through
@@ -195,8 +198,10 @@
           set no_bots true
         case '--raw'
           set raw true
-        case '--code'
-          set with_code true
+        case '--no-code'
+          set with_code false
+        case '--pretty'
+          set pretty true
         case '*'
           set -a pass_args $arg
       end
@@ -260,8 +265,33 @@
       mv "$tmpfile.tmp" $tmpfile
     end
 
-    # Output: pretty-print unless --raw
-    if $raw
+    # Output
+    if $pretty
+      jq -r '
+        [.reviews[]? | select((.body and (.body | length > 0)) or (.comments and (.comments | length > 0)))] |
+        map(
+          "## " + .author_login + " — " + .state +
+          (if .submitted_at then " (" + (.submitted_at | split("T") | .[0]) + ")" else "" end) +
+          (if .body and (.body | length > 0) then "\n\n" + .body else "" end) +
+          (if .comments and (.comments | length > 0) then "\n\n" +
+            ([.comments[] |
+              "### `" + .path + ":" + (.line | tostring) + "`" +
+              (if .is_resolved then " ✅" else "" end) +
+              (if .is_outdated then " ~~outdated~~" else "" end) +
+              (if .code_context then
+                "\n\n```" + (.path | split(".") | last) + "\n" + (.code_context | rtrimstr("\n")) + "\n```"
+              else "" end) +
+              "\n\n**" + .author_login + ":** " + .body +
+              (if .thread_comments and (.thread_comments | length > 0) then
+                "\n" + ([.thread_comments[] |
+                  "\n> **" + .author_login + ":** " + .body
+                ] | join(""))
+              else "" end)
+            ] | join("\n\n---\n\n"))
+          else "" end)
+        ) | join("\n\n===\n\n")
+      ' $tmpfile
+    else if $raw
       cat $tmpfile
     else
       jq . $tmpfile
