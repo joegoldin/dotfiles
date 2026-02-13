@@ -19,10 +19,10 @@
     end
     fish_add_path -a /Applications/Obsidian.app/Contents/MacOS
   '';
-  fonts = import ../../common/system/fonts {inherit pkgs lib dotfiles-assets;};
+  fonts = import ../common/system/fonts {inherit pkgs lib dotfiles-assets;};
 in {
   imports = [
-    ../../common/home
+    ../common/home
   ];
 
   home.packages = with pkgs; [
@@ -34,7 +34,7 @@ in {
   };
 
   programs.fish.interactiveShellInit = lib.strings.concatStrings [
-    (import ../../common/home/fish/init.nix {inherit pkgs config;}).interactiveShellInit
+    (import ../common/home/fish/init.nix {inherit pkgs config;}).interactiveShellInit
     initConfigAdditions
   ];
 

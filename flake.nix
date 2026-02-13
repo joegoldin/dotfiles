@@ -286,7 +286,7 @@
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = specialArgs;
             home-manager.backupFileExtension = "backup"; # enable moving existing files
-            home-manager.users.${specialArgs.username} = import ./hosts/wsl/home;
+            home-manager.users.${specialArgs.username} = import ./hosts/wsl/home-manager.nix;
           })
           agenix.nixosModules.default
         ];
@@ -310,7 +310,7 @@
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = specialArgs;
             home-manager.backupFileExtension = "backup"; # enable moving existing files
-            home-manager.users.${specialArgs.username} = import ./hosts/oracle-cloud/home;
+            home-manager.users.${specialArgs.username} = import ./hosts/oracle-cloud/home-manager.nix;
           })
           agenix.nixosModules.default
           ({specialArgs, ...}: {
@@ -341,7 +341,7 @@
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = specialArgs;
             home-manager.backupFileExtension = "backup"; # enable moving existing files
-            home-manager.users.${specialArgs.username} = import ./hosts/racknerd-cloud/home;
+            home-manager.users.${specialArgs.username} = import ./hosts/racknerd-cloud/home-manager.nix;
           })
           agenix.nixosModules.default
           ({specialArgs, ...}: {
@@ -376,7 +376,7 @@
             home-manager.sharedModules = [
               plasma-manager.homeModules.plasma-manager
             ];
-            home-manager.users.${specialArgs.username} = import ./hosts/nixos/home;
+            home-manager.users.${specialArgs.username} = import ./hosts/nixos/home-manager.nix;
           })
           agenix.nixosModules.default
           erosanix.nixosModules.mkwindowsapp-gc
@@ -410,7 +410,7 @@
             home-manager.extraSpecialArgs = specialArgs;
             home-manager.backupFileExtension = "backup"; # enable moving existing files
             home-manager.users.joe.imports = [
-              ./hosts/darwin/home
+              ./hosts/darwin/home-manager.nix
             ];
           })
           agenix.darwinModules.default
