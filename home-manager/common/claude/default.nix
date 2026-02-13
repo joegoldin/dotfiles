@@ -79,6 +79,7 @@ let
   # All skill derivations
   superpowersSkillDerivations = (map wrapSkill skillNames) ++ [
     (localSkill "executing-plans")
+    (localSkill "gh-pr-review")
     (localSkill "obsidian-cli")
   ];
 
