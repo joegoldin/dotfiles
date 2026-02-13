@@ -4,7 +4,7 @@
 set -e
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-PKG_FILE="../home-manager/common/python/custom-pypi-packages.nix"
+PKG_FILE="../hosts/common/home/python/custom-pypi-packages.nix"
 FULL_PKG_PATH="$SCRIPT_DIR/$PKG_FILE"
 
 echo "🔍 Extracting current Python packages from $PKG_FILE..."

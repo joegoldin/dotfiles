@@ -11,9 +11,9 @@ This dotfiles repo manages Claude Code declaratively via [claude-nix](https://gi
 
 | File | Purpose |
 |------|---------|
-| `home-manager/common/claude/default.nix` | Main config — plugins, skills, commands, packages |
-| `home-manager/common/claude/settings.nix` | `settings.json` — permissions, hooks |
-| `home-manager/common/claude/skills/<name>/SKILL.md` | Local skill definitions |
+| `hosts/common/home/claude/default.nix` | Main config — plugins, skills, commands, packages |
+| `hosts/common/home/claude/settings.nix` | `settings.json` — permissions, hooks |
+| `hosts/common/home/claude/skills/<name>/SKILL.md` | Local skill definitions |
 
 ## Architecture
 
@@ -31,7 +31,7 @@ The plugin is built and passed to `mkClaude`, which produces a wrapped `claude` 
 
 ## Adding a Local Skill
 
-1. Create `home-manager/common/claude/skills/<skill-name>/SKILL.md` with frontmatter:
+1. Create `hosts/common/home/claude/skills/<skill-name>/SKILL.md` with frontmatter:
 
 ```markdown
 ---
