@@ -7,6 +7,17 @@ description: Use when viewing, replying to, or managing inline GitHub PR review 
 
 GitHub CLI extension for inline PR review comments with LLM-friendly JSON output.
 
+## IMPORTANT: Running Commands
+
+`ghreview` is a fish shell function. **Always run it via fish:**
+
+```sh
+fish -c 'ghreview'
+fish -c 'ghreview --pretty --no-bots'
+```
+
+Never run `ghreview` directly in bash — it will fail with `command not found`.
+
 ## Shell Wrapper
 
 `ghreview` auto-detects repo and PR from the current directory/branch. All args pass through to `gh pr-review`. Defaults to `review view` with code context.
@@ -26,22 +37,22 @@ Code context is injected by default — each comment includes a `code_context` f
 
 ```sh
 # View all reviews for current PR (default, includes code context)
-ghreview
+fish -c 'ghreview'
 
 # Readable markdown output with code
-ghreview --pretty
+fish -c 'ghreview --pretty'
 
 # Human-only comments as markdown
-ghreview --pretty --no-bots
+fish -c 'ghreview --pretty --no-bots'
 
 # Raw compact JSON (for piping)
-ghreview --raw
+fish -c 'ghreview --raw'
 
 # Skip code injection (faster, less output)
-ghreview --no-code
+fish -c 'ghreview --no-code'
 
 # Override auto-detection
-ghreview -R owner/repo --pr 42 review view
+fish -c 'ghreview -R owner/repo --pr 42 review view'
 ```
 
 ## Core Commands
@@ -49,12 +60,12 @@ ghreview -R owner/repo --pr 42 review view
 ### View Reviews and Threads
 
 ```sh
-ghreview
-ghreview review view --unresolved --not_outdated
-ghreview review view --reviewer octocat
-ghreview review view --states CHANGES_REQUESTED,COMMENTED
-ghreview review view --tail 1
-ghreview --no-bots review view --unresolved
+fish -c 'ghreview'
+fish -c 'ghreview review view --unresolved --not_outdated'
+fish -c 'ghreview review view --reviewer octocat'
+fish -c 'ghreview review view --states CHANGES_REQUESTED,COMMENTED'
+fish -c 'ghreview review view --tail 1'
+fish -c 'ghreview --no-bots review view --unresolved'
 ```
 
 | Flag | Purpose |
@@ -69,40 +80,33 @@ ghreview --no-bots review view --unresolved
 ### Reply to Threads
 
 ```sh
-ghreview comments reply --thread-id PRRT_xxx --body "Addressed in latest commit"
+fish -c 'ghreview comments reply --thread-id PRRT_xxx --body "Addressed in latest commit"'
 ```
 
 ### List Threads
 
 ```sh
-ghreview threads list --unresolved --mine
+fish -c 'ghreview threads list --unresolved --mine'
 ```
 
 ### Resolve / Unresolve Threads
 
 ```sh
-ghreview threads resolve --thread-id PRRT_xxx
-ghreview threads unresolve --thread-id PRRT_xxx
+fish -c 'ghreview threads resolve --thread-id PRRT_xxx'
+fish -c 'ghreview threads unresolve --thread-id PRRT_xxx'
 ```
 
 ### Create and Submit Reviews
 
 ```sh
 # Start pending review
-ghreview review --start
+fish -c 'ghreview review --start'
 
 # Add inline comment
-ghreview review --add-comment \
-  --review-id PRR_xxx \
-  --path src/file.go \
-  --line 42 \
-  --body "nit: use helper"
+fish -c 'ghreview review --add-comment --review-id PRR_xxx --path src/file.go --line 42 --body "nit: use helper"'
 
 # Submit
-ghreview review --submit \
-  --review-id PRR_xxx \
-  --event REQUEST_CHANGES \
-  --body "Please address the comments"
+fish -c 'ghreview review --submit --review-id PRR_xxx --event REQUEST_CHANGES --body "Please address the comments"'
 ```
 
 Events: `APPROVE`, `REQUEST_CHANGES`, `COMMENT`
@@ -152,26 +156,26 @@ Renders reviews as readable markdown with fenced code blocks for code context an
 ### Get actionable review feedback
 
 ```sh
-ghreview --pretty --no-bots review view --unresolved --not_outdated
+fish -c 'ghreview --pretty --no-bots review view --unresolved --not_outdated'
 ```
 
 ### Reply and resolve
 
 ```sh
 # Get thread IDs
-ghreview threads list --unresolved
+fish -c 'ghreview threads list --unresolved'
 
 # Reply
-ghreview comments reply --thread-id PRRT_xxx --body "Fixed in abc123"
+fish -c 'ghreview comments reply --thread-id PRRT_xxx --body "Fixed in abc123"'
 
 # Resolve
-ghreview threads resolve --thread-id PRRT_xxx
+fish -c 'ghreview threads resolve --thread-id PRRT_xxx'
 ```
 
 ### Full review cycle
 
 ```sh
-ghreview review --start
-ghreview review --add-comment --review-id PRR_xxx --path file.go --line 10 --body "Issue here"
-ghreview review --submit --review-id PRR_xxx --event REQUEST_CHANGES --body "See inline comments"
+fish -c 'ghreview review --start'
+fish -c 'ghreview review --add-comment --review-id PRR_xxx --path file.go --line 10 --body "Issue here"'
+fish -c 'ghreview review --submit --review-id PRR_xxx --event REQUEST_CHANGES --body "See inline comments"'
 ```
