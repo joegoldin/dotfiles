@@ -167,6 +167,7 @@
     #
     # Custom flags:
     #   --no-bots    Exclude bot authors (login ending in [bot]) from output
+    #   --raw        Output raw JSON (skip jq pretty-printing)
     #
     # Repo and PR auto-detected from current directory/branch.
     # Override with -R owner/repo and/or --pr NUMBER.
@@ -180,6 +181,7 @@
     #   ghreview comments reply --thread-id PRRT_xxx --body "fixed"
 
     set -l no_bots false
+    set -l raw false
     set -l pass_args
 
     # Parse custom flags, pass everything else through
@@ -187,9 +189,16 @@
       switch $arg
         case '--no-bots'
           set no_bots true
+        case '--raw'
+          set raw true
         case '*'
           set -a pass_args $arg
       end
+    end
+
+    # Default to 'review view' if no subcommand given
+    if test (count $pass_args) -eq 0
+      set pass_args review view
     end
 
     set -l extra_args
@@ -214,11 +223,17 @@
       set extra_args $extra_args --pr $pr_number
     end
 
-    # Execute and optionally filter bot authors
+    # Execute, optionally filter bots, and pretty-print by default
     if $no_bots
-      gh pr-review $pass_args $extra_args | jq 'walk(if type == "array" then map(select(if .author_login? then (.author_login | test("\\[bot\\]$") | not) else true end)) else . end)'
-    else
+      if $raw
+        gh pr-review $pass_args $extra_args | jq -c 'walk(if type == "array" then map(select(if .author_login? then (.author_login | test("\\[bot\\]$") | not) else true end)) else . end)'
+      else
+        gh pr-review $pass_args $extra_args | jq 'walk(if type == "array" then map(select(if .author_login? then (.author_login | test("\\[bot\\]$") | not) else true end)) else . end)'
+      end
+    else if $raw
       gh pr-review $pass_args $extra_args
+    else
+      gh pr-review $pass_args $extra_args | jq .
     end
   '';
 
