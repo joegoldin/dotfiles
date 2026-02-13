@@ -4,6 +4,9 @@
 #   cd /var/lib/pelican-panel
 #   nix-shell -p php --run "sudo -u pelican-panel php /nix/store/*pelican-panel*/artisan p:user:make"
 #
+let
+  domains = import ../../secrets/domains.nix;
+in
 {
   config,
   lib,
@@ -23,7 +26,7 @@
   services.pelican.panel = {
     enable = true;
     app = {
-      url = "https://REDACTED_DOMAIN";
+      url = "https://${domains.pelicanDomain}";
       # Generate with: echo "base64:$(openssl rand -base64 32)"
       keyFile = config.age.secrets.pelican-app-key.path;
     };
@@ -36,7 +39,7 @@
     enable = true;
     openFirewall = true; # Opens API (8080) and SFTP (2022) ports
     uuid = "dab990d7-ea48-498a-846c-d4afe46cee1e";
-    remote = "https://REDACTED_DOMAIN";
+    remote = "https://${domains.pelicanDomain}";
     tokenIdFile = config.age.secrets.pelican-token-id.path;
     tokenFile = config.age.secrets.pelican-token.path;
     allowedMounts = ["/home/joe/pelican-mounts"];

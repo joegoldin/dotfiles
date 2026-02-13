@@ -1,5 +1,8 @@
 # Services configuration for RackNerd VPS
 # Runs happy-server (handy), happy-redis, and PostgreSQL - accessible only via Tailscale
+let
+  domains = import ../../secrets/domains.nix;
+in
 {
   config,
   lib,
@@ -10,7 +13,7 @@
   # Caddy reverse proxy for HTTPS access to Happy Server
   services.caddy = {
     enable = true;
-    virtualHosts."REDACTED_DOMAIN:3006" = {
+    virtualHosts."${domains.sshDomain}:3006" = {
       extraConfig = ''
         reverse_proxy localhost:3005
       '';

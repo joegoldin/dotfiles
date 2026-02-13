@@ -9,6 +9,9 @@ devenv.local.nix
 # pre-commit
 .pre-commit-config.yaml
 
+# Domain secrets (real values, not committed)
+secrets/domains.nix
+
 # Byte-compiled / optimized / DLL Python files
 __pycache__/
 *.py[codz]
