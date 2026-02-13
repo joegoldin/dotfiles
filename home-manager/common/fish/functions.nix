@@ -160,25 +160,42 @@
   '';
 
   ghreview = ''
-    # Wrapper for gh-pr-review with auto-detection of repo and PR
-    #
-    # Auto-detects repo and PR number from current directory/branch.
-    # All arguments are passed through to gh pr-review.
+    # Wrapper for gh-pr-review with auto-detection and bot filtering
     #
     # Usage:
-    #   gh_review review view [--reviewer login] [--unresolved]
-    #   gh_review threads list [--unresolved] [--mine]
-    #   gh_review threads resolve --thread-id ID
-    #   gh_review comments reply --thread-id ID --body "msg"
-    #   gh_review review --start
-    #   gh_review review --submit --review-id ID --event EVENT --body "msg"
+    #   ghreview [--no-bots] <subcommand> [args...]
     #
-    # Override auto-detection with -R owner/repo and/or trailing PR number.
+    # Custom flags:
+    #   --no-bots    Exclude bot authors (login ending in [bot]) from output
+    #
+    # Repo and PR auto-detected from current directory/branch.
+    # Override with -R owner/repo and/or trailing PR number.
+    #
+    # Examples:
+    #   ghreview review view
+    #   ghreview review view --unresolved --reviewer octocat
+    #   ghreview --no-bots review view
+    #   ghreview threads list --mine
+    #   ghreview threads resolve --thread-id PRRT_xxx
+    #   ghreview comments reply --thread-id PRRT_xxx --body "fixed"
+
+    set -l no_bots false
+    set -l pass_args
+
+    # Parse custom flags, pass everything else through
+    for arg in $argv
+      switch $arg
+        case '--no-bots'
+          set no_bots true
+        case '*'
+          set -a pass_args $arg
+      end
+    end
 
     set -l extra_args
 
-    # Auto-detect repo unless -R is already provided
-    if not contains -- -R $argv
+    # Auto-detect repo unless -R already provided
+    if not contains -- -R $pass_args
       set -l repo (gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null)
       if test -z "$repo"
         echo "Error: Could not detect repository. Use -R owner/repo" >&2
@@ -189,15 +206,15 @@
 
     # Check if last arg is a PR number (bare integer, not a flag value)
     set -l has_pr false
-    if test (count $argv) -gt 0
-      if string match -qr '^\d+$' -- $argv[-1]
-        if test (count $argv) -lt 2; or not string match -qr '^--(tail|line|start-line)$' -- $argv[-2]
+    if test (count $pass_args) -gt 0
+      if string match -qr '^\d+$' -- $pass_args[-1]
+        if test (count $pass_args) -lt 2; or not string match -qr '^--(tail|line|start-line)$' -- $pass_args[-2]
           set has_pr true
         end
       end
     end
 
-    # Auto-detect PR number if not provided
+    # Auto-detect PR if not provided
     if not $has_pr
       set -l pr_number (gh pr view --json number -q .number 2>/dev/null)
       if test -z "$pr_number"
@@ -207,7 +224,12 @@
       set extra_args $extra_args $pr_number
     end
 
-    gh pr-review $argv $extra_args
+    # Execute and optionally filter bot authors
+    if $no_bots
+      gh pr-review $pass_args $extra_args | jq 'walk(if type == "array" then map(select(if .author_login? then (.author_login | test("\\[bot\\]$") | not) else true end)) else . end)'
+    else
+      gh pr-review $pass_args $extra_args
+    end
   '';
 
   # Custom history expansion functions (replacing puffer-fish plugin)
