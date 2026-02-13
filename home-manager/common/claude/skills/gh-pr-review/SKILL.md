@@ -9,25 +9,47 @@ GitHub CLI extension for inline PR review comments with LLM-friendly JSON output
 
 ## Shell Wrapper
 
-`ghreview` auto-detects repo and PR from the current directory/branch. All args pass through to `gh pr-review`.
+`ghreview` auto-detects repo and PR from the current directory/branch. All args pass through to `gh pr-review`. Defaults to `review view` with code context.
+
+### Wrapper Flags
+
+| Flag | Default | Purpose |
+|------|---------|---------|
+| `--no-bots` | off | Exclude bot authors (login ending in `[bot]`) |
+| `--no-code` | off | Skip injecting source code context into comments |
+| `--pretty` | off | Render as readable markdown instead of JSON |
+| `--raw` | off | Output raw JSON (skip jq pretty-printing) |
+
+Code context is injected by default — each comment includes a `code_context` field with the referenced source lines (3 lines above and below). Use `--no-code` to disable.
+
+### Quick Reference
 
 ```sh
-# These are equivalent:
-ghreview review view --unresolved
-gh pr-review review view --unresolved -R owner/repo 42
+# View all reviews for current PR (default, includes code context)
+ghreview
 
-# Exclude bot comments (filters author_login ending in [bot])
-ghreview --no-bots review view
+# Readable markdown output with code
+ghreview --pretty
+
+# Human-only comments as markdown
+ghreview --pretty --no-bots
+
+# Raw compact JSON (for piping)
+ghreview --raw
+
+# Skip code injection (faster, less output)
+ghreview --no-code
+
+# Override auto-detection
+ghreview -R owner/repo --pr 42 review view
 ```
-
-Override auto-detection with `-R owner/repo` and/or a trailing PR number.
 
 ## Core Commands
 
 ### View Reviews and Threads
 
 ```sh
-ghreview review view
+ghreview
 ghreview review view --unresolved --not_outdated
 ghreview review view --reviewer octocat
 ghreview review view --states CHANGES_REQUESTED,COMMENTED
@@ -87,7 +109,9 @@ Events: `APPROVE`, `REQUEST_CHANGES`, `COMMENT`
 
 ## Output Format
 
-Structured JSON. IDs use GraphQL format: `PRR_` (reviews), `PRRT_` (threads), `PRRC_` (comments).
+### JSON (default)
+
+Structured JSON with code context. IDs use GraphQL format: `PRR_` (reviews), `PRRT_` (threads), `PRRC_` (comments).
 
 ```json
 {
@@ -100,10 +124,12 @@ Structured JSON. IDs use GraphQL format: `PRR_` (reviews), `PRRT_` (threads), `P
         {
           "thread_id": "PRRT_...",
           "path": "src/file.go",
+          "line": 42,
           "author_login": "reviewer",
           "body": "Consider refactoring this",
           "is_resolved": false,
           "is_outdated": false,
+          "code_context": "39: func handler() {\n40:   ...\n41:   // existing code\n42:   problematicCall()\n43:   ...\n44: }\n45: ",
           "thread_comments": [
             {
               "author_login": "author",
@@ -117,12 +143,16 @@ Structured JSON. IDs use GraphQL format: `PRR_` (reviews), `PRRT_` (threads), `P
 }
 ```
 
+### Markdown (`--pretty`)
+
+Renders reviews as readable markdown with fenced code blocks for code context and threaded replies as blockquotes.
+
 ## Common Workflows
 
 ### Get actionable review feedback
 
 ```sh
-ghreview --no-bots review view --unresolved --not_outdated
+ghreview --pretty --no-bots review view --unresolved --not_outdated
 ```
 
 ### Reply and resolve
