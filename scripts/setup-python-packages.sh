@@ -31,9 +31,9 @@ done
 
 # Get the script directory and set paths
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-PKG_FILE="../home-manager/common/python/custom-pypi-packages.nix"
+PKG_FILE="../hosts/common/home/python/custom-pypi-packages.nix"
 FULL_PKG_PATH="$SCRIPT_DIR/$PKG_FILE"
-DEFAULT_NIX_PATH="$SCRIPT_DIR/../home-manager/common/python/default.nix"
+DEFAULT_NIX_PATH="$SCRIPT_DIR/../hosts/common/home/python/default.nix"
 
 # Create a temporary directory
 TEMP_DIR=$(mktemp -d)

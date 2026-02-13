@@ -43,13 +43,13 @@
 
   # copy xdg config files
   home.file."${config.xdg.configHome}/." = {
-    source = ../../environments/common/dotconfig;
+    source = ../system/dotconfig;
     recursive = true;
   };
 
   # symlink bin folder
   home.file.".local/bin" = {
-    source = ../../bin;
+    source = ../../../bin;
     recursive = true;
   };
 }

@@ -1,4 +1,4 @@
-# environments/nixos/joe-desktop.nix
+# hosts/nixos/system/joe-desktop.nix
 # Specific configuration for joe-desktop tower machine
 {
   config,
@@ -8,7 +8,7 @@
   dotfiles-assets,
   ...
 }: let
-  fonts = import ../common/fonts {inherit pkgs lib dotfiles-assets;};
+  fonts = import ../../common/system/fonts {inherit pkgs lib dotfiles-assets;};
 in {
   # TODO: Add litra-autotoggle as a service to systemd
 

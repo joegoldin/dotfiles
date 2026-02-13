@@ -98,13 +98,13 @@ build-macos-initial:
 [macos]
 organize-launchpad:
   @echo "🔨  Organizing Launchpad..."
-  @lporg load --config $(pwd)/environments/common/dotconfig/lporg.yaml --yes --no-backup
+  @lporg load --config $(pwd)/hosts/common/system/dotconfig/lporg.yaml --yes --no-backup
   @echo "✅  Organized Launchpad!"
 
 [macos]
 save-launchpad:
   @echo "🔨  Organizing Launchpad..."
-  @lporg save --config $(pwd)/environments/common/dotconfig/lporg.yaml
+  @lporg save --config $(pwd)/hosts/common/system/dotconfig/lporg.yaml
   @echo "✅  Saved Launchpad!"
 
 [macos]
