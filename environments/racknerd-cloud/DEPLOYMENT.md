@@ -20,6 +20,7 @@ This guide covers deploying Happy Server to your RackNerd VPS using NixOS.
 2. **Tailscale** configured and running
 3. **agenix** installed locally (`nix-shell -p agenix`)
 4. **SSH access** to the RackNerd server
+5. **Domain config**: Copy `secrets/domains.nix.example` to `secrets/domains.nix` and fill in your actual domains
 
 ## Initial Setup
 
@@ -105,7 +106,7 @@ Happy Server is accessible via multiple methods:
 
 Caddy provides automatic HTTPS with Let's Encrypt:
 
-- **Public HTTPS**: `https://REDACTED_DOMAIN:3006`
+- **Public HTTPS**: `https://<YOUR_DOMAIN>:3006`
   - Accessible from anywhere
   - Automatic SSL certificates
   - Reverse proxy to Happy Server on port 3005
@@ -124,7 +125,7 @@ On your computer, configure the Happy CLI to use your server:
 
 ```bash
 # Option 1: Public HTTPS (works everywhere)
-export HAPPY_SERVER_URL="https://REDACTED_DOMAIN:3006"
+export HAPPY_SERVER_URL="https://<YOUR_DOMAIN>:3006"
 
 # Option 2: Tailscale (private network only)
 export HAPPY_SERVER_URL="http://<racknerd-tailscale-ip>:3005"
@@ -133,7 +134,7 @@ export HAPPY_SERVER_URL="http://<racknerd-tailscale-ip>:3005"
 Or add to your shell config (`~/.bashrc`, `~/.zshrc`, etc.):
 
 ```bash
-echo 'export HAPPY_SERVER_URL="https://REDACTED_DOMAIN:3006"' >> ~/.bashrc
+echo 'export HAPPY_SERVER_URL="https://<YOUR_DOMAIN>:3006"' >> ~/.bashrc
 ```
 
 ### Configure Happy Mobile App
@@ -143,7 +144,7 @@ On your phone:
 1. Open Happy app
 2. Go to Settings
 3. Set "Relay Server URL" to:
-   - **Public**: `https://REDACTED_DOMAIN:3006` (works anywhere)
+   - **Public**: `https://<YOUR_DOMAIN>:3006` (works anywhere)
    - **Tailscale**: `http://<racknerd-tailscale-ip>:3005` (requires Tailscale)
 4. Save
 
