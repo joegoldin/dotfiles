@@ -83,6 +83,26 @@ let
     (localSkill "obsidian-cli")
   ];
 
+  # Custom commands
+  prReviewCommand = claudeLib.mkCommand {
+    name = "pr-review";
+    description = "Fetch and analyze inline PR review comments for the current branch";
+  } ''
+    Use the gh-pr-review skill for this task.
+
+    Fetch and analyze the inline PR review comments for the current branch.
+
+    1. Run `ghreview --raw` to get the full review JSON (includes code context by default)
+    2. Summarize each reviewer's feedback
+    3. List all unresolved comments grouped by file, with the referenced code and the reviewer's concern
+    4. Categorize feedback (bugs, security, performance, style, architecture, questions)
+    5. Propose a prioritized plan to address the comments
+
+    If there are thread replies, note which comments already have responses and which are unanswered.
+
+    $ARGUMENTS
+  '';
+
   # Copy hooks from superpowers (includes session-start hook)
   superpowersHooks = pkgs.runCommand "superpowers-hooks" { } ''
     mkdir -p $out/hooks
@@ -95,6 +115,9 @@ let
     name = "superpowers";
     description = "Core skills library: TDD, debugging, collaboration patterns, and proven techniques (from github:obra/superpowers)";
     skills = superpowersSkillDerivations;
+    commands = [
+      prReviewCommand
+    ];
   };
 
   # Attribution file for the plugin
