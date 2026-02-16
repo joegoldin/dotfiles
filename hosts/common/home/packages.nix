@@ -23,7 +23,7 @@
       unstable.discord
       unstable.dumbpipe
       # extraterm
-      unstable.ghostty
+      # ghostty is managed by programs.ghostty in ghostty.nix
       inotify-tools
       # unstable.jellyfin-media-player
       #      cargoModule.packages.litra
