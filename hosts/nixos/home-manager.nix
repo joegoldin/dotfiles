@@ -9,6 +9,7 @@
   imports = [
     ../common/home
     ../common/home/firefox
+    ./packages.nix
   ];
 
   # TODO: git signing with 1password

@@ -2,58 +2,11 @@
   pkgs,
   lib,
   config,
-  affinity-nix,
   ...
 }: let
   unstable = pkgs.unstable;
   pythonModule = import ./python {inherit pkgs lib unstable;};
-  appImagePackages = import ./appimages.nix {inherit pkgs;};
-  cargoModule = import ./cargo.nix {inherit pkgs lib;};
-  goModule = import ./go.nix {inherit pkgs lib;};
   spritesModule = import ./sprites.nix {inherit pkgs lib;};
-
-  # System-specific package sets
-  nixosPackages = with pkgs;
-    lib.optionals (pkgs.stdenv.hostPlatform.isx86_64) [
-      # affinity-nix.packages.x86_64-linux.photo
-      # unstable.android-studio-full
-      goModule.packages.claude-squad
-      unstable.cloudflared
-      #      unstable.davinci-resolve
-      unstable.discord
-      unstable.dumbpipe
-      # extraterm
-      # ghostty is managed by programs.ghostty in ghostty.nix
-      inotify-tools
-      # unstable.jellyfin-media-player
-      #      cargoModule.packages.litra
-      #      cargoModule.packages.litra-autotoggle
-      unstable.obsidian
-      unstable.parsec-bin
-      unstable.pulsemixer
-      reptyr
-      unstable.slack
-      unstable.steam
-      unstable.streamcontroller
-      sublime-merge
-      unstable.tailscale
-      ungoogled-chromium
-      vlc
-      unstable.zed-editor
-      unstable.zoom-us
-    ]
-    ++ appImagePackages;
-
-  macosPackages = with pkgs; [
-    shopt-script
-    iterm2-terminal-integration
-  ];
-
-  wslPackages = with pkgs; [
-    openssl
-    openssl.dev
-    wsl-open
-  ];
 
   # Common packages for all systems
   commonPackages = with pkgs;
@@ -153,23 +106,7 @@
       zstd
     ];
 in {
-  home.packages =
-    commonPackages
-    ++ (
-      if pkgs.stdenv.isLinux && !(lib.hasAttr "wsl" config && config.wsl.enable)
-      then nixosPackages
-      else []
-    )
-    ++ (
-      if pkgs.stdenv.isDarwin
-      then macosPackages
-      else []
-    )
-    ++ (
-      if lib.hasAttr "wsl" config && config.wsl.enable
-      then wslPackages
-      else []
-    );
+  home.packages = commonPackages;
 
   home.activation.pythonPostInstall = pythonModule.pythonPostInstall;
 
