@@ -33,25 +33,25 @@
   fileSystems."/mnt/windows" = {
     device = "/dev/nvme0n1p3";
     fsType = "ntfs-3g";
-    options = ["rw" "uid=1000"];
+    options = ["rw" "uid=1000" "nofail"];
   };
 
   fileSystems."/mnt/windows-2" = {
     device = "/dev/nvme4n1p2";
     fsType = "ntfs-3g";
-    options = ["rw" "uid=1000"];
+    options = ["rw" "uid=1000" "nofail"];
   };
 
   fileSystems."/mnt/data" = {
     device = "/dev/nvme1n1p2";
     fsType = "ntfs-3g";
-    options = ["rw" "uid=1000"];
+    options = ["rw" "uid=1000" "nofail"];
   };
 
   fileSystems."/mnt/data-2" = {
     device = "/dev/nvme3n1p2";
     fsType = "ntfs-3g";
-    options = ["rw" "uid=1000"];
+    options = ["rw" "uid=1000" "nofail"];
   };
 
   swapDevices = [];
