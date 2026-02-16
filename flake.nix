@@ -380,7 +380,8 @@
           })
           agenix.nixosModules.default
           erosanix.nixosModules.mkwindowsapp-gc
-          lanzaboote.nixosModules.lanzaboote
+          # TODO: Re-enable once system is bootstrapped
+          # lanzaboote.nixosModules.lanzaboote
         ];
       };
     };
