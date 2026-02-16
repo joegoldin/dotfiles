@@ -6,7 +6,7 @@
 }: let
   baseSettings = {
     font-family = "TX02 Nerd Font";
-    font-size = 14;
+    font-size = 11;
     font-feature = [
       "calt"
       "liga"
