@@ -11,6 +11,7 @@
 }: {
   imports = [
     ../common/home
+    ./packages.nix
   ];
 
   home.sessionVariables = {
