@@ -22,6 +22,13 @@
     '';
     destination = "/etc/udev/rules.d/99-litra.rules";
   };
+  streamcontroller-rules = pkgs.writeTextFile {
+    name = "99-streamcontroller-osplugin.rules";
+    text = ''
+      KERNEL=="uinput", SUBSYSTEM=="misc", OPTIONS+="static_node=uinput", TAG+="uaccess", GROUP="input", MODE="0660"
+    '';
+    destination = "/etc/udev/rules.d/99-streamcontroller-osplugin.rules";
+  };
 in {
   system.stateVersion = "${stateVersion}";
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
@@ -92,7 +99,7 @@ in {
       openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP0vgzxNgZd51jZ3K/s64jltFRSyVLxjLPWM4Q6747Zw"
       ];
-      extraGroups = ["wheel" "audio" "video" "docker" "networkmanager"];
+      extraGroups = ["wheel" "audio" "video" "docker" "networkmanager" "input"];
     };
   };
 
@@ -133,5 +140,5 @@ in {
   };
   programs.nix-ld.enable = true;
 
-  services.udev.packages = [litra-rules];
+  services.udev.packages = [litra-rules streamcontroller-rules];
 }
