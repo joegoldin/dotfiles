@@ -23,6 +23,7 @@
 in {
   imports = [
     ../common/home
+    ./packages.nix
   ];
 
   home.packages = with pkgs; [

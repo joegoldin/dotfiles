@@ -9,7 +9,6 @@
   username,
   homeDirectory,
   stateVersion,
-  affinity-nix,
   ...
 }: {
   # You can import other home-manager modules here
@@ -22,7 +21,7 @@
 
     # You can also split up your configuration and import pieces of it here:
     ./fish
-    (import ./packages.nix {inherit pkgs lib config affinity-nix;})
+    (import ./packages.nix {inherit pkgs lib config;})
     ./gh.nix
     ./git.nix
     ./ghostty.nix
