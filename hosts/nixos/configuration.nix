@@ -26,13 +26,12 @@ in {
   system.stateVersion = "${stateVersion}";
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
-  # TODO: Re-enable lanzaboote for secure boot once system is bootstrapped
-  # boot.loader.systemd-boot.enable = lib.mkForce false;
-  # boot.lanzaboote = {
-  #   enable = true;
-  #   pkiBundle = "/var/lib/sbctl";
-  # };
-  boot.loader.systemd-boot.enable = true;
+  # Lanzaboote replaces systemd-boot for secure boot
+  boot.loader.systemd-boot.enable = lib.mkForce false;
+  boot.lanzaboote = {
+    enable = true;
+    pkiBundle = "/var/lib/sbctl";
+  };
 
   boot.loader.efi.canTouchEfiVariables = true;
 
