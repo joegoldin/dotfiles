@@ -19,7 +19,7 @@
     lib.hm.dag.entryAfter ["linkGeneration"] ''
       export PATH="${lib.makeBinPath [pkgs.python3 pkgs.grc pkgs.git pkgs.uv]}:$PATH"
       echo "Running fish-ai installation..."
-      run ${pkgs.fish}/bin/fish -c 'source ${config.xdg.configHome}/fish/conf.d/fish_ai.fish; _fish_ai_install'
+      run ${pkgs.fish}/bin/fish -c 'source ${config.xdg.configHome}/fish/conf.d/plugin-fish-ai.fish; _fish_ai_install'
     ''
   );
 }
