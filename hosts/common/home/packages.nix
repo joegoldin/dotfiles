@@ -30,6 +30,7 @@
       #      cargoModule.packages.litra-autotoggle
       unstable.obsidian
       unstable.parsec-bin
+      unstable.pulsemixer
       reptyr
       unstable.slack
       unstable.steam
@@ -38,6 +39,7 @@
       unstable.tailscale
       ungoogled-chromium
       vlc
+      unstable.zed-editor
       unstable.zoom-us
     ]
     ++ appImagePackages;
