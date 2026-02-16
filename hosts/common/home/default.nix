@@ -24,7 +24,6 @@
     (import ./packages.nix {inherit pkgs lib config;})
     ./gh.nix
     ./git.nix
-    ./ghostty.nix
     ./starship.nix
     ./claude
   ];
