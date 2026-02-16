@@ -131,5 +131,7 @@ in {
       PasswordAuthentication = false;
     };
   };
+  programs.nix-ld.enable = true;
+
   services.udev.packages = [litra-rules];
 }
