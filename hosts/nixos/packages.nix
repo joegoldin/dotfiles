@@ -29,6 +29,7 @@ in
       notion-app
       unstable.obsidian
       unstable.parsec-bin
+      pulseaudio # pactl required by pulsemeeter's pmctl script
       unstable.pulsemeeter
       unstable.pulsemixer
       reptyr

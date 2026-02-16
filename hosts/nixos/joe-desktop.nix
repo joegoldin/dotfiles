@@ -55,6 +55,13 @@ in {
     alsa.support32Bit = true;
     pulse.enable = true;
     jack.enable = true;
+    extraConfig.pipewire."99-pulsemeeter" = {
+      "context.properties" = {
+        "default.clock.quantum" = 1024;
+        "default.clock.min-quantum" = 512;
+        "default.clock.max-quantum" = 2048;
+      };
+    };
   };
   # Disable PulseAudio as it conflicts with PipeWire
   services.pulseaudio.enable = false;
