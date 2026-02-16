@@ -76,6 +76,8 @@ in {
     channel.enable = false;
   };
 
+  time.timeZone = "America/Los_Angeles";
+
   networking.hostName = hostname;
 
   users.users = {

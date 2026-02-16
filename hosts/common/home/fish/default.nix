@@ -19,7 +19,7 @@
     lib.hm.dag.entryAfter ["installPackages"] ''
       export PATH="${lib.makeBinPath [pkgs.python3 pkgs.grc pkgs.git pkgs.uv]}:$PATH"
       echo "Running fish-ai installation..."
-      run ${pkgs.fish}/bin/fish -c '_fish_ai_install'
+      run ${pkgs.fish}/bin/fish -c 'for f in $__fish_config_dir/conf.d/*.fish; source $f; end; _fish_ai_install'
     ''
   );
 }
