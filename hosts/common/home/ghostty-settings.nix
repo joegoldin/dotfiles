@@ -1,9 +1,4 @@
-{
-  pkgs,
-  lib,
-  config,
-  ...
-}: let
+{lib}: let
   baseSettings = {
     font-family = "TX02 Nerd Font";
     font-size = 11;
@@ -43,26 +38,10 @@
     ];
   };
 
-  macosSettings = baseSettings // {
-    command = "/etc/profiles/per-user/joe/bin/fish";
-  };
-
   toGhosttyConfig = settings: let
     mkLine = key: value:
       if builtins.isList value
       then lib.concatMapStringsSep "\n" (v: "${key} = ${toString v}") value
       else "${key} = ${toString value}";
   in lib.concatStringsSep "\n" (lib.mapAttrsToList mkLine settings);
-in {
-  programs.ghostty = lib.mkIf pkgs.stdenv.isLinux {
-    enable = true;
-    enableBashIntegration = true;
-    enableFishIntegration = true;
-    enableZshIntegration = false;
-    settings = baseSettings;
-  };
-
-  home.file."Library/Application Support/com.mitchellh.ghostty/config" = lib.mkIf pkgs.stdenv.isDarwin {
-    text = toGhosttyConfig macosSettings;
-  };
-}
+in {inherit baseSettings toGhosttyConfig;}

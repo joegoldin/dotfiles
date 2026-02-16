@@ -24,6 +24,7 @@ in {
   imports = [
     ../common/home
     ./packages.nix
+    ./ghostty.nix
   ];
 
   home.packages = with pkgs; [

@@ -15,9 +15,6 @@
     ../common/home
   ];
 
-  # Disable ghostty for headless server
-  programs.ghostty.enable = lib.mkForce false;
-
   # Disable fish-ai installation for headless server
   home.activation.fishAiPostInstall = lib.mkForce (lib.hm.dag.entryAnywhere "");
 
