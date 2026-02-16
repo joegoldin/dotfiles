@@ -165,7 +165,7 @@ build-nixos fast='':
 [private]
 build-nixos-fast:
   @echo "🔨  Building Nix config for NixOS 🐧 (fast mode)"
-  sudo nixos-rebuild --flake .#nixos switch
+  sudo nixos-rebuild --flake .#joe-desktop switch
   @echo "✅  Built for NixOS!"
 
 [linux]
