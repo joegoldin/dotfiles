@@ -8,7 +8,7 @@
   dotfiles-assets,
   ...
 }: let
-  fonts = import ../../common/system/fonts {inherit pkgs lib dotfiles-assets;};
+  fonts = import ../common/system/fonts {inherit pkgs lib dotfiles-assets;};
 in {
   # TODO: Add litra-autotoggle as a service to systemd
 
