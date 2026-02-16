@@ -78,6 +78,7 @@ in {
 
   time.timeZone = "America/Los_Angeles";
 
+  networking.networkmanager.enable = true;
   networking.hostName = hostname;
 
   users.users = {
