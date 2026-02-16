@@ -64,10 +64,31 @@
       # Main panel at the bottom
       {
         location = "bottom";
+        floating = false;
         height = 38;
         widgets = [
-          "org.kde.plasma.kickoff"
-          "org.kde.plasma.icontasks"
+          {
+            kickoff = {
+              popupHeight = 509;
+              popupWidth = 647;
+            };
+          }
+          {
+            iconTasks = {
+              launchers = [
+                "preferred://filemanager"
+                "applications:firefox.desktop"
+                "applications:com.mitchellh.ghostty.desktop"
+                "applications:dev.zed.Zed.desktop"
+                "applications:parsecd.desktop"
+                "applications:discord.desktop"
+                "applications:obsidian.desktop"
+                "applications:steam.desktop"
+                "applications:slack.desktop"
+                "applications:Zoom.desktop"
+              ];
+            };
+          }
           "org.kde.plasma.marginsseparator"
           "org.kde.plasma.systemtray"
           "org.kde.plasma.digitalclock"
