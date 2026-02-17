@@ -3,7 +3,6 @@
   lib,
   inputs,
   outputs,
-  pkgs,
   config,
   username,
   hostname,

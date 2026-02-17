@@ -2,15 +2,12 @@
   pkgs,
   lib,
   ...
-}:
-let
+}: let
   unstable = pkgs.unstable;
-  goModule = import ../common/home/go.nix { inherit pkgs lib; };
-  appImagePackages = import ../common/home/appimages.nix { inherit pkgs; };
-in
-{
-  home.packages =
-    with pkgs;
+  goModule = import ../common/home/go.nix {inherit pkgs lib;};
+  appImagePackages = import ../common/home/appimages.nix {inherit pkgs;};
+in {
+  home.packages = with pkgs;
     lib.optionals (pkgs.stdenv.hostPlatform.isx86_64) [
       # affinity-nix.packages.x86_64-linux.photo
       # unstable.android-studio-full

@@ -7,6 +7,11 @@
       url = "git+file:assets";
       flake = false;
     };
+    # secrets (domains, encrypted age files, etc.)
+    dotfiles-secrets = {
+      url = "git+file:secrets";
+      flake = false;
+    };
     # Nixpkgs
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     # You can access packages and modules from different nixpkgs revs
@@ -214,6 +219,7 @@
     lanzaboote,
     llm-agents,
     dotfiles-assets,
+    dotfiles-secrets,
     superpowers,
     claude-nix,
     pelican,
@@ -230,7 +236,7 @@
     commonSpecialArgs =
       inputs
       // {
-        inherit inputs outputs useremail stateVersion username hostname homeDirectory dotfiles-assets;
+        inherit inputs outputs useremail stateVersion username hostname homeDirectory dotfiles-assets dotfiles-secrets;
       };
     eachSystem = nixpkgs.lib.genAttrs (import systems);
     basePackages = eachSystem (system: import ./hosts/common/system/pkgs nixpkgs.legacyPackages.${system});
@@ -318,7 +324,7 @@
           agenix.nixosModules.default
           ({specialArgs, ...}: {
             age.secrets.cf = {
-              file = ./secrets/cf.json.age;
+              file = "${dotfiles-secrets}/cf.json.age";
               mode = "655";
               owner = specialArgs.username;
               group = "users";
@@ -349,7 +355,7 @@
           agenix.nixosModules.default
           ({specialArgs, ...}: {
             age.secrets.happy-secrets = {
-              file = ./secrets/happy-secrets.env.age;
+              file = "${dotfiles-secrets}/happy-secrets.env.age";
               mode = "400";
               owner = "root";
               group = "root";
