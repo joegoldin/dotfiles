@@ -48,6 +48,7 @@ in {
       outputs.overlays.modifications
       outputs.overlays.unstable-packages
       outputs.overlays.llm-agents-packages
+      outputs.overlays.mcps-packages
     ];
     config = {
       allowUnfree = true;
