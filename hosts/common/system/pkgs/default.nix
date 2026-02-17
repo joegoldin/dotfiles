@@ -65,50 +65,11 @@ pkgs: {
       ;
   };
 
-  claude-desktop = pkgs.callPackage ./claude-desktop.nix {};
+  claude-desktop = pkgs.callPackage ./claude-desktop {};
 
-  lotion = pkgs.callPackage ./lotion.nix {
+  lotion = pkgs.callPackage ./lotion {
     electron = pkgs.electron_37;
   };
 
-  happy-cli = pkgs.stdenv.mkDerivation (finalAttrs: {
-    pname = "happy-coder";
-    version = "0.14.0-0";
-
-    src = pkgs.fetchFromGitHub {
-      owner = "slopus";
-      repo = "happy-cli";
-      tag = "v${finalAttrs.version}";
-      hash = "sha256-kEYgo+n1qv+jJ9GvqiwJtf6JSA2xSkLMEbvuY/b7Gdk=";
-    };
-
-    yarnOfflineCache = pkgs.fetchYarnDeps {
-      yarnLock = "${finalAttrs.src}/yarn.lock";
-      hash = "sha256-DlUUAj5b47KFhUBsftLjxYJJxyCxW9/xfp3WUCCClDY=";
-    };
-
-    nativeBuildInputs = [
-      pkgs.nodejs
-      pkgs.yarnConfigHook
-      pkgs.yarnBuildHook
-      pkgs.yarnInstallHook
-      pkgs.makeWrapper
-    ];
-
-    postInstall = ''
-      wrapProgram $out/bin/happy \
-        --prefix PATH : ${pkgs.lib.makeBinPath [pkgs.nodejs]}
-      wrapProgram $out/bin/happy-mcp \
-        --prefix PATH : ${pkgs.lib.makeBinPath [pkgs.nodejs]}
-    '';
-
-    meta = with pkgs.lib; {
-      description = "Mobile and web client wrapper for Claude Code and Codex with end-to-end encryption";
-      homepage = "https://github.com/slopus/happy-cli";
-      changelog = "https://github.com/slopus/happy-cli/releases/tag/v${finalAttrs.version}";
-      license = licenses.mit;
-      maintainers = [];
-      mainProgram = "happy";
-    };
-  });
+  happy-cli = pkgs.callPackage ./happy-cli {};
 }

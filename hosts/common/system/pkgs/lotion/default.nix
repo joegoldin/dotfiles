@@ -36,7 +36,7 @@ buildNpmPackage rec {
   ];
 
   patches = [
-    ./lotion-open-in-tab.patch
+    ./open-in-tab.patch
   ];
 
   makeCacheWritable = true;
