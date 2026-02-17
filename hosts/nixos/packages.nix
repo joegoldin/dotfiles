@@ -34,7 +34,6 @@ in
       unstable.pulsemixer
       reptyr
       unstable.slack
-      unstable.steam
       unstable.streamcontroller
       sublime-merge
       unstable.tailscale
