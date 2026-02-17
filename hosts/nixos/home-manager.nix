@@ -79,10 +79,10 @@
                 "applications:dev.zed.Zed.desktop"
                 "applications:parsecd.desktop"
                 "applications:discord.desktop"
-                "applications:obsidian.desktop"
                 "applications:steam.desktop"
+                "applications:claude-desktop.desktop"
+                "applications:obsidian.desktop"
                 "applications:slack.desktop"
-                "applications:Zoom.desktop"
               ];
             };
           }
