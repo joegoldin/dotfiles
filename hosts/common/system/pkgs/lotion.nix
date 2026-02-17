@@ -35,6 +35,10 @@ buildNpmPackage rec {
     alsa-lib
   ];
 
+  patches = [
+    ./lotion-open-in-tab.patch
+  ];
+
   makeCacheWritable = true;
 
   # No build script in package.json; source is plain JS
