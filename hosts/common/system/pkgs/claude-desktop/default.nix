@@ -38,7 +38,7 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   npmDeps = fetchNpmDeps {
-    src = ./claude-desktop-npm;
+    src = ./npm;
     hash = "sha256-SP1sqDbiUtzN4EIPcKkHglBe9eFlBMTnH5/ijhzs8Fk=";
   };
 
@@ -71,8 +71,8 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   postUnpack = ''
-    cp ${./claude-desktop-npm/package.json} source/package.json
-    cp ${./claude-desktop-npm/package-lock.json} source/package-lock.json
+    cp ${./npm/package.json} source/package.json
+    cp ${./npm/package-lock.json} source/package-lock.json
   '';
 
   postPatch = ''
