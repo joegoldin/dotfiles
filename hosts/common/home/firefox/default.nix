@@ -303,6 +303,11 @@ in {
 
         # "network.dns.disableIPv6" = false;
 
+        # Network privacy hardening
+        "network.dns.disablePrefetch" = true;
+        "network.http.speculative-parallel-limit" = 0;
+        "network.prefetch-next" = false;
+
         "privacy.donottrackheader.enabled" = true;
 
         # "privacy.clearOnShutdown.history" = true;
@@ -315,6 +320,15 @@ in {
         "privacy.resistFingerprinting" = true;
 
         "signon.management.page.breach-alerts.enabled" = false; # Disable firefox password checking against a breach database
+
+        # Container tabs (used by Sidebery)
+        "privacy.userContext.enabled" = true;
+        "privacy.userContext.ui.enabled" = true;
+
+        # UI preferences
+        "browser.toolbars.bookmarks.visibility" = "always";
+        "browser.theme.toolbar-theme" = 0; # Dark toolbar
+        "ui.key.menuAccessKeyFocuses" = false; # Disable Alt key focusing menu bar
 
         "media.videocontrols.picture-in-picture.enabled" = true;
         "media.videocontrols.picture-in-picture.enable-when-switching-tabs.enabled" = true;
