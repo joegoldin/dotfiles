@@ -13,6 +13,7 @@
   imports = [
     ./configuration.nix
     ./hardware-configuration.nix
+    ./gaming.nix
     ./joe-desktop.nix
     ./wallpaper.nix
   ];
