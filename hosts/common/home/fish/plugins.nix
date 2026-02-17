@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   plugins = with pkgs.fishPlugins; [
     # Refresh prompt on command - shows accurate time/git status at execution time
     {

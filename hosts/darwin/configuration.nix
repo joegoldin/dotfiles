@@ -8,8 +8,7 @@
   hostname,
   agenix,
   ...
-}:
-{
+}: {
   imports = [
     ./system.nix
     ./apps.nix
@@ -38,44 +37,42 @@
     };
   };
 
-  nix =
-    let
-      flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
-    in
-    {
-      enable = true;
-      settings = {
-        experimental-features = [
-          "nix-command"
-          "flakes"
-        ];
-        nix-path = config.nix.nixPath;
-        trusted-users = [ "${username}" ];
-        auto-optimise-store = false;
-        extra-substituters = [ "https://nixpkgs-python.cachix.org" ];
-        extra-trusted-public-keys = [
-          "nixpkgs-python.cachix.org-1:hxjI7pFxTyuTHn2NkvWCrAUcNZLNS3ZAvfYNuYifcEU="
-          "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
-        ];
-        # Enable building for x86_64-darwin on aarch64-darwin
-        extra-platforms = [
-          "x86_64-darwin"
-          "aarch64-darwin"
-        ];
-      };
-
-      gc = {
-        automatic = lib.mkDefault true;
-        options = lib.mkDefault "--delete-older-than 7d";
-      };
-
-      extraOptions = lib.optionalString (
-        config.nix.package == pkgs.nixVersions.stable
-      ) "experimental-features = nix-command flakes";
-
-      registry = lib.mapAttrs (_: flake: { inherit flake; }) flakeInputs;
-      nixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
+  nix = let
+    flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
+  in {
+    enable = true;
+    settings = {
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
+      nix-path = config.nix.nixPath;
+      trusted-users = ["${username}"];
+      auto-optimise-store = false;
+      extra-substituters = ["https://nixpkgs-python.cachix.org"];
+      extra-trusted-public-keys = [
+        "nixpkgs-python.cachix.org-1:hxjI7pFxTyuTHn2NkvWCrAUcNZLNS3ZAvfYNuYifcEU="
+        "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
+      ];
+      # Enable building for x86_64-darwin on aarch64-darwin
+      extra-platforms = [
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
     };
+
+    gc = {
+      automatic = lib.mkDefault true;
+      options = lib.mkDefault "--delete-older-than 7d";
+    };
+
+    extraOptions = lib.optionalString (
+      config.nix.package == pkgs.nixVersions.stable
+    ) "experimental-features = nix-command flakes";
+
+    registry = lib.mapAttrs (_: flake: {inherit flake;}) flakeInputs;
+    nixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
+  };
 
   ids.uids.nixbld = lib.mkForce 350;
 
@@ -107,5 +104,4 @@
     agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
     # darwin.xcode_16_3  # TODO: enable this when available in nixpkgs
   ];
-
 }

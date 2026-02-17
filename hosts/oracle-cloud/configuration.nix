@@ -11,8 +11,7 @@
   stateVersion,
   agenix,
   ...
-}:
-{
+}: {
   system.stateVersion = "${stateVersion}";
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
@@ -33,41 +32,39 @@
     };
   };
 
-  nix =
-    let
-      flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
-    in
-    {
-      settings = {
-        experimental-features = [
-          "nix-command"
-          "flakes"
-        ];
-        nix-path = config.nix.nixPath;
-        trusted-users = [ "${username}" ];
-        auto-optimise-store = false;
-        extra-substituters = [ "https://nixpkgs-python.cachix.org" ];
-        extra-trusted-public-keys = [
-          "nixpkgs-python.cachix.org-1:hxjI7pFxTyuTHn2NkvWCrAUcNZLNS3ZAvfYNuYifcEU="
-          "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
-        ];
-      };
-
-      gc = {
-        automatic = lib.mkDefault true;
-        options = lib.mkDefault "--delete-older-than 7d";
-      };
-
-      extraOptions = lib.optionalString (
-        config.nix.package == pkgs.nixVersions.stable
-      ) "experimental-features = nix-command flakes";
-
-      registry = lib.mapAttrs (_: flake: { inherit flake; }) flakeInputs;
-      nixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
-
-      # Disable channels entirely - use flakes only
-      channel.enable = false;
+  nix = let
+    flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
+  in {
+    settings = {
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
+      nix-path = config.nix.nixPath;
+      trusted-users = ["${username}"];
+      auto-optimise-store = false;
+      extra-substituters = ["https://nixpkgs-python.cachix.org"];
+      extra-trusted-public-keys = [
+        "nixpkgs-python.cachix.org-1:hxjI7pFxTyuTHn2NkvWCrAUcNZLNS3ZAvfYNuYifcEU="
+        "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
+      ];
     };
+
+    gc = {
+      automatic = lib.mkDefault true;
+      options = lib.mkDefault "--delete-older-than 7d";
+    };
+
+    extraOptions = lib.optionalString (
+      config.nix.package == pkgs.nixVersions.stable
+    ) "experimental-features = nix-command flakes";
+
+    registry = lib.mapAttrs (_: flake: {inherit flake;}) flakeInputs;
+    nixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
+
+    # Disable channels entirely - use flakes only
+    channel.enable = false;
+  };
 
   networking.hostName = hostname;
 

@@ -1,7 +1,4 @@
-{
-  codeNotify,
-}:
-{
+{codeNotify}: {
   attribution = {
     commit = "";
     pr = "";
@@ -78,7 +75,7 @@
     ];
   };
 
-  enabledPlugins = { };
+  enabledPlugins = {};
 
   alwaysThinkingEnabled = true;
 

@@ -4,9 +4,8 @@
   pkgs,
   username,
   ...
-}:
-let
-  python = pkgs.python3.withPackages (ps: [ ps.evdev ]);
+}: let
+  python = pkgs.python3.withPackages (ps: [ps.evdev]);
 
   drag-shift = pkgs.writeScriptBin "drag-shift" ''
     #!${python}/bin/python3
@@ -66,12 +65,11 @@ let
 
     asyncio.run(main())
   '';
-in
-{
+in {
   systemd.services."drag-shift" = {
     description = "Inject Shift when left+right mouse buttons held during window drag";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "systemd-udevd.service" ];
+    wantedBy = ["multi-user.target"];
+    after = ["systemd-udevd.service"];
     serviceConfig = {
       Type = "simple";
       User = username;

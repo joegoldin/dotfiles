@@ -5,8 +5,7 @@
   lib,
   username,
   ...
-}:
-{
+}: {
   users.users.root.openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP0vgzxNgZd51jZ3K/s64jltFRSyVLxjLPWM4Q6747Zw"
   ];
@@ -23,7 +22,7 @@
   services.tailscale.useRoutingFeatures = "server";
 
   virtualisation.docker.enable = true;
-  users.extraGroups.docker.members = [ "${username}" ];
+  users.extraGroups.docker.members = ["${username}"];
 
   # Configure firewall
   # RackNerd VPS doesn't have its own firewall, so we need to use NixOS firewall
