@@ -1,11 +1,21 @@
 diff --git a/src/main/controllers/TabController.js b/src/main/controllers/TabController.js
-index c03f6f1..808c00a 100644
+index c03f6f1..c7d7448 100644
 --- a/src/main/controllers/TabController.js
 +++ b/src/main/controllers/TabController.js
-@@ -87,6 +87,57 @@ class TabController {
+@@ -78,6 +78,9 @@ class TabController {
+       log.error(`Tab ${this.tabId}: Error setting spell checker languages:`, err);
+     }
+ 
++    // Ensure background tabs load fully so they're ready when switched to
++    this.webContentsView.webContents.backgroundThrottling = false;
++
+     log.debug(`WebContentsView created for tab: ${this.tabId}`);
+   }
+ 
+@@ -87,6 +90,57 @@ class TabController {
    setupEventListeners() {
      const { webContents } = this.webContentsView;
-
+ 
 +    // Keyboard shortcuts for tab management
 +    webContents.on('before-input-event', (event, input) => {
 +      if (input.type !== 'keyDown' || !input.control || input.alt) return;
@@ -60,21 +70,21 @@ index c03f6f1..808c00a 100644
      // Page title updated
      webContents.on('page-title-updated', (event, title) => {
        event.preventDefault(); // Prevent default title setting
-@@ -162,8 +213,8 @@ class TabController {
+@@ -162,8 +216,8 @@ class TabController {
        }
      });
-
+ 
 -    // Handle external links - allow Notion domains, open others externally
 -    webContents.setWindowOpenHandler(({ url }) => {
 +    // Handle external links - open Notion domains in new tab, others externally
 +    webContents.setWindowOpenHandler(({ url, disposition }) => {
        const parsedUrl = new URL(url);
-
+ 
        // Check if URL is a Notion domain (notion.so or notion.com)
-@@ -175,16 +226,39 @@ class TabController {
+@@ -175,16 +229,39 @@ class TabController {
          parsedUrl.hostname === 'www.notion.com' ||
          parsedUrl.hostname.endsWith('.notion.com');
-
+ 
 -      if (isNotionDomain) {
 -        // Allow Notion links to open in new tab within app
 -        log.debug(`Tab ${this.tabId}: Allowing new window for Notion URL: ${url}`);
@@ -114,7 +124,7 @@ index c03f6f1..808c00a 100644
 +      });
 +      return { action: 'deny' };
      });
-
+ 
      // Allow navigation within Notion, block external sites
 diff --git a/src/main/controllers/WindowController.js b/src/main/controllers/WindowController.js
 index 3c239af..b19b5a6 100644
@@ -125,7 +135,7 @@ index 3c239af..b19b5a6 100644
      this.createTabBarView();
      this.setupBrowserWindowListeners();
 -    this.createInitialTab();
-
+ 
 -    // Dispatch action to add this window to the Redux store
 +    // Dispatch action to add this window to the Redux store BEFORE creating
 +    // the initial tab, so that addTabToWindow/setActiveTabForWindow can find it.
@@ -135,7 +145,7 @@ index 3c239af..b19b5a6 100644
 @@ -37,6 +37,8 @@ class WindowController {
        isFocused: this.browserWindow.isFocused(), // Check initial focus state
      }));
-
+ 
 +    this.createInitialTab();
 +
      // Show window after everything is set up
@@ -144,7 +154,7 @@ index 3c239af..b19b5a6 100644
 @@ -55,8 +57,18 @@ class WindowController {
        return path.join(__dirname, '../../../assets/icon.png');
      };
-
+ 
 +    // Center on primary display
 +    const { screen } = require('electron');
 +    const primaryDisplay = screen.getPrimaryDisplay();
@@ -168,7 +178,7 @@ index bdf8114..b1df488 100644
 @@ -676,7 +676,7 @@ ipcMain.handle('tab-bar:close-tab', async (event, tabId) => {
    // Destroy the tab
    tabManager.destroyTab(tabId);
-
+ 
 -  // If this was the active tab, switch to another tab
 +  // If this was the active tab, switch to another tab or close the window
    if (windowController && windowController.currentActiveTabController?.tabId === tabId) {
@@ -184,7 +194,7 @@ index bdf8114..b1df488 100644
 +      if (bw) bw.close();
      }
    }
-
+ 
 @@ -710,6 +714,7 @@ ipcMain.handle('tab-bar:switch-tab', async (event, tabId) => {
    const windowController = appController.windowControllers.get(tabController.windowId);
    if (windowController) {
@@ -192,15 +202,42 @@ index bdf8114..b1df488 100644
 +    notifyTabBarUpdate(tabController.windowId);
      return { success: true };
    }
-
+ 
+diff --git a/src/renderer/tab-bar/index.html b/src/renderer/tab-bar/index.html
+index add4544..4d63486 100644
+--- a/src/renderer/tab-bar/index.html
++++ b/src/renderer/tab-bar/index.html
+@@ -319,6 +319,14 @@
+       background-color: var(--bg-tab-hover);
+     }
+ 
++    .tab.dragging {
++      opacity: 0.4;
++    }
++
++    .tab.drag-over {
++      border-left: 2px solid var(--accent-color);
++    }
++
+     .tab.active {
+       background-color: var(--bg-tab-active);
+       border-bottom: 2px solid var(--accent-color);
 diff --git a/src/renderer/tab-bar/renderer.js b/src/renderer/tab-bar/renderer.js
-index 3f8a211..b2df3d3 100644
+index 3f8a211..c6a3ca5 100644
 --- a/src/renderer/tab-bar/renderer.js
 +++ b/src/renderer/tab-bar/renderer.js
-@@ -120,6 +120,18 @@ function addEventListeners() {
+@@ -93,6 +93,7 @@ function renderTab(tab) {
+   return `
+     <div class="tab ${isActive ? 'active' : ''} ${isPinned ? 'pinned' : ''}"
+          data-tab-id="${tab.tabId}"
++         draggable="true"
+          title="${escapeHtml(tab.title || 'Untitled')}">
+       ${faviconHtml}
+       <span class="tab-title">${escapeHtml(title)}</span>
+@@ -120,6 +121,59 @@ function addEventListeners() {
      });
    });
-
+ 
 +  // Middle-click on tab - close tab
 +  document.querySelectorAll('.tab').forEach(tabEl => {
 +    tabEl.addEventListener('auxclick', (e) => {
@@ -209,6 +246,47 @@ index 3f8a211..b2df3d3 100644
 +        e.stopPropagation();
 +        const tabId = tabEl.dataset.tabId;
 +        window.tabBarAPI.closeTab(tabId);
++      }
++    });
++  });
++
++  // Drag-and-drop tab reordering
++  document.querySelectorAll('.tab').forEach(tabEl => {
++    tabEl.addEventListener('dragstart', (e) => {
++      e.dataTransfer.effectAllowed = 'move';
++      e.dataTransfer.setData('text/plain', tabEl.dataset.tabId);
++      tabEl.classList.add('dragging');
++    });
++    tabEl.addEventListener('dragend', () => {
++      tabEl.classList.remove('dragging');
++      document.querySelectorAll('.tab.drag-over').forEach(el => el.classList.remove('drag-over'));
++    });
++    tabEl.addEventListener('dragover', (e) => {
++      e.preventDefault();
++      e.dataTransfer.dropEffect = 'move';
++      const dragging = document.querySelector('.tab.dragging');
++      if (dragging && dragging !== tabEl) {
++        tabEl.classList.add('drag-over');
++      }
++    });
++    tabEl.addEventListener('dragleave', () => {
++      tabEl.classList.remove('drag-over');
++    });
++    tabEl.addEventListener('drop', (e) => {
++      e.preventDefault();
++      tabEl.classList.remove('drag-over');
++      const draggedTabId = e.dataTransfer.getData('text/plain');
++      const targetTabId = tabEl.dataset.tabId;
++      if (draggedTabId && draggedTabId !== targetTabId) {
++        // Compute new order by moving dragged tab before target
++        const tabIds = tabs.map(t => t.tabId);
++        const fromIdx = tabIds.indexOf(draggedTabId);
++        if (fromIdx !== -1) {
++          tabIds.splice(fromIdx, 1);
++          const toIdx = tabIds.indexOf(targetTabId);
++          tabIds.splice(toIdx, 0, draggedTabId);
++          window.tabBarAPI.reorderTabs(windowId, tabIds);
++        }
 +      }
 +    });
 +  });
