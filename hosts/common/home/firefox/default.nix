@@ -2,12 +2,12 @@
   config,
   pkgs,
   lib,
-  firefox-addons,
   ...
-}: let
-  inherit (lib) mkForce;
-  addons = import ./addons.nix {inherit lib;};
-in {
+}:
+let
+  addons = import ./addons.nix { inherit lib; };
+in
+{
   programs.firefox = {
     enable = true;
     package = pkgs.firefox;

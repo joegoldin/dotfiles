@@ -2,12 +2,12 @@
   pkgs,
   lib,
   pythonBase,
-  unstable,
   ...
-}: let
+}:
+let
   # Define all packages in a recursive attribute set
-  pythonPackages = rec {
-    fal-client = pythonBase.pkgs.buildPythonPackage rec {
+  pythonPackages = {
+    fal-client = pythonBase.pkgs.buildPythonPackage {
       pname = "fal-client";
       version = "0.7.0";
       format = "pyproject";
@@ -32,7 +32,7 @@
       doCheck = false;
 
       # Basic import check
-      pythonImportsCheck = ["fal_client"];
+      pythonImportsCheck = [ "fal_client" ];
 
       meta = with lib; {
         description = "Python client for fal.ai";
@@ -283,7 +283,7 @@
     #   };
     # };
 
-    mlx = pythonBase.pkgs.buildPythonPackage rec {
+    mlx = pythonBase.pkgs.buildPythonPackage {
       pname = "mlx";
       version = "0.26.5";
       format = "wheel";
@@ -294,13 +294,13 @@
       };
 
       # Dependencies
-      propagatedBuildInputs = [];
+      propagatedBuildInputs = [ ];
 
       # Disable tests - enable if you have specific test dependencies
       doCheck = false;
 
       # Basic import check
-      pythonImportsCheck = ["mlx"];
+      pythonImportsCheck = [ "mlx" ];
 
       meta = with lib; {
         description = "A framework for machine learning on Apple silicon.";
@@ -445,7 +445,7 @@
     #   };
     # };
 
-    deepgram-sdk = pythonBase.pkgs.buildPythonPackage rec {
+    deepgram-sdk = pythonBase.pkgs.buildPythonPackage {
       pname = "deepgram-sdk";
       version = "4.7.0";
       format = "pyproject";
@@ -476,7 +476,7 @@
       doCheck = false;
 
       # Basic import check
-      pythonImportsCheck = ["deepgram"];
+      pythonImportsCheck = [ "deepgram" ];
 
       meta = with lib; {
         description = "The official Python SDK for the Deepgram automated speech recognition platform.";
@@ -485,7 +485,7 @@
       };
     };
 
-    lmstudio = pythonBase.pkgs.buildPythonPackage rec {
+    lmstudio = pythonBase.pkgs.buildPythonPackage {
       pname = "lmstudio";
       version = "1.4.1";
       format = "pyproject";
@@ -513,7 +513,7 @@
       doCheck = false;
 
       # Basic import check
-      pythonImportsCheck = ["lmstudio"];
+      pythonImportsCheck = [ "lmstudio" ];
 
       meta = with lib; {
         description = "LM Studio Python SDK";
@@ -521,7 +521,7 @@
         license = licenses.mit;
       };
     };
-    scrapfly-sdk = pythonBase.pkgs.buildPythonPackage rec {
+    scrapfly-sdk = pythonBase.pkgs.buildPythonPackage {
       pname = "scrapfly-sdk";
       version = "0.8.23";
       format = "setuptools";
@@ -545,7 +545,7 @@
       doCheck = false;
 
       # Basic import check
-      pythonImportsCheck = ["scrapfly"];
+      pythonImportsCheck = [ "scrapfly" ];
 
       meta = with lib; {
         description = "Scrapfly SDK for Scrapfly";
@@ -555,4 +555,4 @@
     };
   };
 in
-  pythonPackages
+pythonPackages

@@ -1,4 +1,4 @@
-{lib, ...}: {
+_: {
   disko.devices = {
     disk = {
       main = {

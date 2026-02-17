@@ -11,14 +11,15 @@
   stateVersion,
   agenix,
   ...
-}: {
+}:
+{
   system.stateVersion = "${stateVersion}";
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
   # Use GRUB boot loader for BIOS boot
   boot.loader.grub = {
     enable = lib.mkForce true;
-    devices = lib.mkForce ["/dev/vda"];
+    devices = lib.mkForce [ "/dev/vda" ];
   };
 
   nixpkgs = {
@@ -36,31 +37,41 @@
     };
   };
 
-  nix = let
-    flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
-  in {
-    settings = {
-      experimental-features = ["nix-command" "flakes"];
-      nix-path = config.nix.nixPath;
-      trusted-users = ["${username}"];
-      auto-optimise-store = false;
-      extra-substituters = ["https://nixpkgs-python.cachix.org"];
-      extra-trusted-public-keys = ["nixpkgs-python.cachix.org-1:hxjI7pFxTyuTHn2NkvWCrAUcNZLNS3ZAvfYNuYifcEU=" "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="];
+  nix =
+    let
+      flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
+    in
+    {
+      settings = {
+        experimental-features = [
+          "nix-command"
+          "flakes"
+        ];
+        nix-path = config.nix.nixPath;
+        trusted-users = [ "${username}" ];
+        auto-optimise-store = false;
+        extra-substituters = [ "https://nixpkgs-python.cachix.org" ];
+        extra-trusted-public-keys = [
+          "nixpkgs-python.cachix.org-1:hxjI7pFxTyuTHn2NkvWCrAUcNZLNS3ZAvfYNuYifcEU="
+          "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
+        ];
+      };
+
+      gc = {
+        automatic = lib.mkDefault true;
+        options = lib.mkDefault "--delete-older-than 7d";
+      };
+
+      extraOptions = lib.optionalString (
+        config.nix.package == pkgs.nixVersions.stable
+      ) "experimental-features = nix-command flakes";
+
+      registry = lib.mapAttrs (_: flake: { inherit flake; }) flakeInputs;
+      nixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
+
+      # Disable channels entirely - use flakes only
+      channel.enable = false;
     };
-
-    gc = {
-      automatic = lib.mkDefault true;
-      options = lib.mkDefault "--delete-older-than 7d";
-    };
-
-    extraOptions = lib.optionalString (config.nix.package == pkgs.nixVersions.stable) "experimental-features = nix-command flakes";
-
-    registry = lib.mapAttrs (_: flake: {inherit flake;}) flakeInputs;
-    nixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
-
-    # Disable channels entirely - use flakes only
-    channel.enable = false;
-  };
 
   networking.hostName = hostname;
 
@@ -76,16 +87,24 @@
       openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP0vgzxNgZd51jZ3K/s64jltFRSyVLxjLPWM4Q6747Zw"
       ];
-      extraGroups = ["wheel" "audio" "video" "docker" "networkmanager"];
+      extraGroups = [
+        "wheel"
+        "audio"
+        "video"
+        "docker"
+        "networkmanager"
+      ];
     };
   };
 
-  programs.zsh = {
-    enable = true;
-  };
-
-  programs.fish = {
-    enable = true;
+  programs = {
+    zsh.enable = true;
+    fish.enable = true;
+    # ld for vscode server
+    nix-ld = {
+      enable = true;
+      package = pkgs.nix-ld;
+    };
   };
 
   environment.systemPackages = with pkgs; [
@@ -106,11 +125,5 @@
       # Remove if you want to SSH using passwords
       PasswordAuthentication = false;
     };
-  };
-
-  # ld for wsl for vscode server
-  programs.nix-ld = {
-    enable = true;
-    package = pkgs.nix-ld;
   };
 }

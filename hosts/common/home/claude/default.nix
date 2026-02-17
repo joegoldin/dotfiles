@@ -2,9 +2,9 @@
   pkgs,
   lib,
   inputs,
-  config,
   ...
-}: let
+}:
+let
   enabled = pkgs ? llm-agents;
 
   # Get the latest claude-code from llm-agents
@@ -12,9 +12,11 @@
 
   # Get claude-nix library with explicitly overridden claude-code
   claudeLib = import "${inputs.claude-nix}/lib" {
-    pkgs = pkgs.extend (final: prev: {
-      claude-code = claude-code-latest;
-    });
+    pkgs = pkgs.extend (
+      final: prev: {
+        claude-code = claude-code-latest;
+      }
+    );
   };
 
   # WSL-compatible notify-send wrapper (detects wsl-notify-send.exe at runtime)
@@ -43,7 +45,7 @@
   '';
 
   # Build code-notify package
-  codeNotify = pkgs.callPackage ./code-notify.nix {};
+  codeNotify = pkgs.callPackage ./code-notify.nix { };
 
   # Skills to extract from superpowers (upstream)
   skillNames = [
@@ -61,56 +63,64 @@
   ];
 
   # Wrap an upstream skill
-  wrapSkill = name:
-    pkgs.runCommand "skill-${name}" {} ''
+  wrapSkill =
+    name:
+    pkgs.runCommand "skill-${name}" { } ''
       mkdir -p $out/skills/${name}
       cp -r ${inputs.superpowers}/skills/${name}/* $out/skills/${name}/
     '';
 
   # Local skills (modified or custom)
-  localSkill = name:
-    pkgs.runCommand "skill-${name}" {} ''
+  localSkill =
+    name:
+    pkgs.runCommand "skill-${name}" { } ''
       mkdir -p $out/skills/${name}
       cp -r ${./skills}/${name}/* $out/skills/${name}/
     '';
 
   # All skill derivations
-  superpowersSkillDerivations =
-    (map wrapSkill skillNames)
-    ++ [
-      (localSkill "claude-nix-config")
-      (localSkill "executing-plans")
-      (localSkill "gh-pr-review")
-      (localSkill "obsidian-cli")
-    ];
+  superpowersSkillDerivations = (map wrapSkill skillNames) ++ [
+    (localSkill "claude-nix-config")
+    (localSkill "executing-plans")
+    (localSkill "gh-pr-review")
+    (localSkill "obsidian-cli")
+  ];
 
   # Custom commands
   prReviewCommand =
-    claudeLib.mkCommand {
-      name = "pr-review";
-      description = "Fetch and analyze inline PR review comments for the current branch";
-      allowed-tools = ["Bash" "Read" "Glob" "Grep" "Skill"];
-    } ''
-      Invoke the gh-pr-review skill, then fetch and analyze inline PR review comments for the current branch.
+    claudeLib.mkCommand
+      {
+        name = "pr-review";
+        description = "Fetch and analyze inline PR review comments for the current branch";
+        allowed-tools = [
+          "Bash"
+          "Read"
+          "Glob"
+          "Grep"
+          "Skill"
+        ];
+      }
+      ''
+        Invoke the gh-pr-review skill, then fetch and analyze inline PR review comments for the current branch.
 
-      IMPORTANT: ghreview is a fish function. Always run it via: fish -c 'ghreview ...'
-      Include bot comments by default (Copilot, etc.) — do NOT pass --no-bots unless the user asks.
+        IMPORTANT: ghreview is a fish function. Always run it via: fish -c 'ghreview ...'
+        Include bot comments by default (Copilot, etc.) — do NOT pass --no-bots unless the user asks.
 
-      Steps:
-      1. Use the Skill tool to load the gh-pr-review skill
-      2. Run `fish -c 'ghreview --raw'` to get the full review JSON (includes code context by default)
-      3. Summarize each reviewer's feedback (including bots like Copilot)
-      4. List all unresolved comments grouped by file, with the referenced code and the reviewer's concern
-      5. Categorize feedback (bugs, security, performance, style, architecture, questions)
-      6. Propose a prioritized plan to address the comments
+        Steps:
+        1. Use the Skill tool to load the gh-pr-review skill
+        2. Run `fish -c 'ghreview --raw'` to get the full review JSON (includes code context by default)
+        3. Summarize each reviewer's feedback (including bots like Copilot)
+        4. List all unresolved comments grouped by file, with the referenced code and the reviewer's concern
+        5. Categorize feedback (bugs, security, performance, style, architecture, questions)
+        6. Propose a prioritized plan to address the comments
 
-      If there are thread replies, note which comments already have responses and which are unanswered.
+        If there are thread replies, note which comments already have responses and which are unanswered.
 
-      $ARGUMENTS
-    '';
+        $ARGUMENTS
+      '';
 
   # Copy hooks from superpowers (includes session-start hook)
-  superpowersHooks = pkgs.runCommand "superpowers-hooks" {} ''
+  superpowersHooks = pkgs.runCommand "superpowers-hooks" { } ''
     mkdir -p $out/hooks
     cp -r ${inputs.superpowers}/hooks/* $out/hooks/
     chmod +x $out/hooks/*.sh 2>/dev/null || true
@@ -140,62 +150,71 @@
       };
     };
     skills = [
-      (claudeLib.mkSkill {
-        name = "nix-helper";
-        description = "Helps with Nix development and formatting";
-        allowed-tools = [
-          "Bash(${pkgs.statix}/bin/statix)"
-          "Bash(${pkgs.nixfmt-rfc-style}/bin/nixfmt)"
-        ];
-      } ''
-        You are a Nix expert. When working with Nix files:
+      (claudeLib.mkSkill
+        {
+          name = "nix-helper";
+          description = "Helps with Nix development and formatting";
+          allowed-tools = [
+            "Bash(${pkgs.statix}/bin/statix)"
+            "Bash(${pkgs.nixfmt-rfc-style}/bin/nixfmt)"
+          ];
+        }
+        ''
+          You are a Nix expert. When working with Nix files:
 
-        1. ALWAYS run `${pkgs.statix}/bin/statix check .` to find anti-patterns
-        2. ADDRESS all issues found
-        3. ALWAYS format files with `${pkgs.nixfmt-rfc-style}/bin/nixfmt`
+          1. ALWAYS run `${pkgs.statix}/bin/statix check .` to find anti-patterns
+          2. ADDRESS all issues found
+          3. ALWAYS format files with `${pkgs.nixfmt-rfc-style}/bin/nixfmt`
 
-        Be pedantic about best practices and code quality.
-      '')
+          Be pedantic about best practices and code quality.
+        ''
+      )
     ];
     commands = [
-      (claudeLib.mkCommand {
-        name = "format-nix";
-        description = "Format all Nix files in the project";
-        allowed-tools = [
-          "Bash(${pkgs.nixfmt-rfc-style}/bin/nixfmt)"
-          "Bash(${pkgs.fd}/bin/fd)"
-        ];
-        argument-hint = "[directory]";
-      } ''
-        Format all Nix files using nixfmt.
+      (claudeLib.mkCommand
+        {
+          name = "format-nix";
+          description = "Format all Nix files in the project";
+          allowed-tools = [
+            "Bash(${pkgs.nixfmt-rfc-style}/bin/nixfmt)"
+            "Bash(${pkgs.fd}/bin/fd)"
+          ];
+          argument-hint = "[directory]";
+        }
+        ''
+          Format all Nix files using nixfmt.
 
-        If an argument is provided, format files in that directory.
-        Otherwise, format all .nix files in the current directory.
+          If an argument is provided, format files in that directory.
+          Otherwise, format all .nix files in the current directory.
 
-        Use: ${pkgs.fd}/bin/fd -e nix -x ${pkgs.nixfmt-rfc-style}/bin/nixfmt
-      '')
+          Use: ${pkgs.fd}/bin/fd -e nix -x ${pkgs.nixfmt-rfc-style}/bin/nixfmt
+        ''
+      )
     ];
     agents = [
-      (claudeLib.mkAgent {
-        name = "nix-analyzer";
-        description = "Specialized agent for analyzing Nix code";
-        tools = [
-          "Read"
-          "Glob"
-          "Grep"
-          "Bash(${pkgs.statix}/bin/statix)"
-        ];
-      } ''
-        You are an expert Nix code analyzer. When asked to analyze Nix code:
+      (claudeLib.mkAgent
+        {
+          name = "nix-analyzer";
+          description = "Specialized agent for analyzing Nix code";
+          tools = [
+            "Read"
+            "Glob"
+            "Grep"
+            "Bash(${pkgs.statix}/bin/statix)"
+          ];
+        }
+        ''
+          You are an expert Nix code analyzer. When asked to analyze Nix code:
 
-        1. Search for all .nix files in the project
-        2. Run statix to identify anti-patterns
-        3. Analyze the flake structure and dependencies
-        4. Provide recommendations for improvements
-        5. Explain any complex Nix patterns found
+          1. Search for all .nix files in the project
+          2. Run statix to identify anti-patterns
+          3. Analyze the flake structure and dependencies
+          4. Provide recommendations for improvements
+          5. Explain any complex Nix patterns found
 
-        Be thorough and educational in your analysis.
-      '')
+          Be thorough and educational in your analysis.
+        ''
+      )
     ];
   };
 
@@ -221,7 +240,7 @@
       superpowersPlugin
       superpowersHooks
       attributionFile
-      (pkgs.runCommand "superpowers-license" {} ''
+      (pkgs.runCommand "superpowers-license" { } ''
         mkdir -p $out
         cp ${inputs.superpowers}/LICENSE $out/SUPERPOWERS-LICENSE
       '')
@@ -238,9 +257,10 @@
 
   # Generate settings.json content
   settingsContent = import ./settings.nix {
-    inherit lib codeNotify;
+    inherit codeNotify;
   };
-in {
+in
+{
   # Add claude (with plugins) and code-notify to packages
   # notify-send wrapper handles WSL (wsl-notify-send.exe) vs native (libnotify)
   home.packages = lib.mkIf enabled [

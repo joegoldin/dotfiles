@@ -2,18 +2,19 @@
   lib,
   config,
   ...
-}: let
+}:
+let
   inherit (lib) mkIf;
   packageNames = map (p: p.pname or p.name or null) config.home.packages;
   hasPackage = name: lib.any (x: x == name) packageNames;
-  hasRipgrep = hasPackage "ripgrep";
   hasExa = hasPackage "eza";
   hasSpecialisationCli = hasPackage "specialisation";
   hasAwsCli = hasPackage "awscli2";
   hasKubectl = hasPackage "kubectl";
   hasLazydocker = hasPackage "lazydocker";
-in {
-  shellAliases = rec {};
+in
+{
+  shellAliases = { };
 
   shellAbbrs = {
     # Clear screen and scrollback

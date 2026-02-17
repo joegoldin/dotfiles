@@ -6,7 +6,8 @@
   lib,
   username,
   ...
-}: {
+}:
+{
   users.users.root.openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP0vgzxNgZd51jZ3K/s64jltFRSyVLxjLPWM4Q6747Zw"
   ];
@@ -14,23 +15,27 @@
   # Set your time zone.
   time.timeZone = "America/Los_Angeles";
 
-  services.cloudflared = {
-    enable = true;
-    tunnels = {
-      "dd9aada3-d855-47fd-b782-f5314c2bb81e" = {
-        credentialsFile = config.age.secrets.cf.path;
-        default = "http_status:404";
+  services = {
+    cloudflared = {
+      enable = true;
+      tunnels = {
+        "dd9aada3-d855-47fd-b782-f5314c2bb81e" = {
+          credentialsFile = config.age.secrets.cf.path;
+          default = "http_status:404";
+        };
       };
+    };
+
+    tailscale = {
+      enable = true;
+      useRoutingFeatures = "server";
     };
   };
 
   programs.ssh.startAgent = true;
 
-  services.tailscale.enable = true;
-  services.tailscale.useRoutingFeatures = "server";
-
   virtualisation.docker.enable = true;
-  users.extraGroups.docker.members = ["${username}"];
+  users.extraGroups.docker.members = [ "${username}" ];
 
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
