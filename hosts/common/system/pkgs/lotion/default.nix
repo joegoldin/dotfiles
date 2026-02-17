@@ -36,7 +36,7 @@ buildNpmPackage rec {
   ];
 
   patches = [
-    ./open-in-tab.patch
+    ./fixes.patch
   ];
 
   makeCacheWritable = true;
