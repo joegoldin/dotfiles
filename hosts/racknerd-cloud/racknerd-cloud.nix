@@ -4,7 +4,6 @@
 {
   config,
   lib,
-  pkgs,
   username,
   ...
 }: {
@@ -31,9 +30,9 @@
   networking.firewall = {
     enable = true;
     # Allow SSH, HTTP (for ACME/Let's Encrypt), HTTPS, and Happy Server HTTPS on 3006
-    allowedTCPPorts = [ 22 80 443 3006 ];
+    allowedTCPPorts = [22 80 443 3006];
     # Allow Tailscale and Docker bridge
-    trustedInterfaces = [ "tailscale0" "docker0" ];
+    trustedInterfaces = ["tailscale0" "docker0"];
   };
 
   # This option defines the first version of NixOS you have installed on this particular machine,

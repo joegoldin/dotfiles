@@ -284,6 +284,22 @@
         "url": "file:assets"
       }
     },
+    "dotfiles-secrets": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1770960490,
+        "narHash": "sha256-ZVLSmDKmiU9KhYPwTfx3VQNApIlRKpGZ9khH/Tk4c9o=",
+        "ref": "refs/heads/main",
+        "rev": "2379447e8256d07d33fdc0a9de50c60f4d2eeba1",
+        "revCount": 1,
+        "type": "git",
+        "url": "file:secrets"
+      },
+      "original": {
+        "type": "git",
+        "url": "file:secrets"
+      }
+    },
     "elemental-wine-source": {
       "flake": false,
       "locked": {
@@ -1568,6 +1584,7 @@
         "devenv": "devenv",
         "disko": "disko",
         "dotfiles-assets": "dotfiles-assets",
+        "dotfiles-secrets": "dotfiles-secrets",
         "erosanix": "erosanix",
         "flake-utils": "flake-utils_2",
         "home-manager": "home-manager_2",

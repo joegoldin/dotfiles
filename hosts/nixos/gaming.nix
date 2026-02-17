@@ -1,6 +1,10 @@
 # hosts/nixos/gaming.nix
 # Steam, GameMode, and gaming performance tools
-{pkgs, username, ...}: {
+{
+  pkgs,
+  username,
+  ...
+}: {
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true;

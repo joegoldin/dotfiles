@@ -43,5 +43,6 @@
       if builtins.isList value
       then lib.concatMapStringsSep "\n" (v: "${key} = ${toString v}") value
       else "${key} = ${toString value}";
-  in lib.concatStringsSep "\n" (lib.mapAttrsToList mkLine settings);
+  in
+    lib.concatStringsSep "\n" (lib.mapAttrsToList mkLine settings);
 in {inherit baseSettings toGhosttyConfig;}
