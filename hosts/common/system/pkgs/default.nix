@@ -65,6 +65,10 @@ pkgs: {
       ;
   };
 
+  lotion = pkgs.callPackage ./lotion.nix {
+    electron = pkgs.electron_37;
+  };
+
   happy-cli = pkgs.stdenv.mkDerivation (finalAttrs: {
     pname = "happy-coder";
     version = "0.14.0-0";
