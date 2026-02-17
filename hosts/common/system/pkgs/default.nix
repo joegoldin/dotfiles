@@ -91,9 +91,9 @@ pkgs: {
 
     postInstall = ''
       wrapProgram $out/bin/happy \
-        --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.nodejs ]}
+        --prefix PATH : ${pkgs.lib.makeBinPath [pkgs.nodejs]}
       wrapProgram $out/bin/happy-mcp \
-        --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.nodejs ]}
+        --prefix PATH : ${pkgs.lib.makeBinPath [pkgs.nodejs]}
     '';
 
     meta = with pkgs.lib; {

@@ -1,6 +1,5 @@
 {
   lib,
-  pkgs,
   username,
   useremail,
   ...
@@ -50,35 +49,35 @@
         commit.verbose = lib.mkDefault true;
 
         aliases = {
-            # common aliases
-            br = "branch";
-            co = "checkout";
-            st = "status";
-            ls = "log --pretty=format:\"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cblue\\\\ [%cn]\" --decorate";
-            ll = "log --pretty=format:\"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cblue\\\\ [%cn]\" --decorate --numstat";
-            cm = "commit -m";
-            ca = "commit -am";
-            dc = "diff --cached";
-            # amend = "commit --amend -m";
+          # common aliases
+          br = "branch";
+          co = "checkout";
+          st = "status";
+          ls = "log --pretty=format:\"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cblue\\\\ [%cn]\" --decorate";
+          ll = "log --pretty=format:\"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cblue\\\\ [%cn]\" --decorate --numstat";
+          cm = "commit -m";
+          ca = "commit -am";
+          dc = "diff --cached";
+          # amend = "commit --amend -m";
 
-            # aliases for submodule
-            update = "submodule update --init --recursive";
-            foreach = "submodule foreach";
+          # aliases for submodule
+          update = "submodule update --init --recursive";
+          foreach = "submodule foreach";
 
-            # git-stack aliases
-            sync = "stack sync";
-            ss = "stack sync";
-            next = "stack next";
-            prev = "stack prev";
-            reword = "stack reword";
-            amend = "stack amend";
-            run = "stack run";
-            restack = "stack --repair";
-            rs = "stack --repair";
-            pushstack = "stack --push";
-            ps = "stack --push";
-            rebasestack = "stack --rebase";
-            rbs = "stack --rebase";
+          # git-stack aliases
+          sync = "stack sync";
+          ss = "stack sync";
+          next = "stack next";
+          prev = "stack prev";
+          reword = "stack reword";
+          amend = "stack amend";
+          run = "stack run";
+          restack = "stack --repair";
+          rs = "stack --repair";
+          pushstack = "stack --push";
+          ps = "stack --push";
+          rebasestack = "stack --rebase";
+          rbs = "stack --rebase";
         };
       };
     };

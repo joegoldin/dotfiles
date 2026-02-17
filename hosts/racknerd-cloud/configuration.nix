@@ -18,7 +18,7 @@
   # Use GRUB boot loader for BIOS boot
   boot.loader.grub = {
     enable = lib.mkForce true;
-    devices = lib.mkForce [ "/dev/vda" ];
+    devices = lib.mkForce ["/dev/vda"];
   };
 
   nixpkgs = {

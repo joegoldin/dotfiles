@@ -1,15 +1,15 @@
 # Services configuration for RackNerd VPS
 # Runs happy-server (handy), happy-redis, and PostgreSQL - accessible only via Tailscale
-let
-  domains = import ../../../secrets/domains.nix;
-in
 {
   config,
   lib,
   pkgs,
   username,
+  dotfiles-secrets,
   ...
-}: {
+}: let
+  domains = import "${dotfiles-secrets}/domains.nix";
+in {
   # Caddy reverse proxy for HTTPS access to Happy Server
   services.caddy = {
     enable = true;
@@ -88,7 +88,7 @@ in
     description = "Create happy bucket in MinIO";
     after = ["minio.service"];
     wantedBy = ["multi-user.target"];
-    path = with pkgs; [ coreutils glibc.bin ]; # Add getent to PATH
+    path = with pkgs; [coreutils glibc.bin]; # Add getent to PATH
     environment = {
       HOME = "/var/lib/minio";
       MC_CONFIG_DIR = "/var/lib/minio/.mc";

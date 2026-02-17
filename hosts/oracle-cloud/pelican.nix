@@ -4,15 +4,14 @@
 #   cd /var/lib/pelican-panel
 #   nix-shell -p php --run "sudo -u pelican-panel php /nix/store/*pelican-panel*/artisan p:user:make"
 #
-let
-  domains = import ../../../secrets/domains.nix;
-in
 {
   config,
   lib,
-  pkgs,
+  dotfiles-secrets,
   ...
-}: {
+}: let
+  domains = import "${dotfiles-secrets}/domains.nix";
+in {
   # Fix missing group for redis
   users.groups.redis-pelican-panel = {};
 
@@ -54,8 +53,18 @@ in
 
   # Open firewall ports for Wings API, SFTP, and game servers
   networking.firewall.allowedTCPPorts = [8080 2022];
-  networking.firewall.allowedTCPPortRanges = [{from = 25565; to = 25665;}];
-  networking.firewall.allowedUDPPortRanges = [{from = 25565; to = 25665;}];
+  networking.firewall.allowedTCPPortRanges = [
+    {
+      from = 25565;
+      to = 25665;
+    }
+  ];
+  networking.firewall.allowedUDPPortRanges = [
+    {
+      from = 25565;
+      to = 25665;
+    }
+  ];
 
   # Ensure pelican directories exist
   system.activationScripts.pelicanDirs = ''
@@ -73,23 +82,23 @@ in
   #   Token ID & Token: Get these from the panel after creating a node
   age.secrets = {
     pelican-app-key = {
-      file = ../../../secrets/pelican-app-key.age;
+      file = "${dotfiles-secrets}/pelican-app-key.age";
       mode = "0644";
     };
     pelican-db-password = {
-      file = ../../../secrets/pelican-db-password.age;
+      file = "${dotfiles-secrets}/pelican-db-password.age";
       mode = "0644";
     };
     pelican-redis-password = {
-      file = ../../../secrets/pelican-redis-password.age;
+      file = "${dotfiles-secrets}/pelican-redis-password.age";
       mode = "0644";
     };
     pelican-token-id = {
-      file = ../../../secrets/pelican-token-id.age;
+      file = "${dotfiles-secrets}/pelican-token-id.age";
       mode = "0644";
     };
     pelican-token = {
-      file = ../../../secrets/pelican-token.age;
+      file = "${dotfiles-secrets}/pelican-token.age";
       mode = "0644";
     };
   };
