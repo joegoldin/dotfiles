@@ -1,24 +1,66 @@
 diff --git a/src/main/controllers/TabController.js b/src/main/controllers/TabController.js
-index c03f6f1..67aa25f 100644
+index c03f6f1..808c00a 100644
 --- a/src/main/controllers/TabController.js
 +++ b/src/main/controllers/TabController.js
-@@ -87,6 +87,15 @@ class TabController {
+@@ -87,6 +87,57 @@ class TabController {
    setupEventListeners() {
      const { webContents } = this.webContentsView;
 
-+    // Remap Ctrl+T to Ctrl+K (Notion search)
++    // Keyboard shortcuts for tab management
 +    webContents.on('before-input-event', (event, input) => {
-+      if (input.control && !input.shift && !input.alt && input.key === 't') {
++      if (input.type !== 'keyDown' || !input.control || input.alt) return;
++
++      // Ctrl+T: open a new tab with Notion search active
++      if (!input.shift && input.key === 't') {
 +        event.preventDefault();
-+        webContents.sendInputEvent({ type: 'keyDown', keyCode: 'k', modifiers: ['control'] });
-+        webContents.sendInputEvent({ type: 'keyUp', keyCode: 'k', modifiers: ['control'] });
++        const TabManager = require('../managers/TabManager');
++        const tabManager = TabManager.getInstance();
++        const AppController = require('./AppController');
++        const appController = AppController.getInstance();
++        const windowController = appController.windowControllers.get(this.windowId);
++        if (windowController) {
++          const newTab = tabManager.createTab({
++            windowId: this.windowId,
++            url: 'https://www.notion.so',
++            title: 'New Tab',
++            makeActive: true,
++          });
++          windowController.setActiveTab(newTab);
++          // Once the page finishes loading, trigger Ctrl+K to open search
++          newTab.webContentsView.webContents.once('did-finish-load', () => {
++            newTab.webContentsView.webContents.sendInputEvent({ type: 'keyDown', keyCode: 'k', modifiers: ['control'] });
++            newTab.webContentsView.webContents.sendInputEvent({ type: 'keyUp', keyCode: 'k', modifiers: ['control'] });
++          });
++        }
++      }
++
++      // Ctrl+W: close current tab (or close window if last tab)
++      if (!input.shift && input.key === 'w') {
++        event.preventDefault();
++        const TabManager = require('../managers/TabManager');
++        const tabManager = TabManager.getInstance();
++        const AppController = require('./AppController');
++        const appController = AppController.getInstance();
++        const windowController = appController.windowControllers.get(this.windowId);
++        if (!windowController) return;
++        const tabId = this.tabId;
++        tabManager.destroyTab(tabId);
++        const state = this.store.getState();
++        const windowState = state.windows.windows[this.windowId];
++        if (windowState && windowState.tabIds.length > 0) {
++          const nextTabId = windowState.tabIds[0];
++          windowController.switchToTab(nextTabId);
++        } else {
++          const bw = windowController.getInternalBrowserWindow();
++          if (bw) bw.close();
++        }
 +      }
 +    });
 +
      // Page title updated
      webContents.on('page-title-updated', (event, title) => {
        event.preventDefault(); // Prevent default title setting
-@@ -162,8 +171,8 @@ class TabController {
+@@ -162,8 +213,8 @@ class TabController {
        }
      });
 
@@ -29,7 +71,7 @@ index c03f6f1..67aa25f 100644
        const parsedUrl = new URL(url);
 
        // Check if URL is a Notion domain (notion.so or notion.com)
-@@ -175,16 +184,39 @@ class TabController {
+@@ -175,16 +226,39 @@ class TabController {
          parsedUrl.hostname === 'www.notion.com' ||
          parsedUrl.hostname.endsWith('.notion.com');
 
@@ -74,8 +116,33 @@ index c03f6f1..67aa25f 100644
      });
 
      // Allow navigation within Notion, block external sites
+diff --git a/src/main/controllers/WindowController.js b/src/main/controllers/WindowController.js
+index 3c239af..c5eeb44 100644
+--- a/src/main/controllers/WindowController.js
++++ b/src/main/controllers/WindowController.js
+@@ -26,9 +26,9 @@ class WindowController {
+     this.createBrowserWindow();
+     this.createTabBarView();
+     this.setupBrowserWindowListeners();
+-    this.createInitialTab();
+
+-    // Dispatch action to add this window to the Redux store
++    // Dispatch action to add this window to the Redux store BEFORE creating
++    // the initial tab, so that addTabToWindow/setActiveTabForWindow can find it.
+     this.store.dispatch(addWindow({
+       windowId: this.windowId,
+       bounds: this.browserWindow.getBounds(), // Get actual bounds after creation
+@@ -37,6 +37,8 @@ class WindowController {
+       isFocused: this.browserWindow.isFocused(), // Check initial focus state
+     }));
+
++    this.createInitialTab();
++
+     // Show window after everything is set up
+     // We don't use ready-to-show because we're using WebContentsView
+     this.show();
 diff --git a/src/main/index.js b/src/main/index.js
-index bdf8114..eeaa643 100644
+index bdf8114..b1df488 100644
 --- a/src/main/index.js
 +++ b/src/main/index.js
 @@ -676,7 +676,7 @@ ipcMain.handle('tab-bar:close-tab', async (event, tabId) => {
@@ -98,3 +165,34 @@ index bdf8114..eeaa643 100644
      }
    }
 
+@@ -710,6 +714,7 @@ ipcMain.handle('tab-bar:switch-tab', async (event, tabId) => {
+   const windowController = appController.windowControllers.get(tabController.windowId);
+   if (windowController) {
+     windowController.switchToTab(tabId);
++    notifyTabBarUpdate(tabController.windowId);
+     return { success: true };
+   }
+
+diff --git a/src/renderer/tab-bar/renderer.js b/src/renderer/tab-bar/renderer.js
+index 3f8a211..b2df3d3 100644
+--- a/src/renderer/tab-bar/renderer.js
++++ b/src/renderer/tab-bar/renderer.js
+@@ -120,6 +120,18 @@ function addEventListeners() {
+     });
+   });
+
++  // Middle-click on tab - close tab
++  document.querySelectorAll('.tab').forEach(tabEl => {
++    tabEl.addEventListener('auxclick', (e) => {
++      if (e.button === 1) {
++        e.preventDefault();
++        e.stopPropagation();
++        const tabId = tabEl.dataset.tabId;
++        window.tabBarAPI.closeTab(tabId);
++      }
++    });
++  });
++
+   // Close button click
+   document.querySelectorAll('.close-btn').forEach(btn => {
+     btn.addEventListener('click', (e) => {
