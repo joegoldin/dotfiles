@@ -1,7 +1,4 @@
-{
-  config,
-  ...
-}: {
+_: {
   enable = true;
   enableFishIntegration = true;
   enableBashIntegration = true;

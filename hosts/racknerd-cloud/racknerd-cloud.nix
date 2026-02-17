@@ -2,11 +2,11 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 {
-  config,
   lib,
   username,
   ...
-}: {
+}:
+{
   users.users.root.openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP0vgzxNgZd51jZ3K/s64jltFRSyVLxjLPWM4Q6747Zw"
   ];
@@ -23,16 +23,24 @@
   services.tailscale.useRoutingFeatures = "server";
 
   virtualisation.docker.enable = true;
-  users.extraGroups.docker.members = ["${username}"];
+  users.extraGroups.docker.members = [ "${username}" ];
 
   # Configure firewall
   # RackNerd VPS doesn't have its own firewall, so we need to use NixOS firewall
   networking.firewall = {
     enable = true;
     # Allow SSH, HTTP (for ACME/Let's Encrypt), HTTPS, and Happy Server HTTPS on 3006
-    allowedTCPPorts = [22 80 443 3006];
+    allowedTCPPorts = [
+      22
+      80
+      443
+      3006
+    ];
     # Allow Tailscale and Docker bridge
-    trustedInterfaces = ["tailscale0" "docker0"];
+    trustedInterfaces = [
+      "tailscale0"
+      "docker0"
+    ];
   };
 
   # This option defines the first version of NixOS you have installed on this particular machine,

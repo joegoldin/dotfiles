@@ -1,15 +1,18 @@
 {
   pkgs,
-  lib,
   ...
-}: {
+}:
+{
   packages = {
     litra = pkgs.rustPlatform.buildRustPackage rec {
       pname = "litra-rs";
       version = "ffc76804b4933585d10f76b6234c068ca84d009a";
 
-      buildInputs = with pkgs; [openssl systemd];
-      nativeBuildInputs = with pkgs; [pkg-config];
+      buildInputs = with pkgs; [
+        openssl
+        systemd
+      ];
+      nativeBuildInputs = with pkgs; [ pkg-config ];
 
       src = pkgs.fetchFromGitHub {
         owner = "joegoldin";
@@ -23,8 +26,11 @@
       pname = "litra-autotoggle";
       version = "391de640657235219d663941120a02f127473f56";
 
-      buildInputs = with pkgs; [openssl systemd];
-      nativeBuildInputs = with pkgs; [pkg-config];
+      buildInputs = with pkgs; [
+        openssl
+        systemd
+      ];
+      nativeBuildInputs = with pkgs; [ pkg-config ];
 
       src = pkgs.fetchFromGitHub {
         owner = "joegoldin";

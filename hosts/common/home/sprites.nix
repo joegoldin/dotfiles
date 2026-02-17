@@ -2,7 +2,8 @@
   pkgs,
   lib,
   ...
-}: let
+}:
+let
   version = "0.0.1-rc29";
 
   # Platform-specific sources
@@ -25,8 +26,11 @@
     };
   };
 
-  source = sources.${pkgs.stdenv.hostPlatform.system} or (throw "Unsupported platform: ${pkgs.stdenv.hostPlatform.system}");
-in {
+  source =
+    sources.${pkgs.stdenv.hostPlatform.system}
+      or (throw "Unsupported platform: ${pkgs.stdenv.hostPlatform.system}");
+in
+{
   packages = {
     sprite = pkgs.stdenv.mkDerivation {
       pname = "sprite";
@@ -38,7 +42,7 @@ in {
 
       sourceRoot = ".";
 
-      nativeBuildInputs = [pkgs.gnutar];
+      nativeBuildInputs = [ pkgs.gnutar ];
 
       unpackPhase = ''
         tar -xzf $src
@@ -53,7 +57,12 @@ in {
         description = "Sprite CLI - create and manage Sprites";
         homepage = "https://sprites.dev";
         license = licenses.unfree;
-        platforms = ["x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"];
+        platforms = [
+          "x86_64-linux"
+          "aarch64-linux"
+          "x86_64-darwin"
+          "aarch64-darwin"
+        ];
         mainProgram = "sprite";
       };
     };

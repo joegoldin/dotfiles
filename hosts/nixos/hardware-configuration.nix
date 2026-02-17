@@ -6,54 +6,87 @@
   lib,
   modulesPath,
   ...
-}: {
+}:
+{
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
 
-  boot.initrd.availableKernelModules = ["xhci_pci" "ahci" "nvme" "usbhid" "usb_storage" "sd_mod"];
-  boot.initrd.kernelModules = ["amdgpu"];
-  boot.kernelModules = ["kvm-intel"];
-  boot.extraModulePackages = [];
-
-  boot.initrd.luks.devices."luks-bf7e5885-6a8e-447b-bb6d-b682b2991325".device = "/dev/disk/by-uuid/bf7e5885-6a8e-447b-bb6d-b682b2991325";
-
-  fileSystems."/" = {
-    device = "/dev/mapper/luks-bf7e5885-6a8e-447b-bb6d-b682b2991325";
-    fsType = "ext4";
+  boot = {
+    initrd = {
+      availableKernelModules = [
+        "xhci_pci"
+        "ahci"
+        "nvme"
+        "usbhid"
+        "usb_storage"
+        "sd_mod"
+      ];
+      kernelModules = [ "amdgpu" ];
+      luks.devices."luks-bf7e5885-6a8e-447b-bb6d-b682b2991325".device =
+        "/dev/disk/by-uuid/bf7e5885-6a8e-447b-bb6d-b682b2991325";
+    };
+    kernelModules = [ "kvm-intel" ];
+    extraModulePackages = [ ];
   };
 
-  fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/4E54-4A55";
-    fsType = "vfat";
-    options = ["fmask=0077" "dmask=0077"];
+  fileSystems = {
+    "/" = {
+      device = "/dev/mapper/luks-bf7e5885-6a8e-447b-bb6d-b682b2991325";
+      fsType = "ext4";
+    };
+
+    "/boot" = {
+      device = "/dev/disk/by-uuid/4E54-4A55";
+      fsType = "vfat";
+      options = [
+        "fmask=0077"
+        "dmask=0077"
+      ];
+    };
+
+    "/mnt/windows" = {
+      device = "/dev/nvme0n1p3";
+      fsType = "ntfs-3g";
+      options = [
+        "rw"
+        "uid=1000"
+        "nofail"
+      ];
+    };
+
+    "/mnt/windows-2" = {
+      device = "/dev/nvme4n1p2";
+      fsType = "ntfs-3g";
+      options = [
+        "rw"
+        "uid=1000"
+        "nofail"
+      ];
+    };
+
+    "/mnt/data" = {
+      device = "/dev/nvme1n1p2";
+      fsType = "ntfs-3g";
+      options = [
+        "rw"
+        "uid=1000"
+        "nofail"
+      ];
+    };
+
+    "/mnt/data-2" = {
+      device = "/dev/nvme3n1p2";
+      fsType = "ntfs-3g";
+      options = [
+        "rw"
+        "uid=1000"
+        "nofail"
+      ];
+    };
   };
 
-  fileSystems."/mnt/windows" = {
-    device = "/dev/nvme0n1p3";
-    fsType = "ntfs-3g";
-    options = ["rw" "uid=1000" "nofail"];
-  };
-
-  fileSystems."/mnt/windows-2" = {
-    device = "/dev/nvme4n1p2";
-    fsType = "ntfs-3g";
-    options = ["rw" "uid=1000" "nofail"];
-  };
-
-  fileSystems."/mnt/data" = {
-    device = "/dev/nvme1n1p2";
-    fsType = "ntfs-3g";
-    options = ["rw" "uid=1000" "nofail"];
-  };
-
-  fileSystems."/mnt/data-2" = {
-    device = "/dev/nvme3n1p2";
-    fsType = "ntfs-3g";
-    options = ["rw" "uid=1000" "nofail"];
-  };
-
-  swapDevices = [];
+  swapDevices = [ ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
