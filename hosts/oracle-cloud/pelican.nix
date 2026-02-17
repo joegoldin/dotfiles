@@ -6,20 +6,27 @@
 #
 {
   config,
-  lib,
   dotfiles-secrets,
   ...
-}: let
+}:
+let
   domains = import "${dotfiles-secrets}/domains.nix";
-in {
+in
+{
   # Fix missing group for redis
-  users.groups.redis-pelican-panel = {};
+  users.groups.redis-pelican-panel = { };
 
   # Ensure pelican services wait for agenix secrets
-  systemd.services.pelican-panel-setup.after = ["agenix.service"];
-  systemd.services.pelican-panel-setup.wants = ["agenix.service"];
-  systemd.services.pelican-wings-setup.after = ["agenix.service"];
-  systemd.services.pelican-wings-setup.wants = ["agenix.service"];
+  systemd.services = {
+    pelican-panel-setup = {
+      after = [ "agenix.service" ];
+      wants = [ "agenix.service" ];
+    };
+    pelican-wings-setup = {
+      after = [ "agenix.service" ];
+      wants = [ "agenix.service" ];
+    };
+  };
 
   # PANEL - Game server management web interface
   services.pelican.panel = {
@@ -41,7 +48,7 @@ in {
     remote = "https://${domains.pelicanDomain}";
     tokenIdFile = config.age.secrets.pelican-token-id.path;
     tokenFile = config.age.secrets.pelican-token.path;
-    allowedMounts = ["/home/joe/pelican-mounts"];
+    allowedMounts = [ "/home/joe/pelican-mounts" ];
     system.sftp = {
       host = "0.0.0.0";
       port = 2022;
@@ -52,19 +59,24 @@ in {
   virtualisation.docker.enable = true;
 
   # Open firewall ports for Wings API, SFTP, and game servers
-  networking.firewall.allowedTCPPorts = [8080 2022];
-  networking.firewall.allowedTCPPortRanges = [
-    {
-      from = 25565;
-      to = 25665;
-    }
-  ];
-  networking.firewall.allowedUDPPortRanges = [
-    {
-      from = 25565;
-      to = 25665;
-    }
-  ];
+  networking.firewall = {
+    allowedTCPPorts = [
+      8080
+      2022
+    ];
+    allowedTCPPortRanges = [
+      {
+        from = 25565;
+        to = 25665;
+      }
+    ];
+    allowedUDPPortRanges = [
+      {
+        from = 25565;
+        to = 25665;
+      }
+    ];
+  };
 
   # Ensure pelican directories exist
   system.activationScripts.pelicanDirs = ''

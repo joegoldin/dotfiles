@@ -1,8 +1,6 @@
 {
   pkgs,
   lib,
-  config,
-  inputs,
   ...
 }:
 # Minimal devenv.nix
@@ -11,7 +9,8 @@
   cachix.enable = false;
   dotenv.enable = true;
 
-  packages = with pkgs;
+  packages =
+    with pkgs;
     [
       hello
       fish

@@ -3,21 +3,29 @@
   lib,
   config,
   ...
-}: {
+}:
+{
   programs.fish = {
     enable = true;
-    inherit ((import ./init.nix {inherit pkgs config;})) interactiveShellInit;
+    inherit ((import ./init.nix { inherit pkgs config; })) interactiveShellInit;
     functions = import ./functions.nix;
-    inherit ((import ./plugins.nix {inherit pkgs;})) plugins;
-    inherit ((import ./aliases.nix {inherit lib config;})) shellAbbrs;
-    inherit ((import ./aliases.nix {inherit lib config;})) shellAliases;
+    inherit ((import ./plugins.nix { inherit pkgs; })) plugins;
+    inherit ((import ./aliases.nix { inherit lib config; })) shellAbbrs;
+    inherit ((import ./aliases.nix { inherit lib config; })) shellAliases;
   };
 
-  programs.atuin = import ./atuin.nix {inherit pkgs config;};
+  programs.atuin = import ./atuin.nix { inherit pkgs config; };
 
   home.activation.fishAiPostInstall = lib.mkIf (pkgs.stdenv.hostPlatform.system == "x86_64-linux") (
-    lib.hm.dag.entryAfter ["linkGeneration"] ''
-      export PATH="${lib.makeBinPath [pkgs.python3 pkgs.grc pkgs.git pkgs.uv]}:$PATH"
+    lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+      export PATH="${
+        lib.makeBinPath [
+          pkgs.python3
+          pkgs.grc
+          pkgs.git
+          pkgs.uv
+        ]
+      }:$PATH"
       echo "Running fish-ai installation..."
       run ${pkgs.fish}/bin/fish -c 'source ${config.xdg.configHome}/fish/conf.d/plugin-fish-ai.fish; _fish_ai_install'
     ''

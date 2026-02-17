@@ -1,28 +1,25 @@
 # This is your home-manager configuration file
 # Use this to configure your home environment (it replaces ~/.config/nixpkgs/home.nix)
 {
-  inputs,
-  outputs,
-  lib,
-  config,
   pkgs,
-  username,
-  homeDirectory,
-  stateVersion,
   ...
-}: {
+}:
+{
   imports = [
     ../common/home
   ];
 
-  # lorri for nix-shell
-  services.lorri.enable = true;
-
-  # gnupg gpg stuff
-  services.gnome-keyring.enable = true;
   programs.gpg.enable = true;
-  services.gpg-agent = {
-    enable = true;
-    pinentry.package = pkgs.pinentry-curses;
+
+  services = {
+    # lorri for nix-shell
+    lorri.enable = true;
+
+    # gnupg gpg stuff
+    gnome-keyring.enable = true;
+    gpg-agent = {
+      enable = true;
+      pinentry.package = pkgs.pinentry-curses;
+    };
   };
 }

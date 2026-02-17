@@ -91,9 +91,9 @@ pkgs: {
 
     postInstall = ''
       wrapProgram $out/bin/happy \
-        --prefix PATH : ${pkgs.lib.makeBinPath [pkgs.nodejs]}
+        --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.nodejs ]}
       wrapProgram $out/bin/happy-mcp \
-        --prefix PATH : ${pkgs.lib.makeBinPath [pkgs.nodejs]}
+        --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.nodejs ]}
     '';
 
     meta = with pkgs.lib; {
@@ -101,7 +101,7 @@ pkgs: {
       homepage = "https://github.com/slopus/happy-cli";
       changelog = "https://github.com/slopus/happy-cli/releases/tag/v${finalAttrs.version}";
       license = licenses.mit;
-      maintainers = [];
+      maintainers = [ ];
       mainProgram = "happy";
     };
   });

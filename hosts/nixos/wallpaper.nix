@@ -5,17 +5,17 @@
   username,
   ...
 }:
-with lib; let
-  cfg = config.services.wallpaper;
+let
   scriptPath = "${config.users.users.${username}.home}/dotfiles/scripts/set-wallpaper.py";
   wallpaperDirs = [
     "${config.users.users.${username}.home}/Pictures/Wallpaper"
     "${config.users.users.${username}.home}/Pictures/Backgrounds"
   ];
   inherit (config.users.users.${username}) uid;
-in {
+in
+{
   systemd.timers."set-wallpaper" = {
-    wantedBy = ["timers.target"];
+    wantedBy = [ "timers.target" ];
     timerConfig = {
       OnBootSec = "60m";
       OnUnitActiveSec = "60m";
@@ -41,7 +41,12 @@ in {
 
       export XAUTHORITY="$XAUTH_TMP"
 
-      ${pkgs.python3.withPackages (ps: [ps.dbus-python ps.pillow])}/bin/python3 ${scriptPath} ${lib.concatStringsSep " " wallpaperDirs}
+      ${
+        pkgs.python3.withPackages (ps: [
+          ps.dbus-python
+          ps.pillow
+        ])
+      }/bin/python3 ${scriptPath} ${lib.concatStringsSep " " wallpaperDirs}
 
       # Clean up
       rm -f "$XAUTH_TMP"

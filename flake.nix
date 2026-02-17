@@ -194,42 +194,16 @@
       home-manager,
       nixos-wsl,
       nix-darwin,
-      devenv,
-      flake-utils,
       systems,
-      nixpkgs-python,
       pre-commit-hooks,
-      brew-nix,
-      brew-api,
       nix-homebrew,
-      homebrew-core,
-      homebrew-cask,
-      homebrew-services,
-      homebrew-bundle,
-      homebrew-argoproj,
-      homebrew-assemblyai,
-      homebrew-k9s,
-      homebrew-ibigio,
-      homebrew-vd,
-      homebrew-ocr,
-      homebrew-skip,
-      homebrew-txn2,
-      homebrew-versent,
-      homebrew-blacktop,
-      homebrew-cirruslabs,
-      homebrew-neilberkman,
       disko,
       agenix,
       plasma-manager,
-      affinity-nix,
       erosanix,
       lanzaboote,
-      llm-agents,
       dotfiles-assets,
       dotfiles-secrets,
-      superpowers,
-      claude-nix,
-      mcps,
       pelican,
       nix-rosetta-builder,
       nix-flatpak,
@@ -311,11 +285,13 @@
             (
               { specialArgs, ... }:
               {
-                home-manager.useGlobalPkgs = true;
-                home-manager.useUserPackages = true;
-                home-manager.extraSpecialArgs = specialArgs;
-                home-manager.backupFileExtension = "backup"; # enable moving existing files
-                home-manager.users.${specialArgs.username} = import ./hosts/wsl/home-manager.nix;
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  extraSpecialArgs = specialArgs;
+                  backupFileExtension = "backup"; # enable moving existing files
+                  users.${specialArgs.username} = import ./hosts/wsl/home-manager.nix;
+                };
               }
             )
             agenix.nixosModules.default
@@ -336,11 +312,13 @@
             (
               { specialArgs, ... }:
               {
-                home-manager.useGlobalPkgs = true;
-                home-manager.useUserPackages = true;
-                home-manager.extraSpecialArgs = specialArgs;
-                home-manager.backupFileExtension = "backup"; # enable moving existing files
-                home-manager.users.${specialArgs.username} = import ./hosts/oracle-cloud/home-manager.nix;
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  extraSpecialArgs = specialArgs;
+                  backupFileExtension = "backup"; # enable moving existing files
+                  users.${specialArgs.username} = import ./hosts/oracle-cloud/home-manager.nix;
+                };
               }
             )
             agenix.nixosModules.default
@@ -371,11 +349,13 @@
             (
               { specialArgs, ... }:
               {
-                home-manager.useGlobalPkgs = true;
-                home-manager.useUserPackages = true;
-                home-manager.extraSpecialArgs = specialArgs;
-                home-manager.backupFileExtension = "backup"; # enable moving existing files
-                home-manager.users.${specialArgs.username} = import ./hosts/racknerd-cloud/home-manager.nix;
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  extraSpecialArgs = specialArgs;
+                  backupFileExtension = "backup"; # enable moving existing files
+                  users.${specialArgs.username} = import ./hosts/racknerd-cloud/home-manager.nix;
+                };
               }
             )
             agenix.nixosModules.default
@@ -407,14 +387,16 @@
             (
               { specialArgs, ... }:
               {
-                home-manager.useGlobalPkgs = true;
-                home-manager.useUserPackages = true;
-                home-manager.extraSpecialArgs = specialArgs;
-                home-manager.backupFileExtension = "backup"; # enable moving existing files
-                home-manager.sharedModules = [
-                  plasma-manager.homeModules.plasma-manager
-                ];
-                home-manager.users.${specialArgs.username} = import ./hosts/nixos/home-manager.nix;
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  extraSpecialArgs = specialArgs;
+                  backupFileExtension = "backup"; # enable moving existing files
+                  sharedModules = [
+                    plasma-manager.homeModules.plasma-manager
+                  ];
+                  users.${specialArgs.username} = import ./hosts/nixos/home-manager.nix;
+                };
               }
             )
             nix-flatpak.nixosModules.nix-flatpak
@@ -445,13 +427,15 @@
             (
               { specialArgs, ... }:
               {
-                home-manager.useGlobalPkgs = true;
-                home-manager.useUserPackages = true;
-                home-manager.extraSpecialArgs = specialArgs;
-                home-manager.backupFileExtension = "backup"; # enable moving existing files
-                home-manager.users.joe.imports = [
-                  ./hosts/darwin/home-manager.nix
-                ];
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  extraSpecialArgs = specialArgs;
+                  backupFileExtension = "backup"; # enable moving existing files
+                  users.joe.imports = [
+                    ./hosts/darwin/home-manager.nix
+                  ];
+                };
               }
             )
             agenix.darwinModules.default

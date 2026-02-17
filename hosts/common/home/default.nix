@@ -1,8 +1,6 @@
 # This is your home-manager configuration file
 # Use this to configure your home environment (it replaces ~/.config/nixpkgs/home.nix)
 {
-  inputs,
-  outputs,
   lib,
   config,
   pkgs,
@@ -10,7 +8,8 @@
   homeDirectory,
   stateVersion,
   ...
-}: {
+}:
+{
   # You can import other home-manager modules here
   imports = [
     # If you want to use modules your own flake exports (from modules/home-manager):
@@ -21,7 +20,7 @@
 
     # You can also split up your configuration and import pieces of it here:
     ./fish
-    (import ./packages.nix {inherit pkgs lib config;})
+    (import ./packages.nix { inherit pkgs lib config; })
     ./gh.nix
     ./git.nix
     ./starship.nix
@@ -35,19 +34,19 @@
   systemd.user.startServices = "sd-switch";
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-  home.stateVersion = stateVersion;
-  home.username = username;
-  home.homeDirectory = homeDirectory;
+  home = {
+    inherit stateVersion username homeDirectory;
 
-  # copy xdg config files
-  home.file."${config.xdg.configHome}/." = {
-    source = ../system/dotconfig;
-    recursive = true;
-  };
+    # copy xdg config files
+    file."${config.xdg.configHome}/." = {
+      source = ../system/dotconfig;
+      recursive = true;
+    };
 
-  # symlink bin folder
-  home.file.".local/bin" = {
-    source = ../../../bin;
-    recursive = true;
+    # symlink bin folder
+    file.".local/bin" = {
+      source = ../../../bin;
+      recursive = true;
+    };
   };
 }

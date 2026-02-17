@@ -2,66 +2,71 @@
 # and may be overwritten by future invocations.  Please make changes
 # to /etc/nixos/configuration.nix instead.
 {
-  config,
   lib,
-  modulesPath,
   ...
-}: {
-  boot.initrd.availableKernelModules = ["virtio_pci"];
-  boot.initrd.kernelModules = [];
-  boot.kernelModules = ["kvm-intel"];
-  boot.extraModulePackages = [];
-
-  fileSystems."/mnt/wsl" = {
-    device = "none";
-    fsType = "tmpfs";
+}:
+{
+  boot = {
+    initrd = {
+      availableKernelModules = [ "virtio_pci" ];
+      kernelModules = [ ];
+    };
+    kernelModules = [ "kvm-intel" ];
+    extraModulePackages = [ ];
   };
 
-  fileSystems."/usr/lib/wsl/drivers" = {
-    device = "drivers";
-    fsType = "9p";
-  };
+  fileSystems = {
+    "/mnt/wsl" = {
+      device = "none";
+      fsType = "tmpfs";
+    };
 
-  fileSystems."/lib/modules" = {
-    device = "none";
-    fsType = "tmpfs";
-  };
+    "/usr/lib/wsl/drivers" = {
+      device = "drivers";
+      fsType = "9p";
+    };
 
-  fileSystems."/" = {
-    device = "/dev/disk/by-uuid/7a1d55dd-a7ec-4263-86d3-23edcf912572";
-    fsType = "ext4";
-  };
+    "/lib/modules" = {
+      device = "none";
+      fsType = "tmpfs";
+    };
 
-  fileSystems."/mnt/wslg" = {
-    device = "none";
-    fsType = "tmpfs";
-  };
+    "/" = {
+      device = "/dev/disk/by-uuid/7a1d55dd-a7ec-4263-86d3-23edcf912572";
+      fsType = "ext4";
+    };
 
-  fileSystems."/mnt/wslg/distro" = {
-    device = "none";
-    fsType = "none";
-    options = ["bind"];
-  };
+    "/mnt/wslg" = {
+      device = "none";
+      fsType = "tmpfs";
+    };
 
-  fileSystems."/usr/lib/wsl/lib" = {
-    device = "none";
-    fsType = "overlay";
-  };
+    "/mnt/wslg/distro" = {
+      device = "none";
+      fsType = "none";
+      options = [ "bind" ];
+    };
 
-  fileSystems."/tmp/.X11-unix" = {
-    device = "/mnt/wslg/.X11-unix";
-    fsType = "none";
-    options = ["bind"];
-  };
+    "/usr/lib/wsl/lib" = {
+      device = "none";
+      fsType = "overlay";
+    };
 
-  fileSystems."/mnt/wslg/doc" = {
-    device = "none";
-    fsType = "overlay";
-  };
+    "/tmp/.X11-unix" = {
+      device = "/mnt/wslg/.X11-unix";
+      fsType = "none";
+      options = [ "bind" ];
+    };
 
-  fileSystems."/mnt/c" = {
-    device = "C:\134";
-    fsType = "9p";
+    "/mnt/wslg/doc" = {
+      device = "none";
+      fsType = "overlay";
+    };
+
+    "/mnt/c" = {
+      device = "C:\134";
+      fsType = "9p";
+    };
   };
 
   # fileSystems."/mnt/d" = {
@@ -70,7 +75,7 @@
   # };
 
   swapDevices = [
-    {device = "/dev/disk/by-uuid/26624da5-1cb6-47a1-a442-ed16f315174a";}
+    { device = "/dev/disk/by-uuid/26624da5-1cb6-47a1-a442-ed16f315174a"; }
   ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
