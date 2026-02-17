@@ -4,8 +4,7 @@
   pkgs,
   username,
   ...
-}:
-{
+}: {
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true;
@@ -19,5 +18,5 @@
     settings.general.inhibit_screensaver = 0;
   };
 
-  users.users."${username}".extraGroups = [ "gamemode" ];
+  users.users."${username}".extraGroups = ["gamemode"];
 }

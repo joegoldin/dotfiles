@@ -1,6 +1,5 @@
 # This file defines overlays
-{ inputs, ... }:
-{
+{inputs, ...}: {
   # This one brings our custom packages from the 'pkgs' directory
   additions = final: _prev: import ../pkgs final.pkgs;
 
@@ -13,12 +12,14 @@
     # });
 
     howdy = prev.howdy.overrideAttrs (oldAttrs: {
-      patches = (oldAttrs.patches or [ ]) ++ [
-        (final.fetchpatch {
-          url = "https://patch-diff.githubusercontent.com/raw/NixOS/nixpkgs/pull/216245.patch";
-          hash = "sha256-0N8xyCConfOfCNzSnoCHGlCSv6GQfpUQIwb/W5eQA0U=";
-        })
-      ];
+      patches =
+        (oldAttrs.patches or [])
+        ++ [
+          (final.fetchpatch {
+            url = "https://patch-diff.githubusercontent.com/raw/NixOS/nixpkgs/pull/216245.patch";
+            hash = "sha256-0N8xyCConfOfCNzSnoCHGlCSv6GQfpUQIwb/W5eQA0U=";
+          })
+        ];
     });
   };
 
@@ -37,8 +38,7 @@
 
   # MCP server packages for declarative MCP configuration
   # The upstream overlay only exports github-mcp-server; we also need mcp-language-server
-  mcps-packages =
-    final: prev:
+  mcps-packages = final: prev:
     (inputs.mcps.overlays.default final prev)
     // {
       inherit (inputs.mcps.packages.${final.stdenv.hostPlatform.system}) mcp-language-server;

@@ -2,8 +2,7 @@
   pkgs,
   lib,
   dotfiles-assets,
-}:
-{
+}: {
   berkeley-mono-nerd-font = pkgs.stdenv.mkDerivation {
     name = "berkeley-mono-nerd-font";
     version = "2.002";

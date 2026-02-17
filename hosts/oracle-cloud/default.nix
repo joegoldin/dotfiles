@@ -1,8 +1,5 @@
 # common/default.nix
-{
-  ...
-}:
-{
+{...}: {
   imports = [
     ./configuration.nix
     ./disk-config.nix
