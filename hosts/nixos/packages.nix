@@ -26,7 +26,7 @@ in
       # unstable.jellyfin-media-player
       #      cargoModule.packages.litra
       #      cargoModule.packages.litra-autotoggle
-      notion-app
+      lotion
       unstable.obsidian
       unstable.parsec-bin
       pulseaudio # pactl required by pulsemeeter's pmctl script
