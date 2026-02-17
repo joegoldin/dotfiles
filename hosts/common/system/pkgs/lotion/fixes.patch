@@ -117,7 +117,7 @@ index c03f6f1..808c00a 100644
 
      // Allow navigation within Notion, block external sites
 diff --git a/src/main/controllers/WindowController.js b/src/main/controllers/WindowController.js
-index 3c239af..c5eeb44 100644
+index 3c239af..b19b5a6 100644
 --- a/src/main/controllers/WindowController.js
 +++ b/src/main/controllers/WindowController.js
 @@ -26,9 +26,9 @@ class WindowController {
@@ -141,6 +141,26 @@ index 3c239af..c5eeb44 100644
      // Show window after everything is set up
      // We don't use ready-to-show because we're using WebContentsView
      this.show();
+@@ -55,8 +57,18 @@ class WindowController {
+       return path.join(__dirname, '../../../assets/icon.png');
+     };
+
++    // Center on primary display
++    const { screen } = require('electron');
++    const primaryDisplay = screen.getPrimaryDisplay();
++    const { width: screenW, height: screenH } = primaryDisplay.workAreaSize;
++    const winW = this.initialBounds.width || 1200;
++    const winH = this.initialBounds.height || 800;
++
+     this.browserWindow = new BrowserWindow({
+-      ...this.initialBounds,
++      width: winW,
++      height: winH,
++      x: Math.round((screenW - winW) / 2) + primaryDisplay.workArea.x,
++      y: Math.round((screenH - winH) / 2) + primaryDisplay.workArea.y,
+       minWidth: 600,
+       minHeight: 400,
+       icon: getIconPath(),
 diff --git a/src/main/index.js b/src/main/index.js
 index bdf8114..b1df488 100644
 --- a/src/main/index.js
