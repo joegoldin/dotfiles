@@ -387,6 +387,11 @@
 
     # Desktop effects
     configFile = {
+      # Power management: no auto-suspend, power button sleeps, screen off after 15min
+      "powerdevilrc"."AC/Display"."TurnOffDisplayIdleTimeoutSec" = 900;
+      "powerdevilrc"."AC/Display"."TurnOffDisplayIdleTimeoutWhenLockedSec" = 20;
+      "powerdevilrc"."AC/SuspendAndShutdown"."AutoSuspendAction" = 0;
+      "powerdevilrc"."AC/SuspendAndShutdown"."PowerButtonAction" = 1;
       "baloofilerc"."Basic Settings"."Indexing-Enabled" = false;
       "baloofilerc"."General"."dbVersion" = 2;
       "baloofilerc"."General"."exclude filters" =
