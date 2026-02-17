@@ -275,8 +275,8 @@ in
         # Startup with previous session
         "browser.startup.page" = 3;
 
-        # Enable letterboxing
-        "privacy.resistFingerprinting.letterboxing" = true;
+        # Disable letterboxing
+        "privacy.resistFingerprinting.letterboxing" = false;
 
         # WebGL
         "webgl.disabled" = false;
