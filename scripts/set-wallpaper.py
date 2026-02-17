@@ -7,11 +7,12 @@ creating separate slices for each monitor to create one seamless wallpaper.
 """
 
 import os
-import sys
 import random
 import subprocess
-from PIL import Image
+import sys
 import time
+
+from PIL import Image
 
 # Supported image extensions
 SUPPORTED_IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tiff", ".webp")
@@ -150,7 +151,7 @@ def resize_image_to_fill(img, canvas_size):
         new_height = int(new_width / img_ratio)
 
     # Resize the image
-    resized_img = img.resize((new_width, new_height), Image.LANCZOS)
+    resized_img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
 
     # Center crop to match canvas size
     left = (new_width - canvas_width) // 2
