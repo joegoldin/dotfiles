@@ -166,6 +166,8 @@
       url = "github:cpick/nix-rosetta-builder?rev=ebb7162a975074fb570a2c3ac02bc543ff2e9df4";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # nix-flatpak for declarative flatpak management
+    nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.7.0";
   };
 
   nixConfig = {
@@ -216,6 +218,7 @@
     claude-nix,
     pelican,
     nix-rosetta-builder,
+    nix-flatpak,
     ...
   } @ inputs: let
     inherit (self) outputs;
@@ -378,6 +381,7 @@
             ];
             home-manager.users.${specialArgs.username} = import ./hosts/nixos/home-manager.nix;
           })
+          nix-flatpak.nixosModules.nix-flatpak
           agenix.nixosModules.default
           erosanix.nixosModules.mkwindowsapp-gc
           lanzaboote.nixosModules.lanzaboote
