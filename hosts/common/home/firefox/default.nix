@@ -4,10 +4,12 @@
   lib,
   firefox-addons,
   ...
-}: let
+}:
+let
   inherit (lib) mkForce;
-  addons = import ./addons.nix {inherit lib;};
-in {
+  addons = import ./addons.nix { inherit lib; };
+in
+{
   programs.firefox = {
     enable = true;
     package = pkgs.firefox;
@@ -206,9 +208,63 @@ in {
 
     profiles.Default = {
       userChrome = ''
-        /* Hide native tab bar when Sidebery is active */
-        #main-window[titlepreface*="sidebery"] #TabsToolbar {
-          display: none;
+        /**
+         * Dynamic Horizontal Tabs Toolbar (with animations)
+         * sidebar.verticalTabs: false (with native horizontal tabs)
+         */
+        #main-window #TabsToolbar > .toolbar-items {
+          overflow: hidden;
+          transition: height 0.3s 0.3s !important;
+        }
+        /* Default state: Set initial height to enable animation */
+        #main-window #TabsToolbar > .toolbar-items { height: 3em !important; }
+        #main-window[uidensity="touch"] #TabsToolbar > .toolbar-items { height: 3.35em !important; }
+        #main-window[uidensity="compact"] #TabsToolbar > .toolbar-items { height: 2.7em !important; }
+        /* Hidden state: Hide native tabs strip */
+        #main-window[titlepreface*="sidebery"] #TabsToolbar > .toolbar-items { height: 0 !important; }
+        /* Hidden state: Fix z-index of active pinned tabs */
+        #main-window[titlepreface*="sidebery"] #tabbrowser-tabs { z-index: 0 !important; }
+        /* Hidden state: Hide window buttons in tabs-toolbar */
+        #main-window[titlepreface*="sidebery"] #TabsToolbar .titlebar-spacer,
+        #main-window[titlepreface*="sidebery"] #TabsToolbar .titlebar-buttonbox-container {
+          display: none !important;
+        }
+        /* [Optional] Uncomment block below to show window buttons in nav-bar (maybe, I didn't test it on non-linux-i3wm env) */
+        /* #main-window[titlepreface*="sidebery"] #nav-bar > .titlebar-buttonbox-container,
+        #main-window[titlepreface*="sidebery"] #nav-bar > .titlebar-buttonbox-container > .titlebar-buttonbox {
+          display: flex !important;
+        } */
+        /* [Optional] Uncomment one of the line below if you need space near window buttons */
+        /* #main-window[titlepreface*="sidebery"] #nav-bar > .titlebar-spacer[type="pre-tabs"] { display: flex !important; } */
+        /* #main-window[titlepreface*="sidebery"] #nav-bar > .titlebar-spacer[type="post-tabs"] { display: flex !important; } */
+
+        /* Page action buttons: show dots, reveal on hover */
+        #page-action-buttons::after {
+          content: "•••";
+          position: absolute;
+          top: 0.7em;
+          font-size: 0.7em;
+          opacity: 0.5;
+          right: 8px;
+          transition: all 50ms ease-in-out;
+        }
+
+        #page-action-buttons:hover::after {
+          display: none !important;
+          width: 0px !important;
+          margin-left: 0px !important;
+          transition: all 50ms ease-in-out;
+        }
+
+        /* URL bar font size */
+        #urlbar, #searchbar {
+          font-size: 13px !important;
+          margin-top: 1px !important;
+        }
+
+        /* Hide native sidebar header (panel switcher above Sidebery) */
+        #sidebar-header {
+          display: none !important;
         }
       '';
 
