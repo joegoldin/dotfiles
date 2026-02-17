@@ -262,6 +262,20 @@ in
           margin-top: 1px !important;
         }
 
+        /* Nav bar + bookmarks bar: use darker menubar/frame background */
+        #nav-bar,
+        #PersonalToolbar {
+          background-color: var(--lwt-accent-color) !important;
+          color: var(--lwt-text-color) !important;
+        }
+        #nav-bar toolbarbutton image,
+        #nav-bar .toolbarbutton-icon,
+        #PersonalToolbar toolbarbutton image,
+        #PersonalToolbar .toolbarbutton-icon {
+          fill: var(--lwt-text-color) !important;
+          color: var(--lwt-text-color) !important;
+        }
+
         /* Hide native sidebar header (panel switcher above Sidebery) */
         #sidebar-header {
           display: none !important;
