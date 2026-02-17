@@ -1,5 +1,5 @@
-# Injects Shift key when both left and right mouse buttons are held simultaneously.
-# Useful for KDE Plasma window drag + right-click → Shift modifier workflows.
+# Right-click toggles Shift during a window drag (left-click held).
+# Shift stays on until right-click again (toggle off) or left-click released.
 {
   pkgs,
   username,
@@ -16,7 +16,6 @@
     SHIFT_KEY = ecodes.KEY_LEFTSHIFT
 
     def find_mice():
-        """Find all mouse devices."""
         mice = []
         for path in evdev.list_devices():
             dev = evdev.InputDevice(path)
@@ -41,19 +40,13 @@
                         state["shift"] = False
 
                 elif event.code == ecodes.BTN_RIGHT:
-                    state["right"] = event.value in (1, 2)
-
-                    if state["right"] and state["left"] and not state["shift"]:
-                        ui.write(ecodes.EV_KEY, SHIFT_KEY, 1)
+                    pressed = event.value == 1
+                    if pressed and state["left"]:
+                        state["shift"] = not state["shift"]
+                        ui.write(ecodes.EV_KEY, SHIFT_KEY, 1 if state["shift"] else 0)
                         ui.syn()
-                        state["shift"] = True
-                    elif not state["right"] and state["shift"]:
-                        ui.write(ecodes.EV_KEY, SHIFT_KEY, 0)
-                        ui.syn()
-                        state["shift"] = False
         except OSError:
-            pass  # Device disconnected
-
+            pass
     async def main():
         mice = find_mice()
         if not mice:
@@ -61,7 +54,7 @@
             return
 
         ui = UInput({ecodes.EV_KEY: [SHIFT_KEY]}, name="drag-shift-injector")
-        state = {"left": False, "right": False, "shift": False}
+        state = {"left": False, "shift": False}
 
         print(f"Monitoring {len(mice)} mouse device(s):")
         for m in mice:
