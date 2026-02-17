@@ -6,11 +6,9 @@
   pkgs,
   dotfiles-secrets,
   ...
-}:
-let
+}: let
   domains = import "${dotfiles-secrets}/domains.nix";
-in
-{
+in {
   services = {
     # Caddy reverse proxy for HTTPS access to Happy Server
     caddy = {
@@ -30,7 +28,7 @@ in
       settings = {
         listen_addresses = lib.mkForce "*";
       };
-      ensureDatabases = [ "happy" ];
+      ensureDatabases = ["happy"];
       ensureUsers = [
         {
           name = "happy";
@@ -83,7 +81,7 @@ in
         MINIO_ROOT_USER=minioadmin
         MINIO_ROOT_PASSWORD=minioadmin
       '';
-      dataDir = [ "/var/lib/minio/data" ];
+      dataDir = ["/var/lib/minio/data"];
     };
   };
 
@@ -91,8 +89,8 @@ in
     # Create happy bucket in MinIO
     services.minio-setup-bucket = {
       description = "Create happy bucket in MinIO";
-      after = [ "minio.service" ];
-      wantedBy = [ "multi-user.target" ];
+      after = ["minio.service"];
+      wantedBy = ["multi-user.target"];
       path = with pkgs; [
         coreutils
         glibc.bin

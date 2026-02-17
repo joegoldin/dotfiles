@@ -5,8 +5,7 @@
   lib,
   modulesPath,
   ...
-}:
-{
+}: {
   imports = [
     (modulesPath + "/profiles/qemu-guest.nix")
   ];
@@ -17,10 +16,10 @@
         "xhci_pci"
         "virtio_scsi"
       ];
-      kernelModules = [ ];
+      kernelModules = [];
     };
-    kernelModules = [ ];
-    extraModulePackages = [ ];
+    kernelModules = [];
+    extraModulePackages = [];
     tmp.useTmpfs = false;
   };
 

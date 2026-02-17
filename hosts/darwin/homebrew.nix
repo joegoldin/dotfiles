@@ -3,8 +3,7 @@
   config,
   username,
   ...
-}:
-{
+}: {
   nix-homebrew = {
     # Install Homebrew under the default prefix
     enable = true;

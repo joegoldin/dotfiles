@@ -2,15 +2,13 @@
   pkgs,
   lib,
   ...
-}:
-let
+}: let
   inherit (pkgs) unstable;
-  pythonModule = import ./python { inherit pkgs lib unstable; };
-  spritesModule = import ./sprites.nix { inherit pkgs lib; };
+  pythonModule = import ./python {inherit pkgs lib unstable;};
+  spritesModule = import ./sprites.nix {inherit pkgs lib;};
 
   # Common packages for all systems
-  commonPackages =
-    with pkgs;
+  commonPackages = with pkgs;
     lib.flatten [
       act
       aria2 # A lightweight multi-protocol & multi-source command-line download utility
@@ -106,8 +104,7 @@ let
       zlib
       zstd
     ];
-in
-{
+in {
   home.packages = commonPackages;
 
   home.activation.pythonPostInstall = pythonModule.pythonPostInstall;
