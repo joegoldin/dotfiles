@@ -27,7 +27,7 @@
   # be accessible through 'pkgs.unstable'
   unstable-packages = final: _prev: {
     unstable = import inputs.nixpkgs-unstable {
-      system = final.stdenv.hostPlatform.system;
+      inherit (final.stdenv.hostPlatform) system;
       config.allowUnfree = true;
       config.android_sdk.accept_license = true;
     };
@@ -41,7 +41,7 @@
   mcps-packages = final: prev:
     (inputs.mcps.overlays.default final prev)
     // {
-      mcp-language-server = inputs.mcps.packages.${final.stdenv.hostPlatform.system}.mcp-language-server;
+      inherit (inputs.mcps.packages.${final.stdenv.hostPlatform.system}) mcp-language-server;
       mcp-nixos = inputs.mcps.inputs.mcp-nixos.packages.${final.stdenv.hostPlatform.system}.default;
     };
 }

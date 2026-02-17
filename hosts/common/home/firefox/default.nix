@@ -57,7 +57,7 @@ in {
       # "restricted_domains": [
       # 	"TEST_BLOCKED_DOMAIN"
       # ]
-      ExtensionSettings = addons.ExtensionSettings;
+      inherit (addons) ExtensionSettings;
       "3rdparty" = addons."3rdparty";
 
       FirefoxHome = {

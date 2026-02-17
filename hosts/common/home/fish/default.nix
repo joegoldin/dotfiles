@@ -6,11 +6,11 @@
 }: {
   programs.fish = {
     enable = true;
-    interactiveShellInit = (import ./init.nix {inherit pkgs config;}).interactiveShellInit;
+    inherit ((import ./init.nix {inherit pkgs config;})) interactiveShellInit;
     functions = import ./functions.nix;
-    plugins = (import ./plugins.nix {inherit pkgs;}).plugins;
-    shellAbbrs = (import ./aliases.nix {inherit lib config;}).shellAbbrs;
-    shellAliases = (import ./aliases.nix {inherit lib config;}).shellAliases;
+    inherit ((import ./plugins.nix {inherit pkgs;})) plugins;
+    inherit ((import ./aliases.nix {inherit lib config;})) shellAbbrs;
+    inherit ((import ./aliases.nix {inherit lib config;})) shellAliases;
   };
 
   programs.atuin = import ./atuin.nix {inherit pkgs config;};
