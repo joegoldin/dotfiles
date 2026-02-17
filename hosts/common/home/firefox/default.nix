@@ -23,6 +23,8 @@ in
       DisableAppUpdate = true;
       DisableFeedbackCommands = true;
       DisableBuiltinPDFViewer = true; # Considered a security liability
+      AutofillAddressEnabled = false;
+      AutofillCreditCardEnabled = false;
       DisableFirefoxStudies = true;
       DisableFirefoxAccounts = true; # Disable Firefox Sync
       DisableFirefoxScreenshots = false;
@@ -35,6 +37,9 @@ in
       DisplayMenuBar = "default-off"; # Whether to show the menu bar
       DisablePocket = true;
       DisableTelemetry = true;
+      NetworkPrediction = false;
+      SSLVersionMin = "tls1.2";
+      PostQuantumKeyAgreementEnabled = true;
       DisableFormHistory = true;
       DisablePasswordReveal = true;
       DontCheckDefaultBrowser = true;
@@ -174,7 +179,11 @@ in
         Remove = [
           "Amazon.com"
           "Bing"
+          "eBay"
+          "Ecosia"
           "Google"
+          "Perplexity"
+          "Wikipedia"
         ];
         Default = "Kagi";
       };
@@ -189,13 +198,14 @@ in
       # };
       StartDownloadsInTempDirectory = true;
       UserMessaging = {
-        ExtensionRecommendations = false; # Don't recommend extensions while the user is visiting web pages
-        FeatureRecommendations = false; # Don't recommend browser features
-        Locked = true; # Prevent the user from changing user messaging preferences
-        MoreFromMozilla = false; # Don't show the "More from Mozilla" section in Preferences
-        SkipOnboarding = true; # Don't show onboarding messages on the new tab page
-        UrlbarInterventions = false; # Don't offer suggestions in the URL bar
-        WhatsNew = false; # Remove the "What's New" icon and menuitem
+        ExtensionRecommendations = false;
+        FeatureRecommendations = false;
+        Locked = true;
+        MoreFromMozilla = false;
+        SkipOnboarding = true;
+        UrlbarInterventions = false;
+        WhatsNew = false;
+        FirefoxLabs = true;
       };
       UseSystemPrintDialog = true;
       # WebsiteFilter = {
@@ -295,32 +305,14 @@ in
 
         "browser.preferences.defaultPerformanceSettings.enabled" = true;
         "layers.acceleration.disabled" = false;
-        "privacy.globalprivacycontrol.enabled" = true;
-
-        "browser.newtabpage.activity-stream.showSponsoredTopSites" = false;
 
         # Disable Firefox AI features
         "browser.ml.enable" = false;
 
-        # "network.trr.mode" = 3;
-
-        # "network.dns.disableIPv6" = false;
-
-        # Network privacy hardening
-        "network.dns.disablePrefetch" = true;
-        "network.http.speculative-parallel-limit" = 0;
-        "network.prefetch-next" = false;
-
-        "privacy.donottrackheader.enabled" = true;
-
-        # "privacy.clearOnShutdown.history" = true;
-        # "privacy.clearOnShutdown.downloads" = true;
         "browser.sessionstore.resume_from_crash" = true;
 
         # See https://librewolf.net/docs/faq/#how-do-i-fully-prevent-autoplay for options
         "media.autoplay.blocking_policy" = 2;
-
-        "privacy.resistFingerprinting" = true;
 
         "signon.management.page.breach-alerts.enabled" = false; # Disable firefox password checking against a breach database
 
@@ -338,6 +330,60 @@ in
         "media.videocontrols.picture-in-picture.video-toggle.first-seen-secs" = 1746510487;
         "media.videocontrols.picture-in-picture.video-toggle.has-used" = true;
         "media.videocontrols.picture-in-picture.video-toggle.enabled" = true;
+
+        ### DEBLOAT ###
+        "browser.discovery.enabled" = false;
+        "app.shield.optoutstudies.enabled" = false;
+        "browser.topsites.contile.enabled" = false;
+        "browser.urlbar.suggest.quicksuggest.sponsored" = false;
+        "browser.urlbar.trending.featureGate" = false;
+        "browser.newtabpage.activity-stream.feeds.section.topstories" = false;
+        "browser.newtabpage.activity-stream.feeds.snippets" = false;
+        "browser.newtabpage.activity-stream.section.highlights.includePocket" = false;
+        "browser.newtabpage.activity-stream.section.highlights.includeBookmarks" = false;
+        "browser.newtabpage.activity-stream.section.highlights.includeDownloads" = false;
+        "browser.newtabpage.activity-stream.section.highlights.includeVisited" = false;
+        "browser.newtabpage.activity-stream.showSponsored" = false;
+        "browser.newtabpage.activity-stream.system.showSponsored" = false;
+        "browser.newtabpage.activity-stream.showSponsoredTopSites" = false;
+
+        ### PRIVACY ###
+        "privacy.resistFingerprinting" = true;
+        "privacy.fingerprintingProtection" = true;
+        "privacy.globalprivacycontrol.enabled" = true;
+        "privacy.donottrackheader.enabled" = true;
+        "browser.safebrowsing.downloads.remote.enabled" = false;
+        "network.dns.disablePrefetch" = false;
+        "network.predictor.enabled" = false;
+        "network.http.speculative-parallel-limit" = 0;
+        "browser.places.speculativeConnect.enabled" = false;
+        "browser.contentblocking.category" = "strict";
+        "extensions.pocket.enabled" = false;
+        "browser.search.suggest.enabled.private" = false;
+        "browser.privatebrowsing.forceMediaMemoryCache" = true;
+        "network.http.referer.XOriginTrimmingPolicy" = 2;
+        # Disable CSP reporting: https://bugzilla.mozilla.org/show_bug.cgi?id=1964249
+        "security.csp.reporting.enabled" = false;
+
+        ### SECURITY ###
+        "pdfjs.enableScripting" = false;
+        "signon.formlessCapture.enabled" = false;
+        "dom.disable_window_move_resize" = true;
+        # Disable remote debugging: https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/16222
+        "devtools.debugger.remote-enabled" = false;
+
+        ### SSL ###
+        "security.ssl.require_safe_negotiation" = true;
+        # Disable TLS1.3 0-RTT: https://github.com/tlswg/tls13-spec/issues/1001
+        "security.tls.enable_0rtt_data" = 2;
+        # Strict public key pinning
+        "security.cert_pinning.enforcement_level" = 2;
+        # CRLite for revoked certificate detection
+        "security.pki.crlite_mode" = 2;
+        # Treat unsafe negotiation as broken: https://wiki.mozilla.org/Security:Renegotiation
+        "security.ssl.treat_unsafe_negotiation_as_broken" = true;
+        # More info on insecure connection warnings (test: https://badssl.com)
+        "browser.xul.error_pages.expert_bad_cert" = true;
       };
     };
   };
