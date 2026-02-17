@@ -1,0 +1,100 @@
+diff --git a/src/main/controllers/TabController.js b/src/main/controllers/TabController.js
+index c03f6f1..67aa25f 100644
+--- a/src/main/controllers/TabController.js
++++ b/src/main/controllers/TabController.js
+@@ -87,6 +87,15 @@ class TabController {
+   setupEventListeners() {
+     const { webContents } = this.webContentsView;
+
++    // Remap Ctrl+T to Ctrl+K (Notion search)
++    webContents.on('before-input-event', (event, input) => {
++      if (input.control && !input.shift && !input.alt && input.key === 't') {
++        event.preventDefault();
++        webContents.sendInputEvent({ type: 'keyDown', keyCode: 'k', modifiers: ['control'] });
++        webContents.sendInputEvent({ type: 'keyUp', keyCode: 'k', modifiers: ['control'] });
++      }
++    });
++
+     // Page title updated
+     webContents.on('page-title-updated', (event, title) => {
+       event.preventDefault(); // Prevent default title setting
+@@ -162,8 +171,8 @@ class TabController {
+       }
+     });
+
+-    // Handle external links - allow Notion domains, open others externally
+-    webContents.setWindowOpenHandler(({ url }) => {
++    // Handle external links - open Notion domains in new tab, others externally
++    webContents.setWindowOpenHandler(({ url, disposition }) => {
+       const parsedUrl = new URL(url);
+
+       // Check if URL is a Notion domain (notion.so or notion.com)
+@@ -175,16 +184,39 @@ class TabController {
+         parsedUrl.hostname === 'www.notion.com' ||
+         parsedUrl.hostname.endsWith('.notion.com');
+
+-      if (isNotionDomain) {
+-        // Allow Notion links to open in new tab within app
+-        log.debug(`Tab ${this.tabId}: Allowing new window for Notion URL: ${url}`);
+-        return { action: 'allow' };
+-      } else {
++      if (!isNotionDomain) {
+         // Open non-Notion links in external browser
+         require('electron').shell.openExternal(url);
+         log.debug(`Tab ${this.tabId}: Opening external URL in browser: ${url}`);
+         return { action: 'deny' };
+       }
++
++      // Explicit new-window requests: let Electron create a new window
++      if (disposition === 'new-window') {
++        log.debug(`Tab ${this.tabId}: Allowing new window for Notion URL: ${url}`);
++        return { action: 'allow' };
++      }
++
++      // Everything else (foreground-tab, background-tab, default): open in a tab
++      log.debug(`Tab ${this.tabId}: Opening Notion URL in new tab (disposition=${disposition}): ${url}`);
++      setImmediate(() => {
++        const TabManager = require('../managers/TabManager');
++        const tabManager = TabManager.getInstance();
++        const AppController = require('./AppController');
++        const appController = AppController.getInstance();
++        const windowController = appController.windowControllers.get(this.windowId);
++        if (windowController) {
++          const makeActive = disposition !== 'background-tab';
++          const newTab = tabManager.createTab({
++            windowId: this.windowId,
++            url: url,
++            title: 'Loading...',
++            makeActive,
++          });
++          if (makeActive) windowController.setActiveTab(newTab);
++        }
++      });
++      return { action: 'deny' };
+     });
+
+     // Allow navigation within Notion, block external sites
+diff --git a/src/main/index.js b/src/main/index.js
+index bdf8114..eeaa643 100644
+--- a/src/main/index.js
++++ b/src/main/index.js
+@@ -676,7 +676,7 @@ ipcMain.handle('tab-bar:close-tab', async (event, tabId) => {
+   // Destroy the tab
+   tabManager.destroyTab(tabId);
+
+-  // If this was the active tab, switch to another tab
++  // If this was the active tab, switch to another tab or close the window
+   if (windowController && windowController.currentActiveTabController?.tabId === tabId) {
+     const state = reduxStore.getState();
+     const windowState = state.windows.windows[windowId];
+@@ -685,6 +685,10 @@ ipcMain.handle('tab-bar:close-tab', async (event, tabId) => {
+       // Switch to first available tab
+       const nextTabId = windowState.tabIds[0];
+       windowController.switchToTab(nextTabId);
++    } else {
++      // No tabs left — close the window
++      const bw = windowController.getInternalBrowserWindow();
++      if (bw) bw.close();
+     }
+   }
+
