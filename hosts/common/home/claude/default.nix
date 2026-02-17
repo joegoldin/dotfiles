@@ -126,6 +126,79 @@
     ];
   };
 
+  # Nix development plugin — MCP servers, LSP, skills, commands, agents
+  nixPlugin = claudeLib.mkPlugin {
+    name = "nix";
+    description = "Nix development tools and helpers";
+    mcpServers.nixos = {
+      command = "${pkgs.mcp-nixos}/bin/mcp-nixos";
+    };
+    lspServers.nix = {
+      command = lib.getExe pkgs.nixd;
+      extensionToLanguage = {
+        ".nix" = "nix";
+      };
+    };
+    skills = [
+      (claudeLib.mkSkill {
+        name = "nix-helper";
+        description = "Helps with Nix development and formatting";
+        allowed-tools = [
+          "Bash(${pkgs.statix}/bin/statix)"
+          "Bash(${pkgs.nixfmt-rfc-style}/bin/nixfmt)"
+        ];
+      } ''
+        You are a Nix expert. When working with Nix files:
+
+        1. ALWAYS run `${pkgs.statix}/bin/statix check .` to find anti-patterns
+        2. ADDRESS all issues found
+        3. ALWAYS format files with `${pkgs.nixfmt-rfc-style}/bin/nixfmt`
+
+        Be pedantic about best practices and code quality.
+      '')
+    ];
+    commands = [
+      (claudeLib.mkCommand {
+        name = "format-nix";
+        description = "Format all Nix files in the project";
+        allowed-tools = [
+          "Bash(${pkgs.nixfmt-rfc-style}/bin/nixfmt)"
+          "Bash(${pkgs.fd}/bin/fd)"
+        ];
+        argument-hint = "[directory]";
+      } ''
+        Format all Nix files using nixfmt.
+
+        If an argument is provided, format files in that directory.
+        Otherwise, format all .nix files in the current directory.
+
+        Use: ${pkgs.fd}/bin/fd -e nix -x ${pkgs.nixfmt-rfc-style}/bin/nixfmt
+      '')
+    ];
+    agents = [
+      (claudeLib.mkAgent {
+        name = "nix-analyzer";
+        description = "Specialized agent for analyzing Nix code";
+        tools = [
+          "Read"
+          "Glob"
+          "Grep"
+          "Bash(${pkgs.statix}/bin/statix)"
+        ];
+      } ''
+        You are an expert Nix code analyzer. When asked to analyze Nix code:
+
+        1. Search for all .nix files in the project
+        2. Run statix to identify anti-patterns
+        3. Analyze the flake structure and dependencies
+        4. Provide recommendations for improvements
+        5. Explain any complex Nix patterns found
+
+        Be thorough and educational in your analysis.
+      '')
+    ];
+  };
+
   # Attribution file for the plugin
   attributionFile = pkgs.writeTextFile {
     name = "superpowers-attribution";
@@ -159,6 +232,7 @@
   claudeWithPlugins = claudeLib.mkClaude {
     plugins = [
       superpowersPluginComplete
+      nixPlugin
     ];
   };
 

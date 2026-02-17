@@ -35,4 +35,13 @@
 
   # LLM agent packages (claude-code, codex, gemini-cli) available as pkgs.llm-agents.*
   llm-agents-packages = inputs.llm-agents.overlays.default;
+
+  # MCP server packages for declarative MCP configuration
+  # The upstream overlay only exports github-mcp-server; we also need mcp-language-server
+  mcps-packages = final: prev:
+    (inputs.mcps.overlays.default final prev)
+    // {
+      mcp-language-server = inputs.mcps.packages.${final.stdenv.hostPlatform.system}.mcp-language-server;
+      mcp-nixos = inputs.mcps.inputs.mcp-nixos.packages.${final.stdenv.hostPlatform.system}.default;
+    };
 }
