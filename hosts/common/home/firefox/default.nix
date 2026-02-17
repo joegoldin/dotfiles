@@ -299,6 +299,9 @@ in {
 
         "browser.newtabpage.activity-stream.showSponsoredTopSites" = false;
 
+        # Disable Firefox AI features
+        "browser.ml.enable" = false;
+
         # "network.trr.mode" = 3;
 
         # "network.dns.disableIPv6" = false;
