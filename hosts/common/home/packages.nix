@@ -4,7 +4,7 @@
   config,
   ...
 }: let
-  unstable = pkgs.unstable;
+  inherit (pkgs) unstable;
   pythonModule = import ./python {inherit pkgs lib unstable;};
   spritesModule = import ./sprites.nix {inherit pkgs lib;};
 

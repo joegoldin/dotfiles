@@ -12,7 +12,7 @@ with lib; let
     "${config.users.users.${username}.home}/Pictures/Wallpaper"
     "${config.users.users.${username}.home}/Pictures/Backgrounds"
   ];
-  uid = config.users.users.${username}.uid;
+  inherit (config.users.users.${username}) uid;
 in {
   systemd.timers."set-wallpaper" = {
     wantedBy = ["timers.target"];

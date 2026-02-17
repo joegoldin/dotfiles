@@ -21,27 +21,27 @@
     }
     {
       name = "z";
-      src = z.src;
+      inherit (z) src;
     } # jethrokuan/z
     {
       name = "colored-man-pages";
-      src = colored-man-pages.src;
+      inherit (colored-man-pages) src;
     } # decors/fish-colored-man
     {
       name = "sponge";
-      src = sponge.src;
+      inherit (sponge) src;
     } # meaningful-ooo/sponge
     {
       name = "foreign-env";
-      src = foreign-env.src;
+      inherit (foreign-env) src;
     } # oh-my-fish/plugin-foreign-env
     {
       name = "fzf";
-      src = fzf.src;
+      inherit (fzf) src;
     } # PatrickF1/fzf.fish
     {
       name = "grc";
-      src = grc.src;
+      inherit (grc) src;
     } # garabik/grc/grc.fish
     {
       name = "nix.fish";

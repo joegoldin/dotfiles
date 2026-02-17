@@ -262,7 +262,7 @@
       additionalPackages = eachSystem (system: {
         # devenv-up = self.devShells.${system}.default.config.procfileScript;
       });
-      mkWindowsApp = erosanix.mkWindowsApp;
+      inherit (erosanix) mkWindowsApp;
     in
     {
       # Your custom packages
