@@ -205,7 +205,17 @@ in {
     };
 
     profiles.Default = {
+      userChrome = ''
+        /* Hide native tab bar when Sidebery is active */
+        #main-window[titlepreface*="sidebery"] #TabsToolbar {
+          display: none;
+        }
+      '';
+
       settings = {
+        # Required for userChrome.css to load
+        "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+
         # Startup with previous session
         "browser.startup.page" = 3;
 
