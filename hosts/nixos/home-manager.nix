@@ -6,6 +6,7 @@
     ./packages.nix
     ./ghostty.nix
     ../common/home/zed.nix
+    ../common/home/default-apps.nix
     ./dolphin.nix
   ];
 
@@ -403,22 +404,7 @@
       "dolphinrc"."IconsMode"."PreviewSize" = 48;
       "dolphinrc"."KFileDialog Settings"."Places Icons Auto-resize" = false;
       "dolphinrc"."KFileDialog Settings"."Places Icons Static Size" = 22;
-      "katerc"."General"."Days Meta Infos" = 30;
-      "katerc"."General"."Save Meta Infos" = true;
-      "katerc"."General"."Show Full Path in Title" = false;
-      "katerc"."General"."Show Menu Bar" = true;
-      "katerc"."General"."Show Status Bar" = true;
-      "katerc"."General"."Show Tab Bar" = true;
-      "katerc"."General"."Show Url Nav Bar" = true;
-      "katerc"."filetree"."editShade" = "31,81,106";
-      "katerc"."filetree"."listMode" = false;
-      "katerc"."filetree"."middleClickToClose" = false;
-      "katerc"."filetree"."shadingEnabled" = true;
-      "katerc"."filetree"."showCloseButton" = false;
-      "katerc"."filetree"."showFullPathOnRoots" = false;
-      "katerc"."filetree"."showToolbar" = true;
-      "katerc"."filetree"."sortRole" = 0;
-      "katerc"."filetree"."viewShade" = "81,49,95";
+
       "kcminputrc"."Libinput/4815/3077/Mad Catz Global MADCATZ R.A.T. 8+ gaming mouse"."PointerAccelerationProfile" =
         1;
       "kded5rc"."Module-browserintegrationreminder"."autoload" = false;
@@ -514,41 +500,6 @@
       "dolphin/view_properties/global/.directory"."Dolphin"."SortOrder" = 1;
       "dolphin/view_properties/global/.directory"."Dolphin"."SortRole" = "modificationtime";
       "dolphin/view_properties/global/.directory"."Dolphin"."ViewMode" = 1;
-      # Kate anonymous session defaults
-      "kate/anonymous.katesession"."Kate Plugins"."bookmarksplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."cmaketoolsplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."compilerexplorer" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."eslintplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."externaltoolsplugin" = true;
-      "kate/anonymous.katesession"."Kate Plugins"."formatplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."katebacktracebrowserplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."katebuildplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."katecloseexceptplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."katecolorpickerplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."katectagsplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."katefilebrowserplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."katefiletreeplugin" = true;
-      "kate/anonymous.katesession"."Kate Plugins"."kategdbplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."kategitblameplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."katekonsoleplugin" = true;
-      "kate/anonymous.katesession"."Kate Plugins"."kateprojectplugin" = true;
-      "kate/anonymous.katesession"."Kate Plugins"."katereplicodeplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."katesearchplugin" = true;
-      "kate/anonymous.katesession"."Kate Plugins"."katesnippetsplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."katesqlplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."katesymbolviewerplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."katexmlcheckplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."katexmltoolsplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."keyboardmacrosplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."ktexteditorpreviewplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."latexcompletionplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."lspclientplugin" = true;
-      "kate/anonymous.katesession"."Kate Plugins"."openlinkplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."rainbowparens" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."rbqlplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."tabswitcherplugin" = true;
-      "kate/anonymous.katesession"."Kate Plugins"."templateplugin" = false;
-      "kate/anonymous.katesession"."Kate Plugins"."textfilterplugin" = true;
     };
 
     # Configure spectacle screenshots
