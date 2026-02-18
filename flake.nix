@@ -177,6 +177,11 @@
       url = "github:cpick/nix-rosetta-builder?rev=ebb7162a975074fb570a2c3ac02bc543ff2e9df4";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # audiotools (recording + transcription CLI)
+    audiotools = {
+      url = "github:joegoldin/audiotools";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # nix-flatpak for declarative flatpak management
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.7.0";
   };

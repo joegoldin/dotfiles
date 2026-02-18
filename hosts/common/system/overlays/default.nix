@@ -42,6 +42,9 @@
   # LLM agent packages (claude-code, codex, gemini-cli) available as pkgs.llm-agents.*
   llm-agents-packages = inputs.llm-agents.overlays.default;
 
+  # audiotools (recording + transcription CLI)
+  audiotools-packages = inputs.audiotools.overlays.default;
+
   # MCP server packages for declarative MCP configuration
   # The upstream overlay only exports github-mcp-server; we also need mcp-language-server
   mcps-packages =
