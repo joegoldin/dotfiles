@@ -90,6 +90,9 @@ in {
     flatpak.enable = true;
   };
 
+  # Enable Docker
+  virtualisation.docker.enable = true;
+
   # Enable XDG desktop portal for better application integration
   xdg.portal = {
     enable = true;
