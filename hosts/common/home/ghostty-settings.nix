@@ -15,6 +15,8 @@ let
     window-padding-balance = true;
     window-inherit-working-directory = true;
     window-inherit-font-size = true;
+    window-height = 30;
+    window-width = 112;
     window-vsync = true;
     cursor-style = "block";
     cursor-style-blink = false;
