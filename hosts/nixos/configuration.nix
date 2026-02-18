@@ -75,6 +75,7 @@ in
         nix-path = config.nix.nixPath;
         trusted-users = [ "${username}" ];
         auto-optimise-store = false;
+        builders-use-substitutes = true;
         extra-substituters = [ "https://nixpkgs-python.cachix.org" ];
         extra-trusted-public-keys = [
           "nixpkgs-python.cachix.org-1:hxjI7pFxTyuTHn2NkvWCrAUcNZLNS3ZAvfYNuYifcEU="

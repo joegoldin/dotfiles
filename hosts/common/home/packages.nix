@@ -97,6 +97,7 @@ let
       watch
       wget
       which
+      whisper-cpp
       xdg-utils
       xz
       unstable.yarn-berry_3
