@@ -1,4 +1,5 @@
-{pkgs, ...}: let
+{ pkgs, ... }:
+let
   gh-pr-review = pkgs.buildGoModule rec {
     pname = "gh-pr-review";
     version = "1.6.2";
@@ -19,7 +20,8 @@
       homepage = "https://github.com/agynio/gh-pr-review";
     };
   };
-in {
+in
+{
   programs.gh = {
     enable = true;
     extensions = [

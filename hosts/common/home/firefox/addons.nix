@@ -1,19 +1,23 @@
-{lib, ...}: let
+{ lib, ... }:
+let
   inherit (lib) mkForce;
-in {
+in
+{
   # Can be used to restrict domains per extension:
   # "restricted_domains": [
   # 	"TEST_BLOCKED_DOMAIN"
   # ]
-  ExtensionSettings = with builtins; let
-    extension = shortId: uuid: {
-      name = uuid;
-      value = {
-        install_url = "https://addons.mozilla.org/en-US/firefox/downloads/latest/${shortId}/latest.xpi";
-        installation_mode = "force_installed";
+  ExtensionSettings =
+    with builtins;
+    let
+      extension = shortId: uuid: {
+        name = uuid;
+        value = {
+          install_url = "https://addons.mozilla.org/en-US/firefox/downloads/latest/${shortId}/latest.xpi";
+          installation_mode = "force_installed";
+        };
       };
-    };
-  in
+    in
     listToAttrs [
       # Default block rule
       {

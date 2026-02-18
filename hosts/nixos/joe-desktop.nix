@@ -6,9 +6,11 @@
   username,
   dotfiles-assets,
   ...
-}: let
-  fonts = import ../common/system/fonts {inherit pkgs lib dotfiles-assets;};
-in {
+}:
+let
+  fonts = import ../common/system/fonts { inherit pkgs lib dotfiles-assets; };
+in
+{
   # TODO: Add litra-autotoggle as a service to systemd
 
   # ssh with 1password
@@ -17,7 +19,7 @@ in {
   };
 
   systemd = {
-    services.dlm.wantedBy = ["multi-user.target"];
+    services.dlm.wantedBy = [ "multi-user.target" ];
 
     # "Most software has the HIP libraries hard-coded. You can work around it on NixOS by using:"
     tmpfiles.rules = [
@@ -103,7 +105,7 @@ in {
   # Enable XDG desktop portal for better application integration
   xdg.portal = {
     enable = true;
-    extraPortals = [pkgs.kdePackages.xdg-desktop-portal-kde];
+    extraPortals = [ pkgs.kdePackages.xdg-desktop-portal-kde ];
   };
 
   security.rtkit.enable = true;

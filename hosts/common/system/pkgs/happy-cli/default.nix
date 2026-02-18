@@ -35,9 +35,9 @@ stdenv.mkDerivation (finalAttrs: {
 
   postInstall = ''
     wrapProgram $out/bin/happy \
-      --prefix PATH : ${lib.makeBinPath [nodejs]}
+      --prefix PATH : ${lib.makeBinPath [ nodejs ]}
     wrapProgram $out/bin/happy-mcp \
-      --prefix PATH : ${lib.makeBinPath [nodejs]}
+      --prefix PATH : ${lib.makeBinPath [ nodejs ]}
   '';
 
   meta = with lib; {
@@ -45,7 +45,7 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/slopus/happy-cli";
     changelog = "https://github.com/slopus/happy-cli/releases/tag/v${finalAttrs.version}";
     license = licenses.mit;
-    maintainers = [];
+    maintainers = [ ];
     mainProgram = "happy";
   };
 })

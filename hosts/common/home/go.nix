@@ -2,7 +2,8 @@
   pkgs,
   lib,
   ...
-}: {
+}:
+{
   packages = {
     claude-squad = pkgs.buildGoModule rec {
       pname = "claude-squad";
@@ -21,17 +22,17 @@
       doCheck = false;
 
       # Runtime dependencies - claude-squad requires tmux for sessions and gh for GitHub operations
-      nativeBuildInputs = [pkgs.makeWrapper];
+      nativeBuildInputs = [ pkgs.makeWrapper ];
 
       postInstall = ''
         wrapProgram $out/bin/claude-squad \
           --prefix PATH : ${
-          lib.makeBinPath [
-            pkgs.tmux
-            pkgs.gh
-            pkgs.git
-          ]
-        }
+            lib.makeBinPath [
+              pkgs.tmux
+              pkgs.gh
+              pkgs.git
+            ]
+          }
       '';
 
       meta = with lib; {

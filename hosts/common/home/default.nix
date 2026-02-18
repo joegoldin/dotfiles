@@ -8,7 +8,8 @@
   homeDirectory,
   stateVersion,
   ...
-}: {
+}:
+{
   # You can import other home-manager modules here
   imports = [
     # If you want to use modules your own flake exports (from modules/home-manager):
@@ -19,7 +20,7 @@
 
     # You can also split up your configuration and import pieces of it here:
     ./fish
-    (import ./packages.nix {inherit pkgs lib config;})
+    (import ./packages.nix { inherit pkgs lib config; })
     ./gh.nix
     ./git.nix
     ./starship.nix

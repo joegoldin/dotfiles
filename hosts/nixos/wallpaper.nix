@@ -4,7 +4,8 @@
   pkgs,
   username,
   ...
-}: let
+}:
+let
   scriptPath = "${config.users.users.${username}.home}/dotfiles/scripts/set-wallpaper.py";
   wallpaperDirs = [
     "${config.users.users.${username}.home}/Pictures/Wallpaper"
@@ -14,9 +15,10 @@
     ps.dbus-python
     ps.pillow
   ]);
-in {
+in
+{
   systemd.user.timers."set-wallpaper" = {
-    wantedBy = ["timers.target"];
+    wantedBy = [ "timers.target" ];
     timerConfig = {
       OnBootSec = "60m";
       OnUnitActiveSec = "60m";
@@ -28,7 +30,7 @@ in {
     script = ''
       ${pythonEnv}/bin/python3 ${scriptPath} ${lib.concatStringsSep " " wallpaperDirs}
     '';
-    path = [pkgs.xorg.xrandr];
+    path = [ pkgs.xorg.xrandr ];
     serviceConfig = {
       Type = "oneshot";
     };

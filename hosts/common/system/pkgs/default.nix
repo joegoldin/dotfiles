@@ -65,11 +65,11 @@ pkgs: {
       ;
   };
 
-  claude-desktop = pkgs.callPackage ./claude-desktop {};
+  claude-desktop = pkgs.callPackage ./claude-desktop { };
 
   lotion = pkgs.callPackage ./lotion {
     electron = pkgs.electron_37;
   };
 
-  happy-cli = pkgs.callPackage ./happy-cli {};
+  happy-cli = pkgs.callPackage ./happy-cli { };
 }
