@@ -90,8 +90,14 @@ in {
     flatpak.enable = true;
   };
 
-  # Enable Docker
-  virtualisation.docker.enable = true;
+  # Rootless Docker
+  virtualisation.docker = {
+    enable = true;
+    rootless = {
+      enable = true;
+      setSocketVariable = true;
+    };
+  };
 
   # Enable XDG desktop portal for better application integration
   xdg.portal = {
