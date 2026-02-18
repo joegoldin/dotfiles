@@ -54,6 +54,7 @@ in
       outputs.overlays.unstable-packages
       outputs.overlays.llm-agents-packages
       outputs.overlays.mcps-packages
+      outputs.overlays.audiotools-packages
     ];
     config = {
       allowUnfree = true;
