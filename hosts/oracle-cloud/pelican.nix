@@ -8,21 +8,23 @@
   config,
   dotfiles-secrets,
   ...
-}: let
+}:
+let
   domains = import "${dotfiles-secrets}/domains.nix";
-in {
+in
+{
   # Fix missing group for redis
-  users.groups.redis-pelican-panel = {};
+  users.groups.redis-pelican-panel = { };
 
   # Ensure pelican services wait for agenix secrets
   systemd.services = {
     pelican-panel-setup = {
-      after = ["agenix.service"];
-      wants = ["agenix.service"];
+      after = [ "agenix.service" ];
+      wants = [ "agenix.service" ];
     };
     pelican-wings-setup = {
-      after = ["agenix.service"];
-      wants = ["agenix.service"];
+      after = [ "agenix.service" ];
+      wants = [ "agenix.service" ];
     };
   };
 
@@ -46,7 +48,7 @@ in {
     remote = "https://${domains.pelicanDomain}";
     tokenIdFile = config.age.secrets.pelican-token-id.path;
     tokenFile = config.age.secrets.pelican-token.path;
-    allowedMounts = ["/home/joe/pelican-mounts"];
+    allowedMounts = [ "/home/joe/pelican-mounts" ];
     system.sftp = {
       host = "0.0.0.0";
       port = 2022;

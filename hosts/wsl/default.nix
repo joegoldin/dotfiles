@@ -1,5 +1,6 @@
 # common/default.nix
-{inputs, ...}: {
+{ inputs, ... }:
+{
   imports = [
     ./hardware-configuration.nix
 

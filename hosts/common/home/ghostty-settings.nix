@@ -1,4 +1,5 @@
-{lib}: let
+{ lib }:
+let
   baseSettings = {
     font-family = "TX02 Nerd Font";
     font-size = 11;
@@ -38,13 +39,18 @@
     ];
   };
 
-  toGhosttyConfig = settings: let
-    mkLine = key: value:
-      if builtins.isList value
-      then lib.concatMapStringsSep "\n" (v: "${key} = ${toString v}") value
-      else "${key} = ${toString value}";
-  in
+  toGhosttyConfig =
+    settings:
+    let
+      mkLine =
+        key: value:
+        if builtins.isList value then
+          lib.concatMapStringsSep "\n" (v: "${key} = ${toString v}") value
+        else
+          "${key} = ${toString value}";
+    in
     lib.concatStringsSep "\n" (lib.mapAttrsToList mkLine settings);
-in {
+in
+{
   inherit baseSettings toGhosttyConfig;
 }

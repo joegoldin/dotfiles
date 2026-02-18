@@ -1,4 +1,5 @@
-{username, ...}: {
+{ username, ... }:
+{
   imports = [
     ../common/home
     ../common/home/firefox
@@ -91,8 +92,8 @@
 
     # Shortcuts
     shortcuts = {
-      "ActivityManager"."switch-to-activity-8a44913d-258b-4faf-b84c-6815d74e5cf1" = [];
-      "ActivityManager"."switch-to-activity-aa47102b-a33c-407f-8039-dbf5985eb3e6" = [];
+      "ActivityManager"."switch-to-activity-8a44913d-258b-4faf-b84c-6815d74e5cf1" = [ ];
+      "ActivityManager"."switch-to-activity-aa47102b-a33c-407f-8039-dbf5985eb3e6" = [ ];
       "KDE Keyboard Layout Switcher"."Switch to Last-Used Keyboard Layout" = "Meta+Alt+L";
       "KDE Keyboard Layout Switcher"."Switch to Next Keyboard Layout" = "Meta+Alt+K";
       "kaccess"."Toggle Screen Reader On and Off" = "Meta+Alt+S";
@@ -127,8 +128,8 @@
       "ksmserver"."Reboot Without Confirmation" = "none,,Reboot Without Confirmation";
       "ksmserver"."Shut Down" = "none,,Shut Down";
       "kwin"."Activate Window Demanding Attention" = "Meta+Ctrl+A";
-      "kwin"."Cycle Overview" = [];
-      "kwin"."Cycle Overview Opposite" = [];
+      "kwin"."Cycle Overview" = [ ];
+      "kwin"."Cycle Overview Opposite" = [ ];
       "kwin"."Decrease Opacity" = "none,,Decrease Opacity of Active Window by 5%";
       "kwin"."Edit Tiles" = "Meta+T";
       "kwin"."Expose" = "Ctrl+F9";
@@ -138,17 +139,17 @@
         "Launch (C),Toggle Present Windows (All desktops)"
       ];
       "kwin"."ExposeClass" = "Ctrl+F7";
-      "kwin"."ExposeClassCurrentDesktop" = [];
+      "kwin"."ExposeClassCurrentDesktop" = [ ];
       "kwin"."Grid View" = "Meta+G";
       "kwin"."Increase Opacity" = "none,,Increase Opacity of Active Window by 5%";
       "kwin"."Kill Window" = "Meta+Ctrl+Esc";
-      "kwin"."Move Tablet to Next Output" = [];
+      "kwin"."Move Tablet to Next Output" = [ ];
       "kwin"."MoveMouseToCenter" = "Meta+F6";
       "kwin"."MoveMouseToFocus" = "Meta+F5";
-      "kwin"."MoveZoomDown" = [];
-      "kwin"."MoveZoomLeft" = [];
-      "kwin"."MoveZoomRight" = [];
-      "kwin"."MoveZoomUp" = [];
+      "kwin"."MoveZoomDown" = [ ];
+      "kwin"."MoveZoomLeft" = [ ];
+      "kwin"."MoveZoomRight" = [ ];
+      "kwin"."MoveZoomUp" = [ ];
       "kwin"."Overview" = "Meta+W";
       "kwin"."Setup Window Shortcut" = "none,,Setup Window Shortcut";
       "kwin"."Show Desktop" = "Meta+D";
@@ -196,17 +197,20 @@
       "kwin"."Switch to Screen Below" = "none,,Switch to Screen Below";
       "kwin"."Switch to Screen to the Left" = "none,,Switch to Screen to the Left";
       "kwin"."Switch to Screen to the Right" = "none,,Switch to Screen to the Right";
-      "kwin"."Toggle Night Color" = [];
+      "kwin"."Toggle Night Color" = [ ];
       "kwin"."Toggle Present Windows (All desktops)" = "Meta+Tab";
       "kwin"."Toggle Window Raise/Lower" = "none,,Toggle Window Raise/Lower";
       "kwin"."Walk Through Windows" = "Alt+Tab";
       "kwin"."Walk Through Windows (Reverse)" = "Alt+Shift+Tab";
       "kwin"."Walk Through Windows Alternative" = "none,,Walk Through Windows Alternative";
-      "kwin"."Walk Through Windows Alternative (Reverse)" = "none,,Walk Through Windows Alternative (Reverse)";
+      "kwin"."Walk Through Windows Alternative (Reverse)" =
+        "none,,Walk Through Windows Alternative (Reverse)";
       "kwin"."Walk Through Windows of Current Application" = "Alt+`";
       "kwin"."Walk Through Windows of Current Application (Reverse)" = "Alt+~";
-      "kwin"."Walk Through Windows of Current Application Alternative" = "none,,Walk Through Windows of Current Application Alternative";
-      "kwin"."Walk Through Windows of Current Application Alternative (Reverse)" = "none,,Walk Through Windows of Current Application Alternative (Reverse)";
+      "kwin"."Walk Through Windows of Current Application Alternative" =
+        "none,,Walk Through Windows of Current Application Alternative";
+      "kwin"."Walk Through Windows of Current Application Alternative (Reverse)" =
+        "none,,Walk Through Windows of Current Application Alternative (Reverse)";
       "kwin"."Window Above Other Windows" = "none,,Keep Window Above Others";
       "kwin"."Window Below Other Windows" = "none,,Keep Window Below Others";
       "kwin"."Window Close" = "Alt+F4";
@@ -306,7 +310,7 @@
       "org_kde_powerdevil"."PowerOff" = "Power Off";
       "org_kde_powerdevil"."Sleep" = "Sleep";
       "org_kde_powerdevil"."Toggle Keyboard Backlight" = "Keyboard Light On/Off";
-      "org_kde_powerdevil"."Turn Off Screen" = [];
+      "org_kde_powerdevil"."Turn Off Screen" = [ ];
       "org_kde_powerdevil"."powerProfile" = [
         "Battery"
         "Meta+B,Battery"
@@ -343,15 +347,15 @@
       "plasmashell"."switch to next activity" = "none,,Switch to Next Activity";
       "plasmashell"."switch to previous activity" = "none,,Switch to Previous Activity";
       "plasmashell"."toggle do not disturb" = "none,,Toggle do not disturb";
-      "services/org.kde.dolphin.desktop"."_launch" = [];
-      "services/com.mitchellh.ghostty.desktop"."_launch" = [];
-      "kwin"."Window Custom Quick Tile Bottom" = [];
-      "kwin"."Window Custom Quick Tile Left" = [];
-      "kwin"."Window Custom Quick Tile Right" = [];
-      "kwin"."Window Custom Quick Tile Top" = [];
+      "services/org.kde.dolphin.desktop"."_launch" = [ ];
+      "services/com.mitchellh.ghostty.desktop"."_launch" = [ ];
+      "kwin"."Window Custom Quick Tile Bottom" = [ ];
+      "kwin"."Window Custom Quick Tile Left" = [ ];
+      "kwin"."Window Custom Quick Tile Right" = [ ];
+      "kwin"."Window Custom Quick Tile Top" = [ ];
       "kwin"."disableInputCapture" = "Meta+Shift+Esc";
-      "plasmashell"."Slideshow Wallpaper Next Image" = [];
-      "plasmashell"."edit_clipboard" = [];
+      "plasmashell"."Slideshow Wallpaper Next Image" = [ ];
+      "plasmashell"."edit_clipboard" = [ ];
     };
 
     # Custom hotkeys
@@ -387,7 +391,8 @@
       "powerdevilrc"."AC/SuspendAndShutdown"."PowerButtonAction" = 1;
       "baloofilerc"."Basic Settings"."Indexing-Enabled" = false;
       "baloofilerc"."General"."dbVersion" = 2;
-      "baloofilerc"."General"."exclude filters" = "*~,*.part,*.o,*.la,*.lo,*.loT,*.moc,moc_*.cpp,qrc_*.cpp,ui_*.h,cmake_install.cmake,CMakeCache.txt,CTestTestfile.cmake,libtool,config.status,confdefs.h,autom4te,conftest,confstat,Makefile.am,*.gcode,.ninja_deps,.ninja_log,build.ninja,*.csproj,*.m4,*.rej,*.gmo,*.pc,*.omf,*.aux,*.tmp,*.po,*.vm*,*.nvram,*.rcore,*.swp,*.swap,lzo,litmain.sh,*.orig,.histfile.*,.xsession-errors*,*.map,*.so,*.a,*.db,*.qrc,*.ini,*.init,*.img,*.vdi,*.vbox*,vbox.log,*.qcow2,*.vmdk,*.vhd,*.vhdx,*.sql,*.sql.gz,*.ytdl,*.tfstate*,*.class,*.pyc,*.pyo,*.elc,*.qmlc,*.jsc,*.fastq,*.fq,*.gb,*.fasta,*.fna,*.gbff,*.faa,po,CVS,.svn,.git,_darcs,.bzr,.hg,CMakeFiles,CMakeTmp,CMakeTmpQmake,.moc,.obj,.pch,.uic,.npm,.yarn,.yarn-cache,__pycache__,node_modules,node_packages,nbproject,.terraform,.venv,venv,core-dumps,lost+found";
+      "baloofilerc"."General"."exclude filters" =
+        "*~,*.part,*.o,*.la,*.lo,*.loT,*.moc,moc_*.cpp,qrc_*.cpp,ui_*.h,cmake_install.cmake,CMakeCache.txt,CTestTestfile.cmake,libtool,config.status,confdefs.h,autom4te,conftest,confstat,Makefile.am,*.gcode,.ninja_deps,.ninja_log,build.ninja,*.csproj,*.m4,*.rej,*.gmo,*.pc,*.omf,*.aux,*.tmp,*.po,*.vm*,*.nvram,*.rcore,*.swp,*.swap,lzo,litmain.sh,*.orig,.histfile.*,.xsession-errors*,*.map,*.so,*.a,*.db,*.qrc,*.ini,*.init,*.img,*.vdi,*.vbox*,vbox.log,*.qcow2,*.vmdk,*.vhd,*.vhdx,*.sql,*.sql.gz,*.ytdl,*.tfstate*,*.class,*.pyc,*.pyo,*.elc,*.qmlc,*.jsc,*.fastq,*.fq,*.gb,*.fasta,*.fna,*.gbff,*.faa,po,CVS,.svn,.git,_darcs,.bzr,.hg,CMakeFiles,CMakeTmp,CMakeTmpQmake,.moc,.obj,.pch,.uic,.npm,.yarn,.yarn-cache,__pycache__,node_modules,node_packages,nbproject,.terraform,.venv,venv,core-dumps,lost+found";
       "baloofilerc"."General"."exclude filters version" = 9;
       "kactivitymanagerdrc"."activities"."8a44913d-258b-4faf-b84c-6815d74e5cf1" = "Default";
       "kactivitymanagerdrc"."main"."currentActivity" = "8a44913d-258b-4faf-b84c-6815d74e5cf1";
@@ -458,22 +463,35 @@
       "kwinrc"."Plugins"."synchronizeskipswitcherEnabled" = true;
       "kwinrc"."Tiling"."padding" = 4;
       # Per-desktop per-screen tiling layouts (Desktop 1: Main)
-      "kwinrc"."Tiling/003e92e5-0a93-4e80-9e46-abcefff2f6ed/1f2c90e2-3a8a-4a2e-831e-02e10fc958cd"."tiles" = ''{"layoutDirection":"horizontal","tiles":[{"width":1}]}'';
-      "kwinrc"."Tiling/003e92e5-0a93-4e80-9e46-abcefff2f6ed/2fd71289-0069-4dd8-b8d9-85a14c65cd2e"."tiles" = ''{"layoutDirection":"floating","tiles":[{"height":0.959259259259256,"width":0.8739583333333356,"x":0.03437500000000005,"y":0.012037037037036995},{"height":0.9888888888888838,"width":0.44427083333334144,"x":0.0005208333333335274,"y":0.004629629629629532},{"height":0.9879629629629589,"width":0.4630208333333371,"x":0.4567708333333289,"y":0.005555555555555555}]}'';
-      "kwinrc"."Tiling/003e92e5-0a93-4e80-9e46-abcefff2f6ed/3f40670c-5b6f-4904-835d-62d17f2324f5"."tiles" = ''{"layoutDirection":"horizontal","tiles":[{"width":0.5},{"width":0.5}]}'';
-      "kwinrc"."Tiling/003e92e5-0a93-4e80-9e46-abcefff2f6ed/71cde4f2-86c2-44dc-9896-c4c025c5c5fb"."tiles" = ''{"layoutDirection":"floating","tiles":[{"height":0.7958333333333314,"width":0.8171875000000013,"x":0.08281249999999869,"y":0.09166666666666654},{"height":0.7562499999999982,"width":0.3812499999999967,"x":0.0191406249999989,"y":0.05972222222222237},{"height":0.8840277777777755,"width":0.394140624999995,"x":0.597656250000001,"y":0.04791666666666706}]}'';
-      "kwinrc"."Tiling/003e92e5-0a93-4e80-9e46-abcefff2f6ed/bd507e42-a7b4-4a0e-8871-ee8e19d10874"."tiles" = ''{"layoutDirection":"floating","tiles":[{"height":0.49322916666666655,"width":0.979629629629628,"x":0.011111111111110945,"y":0.010416666666666692},{"height":0.47447916666666745,"width":0.9703703703703689,"x":0.012962962962962671,"y":0.5156249999999998}]}'';
+      "kwinrc"."Tiling/003e92e5-0a93-4e80-9e46-abcefff2f6ed/1f2c90e2-3a8a-4a2e-831e-02e10fc958cd"."tiles" =
+        ''{"layoutDirection":"horizontal","tiles":[{"width":1}]}'';
+      "kwinrc"."Tiling/003e92e5-0a93-4e80-9e46-abcefff2f6ed/2fd71289-0069-4dd8-b8d9-85a14c65cd2e"."tiles" =
+        ''{"layoutDirection":"floating","tiles":[{"height":0.959259259259256,"width":0.8739583333333356,"x":0.03437500000000005,"y":0.012037037037036995},{"height":0.9888888888888838,"width":0.44427083333334144,"x":0.0005208333333335274,"y":0.004629629629629532},{"height":0.9879629629629589,"width":0.4630208333333371,"x":0.4567708333333289,"y":0.005555555555555555}]}'';
+      "kwinrc"."Tiling/003e92e5-0a93-4e80-9e46-abcefff2f6ed/3f40670c-5b6f-4904-835d-62d17f2324f5"."tiles" =
+        ''{"layoutDirection":"horizontal","tiles":[{"width":0.5},{"width":0.5}]}'';
+      "kwinrc"."Tiling/003e92e5-0a93-4e80-9e46-abcefff2f6ed/71cde4f2-86c2-44dc-9896-c4c025c5c5fb"."tiles" =
+        ''{"layoutDirection":"floating","tiles":[{"height":0.7958333333333314,"width":0.8171875000000013,"x":0.08281249999999869,"y":0.09166666666666654},{"height":0.7562499999999982,"width":0.3812499999999967,"x":0.0191406249999989,"y":0.05972222222222237},{"height":0.8840277777777755,"width":0.394140624999995,"x":0.597656250000001,"y":0.04791666666666706}]}'';
+      "kwinrc"."Tiling/003e92e5-0a93-4e80-9e46-abcefff2f6ed/bd507e42-a7b4-4a0e-8871-ee8e19d10874"."tiles" =
+        ''{"layoutDirection":"floating","tiles":[{"height":0.49322916666666655,"width":0.979629629629628,"x":0.011111111111110945,"y":0.010416666666666692},{"height":0.47447916666666745,"width":0.9703703703703689,"x":0.012962962962962671,"y":0.5156249999999998}]}'';
       # Per-screen tiling layouts for screen 0d989076
-      "kwinrc"."Tiling/0d989076-4679-486f-b77a-d70ddebcf0b8/2fd71289-0069-4dd8-b8d9-85a14c65cd2e"."tiles" = ''{"layoutDirection":"horizontal","tiles":[{"width":0.25},{"width":0.5},{"width":0.25}]}'';
-      "kwinrc"."Tiling/0d989076-4679-486f-b77a-d70ddebcf0b8/71cde4f2-86c2-44dc-9896-c4c025c5c5fb"."tiles" = ''{"layoutDirection":"horizontal","tiles":[{"width":0.25},{"width":0.5},{"width":0.25}]}'';
-      "kwinrc"."Tiling/0d989076-4679-486f-b77a-d70ddebcf0b8/bd507e42-a7b4-4a0e-8871-ee8e19d10874"."tiles" = ''{"layoutDirection":"horizontal","tiles":[{"width":0.25},{"width":0.5},{"width":0.25}]}'';
+      "kwinrc"."Tiling/0d989076-4679-486f-b77a-d70ddebcf0b8/2fd71289-0069-4dd8-b8d9-85a14c65cd2e"."tiles" =
+        ''{"layoutDirection":"horizontal","tiles":[{"width":0.25},{"width":0.5},{"width":0.25}]}'';
+      "kwinrc"."Tiling/0d989076-4679-486f-b77a-d70ddebcf0b8/71cde4f2-86c2-44dc-9896-c4c025c5c5fb"."tiles" =
+        ''{"layoutDirection":"horizontal","tiles":[{"width":0.25},{"width":0.5},{"width":0.25}]}'';
+      "kwinrc"."Tiling/0d989076-4679-486f-b77a-d70ddebcf0b8/bd507e42-a7b4-4a0e-8871-ee8e19d10874"."tiles" =
+        ''{"layoutDirection":"horizontal","tiles":[{"width":0.25},{"width":0.5},{"width":0.25}]}'';
 
       # Per-desktop per-screen tiling layouts (Desktop 2: Alternate)
-      "kwinrc"."Tiling/9d26031a-0f2f-4fdf-9d21-14462065db3a/1f2c90e2-3a8a-4a2e-831e-02e10fc958cd"."tiles" = ''{"layoutDirection":"horizontal","tiles":[{"width":0.25},{"width":0.5},{"width":0.25}]}'';
-      "kwinrc"."Tiling/9d26031a-0f2f-4fdf-9d21-14462065db3a/2fd71289-0069-4dd8-b8d9-85a14c65cd2e"."tiles" = ''{"layoutDirection":"horizontal","tiles":[{"width":0.25},{"width":0.5},{"width":0.25}]}'';
-      "kwinrc"."Tiling/9d26031a-0f2f-4fdf-9d21-14462065db3a/3f40670c-5b6f-4904-835d-62d17f2324f5"."tiles" = ''{"layoutDirection":"horizontal","tiles":[{"width":0.25},{"width":0.5},{"width":0.25}]}'';
-      "kwinrc"."Tiling/9d26031a-0f2f-4fdf-9d21-14462065db3a/71cde4f2-86c2-44dc-9896-c4c025c5c5fb"."tiles" = ''{"layoutDirection":"horizontal","tiles":[{"width":0.25},{"width":0.5},{"width":0.25}]}'';
-      "kwinrc"."Tiling/9d26031a-0f2f-4fdf-9d21-14462065db3a/bd507e42-a7b4-4a0e-8871-ee8e19d10874"."tiles" = ''{"layoutDirection":"horizontal","tiles":[{"width":0.25},{"width":0.5},{"width":0.25}]}'';
+      "kwinrc"."Tiling/9d26031a-0f2f-4fdf-9d21-14462065db3a/1f2c90e2-3a8a-4a2e-831e-02e10fc958cd"."tiles" =
+        ''{"layoutDirection":"horizontal","tiles":[{"width":0.25},{"width":0.5},{"width":0.25}]}'';
+      "kwinrc"."Tiling/9d26031a-0f2f-4fdf-9d21-14462065db3a/2fd71289-0069-4dd8-b8d9-85a14c65cd2e"."tiles" =
+        ''{"layoutDirection":"horizontal","tiles":[{"width":0.25},{"width":0.5},{"width":0.25}]}'';
+      "kwinrc"."Tiling/9d26031a-0f2f-4fdf-9d21-14462065db3a/3f40670c-5b6f-4904-835d-62d17f2324f5"."tiles" =
+        ''{"layoutDirection":"horizontal","tiles":[{"width":0.25},{"width":0.5},{"width":0.25}]}'';
+      "kwinrc"."Tiling/9d26031a-0f2f-4fdf-9d21-14462065db3a/71cde4f2-86c2-44dc-9896-c4c025c5c5fb"."tiles" =
+        ''{"layoutDirection":"horizontal","tiles":[{"width":0.25},{"width":0.5},{"width":0.25}]}'';
+      "kwinrc"."Tiling/9d26031a-0f2f-4fdf-9d21-14462065db3a/bd507e42-a7b4-4a0e-8871-ee8e19d10874"."tiles" =
+        ''{"layoutDirection":"horizontal","tiles":[{"width":0.25},{"width":0.5},{"width":0.25}]}'';
       "kwinrc"."Xwayland"."Scale" = 1.25;
       "kwinrc"."org.kde.kdecoration2"."ButtonsOnLeft" = "XAI";
       "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "FSM";

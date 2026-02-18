@@ -18,14 +18,13 @@ stdenv.mkDerivation rec {
     hash = "sha256-fTgvzWKB6NbfD6S7E1gsbOwg9ny6+1gcIPPlT2X+ubg=";
   };
 
-  nativeBuildInputs = [makeWrapper];
+  nativeBuildInputs = [ makeWrapper ];
 
-  buildInputs =
-    [
-      jq
-    ]
-    ++ lib.optionals stdenv.isLinux [libnotify]
-    ++ lib.optionals stdenv.isDarwin [terminal-notifier];
+  buildInputs = [
+    jq
+  ]
+  ++ lib.optionals stdenv.isLinux [ libnotify ]
+  ++ lib.optionals stdenv.isDarwin [ terminal-notifier ];
 
   dontBuild = true;
 
@@ -46,12 +45,12 @@ stdenv.mkDerivation rec {
 
     wrapProgram $out/bin/code-notify \
       --prefix PATH : ${
-      lib.makeBinPath (
-        [jq]
-        ++ lib.optionals stdenv.isLinux [libnotify]
-        ++ lib.optionals stdenv.isDarwin [terminal-notifier]
-      )
-    }
+        lib.makeBinPath (
+          [ jq ]
+          ++ lib.optionals stdenv.isLinux [ libnotify ]
+          ++ lib.optionals stdenv.isDarwin [ terminal-notifier ]
+        )
+      }
 
     runHook postInstall
   '';

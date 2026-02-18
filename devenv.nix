@@ -9,7 +9,8 @@
   cachix.enable = false;
   dotenv.enable = true;
 
-  packages = with pkgs;
+  packages =
+    with pkgs;
     [
       hello
       fish

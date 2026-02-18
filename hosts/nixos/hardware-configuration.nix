@@ -6,7 +6,8 @@
   lib,
   modulesPath,
   ...
-}: {
+}:
+{
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
@@ -21,11 +22,12 @@
         "usb_storage"
         "sd_mod"
       ];
-      kernelModules = ["amdgpu"];
-      luks.devices."luks-bf7e5885-6a8e-447b-bb6d-b682b2991325".device = "/dev/disk/by-uuid/bf7e5885-6a8e-447b-bb6d-b682b2991325";
+      kernelModules = [ "amdgpu" ];
+      luks.devices."luks-bf7e5885-6a8e-447b-bb6d-b682b2991325".device =
+        "/dev/disk/by-uuid/bf7e5885-6a8e-447b-bb6d-b682b2991325";
     };
-    kernelModules = ["kvm-intel"];
-    extraModulePackages = [];
+    kernelModules = [ "kvm-intel" ];
+    extraModulePackages = [ ];
   };
 
   fileSystems = {
@@ -84,7 +86,7 @@
     };
   };
 
-  swapDevices = [];
+  swapDevices = [ ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's

@@ -6,7 +6,8 @@
   lib,
   username,
   ...
-}: {
+}:
+{
   users.users.root.openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP0vgzxNgZd51jZ3K/s64jltFRSyVLxjLPWM4Q6747Zw"
   ];
@@ -34,7 +35,7 @@
   programs.ssh.startAgent = true;
 
   virtualisation.docker.enable = true;
-  users.extraGroups.docker.members = ["${username}"];
+  users.extraGroups.docker.members = [ "${username}" ];
 
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.

@@ -183,7 +183,7 @@ stdenv.mkDerivation (finalAttrs: {
         "Office"
         "Utility"
       ];
-      mimeTypes = ["x-scheme-handler/claude"];
+      mimeTypes = [ "x-scheme-handler/claude" ];
       startupWMClass = "Claude";
     })
   ];
@@ -191,8 +191,11 @@ stdenv.mkDerivation (finalAttrs: {
   meta = {
     description = "Claude Desktop for Linux";
     homepage = "https://github.com/aaddrick/claude-desktop-debian";
-    license = with lib.licenses; [mit asl20];
-    platforms = ["x86_64-linux"];
+    license = with lib.licenses; [
+      mit
+      asl20
+    ];
+    platforms = [ "x86_64-linux" ];
     mainProgram = "claude-desktop";
   };
 })

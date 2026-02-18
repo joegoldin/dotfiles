@@ -2,7 +2,8 @@
   pkgs,
   lib,
   ...
-}: let
+}:
+let
   version = "0.0.1-rc29";
 
   # Platform-specific sources
@@ -28,7 +29,8 @@
   source =
     sources.${pkgs.stdenv.hostPlatform.system}
       or (throw "Unsupported platform: ${pkgs.stdenv.hostPlatform.system}");
-in {
+in
+{
   packages = {
     sprite = pkgs.stdenv.mkDerivation {
       pname = "sprite";
@@ -40,7 +42,7 @@ in {
 
       sourceRoot = ".";
 
-      nativeBuildInputs = [pkgs.gnutar];
+      nativeBuildInputs = [ pkgs.gnutar ];
 
       unpackPhase = ''
         tar -xzf $src
