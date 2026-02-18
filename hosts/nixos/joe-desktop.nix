@@ -127,7 +127,7 @@ in
     # KDE specific packages for Plasma 6
     kdePackages.ark
     kdePackages.dolphin
-    kdePackages.kate
+    kdePackages.gwenview
     kdePackages.konsole
     kdePackages.spectacle
     kdotool
