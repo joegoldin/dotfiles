@@ -13,6 +13,7 @@ let
     with pkgs;
     lib.flatten [
       act
+      audiotools
       aria2 # A lightweight multi-protocol & multi-source command-line download utility
       unstable.asciinema_3
       awscli2
