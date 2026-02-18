@@ -98,6 +98,7 @@ in {
       setSocketVariable = true;
     };
   };
+  users.extraGroups.docker.members = [ "${username}" ];
 
   # Enable XDG desktop portal for better application integration
   xdg.portal = {
