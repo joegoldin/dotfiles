@@ -119,31 +119,4 @@
       };
     };
   };
-
-  xdg.mimeApps = {
-    enable = true;
-    defaultApplications = {
-      "text/plain" = "dev.zed.Zed.desktop";
-      "text/markdown" = "dev.zed.Zed.desktop";
-      "text/x-csrc" = "dev.zed.Zed.desktop";
-      "text/x-chdr" = "dev.zed.Zed.desktop";
-      "text/x-c++src" = "dev.zed.Zed.desktop";
-      "text/x-c++hdr" = "dev.zed.Zed.desktop";
-      "text/x-java" = "dev.zed.Zed.desktop";
-      "text/x-python" = "dev.zed.Zed.desktop";
-      "text/x-script.python" = "dev.zed.Zed.desktop";
-      "text/x-ruby" = "dev.zed.Zed.desktop";
-      "text/x-shellscript" = "dev.zed.Zed.desktop";
-      "text/x-sql" = "dev.zed.Zed.desktop";
-      "text/css" = "dev.zed.Zed.desktop";
-      "text/html" = "dev.zed.Zed.desktop";
-      "text/xml" = "dev.zed.Zed.desktop";
-      "application/json" = "dev.zed.Zed.desktop";
-      "application/x-yaml" = "dev.zed.Zed.desktop";
-      "application/toml" = "dev.zed.Zed.desktop";
-      "application/xml" = "dev.zed.Zed.desktop";
-      "application/javascript" = "dev.zed.Zed.desktop";
-      "application/x-shellscript" = "dev.zed.Zed.desktop";
-    };
-  };
 }
