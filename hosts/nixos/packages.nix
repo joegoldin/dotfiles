@@ -16,6 +16,7 @@ in
       # unstable.android-studio-full
       unstable.calcurse
       goModule.packages.claude-squad
+      claude-container
       claude-desktop
       unstable.cloudflared
       #      unstable.davinci-resolve
