@@ -7,7 +7,7 @@ pkgs: {
 
   aws-cli = pkgs.writeShellScriptBin "aws" ''
     unset PYTHONPATH
-    exec ${pkgs.awscli2}/bin/aws "$@"
+    exec ${pkgs.unstable.awscli2}/bin/aws "$@"
   '';
 
   shopt-script = pkgs.writeShellScriptBin "shopt" ''
