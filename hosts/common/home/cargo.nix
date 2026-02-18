@@ -1,4 +1,5 @@
-{pkgs, ...}: {
+{ pkgs, ... }:
+{
   packages = {
     litra = pkgs.rustPlatform.buildRustPackage rec {
       pname = "litra-rs";
@@ -8,7 +9,7 @@
         openssl
         systemd
       ];
-      nativeBuildInputs = with pkgs; [pkg-config];
+      nativeBuildInputs = with pkgs; [ pkg-config ];
 
       src = pkgs.fetchFromGitHub {
         owner = "joegoldin";
@@ -26,7 +27,7 @@
         openssl
         systemd
       ];
-      nativeBuildInputs = with pkgs; [pkg-config];
+      nativeBuildInputs = with pkgs; [ pkg-config ];
 
       src = pkgs.fetchFromGitHub {
         owner = "joegoldin";

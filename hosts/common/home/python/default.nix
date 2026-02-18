@@ -3,7 +3,8 @@
   lib,
   unstable,
   ...
-}: let
+}:
+let
   pythonBase = unstable.python3;
 
   # Import custom package definitions
@@ -17,7 +18,8 @@
   };
 
   # Standard packages from nixpkgs
-  nixPythonPackages = with pythonBase.pkgs;
+  nixPythonPackages =
+    with pythonBase.pkgs;
     [
       anthropic
       beautifulsoup4
@@ -58,49 +60,53 @@
       zlib-ng
     ]
     ++ (
-      if (pkgs.stdenv.isDarwin && pkgs.stdenv.isAarch64)
-      then with pythonBase.pkgs; [
-        torch-bin
-        torchvision-bin
-      ]
-      else with pythonBase.pkgs; [
-        torch
-        torchvision
-        screeninfo
-        xcffib
-      ]
+      if (pkgs.stdenv.isDarwin && pkgs.stdenv.isAarch64) then
+        with pythonBase.pkgs;
+        [
+          torch-bin
+          torchvision-bin
+        ]
+      else
+        with pythonBase.pkgs;
+        [
+          torch
+          torchvision
+          screeninfo
+          xcffib
+        ]
     );
 
   # Final Python environment with all packages
   pythonWithPackages = pythonBase.withPackages (
     ps:
-      nixPythonPackages
-      ++ [
-        # Custom packages from PyPI
-        customPackages.deepgram-sdk
-        customPackages.fal-client
-        # customPackages.llm
-        # customPackages.llm-anthropic
-        # customPackages.llm-cmd
-        # customPackages.llm-cmd-comp
-        # customPackages.llm-deepseek
-        # customPackages.llm-gemini
-        # customPackages.llm-grok
-        # customPackages.llm-ollama
-        # customPackages.llm-perplexity
-        customPackages.lmstudio
-        customPackages.scrapfly-sdk
-      ]
-      ++ (
-        if (pkgs.stdenv.isDarwin && pkgs.stdenv.isAarch64)
-        then [
+    nixPythonPackages
+    ++ [
+      # Custom packages from PyPI
+      customPackages.deepgram-sdk
+      customPackages.fal-client
+      # customPackages.llm
+      # customPackages.llm-anthropic
+      # customPackages.llm-cmd
+      # customPackages.llm-cmd-comp
+      # customPackages.llm-deepseek
+      # customPackages.llm-gemini
+      # customPackages.llm-grok
+      # customPackages.llm-ollama
+      # customPackages.llm-perplexity
+      customPackages.lmstudio
+      customPackages.scrapfly-sdk
+    ]
+    ++ (
+      if (pkgs.stdenv.isDarwin && pkgs.stdenv.isAarch64) then
+        [
           customPackages.mlx
           # customPackages.mlx-lm
           # customPackages.llm-mlx
         ]
-        else [
+      else
+        [
         ]
-      )
+    )
   );
 
   # Create an FHS environment for Python
@@ -117,12 +123,13 @@
       ln -s ${pythonWithPackages}/bin/python3 usr/bin/python3
     '';
   };
-in {
+in
+{
   packages = pythonWithPackages;
   fhs = pythonFHSEnv;
 
   # Add Home Manager activation script to run post-install commands
-  pythonPostInstall = lib.hm.dag.entryAfter ["installPackages"] ''
+  pythonPostInstall = lib.hm.dag.entryAfter [ "installPackages" ] ''
     echo "Running Python package post-installation tasks..."
 
     # Changed to use a direct iteration over the packages with non-empty postInstall
@@ -130,12 +137,13 @@ in {
       lib.filter (cmd: cmd != "") (
         map (
           pkg:
-            if pkg ? postInstall && pkg.postInstall != ""
-            then ''
+          if pkg ? postInstall && pkg.postInstall != "" then
+            ''
               echo "Running post-install configuration for ${pkg.pname}..."
               run ${pkg.postInstall}
             ''
-            else ""
+          else
+            ""
         ) (lib.attrValues customPackages)
       )
     )}

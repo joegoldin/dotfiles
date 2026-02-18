@@ -6,7 +6,8 @@
   pkgs,
   dotfiles-assets,
   ...
-}: let
+}:
+let
   initConfigAdditions = ''
     eval $(/opt/homebrew/bin/brew shellenv)
     if test "$TERM_PROGRAM" = "iTerm.app"
@@ -14,8 +15,9 @@
     end
     fish_add_path -a /Applications/Obsidian.app/Contents/MacOS
   '';
-  fonts = import ../common/system/fonts {inherit pkgs lib dotfiles-assets;};
-in {
+  fonts = import ../common/system/fonts { inherit pkgs lib dotfiles-assets; };
+in
+{
   imports = [
     ../common/home
     ./packages.nix
@@ -32,7 +34,7 @@ in {
 
   programs = {
     fish.interactiveShellInit = lib.strings.concatStrings [
-      (import ../common/home/fish/init.nix {inherit pkgs config;}).interactiveShellInit
+      (import ../common/home/fish/init.nix { inherit pkgs config; }).interactiveShellInit
       initConfigAdditions
     ];
 

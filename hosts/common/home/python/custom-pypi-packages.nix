@@ -3,7 +3,8 @@
   lib,
   pythonBase,
   ...
-}: let
+}:
+let
   # Define all packages in a recursive attribute set
   pythonPackages = {
     fal-client = pythonBase.pkgs.buildPythonPackage {
@@ -31,7 +32,7 @@
       doCheck = false;
 
       # Basic import check
-      pythonImportsCheck = ["fal_client"];
+      pythonImportsCheck = [ "fal_client" ];
 
       meta = with lib; {
         description = "Python client for fal.ai";
@@ -293,13 +294,13 @@
       };
 
       # Dependencies
-      propagatedBuildInputs = [];
+      propagatedBuildInputs = [ ];
 
       # Disable tests - enable if you have specific test dependencies
       doCheck = false;
 
       # Basic import check
-      pythonImportsCheck = ["mlx"];
+      pythonImportsCheck = [ "mlx" ];
 
       meta = with lib; {
         description = "A framework for machine learning on Apple silicon.";
@@ -475,7 +476,7 @@
       doCheck = false;
 
       # Basic import check
-      pythonImportsCheck = ["deepgram"];
+      pythonImportsCheck = [ "deepgram" ];
 
       meta = with lib; {
         description = "The official Python SDK for the Deepgram automated speech recognition platform.";
@@ -512,7 +513,7 @@
       doCheck = false;
 
       # Basic import check
-      pythonImportsCheck = ["lmstudio"];
+      pythonImportsCheck = [ "lmstudio" ];
 
       meta = with lib; {
         description = "LM Studio Python SDK";
@@ -544,7 +545,7 @@
       doCheck = false;
 
       # Basic import check
-      pythonImportsCheck = ["scrapfly"];
+      pythonImportsCheck = [ "scrapfly" ];
 
       meta = with lib; {
         description = "Scrapfly SDK for Scrapfly";
@@ -554,4 +555,4 @@
     };
   };
 in
-  pythonPackages
+pythonPackages
