@@ -242,7 +242,7 @@
       # Your custom packages
       # Accessible through 'nix build', 'nix shell', etc
       packages = eachSystem (system: basePackages.${system} // additionalPackages.${system});
-      formatter = eachSystem (system: inputs.nixpkgs-unstable.legacyPackages.${system}.nixfmt-rfc-style);
+      formatter = eachSystem (system: inputs.nixpkgs-unstable.legacyPackages.${system}.nixfmt);
 
       # Your custom packages and modifications, exported as overlays
       overlays = import ./hosts/common/system/overlays { inherit inputs; };
