@@ -118,6 +118,9 @@ UPDATED_COUNT=0
 log_info "Scanning $FLAKE_FILE for pinned inputs..."
 echo
 
+# Read file content upfront so in-place sed edits don't break the loop
+FLAKE_CONTENT=$(< "$FLAKE_FILE")
+
 # Extract all github URLs from flake.nix
 while IFS= read -r line; do
   # Match lines with github: URLs
@@ -146,7 +149,7 @@ while IFS= read -r line; do
           if [[ "$DRY_RUN" != "true" ]]; then
             new_url=$(update_url "$url" "tag" "$latest_tag")
             sed -i "s|$url|$new_url|g" "$FLAKE_FILE"
-            ((UPDATED_COUNT++))
+            UPDATED_COUNT=$((UPDATED_COUNT + 1))
           fi
         else
           echo "  Already at latest tag"
@@ -167,7 +170,7 @@ while IFS= read -r line; do
           if [[ "$DRY_RUN" != "true" ]]; then
             new_url=$(update_url "$url" "rev" "$latest_commit")
             sed -i "s|$url|$new_url|g" "$FLAKE_FILE"
-            ((UPDATED_COUNT++))
+            UPDATED_COUNT=$((UPDATED_COUNT + 1))
           fi
         else
           echo "  Already at latest commit"
@@ -201,7 +204,7 @@ while IFS= read -r line; do
         ;;
     esac
   fi
-done < "$FLAKE_FILE"
+done <<< "$FLAKE_CONTENT"
 
 echo
 log_info "Summary:"
