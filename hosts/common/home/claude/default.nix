@@ -322,12 +322,17 @@
   };
 
   # Create wrapped claude binary with plugins using mkClaude (uses pkgsWithLatestClaude.claude-code)
-  claudeWithPlugins = claudeLib.mkClaude {
+  claudeWithPluginsBase = claudeLib.mkClaude {
     plugins = [
       superpowersPluginComplete
       nixPlugin
     ];
   };
+
+  # Wrap claude to always pass --verbose
+  claudeWithPlugins = pkgs.writeShellScriptBin "claude" ''
+    exec ${claudeWithPluginsBase}/bin/claude --verbose "$@"
+  '';
 
   # Generate settings.json content
   settingsContent = import ./settings.nix {
