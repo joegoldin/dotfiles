@@ -64,26 +64,6 @@
         "nofail"
       ];
     };
-
-    "/mnt/data" = {
-      device = "/dev/nvme1n1p2";
-      fsType = "ntfs-3g";
-      options = [
-        "rw"
-        "uid=1000"
-        "nofail"
-      ];
-    };
-
-    "/mnt/data-2" = {
-      device = "/dev/nvme3n1p2";
-      fsType = "ntfs-3g";
-      options = [
-        "rw"
-        "uid=1000"
-        "nofail"
-      ];
-    };
   };
 
   swapDevices = [ ];
