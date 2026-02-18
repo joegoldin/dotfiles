@@ -27,8 +27,15 @@
   unstable-packages = final: _prev: {
     unstable = import inputs.nixpkgs-unstable {
       inherit (final.stdenv.hostPlatform) system;
-      config.allowUnfree = true;
-      config.android_sdk.accept_license = true;
+      config = {
+        allowUnfree = true;
+        android_sdk.accept_license = true;
+        # TODO: fix rocm/vllm (build takes ages, wait for upstream fix in nixpkgs and cached builds...)
+        # rocmSupport = true;
+      };
+      overlays = [
+        # (import ./vllm-rocm.nix)
+      ];
     };
   };
 
