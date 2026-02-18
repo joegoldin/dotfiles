@@ -6,6 +6,7 @@
     ./packages.nix
     ./ghostty.nix
     ../common/home/zed.nix
+    ./dolphin.nix
   ];
 
   # TODO: git signing with 1password
