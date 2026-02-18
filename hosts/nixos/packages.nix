@@ -41,7 +41,6 @@ in
       ungoogled-chromium
       vlc
       unstable.vllm
-      unstable.zed-editor
       unstable.zoom-us
     ]
     ++ appImagePackages;

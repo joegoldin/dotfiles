@@ -5,6 +5,7 @@
     ../common/home/firefox
     ./packages.nix
     ./ghostty.nix
+    ../common/home/zed.nix
   ];
 
   # TODO: git signing with 1password
