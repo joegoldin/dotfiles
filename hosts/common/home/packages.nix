@@ -16,7 +16,7 @@ let
       audiotools
       aria2 # A lightweight multi-protocol & multi-source command-line download utility
       unstable.asciinema_3
-      awscli2
+      aws-cli
       bc
       bfg-repo-cleaner
       bun
