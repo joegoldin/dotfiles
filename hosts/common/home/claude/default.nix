@@ -156,7 +156,7 @@ let
           description = "Helps with Nix development and formatting";
           allowed-tools = [
             "Bash(${pkgs.statix}/bin/statix)"
-            "Bash(${pkgs.unstable.nixfmt-rfc-style}/bin/nixfmt)"
+            "Bash(${pkgs.unstable.nixfmt}/bin/nixfmt)"
           ];
         }
         ''
@@ -164,7 +164,7 @@ let
 
           1. ALWAYS run `${pkgs.statix}/bin/statix check .` to find anti-patterns
           2. ADDRESS all issues found
-          3. ALWAYS format files with `${pkgs.unstable.nixfmt-rfc-style}/bin/nixfmt`
+          3. ALWAYS format files with `${pkgs.unstable.nixfmt}/bin/nixfmt`
 
           Be pedantic about best practices and code quality.
         ''
@@ -176,7 +176,7 @@ let
           name = "format-nix";
           description = "Format all Nix files in the project";
           allowed-tools = [
-            "Bash(${pkgs.unstable.nixfmt-rfc-style}/bin/nixfmt)"
+            "Bash(${pkgs.unstable.nixfmt}/bin/nixfmt)"
             "Bash(${pkgs.fd}/bin/fd)"
           ];
           argument-hint = "[directory]";
@@ -187,7 +187,7 @@ let
           If an argument is provided, format files in that directory.
           Otherwise, format all .nix files in the current directory.
 
-          Use: ${pkgs.fd}/bin/fd -e nix -x ${pkgs.unstable.nixfmt-rfc-style}/bin/nixfmt
+          Use: ${pkgs.fd}/bin/fd -e nix -x ${pkgs.unstable.nixfmt}/bin/nixfmt
         ''
       )
       (claudeLib.mkCommand
@@ -258,7 +258,7 @@ let
 
           $ARGUMENTS
 
-          Read the relevant files first, then make the changes. Follow existing patterns in the repo. Format changed .nix files with `${pkgs.unstable.nixfmt-rfc-style}/bin/nixfmt`.
+          Read the relevant files first, then make the changes. Follow existing patterns in the repo. Format changed .nix files with `${pkgs.unstable.nixfmt}/bin/nixfmt`.
         ''
       )
     ];
