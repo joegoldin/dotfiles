@@ -52,7 +52,7 @@
     systems.url = "github:nix-systems/default?rev=da67096a3b9bf56a91d16901293e51ba5b49a27e";
     # agenix
     agenix = {
-      url = "github:ryantm/agenix?rev=fcdea223397448d35d9b31f798479227e80183f6";
+      url = "github:ryantm/agenix?rev=b027ee29d959fda4b60b57566d64c98a202e0feb";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # disko
@@ -69,29 +69,24 @@
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.7.0";
     # fast x86_64-linux builds on Apple Silicon
     nix-rosetta-builder = {
-      url = "github:cpick/nix-rosetta-builder?rev=ebb7162a975074fb570a2c3ac02bc543ff2e9df4";
+      url = "github:cpick/nix-rosetta-builder?rev=50e6070082e0b4fbaf67dd8f346892a1a9ed685c";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # ── Development tools ──────────────────────────────────────────────────
     devenv.url = "github:cachix/devenv?ref=v1.11.2";
-    nixpkgs-python.url = "github:cachix/nixpkgs-python?rev=04b27dbad2e004cb237db202f21154eea3c4f89f";
-    pre-commit-hooks.url = "github:cachix/pre-commit-hooks.nix?rev=b314426c17667bcebd73ed7e57ecae2bac9755cf";
+    nixpkgs-python.url = "github:cachix/nixpkgs-python?rev=0630618bfe33895453257fb606af75aa71247393";
+    git-hooks.url = "github:cachix/git-hooks.nix?rev=5eaaedde414f6eb1aea8b8525c466dc37bba95ae";
 
     # ── Desktop / NixOS applications ───────────────────────────────────────
     # affinity apps
     affinity-nix = {
-      url = "github:mrshmllow/affinity-nix?rev=0c110a15fb5605490f7de451073db1c775745fee";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    # mkWindowsApp
-    erosanix = {
-      url = "github:emmanuelrosa/erosanix?rev=ce9b9a671ace6e1c446bcfd3e24a17a3674d04ca";
+      url = "github:mrshmllow/affinity-nix?rev=cfec6b8371038868748370ed38c59ec35e49b62e";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # KDE configuration
     plasma-manager = {
-      url = "github:nix-community/plasma-manager?rev=51816be33a1ff0d4b22427de83222d5bfa96d30e";
+      url = "github:nix-community/plasma-manager?rev=44b928068359b7d2310a34de39555c63c93a2c90";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
@@ -103,7 +98,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, gemini-cli)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=398181e94b91ad081fad17d9b5eab140411d6a29";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=b9565d386f29e6b10cc7c513be3697e7c6694f9c";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
@@ -112,12 +107,12 @@
     };
     # Claude Code skills
     superpowers = {
-      url = "github:obra/superpowers?ref=v4.0.3";
+      url = "github:obra/superpowers?ref=v4.3.0";
       flake = false;
     };
 
     # ── Homebrew (macOS) ───────────────────────────────────────────────────
-    nix-homebrew.url = "github:zhaofengli/nix-homebrew?rev=6a8ab60bfd66154feeaa1021fc3b32684814a62a";
+    nix-homebrew.url = "github:zhaofengli/nix-homebrew?rev=a5409abd0d5013d79775d3419bcac10eacb9d8c5";
     brew-nix = {
       url = "github:BatteredBunny/brew-nix?rev=b314426c17667bcebd73ed7e57ecae2bac9755cf";
       inputs.brew-api.follows = "brew-api";
@@ -210,12 +205,11 @@
       nixos-wsl,
       nix-darwin,
       systems,
-      pre-commit-hooks,
+      git-hooks,
       nix-homebrew,
       disko,
       agenix,
       plasma-manager,
-      erosanix,
       lanzaboote,
       dotfiles-assets,
       dotfiles-secrets,
@@ -251,7 +245,6 @@
       additionalPackages = eachSystem (system: {
         # devenv-up = self.devShells.${system}.default.config.procfileScript;
       });
-      inherit (erosanix) mkWindowsApp;
     in
     {
       # Your custom packages
@@ -263,7 +256,7 @@
       overlays = import ./hosts/common/system/overlays { inherit inputs; };
 
       checks = eachSystem (system: {
-        pre-commit-check = pre-commit-hooks.lib.${system}.run {
+        pre-commit-check = git-hooks.lib.${system}.run {
           src = ./.;
           hooks = {
             nixfmt.enable = true;
@@ -393,7 +386,6 @@
         joe-desktop = nixpkgs.lib.nixosSystem {
           specialArgs = commonSpecialArgs // {
             hostname = "joe-desktop";
-            inherit inputs mkWindowsApp;
           };
           modules = [
             # > Our main nixos configuration <
@@ -416,7 +408,6 @@
             )
             nix-flatpak.nixosModules.nix-flatpak
             agenix.nixosModules.default
-            erosanix.nixosModules.mkwindowsapp-gc
             lanzaboote.nixosModules.lanzaboote
           ];
         };
