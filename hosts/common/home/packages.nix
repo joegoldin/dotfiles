@@ -95,6 +95,7 @@ let
       unstable.just
       unzip
       uv
+      vhs
       watch
       wget
       which
