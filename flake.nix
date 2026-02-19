@@ -240,7 +240,15 @@
       };
       eachSystem = nixpkgs.lib.genAttrs (import systems);
       basePackages = eachSystem (
-        system: import ./hosts/common/system/pkgs nixpkgs.legacyPackages.${system}
+        system:
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = [ self.overlays.unstable-packages ];
+            config.allowUnfree = true;
+          };
+        in
+        import ./hosts/common/system/pkgs pkgs
       );
       additionalPackages = eachSystem (system: {
         # devenv-up = self.devShells.${system}.default.config.procfileScript;

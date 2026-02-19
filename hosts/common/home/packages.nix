@@ -23,6 +23,7 @@ let
       cachix
       caddy
       # claude-code is provided by ./claude module with plugins
+      claude-container
       clojure
       codex
       comma
