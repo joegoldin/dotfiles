@@ -1,6 +1,6 @@
 {
   inputs,
-  outputs,
+  commonOverlays,
   lib,
   config,
   pkgs,
@@ -19,14 +19,7 @@
 
   nixpkgs = {
     hostPlatform = lib.mkDefault "aarch64-darwin";
-    overlays = [
-      outputs.overlays.additions
-      outputs.overlays.modifications
-      outputs.overlays.unstable-packages
-      outputs.overlays.llm-agents-packages
-      outputs.overlays.mcps-packages
-      outputs.overlays.audiotools-packages
-      outputs.overlays.claude-container-packages
+    overlays = commonOverlays ++ [
       inputs.brew-nix.overlays.default
     ];
     config = {

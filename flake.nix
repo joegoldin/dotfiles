@@ -41,6 +41,11 @@
       url = "github:joegoldin/audiotools";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # claude-code wrapper in docker container with sandboxing
+    claude-container = {
+      url = "git+file:///home/joe/Development/claude-container";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # game server management
     pelican = {
       url = "github:joegoldin/nix-pelican?rev=900716d90d01a27666d65c9c112acde4c725ae9f";
@@ -225,10 +230,12 @@
       hostname = "${username}-nix";
       homeDirectory = nixpkgs.lib.mkForce "/home/${username}";
       stateVersion = "24.11";
+      commonOverlays = builtins.attrValues self.overlays;
       commonSpecialArgs = inputs // {
         inherit
           inputs
           outputs
+          commonOverlays
           useremail
           stateVersion
           username
@@ -244,7 +251,7 @@
         let
           pkgs = import nixpkgs {
             inherit system;
-            overlays = [ self.overlays.unstable-packages ];
+            overlays = builtins.attrValues self.overlays;
             config.allowUnfree = true;
           };
         in

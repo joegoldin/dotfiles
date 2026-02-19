@@ -1,6 +1,6 @@
 {
   inputs,
-  outputs,
+  commonOverlays,
   lib,
   config,
   pkgs,
@@ -60,15 +60,7 @@ in
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
   nixpkgs = {
-    overlays = [
-      outputs.overlays.additions
-      outputs.overlays.modifications
-      outputs.overlays.unstable-packages
-      outputs.overlays.llm-agents-packages
-      outputs.overlays.mcps-packages
-      outputs.overlays.audiotools-packages
-      outputs.overlays.claude-container-packages
-    ];
+    overlays = commonOverlays;
     config = {
       allowUnfree = true;
       allowUnsupportedSystem = true;
