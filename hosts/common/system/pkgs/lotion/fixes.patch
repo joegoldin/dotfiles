@@ -1,5 +1,5 @@
 diff --git a/src/main/controllers/TabController.js b/src/main/controllers/TabController.js
-index c03f6f1..c7d7448 100644
+index c03f6f1..d34c5e0 100644
 --- a/src/main/controllers/TabController.js
 +++ b/src/main/controllers/TabController.js
 @@ -78,6 +78,9 @@ class TabController {
@@ -70,7 +70,33 @@ index c03f6f1..c7d7448 100644
      // Page title updated
      webContents.on('page-title-updated', (event, title) => {
        event.preventDefault(); // Prevent default title setting
-@@ -162,8 +216,8 @@ class TabController {
+@@ -125,6 +179,25 @@ class TabController {
+ 
+       // Inject custom CSS after page loads
+       this.injectCustomCSS();
++
++      // Prevent middle-click paste on Linux (X11 primary selection)
++      // while preserving middle-click-on-link to open in new tab
++      if (process.platform === 'linux') {
++        webContents.executeJavaScript(`
++          document.addEventListener('mousedown', function(e) {
++            if (e.button !== 1) return;
++            e.preventDefault();
++            var el = e.target;
++            while (el && el !== document.documentElement) {
++              if (el.tagName === 'A' && el.href) {
++                window.open(el.href, '_blank');
++                return;
++              }
++              el = el.parentElement;
++            }
++          }, true);
++        `).catch(() => {});
++      }
+     });
+ 
+     // Navigation started
+@@ -162,8 +235,8 @@ class TabController {
        }
      });
  
@@ -81,7 +107,7 @@ index c03f6f1..c7d7448 100644
        const parsedUrl = new URL(url);
  
        // Check if URL is a Notion domain (notion.so or notion.com)
-@@ -175,16 +229,39 @@ class TabController {
+@@ -175,16 +248,39 @@ class TabController {
          parsedUrl.hostname === 'www.notion.com' ||
          parsedUrl.hostname.endsWith('.notion.com');
  
@@ -127,7 +153,7 @@ index c03f6f1..c7d7448 100644
  
      // Allow navigation within Notion, block external sites
 diff --git a/src/main/controllers/WindowController.js b/src/main/controllers/WindowController.js
-index 3c239af..b19b5a6 100644
+index 3c239af..ee4320c 100644
 --- a/src/main/controllers/WindowController.js
 +++ b/src/main/controllers/WindowController.js
 @@ -26,9 +26,9 @@ class WindowController {
@@ -171,11 +197,86 @@ index 3c239af..b19b5a6 100644
        minWidth: 600,
        minHeight: 400,
        icon: getIconPath(),
+@@ -101,6 +113,30 @@ class WindowController {
+     // Note: ready-to-show doesn't fire reliably when using WebContentsView
+     // We'll show the window manually after setup
+ 
++    // Save session state before window closes so tabs can be restored
++    this.browserWindow.on('close', () => {
++      const TabManager = require('../managers/TabManager');
++      const tabManager = TabManager.getInstance();
++      const tabs = tabManager.getTabsForWindow(this.windowId);
++      const Store = require('electron-store');
++      const sessionStore = new Store();
++
++      const state = this.store.getState();
++      const windowState = state.windows.windows[this.windowId];
++      const activeTabId = windowState?.activeTabId;
++
++      const sessionTabs = tabs
++        .filter(tab => !tab.isTabDestroyed())
++        .map(tab => ({
++          url: tab.getURL() || tab.initialUrl,
++          active: tab.tabId === activeTabId,
++        }));
++
++      if (sessionTabs.length > 0) {
++        sessionStore.set('session', { tabs: sessionTabs });
++      }
++    });
++
+     this.browserWindow.on('closed', () => {
+       log.info(`Window ${this.windowId} closed`);
+       this.store.dispatch(removeWindow(this.windowId));
+@@ -233,16 +269,34 @@ class WindowController {
+   createInitialTab() {
+     const TabManager = require('../managers/TabManager');
+     const tabManager = TabManager.getInstance();
++    const Store = require('electron-store');
++    const sessionStore = new Store();
++    const session = sessionStore.get('session');
++    sessionStore.delete('session');
+ 
+-    log.info(`Creating initial tab for window ${this.windowId}`);
+-    const tabController = tabManager.createTab({
+-      windowId: this.windowId,
+-      url: this.initialUrl,
+-      title: this.initialTitle,
+-      makeActive: true,
+-    });
+-
+-    this.setActiveTab(tabController);
++    if (session && session.tabs && session.tabs.length > 0) {
++      log.info(`Restoring ${session.tabs.length} tabs for window ${this.windowId}`);
++      let activeTab = null;
++      session.tabs.forEach((savedTab) => {
++        const tabController = tabManager.createTab({
++          windowId: this.windowId,
++          url: savedTab.url,
++          title: 'Loading...',
++          makeActive: savedTab.active,
++        });
++        if (savedTab.active) activeTab = tabController;
++      });
++      this.setActiveTab(activeTab || tabManager.getTabsForWindow(this.windowId)[0]);
++    } else {
++      log.info(`Creating initial tab for window ${this.windowId}`);
++      const tabController = tabManager.createTab({
++        windowId: this.windowId,
++        url: this.initialUrl,
++        title: this.initialTitle,
++        makeActive: true,
++      });
++      this.setActiveTab(tabController);
++    }
+   }
+ 
+   /**
 diff --git a/src/main/index.js b/src/main/index.js
-index bdf8114..b1df488 100644
+index 0fd6b22..17c1951 100644
 --- a/src/main/index.js
 +++ b/src/main/index.js
-@@ -676,7 +676,7 @@ ipcMain.handle('tab-bar:close-tab', async (event, tabId) => {
+@@ -637,7 +637,7 @@ ipcMain.handle('tab-bar:close-tab', async (event, tabId) => {
    // Destroy the tab
    tabManager.destroyTab(tabId);
  
@@ -184,7 +285,7 @@ index bdf8114..b1df488 100644
    if (windowController && windowController.currentActiveTabController?.tabId === tabId) {
      const state = reduxStore.getState();
      const windowState = state.windows.windows[windowId];
-@@ -685,6 +685,10 @@ ipcMain.handle('tab-bar:close-tab', async (event, tabId) => {
+@@ -646,6 +646,10 @@ ipcMain.handle('tab-bar:close-tab', async (event, tabId) => {
        // Switch to first available tab
        const nextTabId = windowState.tabIds[0];
        windowController.switchToTab(nextTabId);
@@ -195,7 +296,7 @@ index bdf8114..b1df488 100644
      }
    }
  
-@@ -710,6 +714,7 @@ ipcMain.handle('tab-bar:switch-tab', async (event, tabId) => {
+@@ -671,6 +675,7 @@ ipcMain.handle('tab-bar:switch-tab', async (event, tabId) => {
    const windowController = appController.windowControllers.get(tabController.windowId);
    if (windowController) {
      windowController.switchToTab(tabId);
