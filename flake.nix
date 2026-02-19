@@ -43,7 +43,7 @@
     };
     # claude-code wrapper in docker container with sandboxing
     claude-container = {
-      url = "git+file:///home/joe/Development/claude-container";
+      url = "github:joegoldin/claude-container";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # game server management
@@ -265,7 +265,7 @@
       # Your custom packages
       # Accessible through 'nix build', 'nix shell', etc
       packages = eachSystem (system: basePackages.${system} // additionalPackages.${system});
-      formatter = eachSystem (system: inputs.nixpkgs-unstable.legacyPackages.${system}.nixfmt);
+      formatter = eachSystem (system: inputs.nixpkgs-unstable.legacyPackages.${system}.nixfmt-tree);
 
       # Your custom packages and modifications, exported as overlays
       overlays = import ./hosts/common/system/overlays { inherit inputs; };
