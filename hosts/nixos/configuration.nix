@@ -55,6 +55,7 @@ in
       outputs.overlays.llm-agents-packages
       outputs.overlays.mcps-packages
       outputs.overlays.audiotools-packages
+      outputs.overlays.claude-container-packages
     ];
     config = {
       allowUnfree = true;
