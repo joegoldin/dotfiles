@@ -70,6 +70,7 @@ let
       nix-output-monitor # nom: pretty nix build progress with percentage
       nix-your-shell
       nixd
+      nixfmt
       nmap
       nnn # terminal file manager
       unstable.marp-cli
@@ -91,6 +92,7 @@ let
       tesseract
       tmux
       tree
+      treefmt
       trippy
       typescript
       unstable.just
