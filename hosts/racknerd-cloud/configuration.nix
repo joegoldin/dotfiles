@@ -2,7 +2,7 @@
 # Use this to configure your system environment (it replaces /etc/nixos/configuration.nix)
 {
   inputs,
-  outputs,
+  commonOverlays,
   lib,
   config,
   pkgs,
@@ -23,14 +23,7 @@
   };
 
   nixpkgs = {
-    overlays = [
-      outputs.overlays.additions
-      outputs.overlays.modifications
-      outputs.overlays.unstable-packages
-      outputs.overlays.llm-agents-packages
-      outputs.overlays.mcps-packages
-      outputs.overlays.claude-container-packages
-    ];
+    overlays = commonOverlays;
     config = {
       allowUnfree = true;
       allowUnsupportedSystem = true;

@@ -46,14 +46,16 @@ in
       };
       # composable_kernel conv instances only exist for gfx9 targets.
       # Add gfx90a as a build-only target so CK compiles; only gfx1201 kernels run at runtime.
-      composable_kernel_base = (rPrev.composable_kernel_base.override {
-        gpuTargets = [
-          "gfx90a"
-          "gfx1201"
-        ];
-      }).overrideAttrs {
-        meta.broken = false;
-      };
+      composable_kernel_base =
+        (rPrev.composable_kernel_base.override {
+          gpuTargets = [
+            "gfx90a"
+            "gfx1201"
+          ];
+        }).overrideAttrs
+          {
+            meta.broken = false;
+          };
     }
   );
 
