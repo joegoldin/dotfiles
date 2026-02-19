@@ -1,5 +1,3 @@
-mod claude-code 'docker/claude-code/Justfile'
-
 [private]
 default: system-info
   @just --list

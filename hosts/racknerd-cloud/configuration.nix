@@ -29,6 +29,7 @@
       outputs.overlays.unstable-packages
       outputs.overlays.llm-agents-packages
       outputs.overlays.mcps-packages
+      outputs.overlays.claude-container-packages
     ];
     config = {
       allowUnfree = true;

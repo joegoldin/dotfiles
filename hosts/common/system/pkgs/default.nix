@@ -72,6 +72,4 @@ pkgs: {
   };
 
   happy-cli = pkgs.callPackage ./happy-cli { };
-
-  claude-container = pkgs.callPackage ../../../../docker/claude-code/package.nix { };
 }

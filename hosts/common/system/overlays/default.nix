@@ -45,6 +45,9 @@
   # audiotools (recording + transcription CLI)
   audiotools-packages = inputs.audiotools.overlays.default;
 
+  # claude-container (claude-code wrapper in docker container with sandboxing)
+  claude-container-packages = inputs.claude-container.overlays.default;
+
   # MCP server packages for declarative MCP configuration
   # The upstream overlay only exports github-mcp-server; we also need mcp-language-server
   mcps-packages =
