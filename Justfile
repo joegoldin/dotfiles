@@ -22,18 +22,20 @@ lint:
 [unix]
 flake-update:
     @echo "🔄  Updating flake..."
-    @nix --extra-experimental-features 'nix-command flakes' flake update --option access-tokens "github.com=$(gh auth token)"
+    @export GH_TOKEN="$(gh auth token 2>/dev/null || echo '')"; \
+     nix --extra-experimental-features 'nix-command flakes' flake update --option access-tokens "github.com=${GH_TOKEN:-}"
     @echo "✅  Flake updated!"
 
 # ── Build ────────────────────────────────────────────────────────────────
 
 [macos]
-build: system-info
-    darwin-rebuild build --flake .#Joes-MacBook-Pro 2>&1 | nom
+build: system-info _check-maintenance
+    @export GH_TOKEN="$(gh auth token 2>/dev/null || echo '')"; \
+     darwin-rebuild build --flake .#Joes-MacBook-Pro 2>&1 | nom
     sudo darwin-rebuild switch --flake .#Joes-MacBook-Pro
 
 [linux]
-build: system-info
+build: system-info _check-maintenance
     @if uname -r | grep -q "WSL"; then \
       just _build-wsl; \
     elif [ "{{ arch() }}" = "aarch64" ]; then \
@@ -48,21 +50,24 @@ build: system-info
 [private]
 _build-wsl:
     @echo "🔨  Building for WSL 🪟..."
-    nixos-rebuild build --flake .#joe-wsl 2>&1 | nom
+    @export GH_TOKEN="$(gh auth token 2>/dev/null || echo '')"; \
+     nixos-rebuild build --flake .#joe-wsl 2>&1 | nom
     sudo nixos-rebuild --flake .#joe-wsl switch
     @echo "✅  Built for WSL!"
 
 [private]
 _build-bastion:
     @echo "🔨  Building for Oracle Cloud bastion 🐧..."
-    nixos-rebuild build --flake .#oracle-cloud-bastion 2>&1 | nom
+    @export GH_TOKEN="$(gh auth token 2>/dev/null || echo '')"; \
+     nixos-rebuild build --flake .#oracle-cloud-bastion 2>&1 | nom
     sudo nixos-rebuild --flake .#oracle-cloud-bastion switch
     @echo "✅  Built for Oracle Cloud!"
 
 [private]
 _build-nixos:
     @echo "🔨  Building for NixOS desktop 🐧..."
-    nixos-rebuild build --flake .#joe-desktop 2>&1 | nom
+    @export GH_TOKEN="$(gh auth token 2>/dev/null || echo '')"; \
+     nixos-rebuild build --flake .#joe-desktop 2>&1 | nom
     sudo nixos-rebuild --flake .#joe-desktop switch
     @echo "✅  Built for NixOS!"
 
@@ -106,7 +111,9 @@ rebuild-racknerd:
 [unix]
 update-pins dry_run='':
     @echo "🔄  Updating pinned flake inputs..."
-    @{{ if dry_run == "--dry-run" { "DRY_RUN=true" } else { "" } }} scripts/update-flake-pins.sh
+    @export GH_TOKEN="$(gh auth token 2>/dev/null || echo '')"; \
+     {{ if dry_run == "--dry-run" { "DRY_RUN=true" } else { "" } }} scripts/update-flake-pins.sh
+    @{{ if dry_run == "--dry-run" { "true" } else { "just _record-history update-pins" } }}
     @echo "✅  Pins updated!"
 
 [unix]
@@ -127,6 +134,15 @@ update-node-packages:
     @scripts/update-node-packages.sh
     @echo "✅  Node packages updated!"
 
+# ── Indexing ─────────────────────────────────────────────────────────
+
+[unix]
+nix-index:
+    @echo "📦  Updating nix-index..."
+    @nix run 'nixpkgs#nix-index' --extra-experimental-features 'nix-command flakes'
+    @just _record-history nix-index
+    @echo "✅  nix-index updated!"
+
 # ── Maintenance ──────────────────────────────────────────────────────────
 
 [unix]
@@ -136,3 +152,42 @@ nix-gc:
     @nix-store --gc
     @nix-collect-garbage -d
     @echo "✅  Garbage collected!"
+
+# ── History tracking ─────────────────────────────────────────────────
+
+history_file := ".history"
+stale_days := "7"
+
+[private]
+_record-history task:
+    @touch {{ history_file }}
+    @grep -v "^{{ task }}:" {{ history_file }} > {{ history_file }}.tmp 2>/dev/null || true
+    @echo "{{ task }}:$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> {{ history_file }}.tmp
+    @mv {{ history_file }}.tmp {{ history_file }}
+
+[private]
+_check-maintenance:
+    #!/usr/bin/env bash
+    history_file="{{ history_file }}"
+    stale_seconds=$(( {{ stale_days }} * 86400 ))
+    now=$(date +%s)
+    check_task() {
+      local task=$1 label=$2 cmd=$3
+      local last=""
+      if [[ -f "$history_file" ]]; then
+        last=$(grep "^${task}:" "$history_file" 2>/dev/null | cut -d: -f2- || true)
+      fi
+      if [[ -z "$last" ]]; then
+        echo -e "\033[0;33m[WARN]\033[0m $label has never been run — consider: just $cmd"
+      else
+        local last_ts
+        last_ts=$(date -d "$last" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%SZ" "$last" +%s 2>/dev/null || echo 0)
+        local age=$(( now - last_ts ))
+        if (( age > stale_seconds )); then
+          local days_ago=$(( age / 86400 ))
+          echo -e "\033[0;33m[WARN]\033[0m $label last run ${days_ago}d ago — consider: just $cmd"
+        fi
+      fi
+    }
+    check_task "update-pins" "Pin updates" "update-pins"
+    check_task "nix-index" "nix-index" "nix-index"
