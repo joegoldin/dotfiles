@@ -89,6 +89,8 @@
       url = "github:mrshmllow/affinity-nix?rev=cfec6b8371038868748370ed38c59ec35e49b62e";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Zed editor (built from source via flake)
+    zed-editor.url = "github:zed-industries/zed";
     # KDE configuration
     plasma-manager = {
       url = "github:nix-community/plasma-manager?rev=44b928068359b7d2310a34de39555c63c93a2c90";
@@ -197,8 +199,8 @@
   };
 
   nixConfig = {
-    extra-trusted-public-keys = "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=";
-    extra-substituters = "https://devenv.cachix.org";
+    extra-trusted-public-keys = "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw= zed.cachix.org-1:/pHQ6dpMsAZk2DiP4WCL0p9YDNKWj2Q5FL20bNmw1cU= cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g=";
+    extra-substituters = "https://devenv.cachix.org https://zed.cachix.org https://cache.garnix.io";
     experimental-features = "nix-command flakes";
   };
 

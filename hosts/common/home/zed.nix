@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 {
   home.sessionVariables = {
     EDITOR = "zeditor --wait";
@@ -7,7 +7,7 @@
 
   programs.zed-editor = {
     enable = true;
-    package = pkgs.unstable.zed-editor;
+    package = inputs.zed-editor.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
     extensions = [
       "csharp"
