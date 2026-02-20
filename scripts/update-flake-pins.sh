@@ -26,25 +26,103 @@ log_success() { echo -e "${GREEN}[OK]${NC} $1"; }
 log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
-# Rate limiting for GitHub API
+# GitHub API with optional auth (GITHUB_TOKEN or GH_TOKEN for 5000 req/hr instead of 60)
 GITHUB_DELAY=0.5
+GITHUB_TOKEN="${GITHUB_TOKEN:-${GH_TOKEN:-}}"
 github_api() {
   sleep "$GITHUB_DELAY"
-  curl -sf -H "Accept: application/vnd.github.v3+json" "$1" 2>/dev/null
+  local -a headers=(-H "Accept: application/vnd.github.v3+json")
+  if [[ -n "$GITHUB_TOKEN" ]]; then
+    headers+=(-H "Authorization: token $GITHUB_TOKEN")
+  fi
+  curl -sf "${headers[@]}" "$1" 2>/dev/null
 }
 
-# Get latest tag for a repo (sorted by semver)
+# Get latest tag for a repo (checks both releases and tags APIs)
 get_latest_tag() {
-  local owner=$1 repo=$2
-  local tags
-  tags=$(github_api "https://api.github.com/repos/$owner/$repo/tags" | jq -r '.[].name' 2>/dev/null) || return 1
+  local owner=$1 repo=$2 current_tag=${3:-}
+  local is_semver=false
+  if [[ "$current_tag" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+    is_semver=true
+  fi
 
-  if [[ -z "$tags" ]]; then
+  # Fetch both sources
+  local releases_json tags_json
+  releases_json=$(github_api "https://api.github.com/repos/$owner/$repo/releases?per_page=100") || true
+  tags_json=$(github_api "https://api.github.com/repos/$owner/$repo/tags?per_page=100") || true
+
+  local release_names tag_names
+  release_names=$(echo "$releases_json" | jq -r '.[].tag_name' 2>/dev/null) || true
+  tag_names=$(echo "$tags_json" | jq -r '.[].name' 2>/dev/null) || true
+
+  if [[ -z "$release_names" && -z "$tag_names" ]]; then
     return 1
   fi
 
-  # Sort by semver (handles v1.0.0, 1.0.0, etc.)
-  echo "$tags" | sort -V | tail -1
+  # For non-semver current tags, return newest from whichever source we have
+  if [[ "$is_semver" != "true" ]]; then
+    if [[ -n "$release_names" ]]; then
+      echo "$release_names" | head -1
+    else
+      echo "$tag_names" | head -1
+    fi
+    return
+  fi
+
+  # Filter both to semver only
+  release_names=$(echo "$release_names" | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+' || true)
+  tag_names=$(echo "$tag_names" | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+' || true)
+
+  # Best candidate from each source
+  local release_candidate tag_candidate
+  release_candidate=$(echo "$release_names" | head -1)        # newest by date (releases API is date-sorted)
+  tag_candidate=$(echo "$tag_names" | sort -V | tail -1)      # highest semver
+
+  # If only one source has results, use it
+  if [[ -z "$release_candidate" && -z "$tag_candidate" ]]; then
+    return 1
+  fi
+  if [[ -n "$release_candidate" && -z "$tag_candidate" ]]; then
+    echo "$release_candidate"; return
+  fi
+  if [[ -z "$release_candidate" && -n "$tag_candidate" ]]; then
+    echo "$tag_candidate"; return
+  fi
+
+  # If they agree, done
+  if [[ "$release_candidate" == "$tag_candidate" ]]; then
+    echo "$release_candidate"; return
+  fi
+
+  # They differ: pick higher semver, but verify the higher one is actually newer by date
+  local higher
+  higher=$(printf '%s\n%s\n' "$release_candidate" "$tag_candidate" | sort -V | tail -1)
+
+  # If release has higher (or equal) semver, trust it
+  if [[ "$higher" == "$release_candidate" ]]; then
+    echo "$release_candidate"; return
+  fi
+
+  # Tag has higher semver than latest release — check if it's actually newer
+  local release_date tag_commit_sha tag_commit_date
+  release_date=$(echo "$releases_json" | jq -r --arg t "$release_candidate" \
+    '[.[] | select(.tag_name == $t)][0].published_at' 2>/dev/null) || true
+  tag_commit_sha=$(echo "$tags_json" | jq -r --arg t "$tag_candidate" \
+    '[.[] | select(.name == $t)][0].commit.sha' 2>/dev/null) || true
+
+  if [[ -n "$tag_commit_sha" && "$tag_commit_sha" != "null" ]]; then
+    tag_commit_date=$(github_api "https://api.github.com/repos/$owner/$repo/commits/$tag_commit_sha" \
+      | jq -r '.commit.committer.date' 2>/dev/null) || true
+  fi
+
+  # Compare dates (ISO 8601, lexicographic comparison works)
+  if [[ -n "$tag_commit_date" && "$tag_commit_date" != "null" \
+     && -n "$release_date" && "$release_date" != "null" \
+     && "$tag_commit_date" > "$release_date" ]]; then
+    echo "$tag_candidate"
+  else
+    echo "$release_candidate"
+  fi
 }
 
 # Get latest commit on default branch
@@ -115,6 +193,10 @@ update_url() {
 UNPINNED_INPUTS=()
 UPDATED_COUNT=0
 
+if [[ -z "$GITHUB_TOKEN" ]]; then
+  log_warn "No GITHUB_TOKEN or GH_TOKEN set — using unauthenticated API (60 req/hr limit)"
+fi
+
 log_info "Scanning $FLAKE_FILE for pinned inputs..."
 echo
 
@@ -137,7 +219,7 @@ while IFS= read -r line; do
     case "$pin_type" in
       tag)
         log_info "Checking $owner/$repo (tagged: $pin_value)"
-        latest_tag=$(get_latest_tag "$owner" "$repo") || { log_warn "  Could not fetch tags"; continue; }
+        latest_tag=$(get_latest_tag "$owner" "$repo" "$pin_value") || { log_warn "  Could not fetch tags"; continue; }
 
         if [[ -z "$latest_tag" || "$latest_tag" == "null" ]]; then
           log_warn "  Could not fetch latest tag (rate limited?)"
@@ -182,7 +264,7 @@ while IFS= read -r line; do
         # Check if it looks like a version tag (starts with v or is semver-like)
         if [[ "$pin_value" =~ ^v?[0-9]+\.[0-9]+ ]]; then
           # Likely a tag, check for updates
-          latest_tag=$(get_latest_tag "$owner" "$repo") || { log_warn "  Could not fetch tags"; continue; }
+          latest_tag=$(get_latest_tag "$owner" "$repo" "$pin_value") || { log_warn "  Could not fetch tags"; continue; }
           if [[ -z "$latest_tag" || "$latest_tag" == "null" ]]; then
             log_warn "  Could not fetch latest tag (rate limited?)"
             continue
