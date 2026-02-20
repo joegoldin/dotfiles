@@ -29,7 +29,7 @@ in
       }
       (extension "libredirect" "7esoorv3@alefvanoon.anonaddy.me")
       (extension "terms-of-service-didnt-read" "jid0-3GUEt1r69sQNSrca5p8kx9Ezc3U@jetpack")
-      (extension "refined-github" "{a4c4eda4-fb84-4a84-b4a1-f7c1cbf2a1ad}")
+      (extension "refined-github-" "{a4c4eda4-fb84-4a84-b4a1-f7c1cbf2a1ad}")
       (extension "clearurls" "{74145f27-f039-47ce-a470-a662b129930a}")
       (extension "sponsorblock" "sponsorBlocker@ajay.app")
       (extension "ublock-origin" "uBlock0@raymondhill.net")
