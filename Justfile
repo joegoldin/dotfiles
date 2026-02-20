@@ -22,15 +22,14 @@ lint:
 [unix]
 flake-update:
     @echo "🔄  Updating flake..."
-    @export GH_TOKEN="$(gh auth token 2>/dev/null || echo '')"; \
-     nix --extra-experimental-features 'nix-command flakes' flake update --option access-tokens "github.com=${GH_TOKEN:-}"
+    @nix --extra-experimental-features 'nix-command flakes' flake update --option access-tokens "github.com=$(gh auth token 2>/dev/null || echo '')"
     @echo "✅  Flake updated!"
 
 # ── Build ────────────────────────────────────────────────────────────────
 
 [macos]
 build: system-info _check-maintenance
-    @export GH_TOKEN="$(gh auth token 2>/dev/null || echo '')"; \
+    @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
      darwin-rebuild build --flake .#Joes-MacBook-Pro 2>&1 | nom
     sudo darwin-rebuild switch --flake .#Joes-MacBook-Pro
 
@@ -50,7 +49,7 @@ build: system-info _check-maintenance
 [private]
 _build-wsl:
     @echo "🔨  Building for WSL 🪟..."
-    @export GH_TOKEN="$(gh auth token 2>/dev/null || echo '')"; \
+    @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
      nixos-rebuild build --flake .#joe-wsl 2>&1 | nom
     sudo nixos-rebuild --flake .#joe-wsl switch
     @echo "✅  Built for WSL!"
@@ -58,7 +57,7 @@ _build-wsl:
 [private]
 _build-bastion:
     @echo "🔨  Building for Oracle Cloud bastion 🐧..."
-    @export GH_TOKEN="$(gh auth token 2>/dev/null || echo '')"; \
+    @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
      nixos-rebuild build --flake .#oracle-cloud-bastion 2>&1 | nom
     sudo nixos-rebuild --flake .#oracle-cloud-bastion switch
     @echo "✅  Built for Oracle Cloud!"
@@ -66,7 +65,7 @@ _build-bastion:
 [private]
 _build-nixos:
     @echo "🔨  Building for NixOS desktop 🐧..."
-    @export GH_TOKEN="$(gh auth token 2>/dev/null || echo '')"; \
+    @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
      nixos-rebuild build --flake .#joe-desktop 2>&1 | nom
     sudo nixos-rebuild --flake .#joe-desktop switch
     @echo "✅  Built for NixOS!"
