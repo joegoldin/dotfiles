@@ -132,7 +132,7 @@
       "kmix"."mute" = "Volume Mute";
       "ksmserver"."Halt Without Confirmation" = "none,,Shut Down Without Confirmation";
       "ksmserver"."Lock Session" = [
-        "Screensaver,Meta+L"
+        "Meta+L"
         "Screensaver,Lock Session"
       ];
       "ksmserver"."Log Out" = "Ctrl+Alt+Del";
