@@ -321,7 +321,9 @@ in
         "privacy.userContext.ui.enabled" = true;
 
         # UI preferences
+        "browser.ctrlTab.sortByRecentlyUsed" = true;
         "browser.toolbars.bookmarks.visibility" = "always";
+        "sidebar.visibility" = "hide-sidebar";
         "browser.theme.toolbar-theme" = 0; # Dark toolbar
         "ui.key.menuAccessKeyFocuses" = false; # Disable Alt key focusing menu bar
 
@@ -353,7 +355,8 @@ in
         "privacy.globalprivacycontrol.enabled" = true;
         "privacy.donottrackheader.enabled" = true;
         "browser.safebrowsing.downloads.remote.enabled" = false;
-        "network.dns.disablePrefetch" = false;
+        "toolkit.telemetry.reportingpolicy.firstRun" = false;
+        "network.dns.disablePrefetch" = true;
         "network.predictor.enabled" = false;
         "network.http.speculative-parallel-limit" = 0;
         "browser.places.speculativeConnect.enabled" = false;
@@ -362,11 +365,14 @@ in
         "browser.search.suggest.enabled.private" = false;
         "browser.privatebrowsing.forceMediaMemoryCache" = true;
         "network.http.referer.XOriginTrimmingPolicy" = 2;
+        "network.http.referer.disallowCrossSiteRelaxingDefault.top_navigation" = true;
+        "network.prefetch-next" = false;
         # Disable CSP reporting: https://bugzilla.mozilla.org/show_bug.cgi?id=1964249
         "security.csp.reporting.enabled" = false;
 
         ### SECURITY ###
         "pdfjs.enableScripting" = false;
+        "pdfjs.enabledCache.state" = false;
         "signon.formlessCapture.enabled" = false;
         "dom.disable_window_move_resize" = true;
         # Disable remote debugging: https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/16222
