@@ -72,11 +72,13 @@
           }
           {
             iconTasks = {
+              behavior.grouping.method = "byProgramName";
+              behavior.grouping.clickAction = "showTooltips";
               launchers = [
                 "preferred://filemanager"
                 "applications:firefox.desktop"
                 "applications:com.mitchellh.ghostty.desktop"
-                "applications:dev.zed.Zed.desktop"
+                "applications:dev.zed.Zed-Nightly.desktop"
                 "applications:parsecd.desktop"
                 "applications:discord.desktop"
                 "applications:steam.desktop"
@@ -91,7 +93,7 @@
           {
             digitalClock = {
               date.format = {
-                custom = "";
+                custom = "ddd MMM d";
               };
               time.showSeconds = "always";
               font = {
