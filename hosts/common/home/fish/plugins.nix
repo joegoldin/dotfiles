@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, fishAiSrc, ... }:
 {
   plugins = with pkgs.fishPlugins; [
     # Refresh prompt on command - shows accurate time/git status at execution time
@@ -13,12 +13,7 @@
     }
     {
       name = "fish-ai";
-      src = pkgs.fetchFromGitHub {
-        owner = "joegoldin";
-        repo = "fish-ai";
-        rev = "4b39b8aa04341322d3f9a1c11a14ca5800b71d28";
-        hash = "sha256-E3/uRDNwn3tlXaUBKCGdPaWh93QNxF3cjZxplzYAgIo=";
-      };
+      src = fishAiSrc;
     }
     {
       name = "z";
