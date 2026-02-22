@@ -8,5 +8,6 @@
     ./gaming.nix
     ./joe-desktop.nix
     ./wallpaper.nix
+    ./app-autostart.nix
   ];
 }
