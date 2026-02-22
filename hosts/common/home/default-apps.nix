@@ -5,7 +5,7 @@
     defaultApplications =
       let
         browser = "firefox.desktop";
-        editor = "dev.zed.Zed.desktop";
+        editor = "dev.zed.Zed-Nightly.desktop";
         fileManager = "org.kde.dolphin.desktop";
         imageViewer = "org.kde.gwenview.desktop";
         videoPlayer = "vlc.desktop";
