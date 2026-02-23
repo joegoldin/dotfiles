@@ -8,13 +8,13 @@ let
   fishAiSrc = pkgs.fetchFromGitHub {
     owner = "joegoldin";
     repo = "fish-ai";
-    rev = "4b39b8aa04341322d3f9a1c11a14ca5800b71d28";
-    hash = "sha256-E3/uRDNwn3tlXaUBKCGdPaWh93QNxF3cjZxplzYAgIo=";
+    rev = "560a16640dc3d32ae754114a1643d4f51efebae0";
+    hash = "sha256-fe7X9vISF0wN1DMJYlhZCuCIb37g/0vV45kfX75DTC4=";
   };
 
   fishAiPython = pkgs.python313Packages.buildPythonApplication {
     pname = "fish-ai";
-    version = "2.7.2";
+    version = "2.10.2";
     src = fishAiSrc;
     pyproject = true;
 
