@@ -2,6 +2,8 @@
   description = "Joe Goldin Nix Config";
 
   inputs = {
+    self.submodules = true;
+
     # ── Nixpkgs ─────────────────────────────────────────────────────────────
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     # You can access packages and modules from different nixpkgs revs
@@ -26,12 +28,12 @@
     # ── Local sources ───────────────────────────────────────────────────────
     # assets (fonts, etc.)
     dotfiles-assets = {
-      url = "git+file:assets";
+      url = "./assets";
       flake = false;
     };
     # secrets (domains, encrypted age files, etc.)
     dotfiles-secrets = {
-      url = "git+file:secrets";
+      url = "./secrets";
       flake = false;
     };
 
