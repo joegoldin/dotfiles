@@ -418,8 +418,10 @@
       "dolphinrc"."KFileDialog Settings"."Places Icons Auto-resize" = false;
       "dolphinrc"."KFileDialog Settings"."Places Icons Static Size" = 22;
 
+      "kcminputrc"."Keyboard"."NumLock" = 0; # 0 = on, 1 = off, 2 = unchanged
       "kcminputrc"."Libinput/4815/3077/Mad Catz Global MADCATZ R.A.T. 8+ gaming mouse"."PointerAccelerationProfile" =
         1;
+      "kcminputrc"."Libinput/4815/3077/Mad Catz Global MADCATZ R.A.T. 8+ gaming mouse"."ScrollMethod" = 0;
       "kded5rc"."Module-browserintegrationreminder"."autoload" = false;
       "kded5rc"."Module-checksums"."Disabled" = true;
       "kded5rc"."Module-device_automounter"."autoload" = false;
@@ -427,6 +429,7 @@
       "kdeglobals"."General"."XftHintStyle" = "hintslight";
       "kdeglobals"."General"."XftSubPixel" = "none";
       "kdeglobals"."General"."fixed" = "TX02 Nerd Font,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1";
+      "kdeglobals"."KDE"."DndBehavior" = "MoveIfSameDevice"; # drag files = move if same device
       "kdeglobals"."KDE"."SingleClick" = false;
       "kdeglobals"."KFileDialog Settings"."Allow Expansion" = false;
       "kdeglobals"."KFileDialog Settings"."Automatically select filename extension" = true;
@@ -515,6 +518,7 @@
         ''{"layoutDirection":"horizontal","tiles":x5b{"width":0.25},{"width":0.5},{"width":0.25}x5d}'';
       "kwinrc"."Tiling/f19ba19e-2ce1-5e23-ae4e-569a8e48ee92"."tiles" =
         ''{"layoutDirection":"horizontal","tiles":x5b{"layoutDirection":"floating","tiles":x5b{"height":0.8965277777777776,"width":0.7894531249999752,"x":0.07148437499999993,"y":0.050000000000000155},{"height":0.7597222222222202,"width":0.36015624999999607,"x":0.6312500000000021,"y":0.029861111111111085},{"height":0.8805555555555554,"width":0.45234375000000104,"x":0.016406250000003054,"y":0.020833333333333603}x5d,"width":0.9999999999999984}x5d}'';
+      "kwinrc"."Wayland"."EnablePrimarySelection" = false; # disable middle-click paste
       "kwinrc"."Xwayland"."Scale" = 1;
       "kwinrc"."org.kde.kdecoration2"."ButtonsOnLeft" = "XAI";
       "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "FSM";
