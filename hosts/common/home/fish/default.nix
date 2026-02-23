@@ -24,6 +24,7 @@ let
     ];
 
     pythonRelaxDeps = true;
+    pythonRemoveDeps = [ "mistralai" ];
 
     propagatedBuildInputs = with pkgs.python313Packages; [
       openai
