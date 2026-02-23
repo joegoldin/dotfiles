@@ -15,6 +15,7 @@ in
       # affinity-nix.packages.x86_64-linux.photo
       # unstable.android-studio-full
       unstable.calcurse
+      chromedriver
       goModule.packages.claude-squad
       claude-desktop
       unstable.cloudflared
