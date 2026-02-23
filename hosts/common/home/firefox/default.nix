@@ -237,6 +237,13 @@ in
         #main-window[titlepreface*="sidebery"] #TabsToolbar .titlebar-buttonbox-container {
           display: none !important;
         }
+        /* Hidden state: Hide native tabs when only one tab is open */
+        #main-window #TabsToolbar:has(.tabbrowser-tab:only-of-type) > .toolbar-items { height: 0 !important; }
+        #main-window #TabsToolbar:has(.tabbrowser-tab:only-of-type) #tabbrowser-tabs { z-index: 0 !important; }
+        #main-window #TabsToolbar:has(.tabbrowser-tab:only-of-type) .titlebar-spacer,
+        #main-window #TabsToolbar:has(.tabbrowser-tab:only-of-type) .titlebar-buttonbox-container {
+          display: none !important;
+        }
         /* [Optional] Uncomment block below to show window buttons in nav-bar (maybe, I didn't test it on non-linux-i3wm env) */
         /* #main-window[titlepreface*="sidebery"] #nav-bar > .titlebar-buttonbox-container,
         #main-window[titlepreface*="sidebery"] #nav-bar > .titlebar-buttonbox-container > .titlebar-buttonbox {
