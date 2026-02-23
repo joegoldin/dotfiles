@@ -103,8 +103,24 @@
       show_edit_predictions = true;
       ensure_final_newline_on_save = true;
 
-      features = {
-        edit_prediction_provider = "zed";
+      edit_predictions = {
+        provider = "zed";
+        mode = "eager";
+      };
+
+      agent = {
+        tool_permissions = {
+          default = "allow";
+        };
+        default_model = {
+          model = "claude-sonnet-4-6-thinking-latest";
+          provider = "anthropic";
+        };
+        inline_assistant_model = {
+          model = "claude-sonnet-4-6";
+          provider = "zed.dev";
+        };
+        model_parameters = [ ];
       };
 
       file_types = {
