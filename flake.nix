@@ -434,7 +434,6 @@
       # Available through 'darwin-rebuild --flake .#Joes-MacBook-Pro'
       darwinConfigurations = {
         Joes-MacBook-Pro = nix-darwin.lib.darwinSystem {
-          system = "aarch64-darwin";
           specialArgs = commonSpecialArgs // {
             username = "joe";
             hostname = "Joes-MacBook-Pro";
