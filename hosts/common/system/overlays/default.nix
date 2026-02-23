@@ -50,10 +50,16 @@
 
   # MCP server packages for declarative MCP configuration
   # The upstream overlay only exports github-mcp-server; we also need mcp-language-server
+  # Inlined upstream overlay to avoid deprecated pkgs.system access in mcps.overlays.default
   mcps-packages =
-    final: prev:
-    (inputs.mcps.overlays.default final prev)
-    // {
+    final: _prev:
+    let
+      unstable-pkgs = import inputs.mcps.inputs.nixpkgs-unstable {
+        inherit (final.stdenv.hostPlatform) system;
+      };
+    in
+    {
+      inherit (unstable-pkgs) github-mcp-server;
       inherit (inputs.mcps.packages.${final.stdenv.hostPlatform.system}) mcp-language-server;
       mcp-nixos = inputs.mcps.inputs.mcp-nixos.packages.${final.stdenv.hostPlatform.system}.default;
     };
