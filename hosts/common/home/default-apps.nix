@@ -81,5 +81,36 @@
         # File manager
         "inode/directory" = fileManager;
       };
+
+    associations.removed = {
+      # Prevent Elisa from claiming audio/video types
+      "audio/mpeg" = "org.kde.elisa.desktop";
+      "audio/flac" = "org.kde.elisa.desktop";
+      "audio/ogg" = "org.kde.elisa.desktop";
+      "audio/wav" = "org.kde.elisa.desktop";
+      "audio/x-wav" = "org.kde.elisa.desktop";
+      "audio/x-vorbis+ogg" = "org.kde.elisa.desktop";
+      "audio/x-flac" = "org.kde.elisa.desktop";
+      "audio/mp4" = "org.kde.elisa.desktop";
+      "audio/aac" = "org.kde.elisa.desktop";
+      "audio/x-ms-wma" = "org.kde.elisa.desktop";
+      "audio/x-aiff" = "org.kde.elisa.desktop";
+      "application/ogg" = "org.kde.elisa.desktop";
+
+      # Prevent Kate from claiming text/code types
+      "text/plain" = "org.kde.kate.desktop";
+      "text/markdown" = "org.kde.kate.desktop";
+      "text/x-csrc" = "org.kde.kate.desktop";
+      "text/x-c++src" = "org.kde.kate.desktop";
+      "text/x-python" = "org.kde.kate.desktop";
+      "text/x-java" = "org.kde.kate.desktop";
+      "text/x-shellscript" = "org.kde.kate.desktop";
+      "text/css" = "org.kde.kate.desktop";
+      "text/xml" = "org.kde.kate.desktop";
+      "application/json" = "org.kde.kate.desktop";
+      "application/xml" = "org.kde.kate.desktop";
+      "application/javascript" = "org.kde.kate.desktop";
+      "application/x-shellscript" = "org.kde.kate.desktop";
+    };
   };
 }

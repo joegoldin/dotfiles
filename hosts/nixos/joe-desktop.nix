@@ -14,6 +14,11 @@ in
   # TODO: Add litra-autotoggle as a service to systemd
 
   # ssh with 1password
+  environment.plasma6.excludePackages = with pkgs.kdePackages; [
+    elisa
+    kate
+  ];
+
   environment.sessionVariables = {
     SSH_AUTH_SOCK = "/home/${username}/.1password/agent.sock";
   };
