@@ -1,3 +1,0 @@
-#!/usr/bin/env fish
-
-echo -n (date '+%Y-%m-%d')
