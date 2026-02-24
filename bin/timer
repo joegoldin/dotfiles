@@ -1,5 +1,0 @@
-#!/usr/bin/env fish
-
-sleep $argv[1]
-sfx ringaling
-notify 'timer complete' $argv[1]

@@ -1,4 +1,0 @@
-#!/usr/bin/env fish
-
-mkdir -p $argv[1]
-cd $argv[1]
