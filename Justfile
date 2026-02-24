@@ -152,6 +152,16 @@ nix-gc:
     @nix-collect-garbage -d
     @echo "✅  Garbage collected!"
 
+# ── Submodules ───────────────────────────────────────────────────────
+
+[unix]
+sync-submodules:
+    @echo "🔄  Syncing submodules..."
+    @git submodule sync --recursive
+    @git submodule update --init --recursive --remote
+    @just _record-history sync-submodules
+    @echo "✅  Submodules synced!"
+
 # ── History tracking ─────────────────────────────────────────────────
 
 history_file := ".history"
@@ -190,3 +200,4 @@ _check-maintenance:
     }
     check_task "update-pins" "Pin updates" "update-pins"
     check_task "nix-index" "nix-index" "nix-index"
+    check_task "sync-submodules" "Submodule sync" "sync-submodules"
