@@ -39,8 +39,8 @@
 
     # ── My repos ─────────────────────────────────────────────────────────────
     # recording + transcription CLI
-    audiotools = {
-      url = "github:joegoldin/audiotools";
+    audiomemo = {
+      url = "github:joegoldin/audiomemo";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # claude-code wrapper in docker container with sandboxing
