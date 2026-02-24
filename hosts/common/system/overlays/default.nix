@@ -42,8 +42,8 @@
   # LLM agent packages (claude-code, codex, gemini-cli) available as pkgs.llm-agents.*
   llm-agents-packages = inputs.llm-agents.overlays.default;
 
-  # audiotools (recording + transcription CLI)
-  audiotools-packages = inputs.audiotools.overlays.default;
+  # audiomemo (recording + transcription CLI)
+  audiomemo-packages = inputs.audiomemo.overlays.default;
 
   # claude-container (claude-code wrapper in docker container with sandboxing)
   claude-container-packages = inputs.claude-container.overlays.default;
