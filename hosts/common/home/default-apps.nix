@@ -8,7 +8,7 @@
         editor = "dev.zed.Zed-Nightly.desktop";
         fileManager = "org.kde.dolphin.desktop";
         imageViewer = "org.kde.gwenview.desktop";
-        videoPlayer = "vlc.desktop";
+        videoPlayer = "mpv.desktop";
         pdfViewer = "firefox.desktop";
         archiveManager = "org.kde.ark.desktop";
       in

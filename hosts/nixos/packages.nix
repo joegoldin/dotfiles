@@ -40,7 +40,7 @@ in
       sublime-merge
       unstable.tailscale
       ungoogled-chromium
-      vlc
+      mpv
       unstable.vllm
       unstable.zoom-us
     ]
