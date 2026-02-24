@@ -22,7 +22,7 @@ let
     cursor-style-blink = false;
     cursor-click-to-move = true;
     mouse-hide-while-typing = true;
-    copy-on-select = "clipboard";
+    copy-on-select = false;
     clipboard-read = "allow";
     clipboard-write = "allow";
     clipboard-trim-trailing-spaces = true;
