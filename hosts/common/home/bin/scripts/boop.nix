@@ -6,9 +6,9 @@
   body = ''
     set last $status
     if test $last -eq 0
-        sfx good
+        sfx level-up
     else
-        sfx bad
+        sfx error
     end
     return $last
   '';

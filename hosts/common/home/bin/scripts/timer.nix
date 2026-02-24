@@ -5,7 +5,7 @@
   type = "fish";
   body = ''
     sleep $argv[1]
-    sfx ringaling
+    sfx timer
     notify 'timer complete' $argv[1]
   '';
 }
