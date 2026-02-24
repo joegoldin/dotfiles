@@ -27,6 +27,7 @@ let
     clipboard-write = "allow";
     clipboard-trim-trailing-spaces = true;
     clipboard-paste-protection = true;
+    scrollbar = "system";
     scrollback-limit = 1000000000;
     shell-integration = "fish";
     shell-integration-features = "cursor,sudo,title";

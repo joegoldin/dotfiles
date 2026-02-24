@@ -91,6 +91,8 @@
       url = "github:mrshmllow/affinity-nix?rev=1e6512bbe1669c88ca9ab34b24db290b06223c5b";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Ghostty terminal
+    ghostty.url = "github:ghostty-org/ghostty?rev=6132597563596a12ced386f3760786b62e2dd216";
     # Zed editor (built from source via flake)
     zed-editor.url = "github:zed-industries/zed?ref=v0.225.5-pre";
     # KDE configuration
