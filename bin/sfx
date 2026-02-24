@@ -1,4 +1,0 @@
-#!/usr/bin/env fish
-
-set -q XDG_CONFIG_HOME; or set XDG_CONFIG_HOME $HOME/.config
-exec mpv --really-quiet --no-video "$XDG_CONFIG_HOME/evanhahn-sfx/$argv[1].ogg" &

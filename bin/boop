@@ -1,9 +1,0 @@
-#!/usr/bin/env fish
-
-set last $status
-if test $last -eq 0
-    sfx good
-else
-    sfx bad
-end
-exit $last

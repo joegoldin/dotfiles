@@ -1,0 +1,30 @@
+{
+  name = "serveit";
+  desc = "Start a local HTTP server";
+  usage = "serveit [PORT]";
+  type = "fish";
+  body = ''
+    set port 8000
+    if test (count $argv) -eq 1
+        set port $argv[1]
+    end
+
+    if command -v php >/dev/null
+        exec php -S "localhost:$port"
+    else if command -v python3 >/dev/null
+        exec python3 -m http.server $port
+    else if command -v python >/dev/null
+        set major_version (python -c 'import platform as p;print(p.python_version_tuple()[0])')
+        if test "$major_version" = 3
+            exec python -m http.server $port
+        else
+            exec python -m SimpleHTTPServer $port
+        end
+    else if command -v ruby >/dev/null
+        exec ruby -run -e httpd . -p $port
+    else
+        echo 'unable to start HTTP server' >&2
+        exit 1
+    end
+  '';
+}

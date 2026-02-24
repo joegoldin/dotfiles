@@ -25,6 +25,7 @@
     ./git.nix
     ./starship.nix
     ./claude
+    ./bin
   ];
 
   # Enable home-manager
@@ -43,10 +44,5 @@
       recursive = true;
     };
 
-    # symlink bin folder
-    file.".local/bin" = {
-      source = ../../../bin;
-      recursive = true;
-    };
   };
 }

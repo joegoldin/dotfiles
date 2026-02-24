@@ -1,3 +1,0 @@
-#!/usr/bin/env fish
-
-exec yt-dlp -f bestaudio -o '%(title)s.%(ext)s' $argv
