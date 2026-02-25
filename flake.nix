@@ -45,7 +45,8 @@
     };
     # claude-code wrapper in docker container with sandboxing
     claude-container = {
-      url = "github:joegoldin/claude-container";
+      type = "git";
+      url = "file:///home/joe/Development/claude-container";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # game server management
@@ -430,6 +431,16 @@
             )
             nix-flatpak.nixosModules.nix-flatpak
             agenix.nixosModules.default
+            (
+              { specialArgs, ... }:
+              {
+                age.secrets.deepgram_api_key = {
+                  file = "${dotfiles-secrets}/deepgram_api_key.age";
+                  mode = "0400";
+                  owner = specialArgs.username;
+                };
+              }
+            )
             lanzaboote.nixosModules.lanzaboote
           ];
         };
