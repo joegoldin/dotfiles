@@ -42,6 +42,7 @@ in
       ungoogled-chromium
       mpv
       # unstable.vllm # disabled: torchaudio/compressed-tensors build failures in nixpkgs-unstable
+      wl-clipboard
     ]
     ++ appImagePackages;
 
