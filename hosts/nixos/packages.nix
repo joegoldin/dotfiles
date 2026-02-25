@@ -41,8 +41,12 @@ in
       unstable.tailscale
       ungoogled-chromium
       mpv
-      unstable.vllm
-      unstable.zoom-us
+      # unstable.vllm # disabled: torchaudio/compressed-tensors build failures in nixpkgs-unstable
     ]
     ++ appImagePackages;
+
+  # Flatpak packages (installed via nix-flatpak)
+  services.flatpak.packages = [
+    "us.zoom.Zoom"
+  ];
 }
