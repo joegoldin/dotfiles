@@ -43,11 +43,15 @@ in
       mpv
       # unstable.vllm # disabled: torchaudio/compressed-tensors build failures in nixpkgs-unstable
       wl-clipboard
+      xclip
     ]
     ++ appImagePackages;
 
   # Flatpak packages (installed via nix-flatpak)
-  services.flatpak.packages = [
-    "us.zoom.Zoom"
-  ];
+  services.flatpak = {
+    enable = true;
+    packages = [
+      "us.zoom.Zoom"
+    ];
+  };
 }
