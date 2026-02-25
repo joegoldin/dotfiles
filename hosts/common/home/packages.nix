@@ -13,7 +13,7 @@ let
     with pkgs;
     lib.flatten [
       act
-      audiomemo
+      # audiomemo is managed by programs.audiomemo
       aria2 # A lightweight multi-protocol & multi-source command-line download utility
       unstable.asciinema_3
       aws-cli
@@ -120,6 +120,25 @@ in
   home.activation.pythonPostInstall = pythonModule.pythonPostInstall;
 
   programs = {
+    audiomemo = {
+      enable = true;
+      settings = {
+        onboard_version = 1;
+        transcribe = {
+          default_backend = "deepgram";
+          deepgram = {
+            api_key_file = "/run/agenix/deepgram_api_key";
+            model = "nova-3";
+            smart_format = true;
+            diarize = true;
+            punctuate = true;
+            filler_words = true;
+            numerals = true;
+          };
+        };
+      };
+    };
+
     # skim provides a single executable: sk.
     # Basically anywhere you would want to use grep, try sk instead.
     skim = {
