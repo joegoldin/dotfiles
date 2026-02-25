@@ -439,6 +439,11 @@
                   mode = "0400";
                   owner = specialArgs.username;
                 };
+                age.secrets.anthropic_api_key = {
+                  file = "${dotfiles-secrets}/anthropic_api_key.age";
+                  mode = "0400";
+                  owner = specialArgs.username;
+                };
               }
             )
             lanzaboote.nixosModules.lanzaboote
