@@ -35,15 +35,6 @@
       };
       overlays = [
         # (import ./vllm-rocm.nix)
-        (pyFinal: pyPrev: {
-          python313Packages = pyPrev.python313Packages.override {
-            overrides = _pfinal: pprev: {
-              compressed-tensors = pprev.compressed-tensors.overridePythonAttrs (old: {
-                dependencies = (old.dependencies or [ ]) ++ [ pprev.loguru ];
-              });
-            };
-          };
-        })
       ];
     };
   };

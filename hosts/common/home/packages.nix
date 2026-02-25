@@ -33,7 +33,7 @@ let
       unstable.devenv
       direnv
       elixir_1_18
-      erlang_27
+      (lib.lowPrio erlang_27)
       file
       fish
       flyctl
