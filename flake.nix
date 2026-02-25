@@ -422,6 +422,7 @@
                   backupFileExtension = "backup"; # enable moving existing files
                   sharedModules = [
                     plasma-manager.homeModules.plasma-manager
+                    nix-flatpak.homeManagerModules.nix-flatpak
                   ];
                   users.${specialArgs.username} = import ./hosts/nixos/home-manager.nix;
                 };
