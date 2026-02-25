@@ -6,6 +6,8 @@
   body = ''
     if command -v pbcopy >/dev/null
         exec pbcopy
+    else if command -v wl-copy >/dev/null
+        exec wl-copy
     else if command -v xclip >/dev/null
         exec xclip -selection clipboard
     else if command -v putclip >/dev/null
