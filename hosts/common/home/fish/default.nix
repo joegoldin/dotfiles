@@ -29,7 +29,7 @@ let
     propagatedBuildInputs = with pkgs.python313Packages; [
       openai
       simple-term-menu
-      iterfzf
+      pkgs.unstable.python313Packages.iterfzf
       binaryornot
       anthropic
       cohere
@@ -41,6 +41,19 @@ let
 
     # Tests require network access
     doCheck = false;
+  };
+
+  # Wrap fish-ai binaries to inject ANTHROPIC_API_KEY from agenix at runtime
+  fishAiPythonWrapped = pkgs.symlinkJoin {
+    name = "fish-ai-wrapped-${fishAiPython.version}";
+    paths = [ fishAiPython ];
+    buildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      for f in $out/bin/*; do
+        wrapProgram "$f" \
+          --run 'export ANTHROPIC_API_KEY=$(cat /run/agenix/anthropic_api_key 2>/dev/null || true)'
+      done
+    '';
   };
 in
 {
@@ -58,7 +71,7 @@ in
   # Symlink the Nix-built fish-ai Python env to where the plugin expects it
   xdg.dataFile."fish-ai".source = lib.mkIf (
     pkgs.stdenv.hostPlatform.system == "x86_64-linux"
-  ) fishAiPython;
+  ) fishAiPythonWrapped;
 
   # Clean up any old venv that was manually installed
   home.activation.fishAiCleanup = lib.mkIf (pkgs.stdenv.hostPlatform.system == "x86_64-linux") (
