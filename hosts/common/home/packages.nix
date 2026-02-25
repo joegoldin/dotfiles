@@ -124,6 +124,17 @@ in
       enable = true;
       settings = {
         onboard_version = 1;
+        record.device = "mic";
+        devices = {
+          mic = "M Series Mic In 1L";
+          speakers = "alsa_output.usb-MOTU_M2_M20000044767-00.HiFi__Line1__sink.monitor";
+        };
+        device_groups = {
+          combo = [
+            "mic"
+            "speakers"
+          ];
+        };
         transcribe = {
           default_backend = "deepgram";
           deepgram = {
