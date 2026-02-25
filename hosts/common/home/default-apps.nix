@@ -9,7 +9,7 @@
         fileManager = "org.kde.dolphin.desktop";
         imageViewer = "org.kde.gwenview.desktop";
         videoPlayer = "mpv.desktop";
-        pdfViewer = "firefox.desktop";
+        pdfViewer = "org.kde.okular.desktop";
         archiveManager = "org.kde.ark.desktop";
       in
       {
