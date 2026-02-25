@@ -82,6 +82,7 @@
                 "applications:parsecd.desktop"
                 "applications:discord.desktop"
                 "applications:steam.desktop"
+                "applications:us.zoom.Zoom.desktop"
                 "applications:claude-desktop.desktop"
                 "applications:obsidian.desktop"
                 "applications:slack.desktop"
