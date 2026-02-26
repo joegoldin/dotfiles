@@ -8,9 +8,20 @@ let
   fishAiSrc = pkgs.fetchFromGitHub {
     owner = "joegoldin";
     repo = "fish-ai";
-    rev = "560a16640dc3d32ae754114a1643d4f51efebae0";
-    hash = "sha256-fe7X9vISF0wN1DMJYlhZCuCIb37g/0vV45kfX75DTC4=";
+    rev = "fdd94b8176b4b538fb424caabd97e636dd620d93";
+    hash = "sha256-7e0so3EXgjqfi6b1H7LIa0y+p2ZwV1lYwK6mrqwMbSI=";
   };
+
+  # Override iterfzf to 1.9.0 within stable python set (fish-ai needs read0 param)
+  iterfzf-1_9 = pkgs.python313Packages.iterfzf.overridePythonAttrs (old: rec {
+    version = "1.9.0.67.0";
+    src = pkgs.fetchFromGitHub {
+      owner = "dahlia";
+      repo = "iterfzf";
+      tag = version;
+      hash = "sha256-Giw5d0X8/1PXK1j428LJjg+Gqadm93C51mLfrYc5J94=";
+    };
+  });
 
   fishAiPython = pkgs.python313Packages.buildPythonApplication {
     pname = "fish-ai";
@@ -29,7 +40,7 @@ let
     propagatedBuildInputs = with pkgs.python313Packages; [
       openai
       simple-term-menu
-      pkgs.unstable.python313Packages.iterfzf
+      iterfzf-1_9
       binaryornot
       anthropic
       cohere
