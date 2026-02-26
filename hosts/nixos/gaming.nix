@@ -1,5 +1,5 @@
 # hosts/nixos/gaming.nix
-# Steam, GameMode, and gaming performance tools
+# Steam, GameMode, Lutris, and gaming performance tools
 {
   pkgs,
   username,
@@ -18,6 +18,18 @@
     enable = true;
     settings.general.inhibit_screensaver = 0;
   };
+
+  environment.systemPackages = with pkgs; [
+    (lutris.override {
+      extraPkgs = pkgs: [
+        # Additional packages for game installers/runners
+      ];
+      extraLibraries = pkgs: [
+        # Additional libraries for game compatibility
+      ];
+    })
+    adwaita-icon-theme
+  ];
 
   users.users."${username}".extraGroups = [ "gamemode" ];
 }
