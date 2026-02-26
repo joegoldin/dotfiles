@@ -84,7 +84,7 @@
     # ── Development tools ──────────────────────────────────────────────────
     devenv.url = "github:cachix/devenv?ref=v1.11.2";
     nixpkgs-python.url = "github:cachix/nixpkgs-python?rev=2571ebc7280fea24ae8827c33f0a644ae515efe2";
-    git-hooks.url = "github:cachix/git-hooks.nix?rev=49bbbfc218bf3856dfa631cead3b052d78248b83";
+    git-hooks.url = "github:cachix/git-hooks.nix?rev=6e34e97ed9788b17796ee43ccdbaf871a5c2b476";
 
     # ── Desktop / NixOS applications ───────────────────────────────────────
     # affinity apps
@@ -93,9 +93,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Ghostty terminal
-    ghostty.url = "github:ghostty-org/ghostty?rev=6132597563596a12ced386f3760786b62e2dd216";
+    ghostty.url = "github:ghostty-org/ghostty?rev=7935ae6649805aa29aa12edb23731d300db76de1";
     # Zed editor (built from source via flake)
-    zed-editor.url = "github:zed-industries/zed?ref=v0.225.8-pre";
+    zed-editor.url = "github:zed-industries/zed?ref=v0.226.0-pre";
     # KDE configuration
     plasma-manager = {
       url = "github:nix-community/plasma-manager?rev=44b928068359b7d2310a34de39555c63c93a2c90";
@@ -110,7 +110,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, gemini-cli)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=aba9382852d7757b45147deee70e464b58e3bd7c";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=5611434a34e8d36b20e6653ce161e1565d5fda3d";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
