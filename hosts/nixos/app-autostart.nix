@@ -3,9 +3,9 @@
   ...
 }:
 let
-  streamcontroller-wrapped = import ./streamcontroller.nix { inherit pkgs; };
+  streamcontroller = import ./streamcontroller.nix { inherit pkgs; };
 
-  startupScript = pkgs.writeShellScript "audio-app-autostart" ''
+  pulsemeeterStartupScript = pkgs.writeShellScript "audio-app-autostart" ''
     export PATH="${pkgs.pipewire}/bin:${pkgs.pulseaudio}/bin:$PATH"
 
     echo "Waiting for PulseAudio to be ready..."
@@ -44,16 +44,13 @@ let
     }
 
     wait_and_close "${pkgs.unstable.pulsemeeter}/bin/pulsemeeter" "PulseMeeter"
-
-    sleep 1
-
-    ${streamcontroller-wrapped}/bin/streamcontroller -b &
-    echo "Started StreamController in background mode"
   '';
 in
 {
+  environment.systemPackages = [ streamcontroller.autostartEntry ];
+
   systemd.user.services."audio-app-autostart" = {
-    description = "Start PulseMeeter and StreamController after login";
+    description = "Start PulseMeeter after login";
     wantedBy = [ "graphical-session.target" ];
     requires = [ "pipewire-pulse.service" ];
     after = [
@@ -63,7 +60,7 @@ in
     ];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = startupScript;
+      ExecStart = pulsemeeterStartupScript;
       RemainAfterExit = true;
     };
   };
