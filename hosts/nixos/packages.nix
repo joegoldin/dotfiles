@@ -7,7 +7,7 @@ let
   inherit (pkgs) unstable;
   goModule = import ../common/home/go.nix { inherit pkgs lib; };
   appImagePackages = import ../common/home/appimages.nix { inherit pkgs; };
-  streamcontroller-wrapped = (import ./streamcontroller.nix { inherit pkgs; }).package;
+  streamcontroller = import ./streamcontroller.nix { inherit pkgs; };
 in
 {
   home.packages =
@@ -37,7 +37,7 @@ in
       unstable.pulsemixer
       reptyr
       unstable.slack
-      streamcontroller-wrapped
+      streamcontroller.package
       sublime-merge
       unstable.tailscale
       ungoogled-chromium
@@ -47,6 +47,8 @@ in
       xclip
     ]
     ++ appImagePackages;
+
+  xdg.configFile."autostart/StreamController.desktop".text = streamcontroller.autostartDesktopEntry;
 
   # Flatpak packages (installed via nix-flatpak)
   services.flatpak = {
