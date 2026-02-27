@@ -12,6 +12,8 @@ let
   });
 
   startupScript = pkgs.writeShellScript "audio-app-autostart" ''
+    export PATH="${pkgs.pipewire}/bin:$PATH"
+
     wait_and_close() {
       local app_name="$1"
       local search_term="$2"
