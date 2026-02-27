@@ -157,6 +157,6 @@ in
   services.udev.packages = [
     litra-rules
     streamcontroller-rules
-    (import ./streamcontroller.nix { inherit pkgs; })
+    (import ./streamcontroller.nix { inherit pkgs; }).package
   ];
 }
