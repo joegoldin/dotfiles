@@ -12,7 +12,16 @@ let
   });
 
   startupScript = pkgs.writeShellScript "audio-app-autostart" ''
-    export PATH="${pkgs.pipewire}/bin:$PATH"
+    export PATH="${pkgs.pipewire}/bin:${pkgs.pulseaudio}/bin:$PATH"
+
+    echo "Waiting for PulseAudio to be ready..."
+    for i in $(seq 1 30); do
+      if ${pkgs.pulseaudio}/bin/pactl info &>/dev/null; then
+        echo "PulseAudio ready after $i attempts"
+        break
+      fi
+      sleep 1
+    done
 
     wait_and_close() {
       local app_name="$1"
@@ -44,7 +53,8 @@ let
 
     sleep 1
 
-    wait_and_close "${streamcontroller-wrapped}/bin/streamcontroller" "StreamController"
+    ${streamcontroller-wrapped}/bin/streamcontroller -b &
+    echo "Started StreamController in background mode"
   '';
 in
 {
