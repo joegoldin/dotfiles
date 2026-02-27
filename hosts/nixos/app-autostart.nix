@@ -3,13 +3,7 @@
   ...
 }:
 let
-  streamcontroller-wrapped = pkgs.unstable.streamcontroller.overrideAttrs (old: {
-    nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
-    postFixup = (old.postFixup or "") + ''
-      wrapProgram $out/bin/streamcontroller \
-        --set GSK_RENDERER ngl
-    '';
-  });
+  streamcontroller-wrapped = import ./streamcontroller.nix { inherit pkgs; };
 
   startupScript = pkgs.writeShellScript "audio-app-autostart" ''
     export PATH="${pkgs.pipewire}/bin:${pkgs.pulseaudio}/bin:$PATH"
