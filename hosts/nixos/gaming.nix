@@ -20,7 +20,7 @@
   };
 
   environment.systemPackages = with pkgs; [
-    (lutris.override {
+    (unstable.lutris.override {
       extraPkgs = pkgs: [
         # Additional packages for game installers/runners
       ];
