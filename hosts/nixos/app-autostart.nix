@@ -63,4 +63,15 @@ in
       RemainAfterExit = true;
     };
   };
+
+  systemd.user.services."1password-autostart" = {
+    description = "Start 1Password after login";
+    wantedBy = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs._1password-gui}/bin/1password --silent";
+      RemainAfterExit = true;
+    };
+  };
 }
