@@ -93,7 +93,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Ghostty terminal
-    ghostty.url = "github:ghostty-org/ghostty?rev=7935ae6649805aa29aa12edb23731d300db76de1";
+    ghostty.url = "github:ghostty-org/ghostty?rev=336ca188457f08df89f5682cdb39288f7b40c946";
     # Zed editor (built from source via flake)
     zed-editor.url = "github:zed-industries/zed?ref=v0.226.0-pre";
     # KDE configuration
@@ -110,7 +110,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, gemini-cli)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=5611434a34e8d36b20e6653ce161e1565d5fda3d";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=1586a18853ab948e9a2f6805a78cefa263cf5223";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
