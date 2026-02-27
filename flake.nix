@@ -89,13 +89,13 @@
     # ── Desktop / NixOS applications ───────────────────────────────────────
     # affinity apps
     affinity-nix = {
-      url = "github:mrshmllow/affinity-nix?rev=1e6512bbe1669c88ca9ab34b24db290b06223c5b";
+      url = "github:mrshmllow/affinity-nix?rev=a3ca1400d98ad66b18cc8eb3fc183b90dcb9469b";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Ghostty terminal
-    ghostty.url = "github:ghostty-org/ghostty?rev=336ca188457f08df89f5682cdb39288f7b40c946";
+    ghostty.url = "github:ghostty-org/ghostty?rev=99311e8c2702d3541d14096c1c140d1808246673";
     # Zed editor (built from source via flake)
-    zed-editor.url = "github:zed-industries/zed?ref=v0.226.0-pre";
+    zed-editor.url = "github:zed-industries/zed?ref=v0.226.1-pre";
     # KDE configuration
     plasma-manager = {
       url = "github:nix-community/plasma-manager?rev=44b928068359b7d2310a34de39555c63c93a2c90";
@@ -110,7 +110,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, gemini-cli)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=1586a18853ab948e9a2f6805a78cefa263cf5223";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=75c53b1158f4674bcaf610cc897fdf17053125a1";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
