@@ -3,8 +3,6 @@
   ...
 }:
 let
-  streamcontroller = import ./streamcontroller.nix { inherit pkgs; };
-
   pulsemeeterStartupScript = pkgs.writeShellScript "audio-app-autostart" ''
     export PATH="${pkgs.pipewire}/bin:${pkgs.pulseaudio}/bin:$PATH"
 
@@ -47,8 +45,6 @@ let
   '';
 in
 {
-  environment.systemPackages = [ streamcontroller.autostartEntry ];
-
   systemd.user.services."audio-app-autostart" = {
     description = "Start PulseMeeter after login";
     wantedBy = [ "graphical-session.target" ];

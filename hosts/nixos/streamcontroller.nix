@@ -28,17 +28,13 @@ let
     exec ${package}/bin/streamcontroller -b
   '';
 
-  autostartEntry = pkgs.writeTextFile {
-    name = "streamcontroller-autostart";
-    text = ''
-      [Desktop Entry]
-      Type=Application
-      Name=StreamController
-      Exec=${startupScript}
-    '';
-    destination = "/etc/xdg/autostart/StreamController.desktop";
-  };
+  autostartDesktopEntry = ''
+    [Desktop Entry]
+    Type=Application
+    Name=StreamController
+    Exec=${startupScript}
+  '';
 in
 {
-  inherit package autostartEntry;
+  inherit package autostartDesktopEntry;
 }
