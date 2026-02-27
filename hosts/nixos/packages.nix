@@ -7,6 +7,13 @@ let
   inherit (pkgs) unstable;
   goModule = import ../common/home/go.nix { inherit pkgs lib; };
   appImagePackages = import ../common/home/appimages.nix { inherit pkgs; };
+  streamcontroller-wrapped = unstable.streamcontroller.overrideAttrs (old: {
+    nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
+    postFixup = (old.postFixup or "") + ''
+      wrapProgram $out/bin/streamcontroller \
+        --set GSK_RENDERER ngl
+    '';
+  });
 in
 {
   home.packages =
@@ -36,7 +43,7 @@ in
       unstable.pulsemixer
       reptyr
       unstable.slack
-      unstable.streamcontroller
+      streamcontroller-wrapped
       sublime-merge
       unstable.tailscale
       ungoogled-chromium
