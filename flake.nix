@@ -75,6 +75,11 @@
     };
     # declarative flatpak management
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.7.0";
+    # pre-built nix-index database
+    nix-index-database = {
+      url = "github:nix-community/nix-index-database?rev=8f590b832326ab9699444f3a48240595954a4b10";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # fast x86_64-linux builds on Apple Silicon
     nix-rosetta-builder = {
       url = "github:cpick/nix-rosetta-builder?rev=50e6070082e0b4fbaf67dd8f346892a1a9ed685c";
@@ -228,6 +233,7 @@
       pelican,
       nix-rosetta-builder,
       nix-flatpak,
+      nix-index-database,
       ...
     }@inputs:
     let
@@ -309,6 +315,7 @@
           };
           modules = [
             nixos-wsl.nixosModules.default
+            nix-index-database.nixosModules.default
             # > Our main nixos configuration <
             ./hosts/wsl
             home-manager.nixosModules.home-manager
@@ -334,6 +341,7 @@
           };
           modules = [
             disko.nixosModules.disko
+            nix-index-database.nixosModules.default
             pelican.nixosModules.default
             { nixpkgs.overlays = [ pelican.overlays.default ]; }
             # > Our main nixos configuration <
@@ -373,6 +381,7 @@
           };
           modules = [
             disko.nixosModules.disko
+            nix-index-database.nixosModules.default
             # > Our main nixos configuration <
             ./hosts/racknerd-cloud
             home-manager.nixosModules.home-manager
@@ -410,6 +419,7 @@
             hostname = "joe-desktop";
           };
           modules = [
+            nix-index-database.nixosModules.default
             # > Our main nixos configuration <
             ./hosts/nixos
             home-manager.nixosModules.home-manager
