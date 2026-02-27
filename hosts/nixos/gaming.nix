@@ -29,6 +29,7 @@
       ];
     })
     adwaita-icon-theme
+    wowup-cf
   ];
 
   users.users."${username}".extraGroups = [ "gamemode" ];
