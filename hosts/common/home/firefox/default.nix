@@ -291,6 +291,31 @@ in
           color: var(--lwt-text-color) !important;
         }
 
+        /**
+         * Dynamic Sideberry Sidebar (with animations)
+         * Animates sidebar in/out on toggle and hides when only one tab is open.
+         */
+        /* Base: Enable width transition on sidebar */
+        #sidebar-box {
+          overflow: hidden !important;
+          min-width: 0 !important;
+          transition: width 0.3s 0.3s ease !important;
+        }
+        /* Animate sidebar close: override hidden to use width collapse instead of display:none */
+        #sidebar-box[hidden] {
+          display: -moz-box !important;
+          width: 0 !important;
+        }
+        /* Hide sidebar when only one tab is open */
+        #main-window[titlepreface*="sidebery"]:has(.tabbrowser-tab:only-of-type) #sidebar-box {
+          width: 0 !important;
+        }
+        /* Hide splitter when sidebar is collapsed */
+        #sidebar-box[hidden] + #sidebar-splitter,
+        #main-window[titlepreface*="sidebery"]:has(.tabbrowser-tab:only-of-type) #sidebar-splitter {
+          display: none !important;
+        }
+
         /* Hide native sidebar header (panel switcher above Sidebery) */
         #sidebar-header {
           display: none !important;
