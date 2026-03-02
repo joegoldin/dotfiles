@@ -65,9 +65,8 @@
         height = 38;
         widgets = [
           {
-            kickoff = {
-              popupHeight = 509;
-              popupWidth = 647;
+            kicker = {
+              icon = "start-here-kde-symbolic";
             };
           }
           {
@@ -335,8 +334,7 @@
       ];
       "plasmashell"."activate application launcher" = [
         "Meta"
-        "Alt+F1,Meta"
-        "Alt+F1,Activate Application Launcher"
+        "Ctrl+Space"
       ];
       "plasmashell"."activate task manager entry 1" = "none,Meta+1,Activate Task Manager Entry 1";
       "plasmashell"."activate task manager entry 10" = "none,Meta+0,Activate Task Manager Entry 10";
