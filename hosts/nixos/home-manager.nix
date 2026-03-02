@@ -429,7 +429,7 @@
       "kdeglobals"."DirSelect Dialog"."DirSelectDialog Size" = "980,600";
       "kdeglobals"."General"."XftHintStyle" = "hintslight";
       "kdeglobals"."General"."XftSubPixel" = "none";
-      "kdeglobals"."General"."fixed" = "TX02 Nerd Font,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1";
+      "kdeglobals"."General"."fixed" = "TX02 Nerd Font Mono,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1";
       "kdeglobals"."KDE"."DndBehavior" = "MoveIfSameDevice"; # drag files = move if same device
       "kdeglobals"."KDE"."SingleClick" = false;
       "kdeglobals"."KFileDialog Settings"."Allow Expansion" = false;
