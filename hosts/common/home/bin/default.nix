@@ -51,6 +51,16 @@ let
     || (s ? runtimeInputs && s.runtimeInputs != [ ])
     || (s ? beforeExit && s.beforeExit != "");
 
+  # ── String escaping helpers ───────────────────────────────────────
+  # Escape for single-quoted shell contexts: ' -> '\''
+  escSQ = s: builtins.replaceStrings [ "'" ] [ "'\\''" ] s;
+  # Escape for fish double-quoted contexts: \ $ "
+  escFishDQ = s: builtins.replaceStrings [ "\\" "$" "\"" ] [ "\\\\" "\\$" "\\\"" ] s;
+  # Escape for bash double-quoted contexts: \ $ " `
+  escBashDQ = s: builtins.replaceStrings [ "\\" "$" "\"" "`" ] [ "\\\\" "\\$" "\\\"" "\\`" ] s;
+  # Escape for Python string literals: \ "
+  escPyStr = s: builtins.replaceStrings [ "\\" "\"" ] [ "\\\\" "\\\"" ] s;
+
   # ── Type predicates ────────────────────────────────────────────────
   isFishBin = s: s.type == "fish";
   isPythonBin = s: s.type == "python";
@@ -95,7 +105,7 @@ let
       argLines =
         if hasParams s then
           let
-            lines = map (p: "    printf '  %-14s %s\\n' '${p.name}' '${p.desc}'") s.params;
+            lines = map (p: "    printf '  %-14s %s\\n' '${escSQ p.name}' '${escSQ p.desc}'") s.params;
           in
           ''
               echo ""
@@ -111,7 +121,7 @@ let
               let
                 label = if f ? arg then "${f.name} ${f.arg}" else f.name;
               in
-              "    printf '  %-14s %s\\n' '${label}' '${f.desc}'"
+              "    printf '  %-14s %s\\n' '${escSQ label}' '${escSQ f.desc}'"
             ) s.flags;
           in
           ''
@@ -190,7 +200,7 @@ let
           envVar = flagEnvVar f;
           defVal = flagDefault f;
         in
-        "${varName}=\"" + "$" + "{${envVar}:-${defVal}}\"";
+        "${varName}=\"" + "$" + "{${envVar}:-${escBashDQ defVal}}\"";
     in
     builtins.concatStringsSep "\n" (map mkDefault flags);
 
@@ -225,7 +235,7 @@ let
             "  echo \"\""
             "  echo \"Arguments:\""
           ]
-          ++ (map (p: "  printf '  %-20s %s\\n' '${p.name}' '${p.desc}'") params)
+          ++ (map (p: "  printf '  %-20s %s\\n' '${escSQ p.name}' '${escSQ p.desc}'") params)
         else
           [ ];
 
@@ -243,7 +253,7 @@ let
               longStr = if flagIsBool f then f.name else "${f.name} ${flagArg f}";
               label = "${shortStr}, ${longStr}";
             in
-            "  printf '  %-20s %s\\n' '${label}' '${f.desc}'"
+            "  printf '  %-20s %s\\n' '${escSQ label}' '${escSQ f.desc}'"
           ) flags)
         else
           [ ];
@@ -252,7 +262,7 @@ let
     in
     ''
       usage() {
-        echo "''${BOLD}${s.name}''${RESET} - ${s.desc}"
+        echo "''${BOLD}${escBashDQ s.name}''${RESET} - ${escBashDQ s.desc}"
         echo ""
         echo "Usage: ${usageLine}"
       ${builtins.concatStringsSep "\n" allHelpLines}
@@ -346,7 +356,7 @@ let
         let
           varName = normalizeFlagName f.name;
         in
-        "[[ -z \"" + "$" + "{${varName}}\" ]] && die \"Required option ${f.name} is missing\""
+        "[[ -z \"" + "$" + "{${varName}}\" ]] && die \"Required option ${escBashDQ f.name} is missing\""
       ) requiredFlags;
     in
     builtins.concatStringsSep "\n" checks;
@@ -402,7 +412,7 @@ let
               set _flag_${varName} $$envName
             ${lib.optionalString hasDef ''
               else
-                          set _flag_${varName} "${def}"''}
+                          set _flag_${varName} "${escFishDQ def}"''}
             end
           end''
       ) flags
@@ -420,7 +430,7 @@ let
             in
             ''
               if not set -q _flag_${varName}; or test -z "$_flag_${varName}"
-                die "required flag '${f.name}' not provided"
+                die "required flag '${escFishDQ f.name}' not provided"
               end''
           else
             ""
@@ -476,12 +486,12 @@ let
             def = flagDefault f;
           in
           if flagIsBool f then
-            ''_parser.add_argument(${shortStr}"${longFlag}", action="store_true", default=bool(_os.environ.get("${envName}", "")), help="${f.desc or "a flag"}")''
+            ''_parser.add_argument(${shortStr}"${longFlag}", action="store_true", default=bool(_os.environ.get("${envName}", "")), help="${escPyStr (f.desc or "a flag")}")''
           else
             let
-              defExpr = if def != "" then ''"${def}"'' else "None";
+              defExpr = if def != "" then ''"${escPyStr def}"'' else "None";
             in
-            ''_parser.add_argument(${shortStr}"${longFlag}", default=_os.environ.get("${envName}", "") or ${defExpr}, ${lib.optionalString (flagRequired f) ''required=not bool(_os.environ.get("${envName}", "")), ''}help="${f.desc or "a flag"}")''
+            ''_parser.add_argument(${shortStr}"${longFlag}", default=_os.environ.get("${envName}", "") or ${defExpr}, ${lib.optionalString (flagRequired f) ''required=not bool(_os.environ.get("${envName}", "")), ''}help="${escPyStr (f.desc or "a flag")}")''
         ) flags
       );
       paramArgs = builtins.concatStringsSep "\n" (
@@ -497,15 +507,15 @@ let
               else
                 "?";
             nargsStr = if nargs != null then '', nargs="${nargs}"'' else "";
-            def = if p ? default then '', default="${p.default}"'' else "";
+            def = if p ? default then '', default="${escPyStr p.default}"'' else "";
           in
-          ''_parser.add_argument("${varName}"${nargsStr}${def}, help="${p.desc}")''
+          ''_parser.add_argument("${varName}"${nargsStr}${def}, help="${escPyStr p.desc}")''
         ) params
       );
     in
     ''
       import argparse as _argparse
-      _parser = _argparse.ArgumentParser(prog="${s.name}", description="${s.desc}")
+      _parser = _argparse.ArgumentParser(prog="${escPyStr s.name}", description="${escPyStr s.desc}")
       _parser.add_argument("-v", "--verbose", action="store_true", default=bool(_os.environ.get("POG_VERBOSE", "")), help="show debug output")
       ${flagArgs}
       ${paramArgs}
@@ -540,9 +550,9 @@ let
         ${lib.optionalString enhanced fishHelpers}
 
         ${helpCond}
-          echo "${s.name} - ${s.desc}"
+          echo "${escFishDQ s.name} - ${escFishDQ s.desc}"
           echo ""
-          echo "Usage: ${usage}"
+          echo "Usage: ${escFishDQ usage}"
         ${paramHelp}
         ${lib.optionalString enhanced ''
           echo ""
@@ -611,7 +621,9 @@ let
         pythonArgHelp =
           if hasParams s then
             let
-              lines = map (p: "        print(\"  %-14s %s\" % (\"${p.name}\", \"${p.desc}\"))") s.params;
+              lines = map (
+                p: "        print(\"  %-14s %s\" % (\"${escPyStr p.name}\", \"${escPyStr p.desc}\"))"
+              ) s.params;
             in
             ''
                     print()
@@ -627,7 +639,7 @@ let
                 let
                   label = if f ? arg then "${f.name} ${f.arg}" else f.name;
                 in
-                "        print(\"  %-14s %s\" % (\"${label}\", \"${f.desc}\"))"
+                "        print(\"  %-14s %s\" % (\"${escPyStr label}\", \"${escPyStr f.desc}\"))"
               ) s.flags;
             in
             ''
@@ -651,7 +663,7 @@ let
           #!${pythonWithPkgs}/bin/python3
           import sys
           ${helpCond}
-              print("${s.name} - ${s.desc}")
+              print("${escPyStr s.name} - ${escPyStr s.desc}")
               print()
               print("Usage: ${usage}")
           ${pythonParamHelp}
@@ -754,7 +766,7 @@ let
 
   # ── bins command ───────────────────────────────────────────────────
   binsLines = builtins.concatStringsSep "\n" (
-    map (s: "  printf '  %-12s %s\\n' '${s.name}' '${s.desc}'") scripts
+    map (s: "  printf '  %-12s %s\\n' '${escSQ s.name}' '${escSQ s.desc}'") scripts
   );
 
   binsScript = pkgs.writeTextFile {
@@ -813,7 +825,7 @@ let
                 completionPart =
                   if f ? completion && f.completion != "" then " -a '(${escapedCompletion})'" else "";
               in
-              "complete -c ${s.name} -l ${longName}${shortPart}${requiresArg}${completionPart} -d \"${f.desc or "a flag"}\""
+              "complete -c ${s.name} -l ${longName}${shortPart}${requiresArg}${completionPart} -d \"${escFishDQ (f.desc or "a flag")}\""
             ) (s.flags or [ ])
           )
         else
