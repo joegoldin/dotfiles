@@ -122,10 +122,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
-    # Claude Code skills
-    superpowers = {
-      url = "github:obra/superpowers?ref=v4.3.1";
-      flake = false;
+    # Claude Code agent skills
+    agent-skills = {
+      url = "github:joegoldin/agent-skills";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # ── Homebrew (macOS) ───────────────────────────────────────────────────
