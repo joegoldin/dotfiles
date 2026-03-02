@@ -65,8 +65,6 @@ pkgs: {
       ;
   };
 
-  claude-desktop = pkgs.callPackage ./claude-desktop { };
-
   lotion = pkgs.callPackage ./lotion {
     electron = pkgs.electron_37;
   };

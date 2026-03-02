@@ -116,6 +116,11 @@
     };
 
     # ── Claude / LLM tooling ───────────────────────────────────────────────
+    # Claude Desktop for Linux
+    claude-desktop-debian = {
+      url = "github:aaddrick/claude-desktop-debian?rev=2706698b2b71eb8d1d2ddb54958d98617a016eb1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # Claude Code configuration library
     claude-nix = {
       url = "github:joegoldin/claude-nix?rev=337e48e08076a01c12a00290a318955e5e8bd6d2";

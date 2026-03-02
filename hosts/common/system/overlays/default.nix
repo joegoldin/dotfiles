@@ -39,6 +39,9 @@
     };
   };
 
+  # Claude Desktop for Linux
+  claude-desktop-packages = inputs.claude-desktop-debian.overlays.default;
+
   # LLM agent packages (claude-code, codex, gemini-cli) available as pkgs.llm-agents.*
   llm-agents-packages = inputs.llm-agents.overlays.default;
 
