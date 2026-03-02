@@ -133,15 +133,6 @@ update-node-packages:
     @scripts/update-node-packages.sh
     @echo "✅  Node packages updated!"
 
-# ── Indexing ─────────────────────────────────────────────────────────
-
-[unix]
-nix-index:
-    @echo "📦  Updating nix-index..."
-    @nix run 'nixpkgs#nix-index' --extra-experimental-features 'nix-command flakes'
-    @just _record-history nix-index
-    @echo "✅  nix-index updated!"
-
 # ── Maintenance ──────────────────────────────────────────────────────────
 
 [unix]
@@ -199,5 +190,4 @@ _check-maintenance:
       fi
     }
     check_task "update-pins" "Pin updates" "update-pins"
-    check_task "nix-index" "nix-index" "nix-index"
     check_task "sync-submodules" "Submodule sync" "sync-submodules"
