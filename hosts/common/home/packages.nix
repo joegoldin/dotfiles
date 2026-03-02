@@ -88,6 +88,7 @@ let
       # rustup
       socat # replacement of openbsd-netcat
       spritesModule.packages.sprite
+      statix
       stripe-cli
       tesseract
       tmux
