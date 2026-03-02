@@ -12,18 +12,13 @@
   flags = [
     {
       name = "--volume";
+      short = "-V";
       arg = "VOL";
       desc = "Volume 0-1.0 (default 1.0)";
+      default = "1.0";
     }
   ];
   body = ''
-    set -l vol 1.0
-    if set -l idx (contains -i -- --volume $argv)
-        set vol $argv[(math $idx + 1)]
-        set -e argv[$idx]
-        set -e argv[$idx]
-    end
-
-    pw-play --volume $vol "$HOME/dotfiles/assets/sfx/$argv[1].ogg" &
+    pw-play --volume $_flag_volume "$HOME/dotfiles/assets/sfx/$argv[1].ogg" &
   '';
 }
