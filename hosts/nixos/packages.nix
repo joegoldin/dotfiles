@@ -18,7 +18,7 @@ in
       unstable.calcurse
       chromedriver
       goModule.packages.claude-squad
-      claude-desktop
+      claude-desktop-fhs
       unstable.cloudflared
       #      unstable.davinci-resolve
       unstable.discord
