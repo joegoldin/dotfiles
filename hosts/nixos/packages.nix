@@ -29,6 +29,7 @@ in
       # unstable.jellyfin-media-player
       #      cargoModule.packages.litra
       #      cargoModule.packages.litra-autotoggle
+      localsend
       lotion
       unstable.obsidian
       unstable.parsec-bin
