@@ -388,7 +388,7 @@
                   owner = "root";
                   group = "root";
                 };
-                age.identityPaths = [ "/home/${specialArgs.username}/.ssh/id_rsa" ];
+                age.identityPaths = [ "/home/${specialArgs.username}/.ssh/id_ed25519" ];
               }
             )
           ];
