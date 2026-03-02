@@ -134,6 +134,10 @@ in
       # require enabling PolKit integration on some desktop environments (e.g. Plasma).
       polkitPolicyOwners = [ "${username}" ];
     };
+    nh = {
+      enable = true;
+      flake = "/home/${username}/dotfiles";
+    };
   };
 
   environment.systemPackages = with pkgs; [

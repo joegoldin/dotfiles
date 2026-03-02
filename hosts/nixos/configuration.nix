@@ -133,6 +133,10 @@ in
       polkitPolicyOwners = [ "${username}" ];
     };
     nix-ld.enable = true;
+    nh = {
+      enable = true;
+      flake = "/home/${username}/dotfiles";
+    };
   };
 
   environment.systemPackages = with pkgs; [

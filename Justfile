@@ -30,8 +30,7 @@ flake-update:
 [macos]
 build: system-info _check-maintenance
     @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
-     darwin-rebuild build --flake .#Joes-MacBook-Pro 2>&1 | nom
-    sudo darwin-rebuild switch --flake .#Joes-MacBook-Pro
+     nh darwin switch .
 
 [linux]
 build: system-info _check-maintenance
@@ -50,24 +49,21 @@ build: system-info _check-maintenance
 _build-wsl:
     @echo "🔨  Building for WSL 🪟..."
     @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
-     nixos-rebuild build --flake .#joe-wsl 2>&1 | nom
-    sudo nixos-rebuild --flake .#joe-wsl switch
+     nh os switch . -H joe-wsl
     @echo "✅  Built for WSL!"
 
 [private]
 _build-bastion:
     @echo "🔨  Building for Oracle Cloud bastion 🐧..."
     @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
-     nixos-rebuild build --flake .#oracle-cloud-bastion 2>&1 | nom
-    sudo nixos-rebuild --flake .#oracle-cloud-bastion switch
+     nh os switch . -H oracle-cloud-bastion
     @echo "✅  Built for Oracle Cloud!"
 
 [private]
 _build-nixos:
     @echo "🔨  Building for NixOS desktop 🐧..."
     @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
-     nixos-rebuild build --flake .#joe-desktop 2>&1 | nom
-    sudo nixos-rebuild --flake .#joe-desktop switch
+     nh os switch . -H joe-desktop
     @echo "✅  Built for NixOS!"
 
 # ── macOS-specific ───────────────────────────────────────────────────────
@@ -101,8 +97,8 @@ deploy-racknerd IP:
 [unix]
 rebuild-racknerd:
     @echo "🔨  Rebuilding NixOS on RackNerd VPS..."
-    nixos-rebuild build --flake .#racknerd-cloud-agent 2>&1 | nom
-    sudo nixos-rebuild switch --flake .#racknerd-cloud-agent
+    @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
+     nh os switch . -H racknerd-cloud-agent
     @echo "✅  Rebuilt RackNerd VPS!"
 
 # ── Package management ───────────────────────────────────────────────────
@@ -138,9 +134,7 @@ update-node-packages:
 [unix]
 nix-gc:
     @echo "🧹  Garbage collecting nix..."
-    @nix-env --delete-generations 14d
-    @nix-store --gc
-    @nix-collect-garbage -d
+    @nh clean all --keep-since 7d --keep 3
     @echo "✅  Garbage collected!"
 
 # ── Submodules ───────────────────────────────────────────────────────
