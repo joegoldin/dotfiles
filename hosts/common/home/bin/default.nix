@@ -13,33 +13,67 @@ let
 
   # ── Param helpers ─────────────────────────────────────────────────
   hasParams = s: s ? params && s.params != [ ];
+  hasFlags = s: s ? flags && s.flags != [ ];
 
   getUsage =
     s:
-    if hasParams s then
-      let
-        paramStr = builtins.concatStringsSep " " (
-          map (p: if p.required or true then p.name else "[${p.name}]") s.params
-        );
-      in
-      "${s.name} ${paramStr}"
-    else
-      s.usage;
+    let
+      flagStr =
+        if hasFlags s then
+          builtins.concatStringsSep " " (
+            map (f: if f ? arg then "[${f.name} ${f.arg}]" else "[${f.name}]") s.flags
+          )
+        else
+          "";
+      paramStr =
+        if hasParams s then
+          builtins.concatStringsSep " " (
+            map (p: if p.required or true then p.name else "[${p.name}]") s.params
+          )
+        else
+          "";
+      parts = builtins.filter (x: x != "") [
+        flagStr
+        paramStr
+      ];
+    in
+    if hasParams s || hasFlags s then "${s.name} ${builtins.concatStringsSep " " parts}" else s.usage;
 
   hasRequiredParams = s: hasParams s && builtins.any (p: p.required or true) s.params;
 
   fishParamHelp =
     s:
-    if hasParams s then
-      let
-        lines = map (p: "    printf '  %-14s %s\\n' '${p.name}' '${p.desc}'") s.params;
-      in
-      ''
-          echo ""
-          echo "Arguments:"
-        ${builtins.concatStringsSep "\n" lines}''
-    else
-      "";
+    let
+      argLines =
+        if hasParams s then
+          let
+            lines = map (p: "    printf '  %-14s %s\\n' '${p.name}' '${p.desc}'") s.params;
+          in
+          ''
+              echo ""
+              echo "Arguments:"
+            ${builtins.concatStringsSep "\n" lines}''
+        else
+          "";
+      flagLines =
+        if hasFlags s then
+          let
+            lines = map (
+              f:
+              let
+                label = if f ? arg then "${f.name} ${f.arg}" else f.name;
+              in
+              "    printf '  %-14s %s\\n' '${label}' '${f.desc}'"
+            ) s.flags;
+          in
+          ''
+              echo ""
+              echo "Options:"
+            ${builtins.concatStringsSep "\n" lines}''
+        else
+          "";
+    in
+    argLines + flagLines;
 
   # ── Builders ───────────────────────────────────────────────────────
   mkFishBin =
@@ -76,7 +110,7 @@ let
     s:
     let
       usage = getUsage s;
-      pythonParamHelp =
+      pythonArgHelp =
         if hasParams s then
           let
             lines = map (p: "        print(\"  %-14s %s\" % (\"${p.name}\", \"${p.desc}\"))") s.params;
@@ -87,6 +121,24 @@ let
             ${builtins.concatStringsSep "\n" lines}''
         else
           "";
+      pythonFlagHelp =
+        if hasFlags s then
+          let
+            lines = map (
+              f:
+              let
+                label = if f ? arg then "${f.name} ${f.arg}" else f.name;
+              in
+              "        print(\"  %-14s %s\" % (\"${label}\", \"${f.desc}\"))"
+            ) s.flags;
+          in
+          ''
+                  print()
+                  print("Options:")
+            ${builtins.concatStringsSep "\n" lines}''
+        else
+          "";
+      pythonParamHelp = pythonArgHelp + pythonFlagHelp;
       helpCond =
         if hasRequiredParams s then
           "if \"--help\" in sys.argv or \"-h\" in sys.argv or len(sys.argv) < 2:"
@@ -180,10 +232,28 @@ let
           )
         else
           "";
+      flagLines =
+        if hasFlags s then
+          builtins.concatStringsSep "\n" (
+            map (
+              f:
+              let
+                longName = builtins.replaceStrings [ "--" ] [ "" ] f.name;
+                requiresArg = if f ? arg then " -r" else "";
+              in
+              "complete -c ${s.name} -l ${longName}${requiresArg} -d \"${f.desc}\""
+            ) s.flags
+          )
+        else
+          "";
+      extra = builtins.filter (x: x != "") [
+        paramLines
+        flagLines
+      ];
     in
     {
       "fish/completions/${s.name}.fish".text =
-        helpLine + (if paramLines != "" then "\n${paramLines}" else "") + "\n";
+        helpLine + (if extra != [ ] then "\n${builtins.concatStringsSep "\n" extra}" else "") + "\n";
     };
 
   binsCompletion = {
