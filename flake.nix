@@ -209,8 +209,8 @@
   };
 
   nixConfig = {
-    extra-trusted-public-keys = "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw= zed.cachix.org-1:/pHQ6dpMsAZk2DiP4WCL0p9YDNKWj2Q5FL20bNmw1cU= cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g=";
-    extra-substituters = "https://devenv.cachix.org https://zed.cachix.org https://cache.garnix.io";
+    extra-trusted-public-keys = "";
+    extra-substituters = "";
     experimental-features = "nix-command flakes";
   };
 
