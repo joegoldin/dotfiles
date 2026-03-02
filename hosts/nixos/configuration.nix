@@ -97,6 +97,10 @@ in
 
   networking.networkmanager.enable = true;
   networking.hostName = hostname;
+  networking.firewall = {
+    allowedTCPPorts = [ 53317 ];
+    allowedUDPPorts = [ 53317 ];
+  };
 
   users.users = {
     "${username}" = {
