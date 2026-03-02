@@ -96,6 +96,10 @@
       enable = true;
       package = pkgs.nix-ld;
     };
+    nh = {
+      enable = true;
+      flake = "/home/${username}/dotfiles";
+    };
   };
 
   environment.systemPackages = with pkgs; [

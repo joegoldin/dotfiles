@@ -95,8 +95,12 @@
   environment.systemPackages = with pkgs; [
     git
     jdk
+    nh
     wget
     agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
     # darwin.xcode_16_3  # TODO: enable this when available in nixpkgs
   ];
+
+  # nh uses NH_DARWIN_FLAKE to locate the flake for darwin commands
+  environment.variables.NH_DARWIN_FLAKE = "/Users/${username}/dotfiles";
 }
