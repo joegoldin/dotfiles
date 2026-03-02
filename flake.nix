@@ -55,6 +55,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # ── Server services ────────────────────────────────────────────────────
+    # binary cache server
+    attic = {
+      url = "github:zhaofengli/attic?rev=12cbeca141f46e1ade76728bce8adc447f2166c6";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # ── Nix utilities ──────────────────────────────────────────────────────
     flake-utils.url = "github:numtide/flake-utils?ref=v1.0.0";
     systems.url = "github:nix-systems/default?rev=da67096a3b9bf56a91d16901293e51ba5b49a27e";
@@ -344,6 +351,7 @@
             nix-index-database.nixosModules.default
             pelican.nixosModules.default
             { nixpkgs.overlays = [ pelican.overlays.default ]; }
+            inputs.attic.nixosModules.atticd
             # > Our main nixos configuration <
             ./hosts/oracle-cloud
             home-manager.nixosModules.home-manager
@@ -368,6 +376,12 @@
                   mode = "655";
                   owner = specialArgs.username;
                   group = "users";
+                };
+                age.secrets.atticd-env = {
+                  file = "${dotfiles-secrets}/atticd.env.age";
+                  mode = "0400";
+                  owner = "root";
+                  group = "root";
                 };
                 age.identityPaths = [ "/home/${specialArgs.username}/.ssh/id_rsa" ];
               }
