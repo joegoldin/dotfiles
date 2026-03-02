@@ -10,6 +10,6 @@
     }
   ];
   body = ''
-    exec mpv --really-quiet --no-video "$HOME/dotfiles/assets/sfx/$argv[1].ogg" &
+    pw-play "$HOME/dotfiles/assets/sfx/$argv[1].ogg" &
   '';
 }
