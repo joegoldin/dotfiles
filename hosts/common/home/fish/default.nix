@@ -81,9 +81,9 @@ in
   programs.atuin = import ./atuin.nix { inherit pkgs config dotfiles-secrets; };
 
   # Symlink the Nix-built fish-ai Python env to where the plugin expects it
-  xdg.dataFile."fish-ai".source = lib.mkIf (
-    pkgs.stdenv.hostPlatform.system == "x86_64-linux"
-  ) fishAiPythonWrapped;
+  xdg.dataFile."fish-ai" = lib.mkIf (pkgs.stdenv.hostPlatform.system == "x86_64-linux") {
+    source = fishAiPythonWrapped;
+  };
 
   # Clean up any old venv that was manually installed
   home.activation.fishAiCleanup = lib.mkIf (pkgs.stdenv.hostPlatform.system == "x86_64-linux") (
