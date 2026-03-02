@@ -788,7 +788,10 @@ let
               map (
                 p:
                 if p ? completions && p.completions != "" then
-                  "complete -c ${s.name} -f -a '(${p.completions})'"
+                  let
+                    escaped = builtins.replaceStrings [ "'" ] [ "'\\''" ] p.completions;
+                  in
+                  "complete -c ${s.name} -f -a '(${escaped})'"
                 else
                   ""
               ) s.params
@@ -806,7 +809,9 @@ let
                 sh = flagShort f;
                 shortPart = if sh != "" then " -s ${sh}" else "";
                 requiresArg = if !(flagIsBool f) then " -r" else "";
-                completionPart = if f ? completion && f.completion != "" then " -a '(${f.completion})'" else "";
+                escapedCompletion = builtins.replaceStrings [ "'" ] [ "'\\''" ] (f.completion or "");
+                completionPart =
+                  if f ? completion && f.completion != "" then " -a '(${escapedCompletion})'" else "";
               in
               "complete -c ${s.name} -l ${longName}${shortPart}${requiresArg}${completionPart} -d \"${f.desc or "a flag"}\""
             ) (s.flags or [ ])
