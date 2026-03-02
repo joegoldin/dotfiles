@@ -1,7 +1,7 @@
 { lib }:
 let
   baseSettings = {
-    font-family = "TX02 Nerd Font";
+    font-family = "TX02 Nerd Font Mono";
     font-size = 11;
     font-feature = [
       "calt"
