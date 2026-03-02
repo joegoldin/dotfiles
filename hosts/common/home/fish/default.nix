@@ -2,6 +2,7 @@
   pkgs,
   lib,
   config,
+  dotfiles-secrets,
   ...
 }:
 let
@@ -77,7 +78,7 @@ in
     inherit ((import ./aliases.nix { inherit lib config; })) shellAliases;
   };
 
-  programs.atuin = import ./atuin.nix { inherit pkgs config; };
+  programs.atuin = import ./atuin.nix { inherit pkgs config dotfiles-secrets; };
 
   # Symlink the Nix-built fish-ai Python env to where the plugin expects it
   xdg.dataFile."fish-ai".source = lib.mkIf (
