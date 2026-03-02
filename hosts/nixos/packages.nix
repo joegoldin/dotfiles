@@ -22,6 +22,7 @@ in
       unstable.cloudflared
       #      unstable.davinci-resolve
       unstable.discord
+      docker-buildx
       unstable.dumbpipe
       # extraterm
       # ghostty is managed by programs.ghostty in ghostty.nix
