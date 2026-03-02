@@ -1,14 +1,15 @@
 {
   name = "snippets";
   desc = "Print a snippet by name";
-  usage = "snippets NAME";
   type = "fish";
+  params = [
+    {
+      name = "NAME";
+      desc = "Snippet name";
+      completions = "ls $HOME/dotfiles/snippets/ 2>/dev/null";
+    }
+  ];
   body = ''
-    if test (count $argv) -ne 1
-        echo 'must pass exactly 1 argument' >&2
-        exit 1
-    end
-
     set snippets_dir "$HOME/dotfiles/snippets"
     set path "$snippets_dir/$argv[1]"
 

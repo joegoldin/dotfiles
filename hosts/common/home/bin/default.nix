@@ -11,9 +11,48 @@ let
   isFunction = s: s.type == "function";
   isBin = s: isFishBin s || isPythonBin s || isPythonArgparse s;
 
+  # ── Param helpers ─────────────────────────────────────────────────
+  hasParams = s: s ? params && s.params != [ ];
+
+  getUsage =
+    s:
+    if hasParams s then
+      let
+        paramStr = builtins.concatStringsSep " " (
+          map (p: if p.required or true then p.name else "[${p.name}]") s.params
+        );
+      in
+      "${s.name} ${paramStr}"
+    else
+      s.usage;
+
+  hasRequiredParams = s: hasParams s && builtins.any (p: p.required or true) s.params;
+
+  fishParamHelp =
+    s:
+    if hasParams s then
+      let
+        lines = map (p: "    printf '  %-14s %s\\n' '${p.name}' '${p.desc}'") s.params;
+      in
+      ''
+          echo ""
+          echo "Arguments:"
+        ${builtins.concatStringsSep "\n" lines}''
+    else
+      "";
+
   # ── Builders ───────────────────────────────────────────────────────
   mkFishBin =
     s:
+    let
+      usage = getUsage s;
+      helpCond =
+        if hasRequiredParams s then
+          "if contains -- --help $argv; or contains -- -h $argv; or test (count $argv) -eq 0"
+        else
+          "if contains -- --help $argv; or contains -- -h $argv";
+      paramHelp = fishParamHelp s;
+    in
     pkgs.writeTextFile {
       inherit (s) name;
       executable = true;
@@ -21,10 +60,11 @@ let
       text = ''
         #!/usr/bin/env fish
 
-        if contains -- --help $argv; or contains -- -h $argv
+        ${helpCond}
           echo "${s.name} - ${s.desc}"
           echo ""
-          echo "Usage: ${s.usage}"
+          echo "Usage: ${usage}"
+        ${paramHelp}
           exit 0
         end
 
@@ -34,6 +74,25 @@ let
 
   mkPythonBin =
     s:
+    let
+      usage = getUsage s;
+      pythonParamHelp =
+        if hasParams s then
+          let
+            lines = map (p: "        print(\"  %-14s %s\" % (\"${p.name}\", \"${p.desc}\"))") s.params;
+          in
+          ''
+                  print()
+                  print("Arguments:")
+            ${builtins.concatStringsSep "\n" lines}''
+        else
+          "";
+      helpCond =
+        if hasRequiredParams s then
+          "if \"--help\" in sys.argv or \"-h\" in sys.argv or len(sys.argv) < 2:"
+        else
+          "if \"--help\" in sys.argv or \"-h\" in sys.argv:";
+    in
     pkgs.writeTextFile {
       inherit (s) name;
       executable = true;
@@ -41,10 +100,11 @@ let
       text = ''
         #!${pkgs.python3}/bin/python3
         import sys
-        if "--help" in sys.argv or "-h" in sys.argv:
+        ${helpCond}
             print("${s.name} - ${s.desc}")
             print()
-            print("Usage: ${s.usage}")
+            print("Usage: ${usage}")
+        ${pythonParamHelp}
             sys.exit(0)
 
         ${s.body}
@@ -101,35 +161,40 @@ let
   };
 
   # ── Fish completions ───────────────────────────────────────────────
-  mkCompletion = s: {
-    "fish/completions/${s.name}.fish".text = ''
-      complete -c ${s.name} -f -l help -s h -d "Show help"
-    '';
-  };
+  mkCompletion =
+    s:
+    let
+      helpLine = "complete -c ${s.name} -f -l help -s h -d \"Show help\"";
+      paramLines =
+        if hasParams s then
+          builtins.concatStringsSep "\n" (
+            builtins.filter (l: l != "") (
+              map (
+                p:
+                if p ? completions && p.completions != "" then
+                  "complete -c ${s.name} -f -a '(${p.completions})'"
+                else
+                  ""
+              ) s.params
+            )
+          )
+        else
+          "";
+    in
+    {
+      "fish/completions/${s.name}.fish".text =
+        helpLine + (if paramLines != "" then "\n${paramLines}" else "") + "\n";
+    };
 
-  specialCompletions = {
-    "fish/completions/snippets.fish".text = ''
-      complete -c snippets -f -l help -s h -d "Show help"
-      complete -c snippets -f -a '(ls $HOME/dotfiles/snippets/ 2>/dev/null)'
-    '';
-    "fish/completions/sfx.fish".text = ''
-      complete -c sfx -f -l help -s h -d "Show help"
-      complete -c sfx -f -a '(ls $HOME/dotfiles/assets/sfx/ 2>/dev/null | string replace -r "\\.ogg\$" "")'
-    '';
+  binsCompletion = {
     "fish/completions/bins.fish".text = ''
       complete -c bins -f -l help -s h -d "Show help"
     '';
   };
 
-  specialNames = [
-    "snippets"
-    "sfx"
-  ];
-  basicCompletions = builtins.foldl' (acc: s: acc // mkCompletion s) { } (
-    builtins.filter (s: !(builtins.elem s.name specialNames) && isBin s) scripts
-  );
-
-  allCompletions = basicCompletions // specialCompletions;
+  allCompletions =
+    (builtins.foldl' (acc: s: acc // mkCompletion s) { } (builtins.filter isBin scripts))
+    // binsCompletion;
 
 in
 {
