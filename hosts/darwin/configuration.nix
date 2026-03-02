@@ -47,11 +47,8 @@
         nix-path = config.nix.nixPath;
         trusted-users = [ "${username}" ];
         auto-optimise-store = false;
-        extra-substituters = [ "https://nixpkgs-python.cachix.org" ];
-        extra-trusted-public-keys = [
-          "nixpkgs-python.cachix.org-1:hxjI7pFxTyuTHn2NkvWCrAUcNZLNS3ZAvfYNuYifcEU="
-          "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
-        ];
+        extra-substituters = [ ];
+        extra-trusted-public-keys = [ ];
         # Enable building for x86_64-darwin on aarch64-darwin
         extra-platforms = [
           "x86_64-darwin"
