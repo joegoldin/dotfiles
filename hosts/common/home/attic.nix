@@ -4,10 +4,10 @@ let
 in
 {
   xdg.configFile."attic/config.toml".text = ''
-    default-server = "turnin"
+    default-server = "default-server"
 
-    [servers.turnin]
+    [servers.default-server]
     endpoint = "https://${domains.atticDomain}/"
-    token_file = "/run/agenix/attic-token"
+    token-file = "/run/agenix/attic-token"
   '';
 }
