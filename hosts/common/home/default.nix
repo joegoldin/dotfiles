@@ -25,6 +25,7 @@
     (import ./packages.nix { inherit pkgs lib config; })
     ./gh.nix
     ./git.nix
+    ./attic.nix
     ./starship.nix
     ./claude
     ./bin
