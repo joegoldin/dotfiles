@@ -59,6 +59,21 @@ in
     };
   };
 
+  # Caddy reverse proxy — handles ACME/Let's Encrypt automatically
+  services.caddy = {
+    enable = true;
+    virtualHosts."${domains.atticDomain}" = {
+      extraConfig = ''
+        reverse_proxy http://[::1]:8081
+      '';
+    };
+  };
+
+  networking.firewall.allowedTCPPorts = [
+    80
+    443
+  ];
+
   systemd.services.atticd = {
     after = [ "agenix.service" ];
     wants = [ "agenix.service" ];
