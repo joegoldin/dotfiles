@@ -2,7 +2,8 @@
 { ... }:
 {
   imports = [
-    ../common/system/attic-substituter.nix
+    ../common/system/attic.nix
+    ../common/system/attic-post-build-hook.nix
     ./configuration.nix
     ./hardware-configuration.nix
     ./drag-shift.nix

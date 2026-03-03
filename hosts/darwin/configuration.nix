@@ -11,7 +11,7 @@
 }:
 {
   imports = [
-    ../common/system/attic-substituter.nix
+    ../common/system/attic.nix
     ./system.nix
     ./apps.nix
     ./homebrew.nix

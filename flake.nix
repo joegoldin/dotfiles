@@ -465,6 +465,7 @@
               }
             )
             nix-flatpak.nixosModules.nix-flatpak
+            inputs.nix-attic-infra.nixosModules.attic-post-build-hook
             agenix.nixosModules.default
             (
               { specialArgs, ... }:

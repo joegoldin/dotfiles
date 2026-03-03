@@ -2,7 +2,7 @@
 { inputs, ... }:
 {
   imports = [
-    ../common/system/attic-substituter.nix
+    ../common/system/attic.nix
     ./hardware-configuration.nix
 
     inputs.nixos-wsl.nixosModules.default
