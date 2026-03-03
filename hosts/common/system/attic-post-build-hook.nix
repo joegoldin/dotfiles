@@ -1,4 +1,8 @@
-{ config, dotfiles-secrets, ... }:
+{
+  config,
+  dotfiles-secrets,
+  ...
+}:
 let
   domains = import "${dotfiles-secrets}/domains.nix";
   attic = import "${dotfiles-secrets}/attic.nix";

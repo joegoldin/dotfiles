@@ -350,6 +350,15 @@
               }
             )
             agenix.nixosModules.default
+            (
+              { ... }:
+              {
+                age.secrets.attic-netrc = {
+                  file = "${dotfiles-secrets}/attic-netrc.age";
+                  mode = "0400";
+                };
+              }
+            )
           ];
         };
 
@@ -394,6 +403,10 @@
                   owner = "root";
                   group = "root";
                 };
+                age.secrets.attic-netrc = {
+                  file = "${dotfiles-secrets}/attic-netrc.age";
+                  mode = "0400";
+                };
                 age.identityPaths = [ "/home/${specialArgs.username}/.ssh/id_ed25519" ];
               }
             )
@@ -431,6 +444,10 @@
                   mode = "400";
                   owner = "root";
                   group = "root";
+                };
+                age.secrets.attic-netrc = {
+                  file = "${dotfiles-secrets}/attic-netrc.age";
+                  mode = "0400";
                 };
                 age.identityPaths = [ "/home/${specialArgs.username}/.ssh/id_rsa" ];
               }
@@ -485,6 +502,10 @@
                   mode = "0400";
                   owner = specialArgs.username;
                 };
+                age.secrets.attic-netrc = {
+                  file = "${dotfiles-secrets}/attic-netrc.age";
+                  mode = "0400";
+                };
               }
             )
             lanzaboote.nixosModules.lanzaboote
@@ -523,6 +544,15 @@
               }
             )
             agenix.darwinModules.default
+            (
+              { ... }:
+              {
+                age.secrets.attic-netrc = {
+                  file = "${dotfiles-secrets}/attic-netrc.age";
+                  mode = "0400";
+                };
+              }
+            )
             {
               # Standard linux-builder (used for initial bootstrap, now replaced by rosetta-builder)
               # nix.linux-builder.enable = true;

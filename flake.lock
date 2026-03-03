@@ -1981,11 +1981,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1772526294,
-        "narHash": "sha256-OdcYZHMg56c6s2PvE6KCnke+RuiJljqbaFbNV5Bjf8Y=",
+        "lastModified": 1772529685,
+        "narHash": "sha256-HkTIJBSsKgezhY5GmTO0Ztqaf7MmZDGvbg5IuszV9mY=",
         "owner": "joegoldin",
         "repo": "nix-attic-infra",
-        "rev": "68bb10bb8f2abae4ea74f54906ac8f96c0cd4a66",
+        "rev": "b46ab187300ef13590d45d506f5a90ddbb240cd6",
         "type": "github"
       },
       "original": {
