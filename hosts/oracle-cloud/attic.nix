@@ -5,6 +5,8 @@
 #
 # Then create atticd.env with:
 #   ATTIC_SERVER_TOKEN_RS256_SECRET_BASE64="<output from above>"
+#   AWS_ACCESS_KEY_ID="<B2 application key ID>"
+#   AWS_SECRET_ACCESS_KEY="<B2 application key>"
 #
 # Encrypt it with agenix:
 #   agenix -e secrets/atticd.env.age
@@ -21,6 +23,7 @@
 }:
 let
   domains = import "${dotfiles-secrets}/domains.nix";
+  b2 = import "${dotfiles-secrets}/b2.nix";
 in
 {
   services.atticd = {
@@ -39,6 +42,11 @@ in
         min-size = 16 * 1024; # 16 KiB
         avg-size = 64 * 1024; # 64 KiB
         max-size = 256 * 1024; # 256 KiB
+      };
+
+      storage = {
+        type = "s3";
+        inherit (b2) region bucket endpoint;
       };
 
       compression = {
