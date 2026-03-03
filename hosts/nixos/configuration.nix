@@ -70,8 +70,7 @@ in
         trusted-users = [ "${username}" ];
         auto-optimise-store = false;
         builders-use-substitutes = true;
-        extra-substituters = [ ];
-        extra-trusted-public-keys = [ ];
+
       };
 
       gc = {

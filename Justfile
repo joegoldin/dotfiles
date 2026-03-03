@@ -30,7 +30,7 @@ flake-update:
 [macos]
 build: system-info _check-maintenance
     @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
-     nh darwin switch .
+     nh darwin switch . --accept-flake-config
 
 [linux]
 build: system-info _check-maintenance
@@ -49,21 +49,21 @@ build: system-info _check-maintenance
 _build-wsl:
     @echo "🔨  Building for WSL 🪟..."
     @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
-     nh os switch . -H joe-wsl
+     nh os switch . -H joe-wsl --accept-flake-config
     @echo "✅  Built for WSL!"
 
 [private]
 _build-bastion:
     @echo "🔨  Building for Oracle Cloud bastion 🐧..."
     @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
-     nh os switch . -H oracle-cloud-bastion
+     nh os switch . -H oracle-cloud-bastion --accept-flake-config
     @echo "✅  Built for Oracle Cloud!"
 
 [private]
 _build-nixos:
     @echo "🔨  Building for NixOS desktop 🐧..."
     @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
-     nh os switch . -H joe-desktop
+     nh os switch . -H joe-desktop --accept-flake-config
     @echo "✅  Built for NixOS!"
 
 # ── macOS-specific ───────────────────────────────────────────────────────
@@ -98,7 +98,7 @@ deploy-racknerd IP:
 rebuild-racknerd:
     @echo "🔨  Rebuilding NixOS on RackNerd VPS..."
     @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
-     nh os switch . -H racknerd-cloud-agent
+     nh os switch . -H racknerd-cloud-agent --accept-flake-config
     @echo "✅  Rebuilt RackNerd VPS!"
 
 # ── Package management ───────────────────────────────────────────────────

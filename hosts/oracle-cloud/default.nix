@@ -2,6 +2,7 @@
 { ... }:
 {
   imports = [
+    ../common/system/attic-substituter.nix
     ./attic.nix
     ./configuration.nix
     ./disk-config.nix
