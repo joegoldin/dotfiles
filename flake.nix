@@ -61,6 +61,12 @@
       url = "github:zhaofengli/attic?rev=12cbeca141f46e1ade76728bce8adc447f2166c6";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # attic infrastructure (client modules, post-build hooks)
+    nix-attic-infra = {
+      url = "github:joegoldin/nix-attic-infra";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.attic.follows = "attic";
+    };
 
     # ── Nix utilities ──────────────────────────────────────────────────────
     flake-utils.url = "github:numtide/flake-utils?ref=v1.0.0";

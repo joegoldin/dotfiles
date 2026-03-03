@@ -23,7 +23,7 @@
 }:
 let
   domains = import "${dotfiles-secrets}/domains.nix";
-  b2 = import "${dotfiles-secrets}/b2.nix";
+  attic = import "${dotfiles-secrets}/attic.nix";
 in
 {
   services.atticd = {
@@ -46,7 +46,7 @@ in
 
       storage = {
         type = "s3";
-        inherit (b2) region bucket endpoint;
+        inherit (attic.b2) region bucket endpoint;
       };
 
       compression = {
