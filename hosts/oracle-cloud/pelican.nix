@@ -11,6 +11,7 @@
 }:
 let
   domains = import "${dotfiles-secrets}/domains.nix";
+  panelCfg = config.services.pelican.panel;
 in
 {
   # Fix missing group for redis
@@ -21,16 +22,24 @@ in
     pelican-panel-setup = {
       after = [ "agenix.service" ];
       wants = [ "agenix.service" ];
+      # Re-add dependencies lost by enableNginx = false
+      requiredBy = [ "phpfpm-pelican-panel.service" ];
+      before = [ "phpfpm-pelican-panel.service" ];
     };
     pelican-wings-setup = {
       after = [ "agenix.service" ];
       wants = [ "agenix.service" ];
+    };
+    phpfpm-pelican-panel = {
+      requires = [ "pelican-panel-setup.service" ];
     };
   };
 
   # PANEL - Game server management web interface
   services.pelican.panel = {
     enable = true;
+    enableNginx = false;
+    group = "caddy";
     app = {
       url = "https://${domains.pelicanDomain}";
       # Generate with: echo "base64:$(openssl rand -base64 32)"
@@ -38,6 +47,35 @@ in
     };
     database.passwordFile = config.age.secrets.pelican-db-password.path;
     redis.passwordFile = config.age.secrets.pelican-redis-password.path;
+  };
+
+  # PHP-FPM pool for Pelican Panel (replaces the one from enableNginx)
+  services.phpfpm.pools.pelican-panel = {
+    user = panelCfg.user;
+    group = "caddy";
+    phpPackage = panelCfg.phpPackage;
+    settings = {
+      "listen.owner" = "caddy";
+      "listen.group" = "caddy";
+      "pm" = "dynamic";
+      "pm.max_children" = 5;
+      "pm.start_servers" = 2;
+      "pm.min_spare_servers" = 1;
+      "pm.max_spare_servers" = 3;
+    };
+  };
+
+  # Caddy reverse proxy for Pelican Panel
+  services.caddy.virtualHosts."${domains.pelicanDomain}" = {
+    extraConfig = ''
+      root * ${panelCfg.package}/public
+      php_fastcgi unix/${config.services.phpfpm.pools.pelican-panel.socket}
+      file_server
+      encode gzip
+      request_body {
+        max_size 100MB
+      }
+    '';
   };
 
   # WINGS - Game server daemon (runs containers)
