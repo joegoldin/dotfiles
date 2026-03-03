@@ -106,6 +106,7 @@ in
     };
   };
   users.extraGroups.docker.members = [ "${username}" ];
+  users.extraGroups.kvm.members = [ "${username}" ];
 
   # Enable XDG desktop portal for better application integration
   xdg.portal = {
