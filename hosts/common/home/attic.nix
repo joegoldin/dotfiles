@@ -6,6 +6,7 @@ in
 {
   programs.attic-client = {
     enable = true;
+    defaultServer = "default-server";
     servers.default-server = {
       endpoint = "https://${domains.atticDomain}/";
       tokenPath = "/run/agenix/attic-token";
