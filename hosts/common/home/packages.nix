@@ -15,6 +15,7 @@ let
       act
       # audiomemo is managed by programs.audiomemo
       aria2 # A lightweight multi-protocol & multi-source command-line download utility
+      attic-client
       unstable.asciinema_3
       aws-cli
       bc
