@@ -11,6 +11,7 @@
 }:
 {
   imports = [
+    ../common/system/attic-substituter.nix
     ./system.nix
     ./apps.nix
     ./homebrew.nix
@@ -47,8 +48,7 @@
         nix-path = config.nix.nixPath;
         trusted-users = [ "${username}" ];
         auto-optimise-store = false;
-        extra-substituters = [ ];
-        extra-trusted-public-keys = [ ];
+
         # Enable building for x86_64-darwin on aarch64-darwin
         extra-platforms = [
           "x86_64-darwin"

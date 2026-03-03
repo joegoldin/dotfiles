@@ -81,8 +81,7 @@ in
         nix-path = config.nix.nixPath;
         trusted-users = [ "${username}" ];
         auto-optimise-store = false;
-        extra-substituters = [ ];
-        extra-trusted-public-keys = [ ];
+
       };
 
       gc = {
