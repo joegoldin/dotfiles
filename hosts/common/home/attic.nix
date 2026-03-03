@@ -1,13 +1,15 @@
 { dotfiles-secrets, ... }:
 let
   domains = import "${dotfiles-secrets}/domains.nix";
+  attic = import "${dotfiles-secrets}/attic.nix";
 in
 {
-  xdg.configFile."attic/config.toml".text = ''
-    default-server = "default-server"
-
-    [servers.default-server]
-    endpoint = "https://${domains.atticDomain}/"
-    token-file = "/run/agenix/attic-token"
-  '';
+  programs.attic-client = {
+    enable = true;
+    servers.default-server = {
+      endpoint = "https://${domains.atticDomain}/";
+      tokenPath = "/run/agenix/attic-token";
+      aliases = [ attic.cacheName ];
+    };
+  };
 }
