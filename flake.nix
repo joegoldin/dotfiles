@@ -58,7 +58,7 @@
     # ── Server services ────────────────────────────────────────────────────
     # binary cache server
     attic = {
-      url = "github:zhaofengli/attic?rev=12cbeca141f46e1ade76728bce8adc447f2166c6";
+      url = "github:joegoldin/attic";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # attic infrastructure (client modules, post-build hooks)
