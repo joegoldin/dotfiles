@@ -5,8 +5,8 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "joegoldin";
       repo = "StreamController";
-      rev = "5fb2d843cf489e759d856b2745890c15b7fc76d8";
-      hash = "sha256-279Tjvax7uZdwPRzDxT5YyQgcEMNUZyaUVb94jfloG4=";
+      rev = "df9cf30429b223fc50dda6b5de5317c63a67c782";
+      hash = "sha256-lFxjmZW7Dvj287RiYRdUZgZxSr7Sa5sStyKUu7uYlyg=";
     };
     nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
     postFixup = (old.postFixup or "") + ''
@@ -16,6 +16,11 @@ let
   });
 
   startupScript = pkgs.writeShellScript "streamcontroller-autostart" ''
+    if ${pkgs.procps}/bin/pgrep -x StreamController >/dev/null 2>&1; then
+      echo "StreamController is already running, skipping."
+      exit 0
+    fi
+
     echo "Waiting for PulseMeeter service to complete..."
     for i in $(seq 1 60); do
       if ${pkgs.systemd}/bin/systemctl --user is-active audio-app-autostart.service &>/dev/null; then
