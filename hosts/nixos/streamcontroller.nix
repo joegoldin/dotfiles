@@ -5,8 +5,8 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "joegoldin";
       repo = "StreamController";
-      rev = "3eaac6e95c7cb0a8b43e3114548f0e2458627b8c";
-      hash = "sha256-dM44RfzjsxOOeZ/Evn6gfTVrOqd6wJNfpUOkL7RnPrU=";
+      rev = "b55103dd4140b618e3b2bbe982bd688f348bd4e4";
+      hash = "sha256-+u7GforxicucO6Tit8Hk/6Bbtz7PwrJDFKxpVwxxawg=";
     };
     nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
     postFixup = (old.postFixup or "") + ''
