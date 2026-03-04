@@ -90,7 +90,7 @@
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.7.0";
     # pre-built nix-index database
     nix-index-database = {
-      url = "github:nix-community/nix-index-database?rev=8f590b832326ab9699444f3a48240595954a4b10";
+      url = "github:nix-community/nix-index-database?rev=a2051ff239ce2e8a0148fa7a152903d9a78e854f";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # fast x86_64-linux builds on Apple Silicon
@@ -100,23 +100,23 @@
     };
 
     # ── Development tools ──────────────────────────────────────────────────
-    devenv.url = "github:cachix/devenv?ref=v1.11.2";
-    nixpkgs-python.url = "github:cachix/nixpkgs-python?rev=2571ebc7280fea24ae8827c33f0a644ae515efe2";
+    devenv.url = "github:cachix/devenv?ref=v2.0.1";
+    nixpkgs-python.url = "github:cachix/nixpkgs-python?rev=188ffc273f679a2d95a1c8aba0be083545417bdd";
     git-hooks.url = "github:cachix/git-hooks.nix?rev=6e34e97ed9788b17796ee43ccdbaf871a5c2b476";
 
     # ── Desktop / NixOS applications ───────────────────────────────────────
     # affinity apps
     affinity-nix = {
-      url = "github:mrshmllow/affinity-nix?rev=a3ca1400d98ad66b18cc8eb3fc183b90dcb9469b";
+      url = "github:mrshmllow/affinity-nix?rev=cd7bed5b72ceeb50b862c550cc16c6f1b11a2d84";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Ghostty terminal
-    ghostty.url = "github:ghostty-org/ghostty?rev=99311e8c2702d3541d14096c1c140d1808246673";
+    ghostty.url = "github:ghostty-org/ghostty?rev=619e33a4febec871c0d655f51d85e7f5f21ba289";
     # Zed editor (built from source via flake)
-    zed-editor.url = "github:zed-industries/zed?ref=v0.226.1-pre";
+    zed-editor.url = "github:zed-industries/zed?ref=v0.226.4-pre";
     # KDE configuration
     plasma-manager = {
-      url = "github:nix-community/plasma-manager?rev=44b928068359b7d2310a34de39555c63c93a2c90";
+      url = "github:nix-community/plasma-manager?rev=a4b33606111c9c5dcd10009042bb710307174f51";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
@@ -124,7 +124,7 @@
     # ── Claude / LLM tooling ───────────────────────────────────────────────
     # Claude Desktop for Linux
     claude-desktop-debian = {
-      url = "github:aaddrick/claude-desktop-debian?rev=2706698b2b71eb8d1d2ddb54958d98617a016eb1";
+      url = "github:aaddrick/claude-desktop-debian?rev=a0456a4972069470cb31cd3d1ab945463ded07a7";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Claude Code configuration library
@@ -133,7 +133,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, gemini-cli)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=75c53b1158f4674bcaf610cc897fdf17053125a1";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=705bb4900230a4e7bdd42bd8f34cb3a4558e593b";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
