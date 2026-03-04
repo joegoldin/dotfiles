@@ -66,7 +66,7 @@ in
   };
 
   # Caddy reverse proxy for Pelican Panel
-  services.caddy.virtualHosts."${domains.pelicanDomain}" = {
+  services.caddy.virtualHosts."http://${domains.pelicanDomain}" = {
     extraConfig = ''
       root * ${panelCfg.package}/public
       php_fastcgi unix/${config.services.phpfpm.pools.pelican-panel.socket}
