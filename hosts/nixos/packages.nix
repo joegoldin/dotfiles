@@ -1,6 +1,7 @@
 {
   pkgs,
   lib,
+  affinity-nix,
   ...
 }:
 let
@@ -13,23 +14,22 @@ in
   home.packages =
     with pkgs;
     lib.optionals pkgs.stdenv.hostPlatform.isx86_64 [
-      # affinity-nix.packages.x86_64-linux.photo
+      affinity-nix.packages.x86_64-linux.v3
       unstable.android-studio-full
       unstable.calcurse
       chromedriver
       goModule.packages.claude-squad
       claude-desktop-fhs
       unstable.cloudflared
-      #      unstable.davinci-resolve
+      unstable.darktable
+      unstable.davinci-resolve
       unstable.discord
       docker-buildx
       unstable.dumbpipe
-      # extraterm
-      # ghostty is managed by programs.ghostty in ghostty.nix
       inotify-tools
-      # unstable.jellyfin-media-player
-      #      cargoModule.packages.litra
-      #      cargoModule.packages.litra-autotoggle
+      unstable.jellyfin-desktop
+      # cargoModule.packages.litra
+      # cargoModule.packages.litra-autotoggle
       localsend
       lotion
       unstable.obsidian

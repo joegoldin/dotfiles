@@ -130,7 +130,7 @@
     casks = [
       "1password"
       "1password-cli"
-      "adobe-creative-cloud"
+      "affinity"
       "android-platform-tools"
       "android-studio"
       "autodesk-fusion"
