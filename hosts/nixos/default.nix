@@ -11,5 +11,6 @@
     ./joe-desktop.nix
     ./wallpaper.nix
     ./app-autostart.nix
+    ./mounts.nix
   ];
 }
