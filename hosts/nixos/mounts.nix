@@ -12,10 +12,8 @@ let
     "uid=1000"
     "gid=100"
     "nofail"
-    "automount"
+    "noauto"
     "_netdev"
-    "x-systemd.automount"
-    "x-systemd.idle-timeout=600"
     "x-systemd.device-timeout=5s"
     "x-systemd.mount-timeout=5s"
   ];
@@ -26,6 +24,14 @@ let
       device = "${mountsCfg.serverAddress}/${share.name}";
       fsType = "cifs";
       options = smbOpts;
+    };
+  };
+
+  mkAutomount = share: {
+    where = share.mountPoint;
+    wantedBy = [ "multi-user.target" ];
+    automountConfig = {
+      TimeoutIdleSec = "600";
     };
   };
 in
@@ -39,4 +45,5 @@ in
   };
 
   fileSystems = builtins.listToAttrs (map mkMount mountsCfg.shares);
+  systemd.automounts = map mkAutomount mountsCfg.shares;
 }
