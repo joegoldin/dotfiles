@@ -15,7 +15,6 @@ in
     with pkgs;
     lib.optionals pkgs.stdenv.hostPlatform.isx86_64 [
       affinity-nix.packages.x86_64-linux.v3
-      unstable.android-studio
       unstable.calcurse
       chromedriver
       goModule.packages.claude-squad

@@ -3,6 +3,7 @@
   imports = [
     ../common/home
     ../common/home/firefox
+    ./android.nix
     ./packages.nix
     ./ghostty.nix
     ../common/home/zed.nix
