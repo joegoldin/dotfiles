@@ -44,26 +44,6 @@
         "dmask=0077"
       ];
     };
-
-    "/mnt/windows" = {
-      device = "/dev/nvme0n1p3";
-      fsType = "ntfs-3g";
-      options = [
-        "rw"
-        "uid=1000"
-        "nofail"
-      ];
-    };
-
-    "/mnt/windows-2" = {
-      device = "/dev/nvme4n1p2";
-      fsType = "ntfs-3g";
-      options = [
-        "rw"
-        "uid=1000"
-        "nofail"
-      ];
-    };
   };
 
   swapDevices = [ ];
