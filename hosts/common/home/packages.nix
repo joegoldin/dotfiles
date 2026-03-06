@@ -32,6 +32,7 @@ let
       cowsay
       unstable.devenv
       direnv
+      dua
       elixir_1_18
       (lib.lowPrio erlang_27)
       file
