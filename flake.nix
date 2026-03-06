@@ -100,9 +100,9 @@
     };
 
     # ── Development tools ──────────────────────────────────────────────────
-    devenv.url = "github:cachix/devenv?ref=v2.0.1";
+    devenv.url = "github:cachix/devenv?ref=v2.0.3";
     nixpkgs-python.url = "github:cachix/nixpkgs-python?rev=188ffc273f679a2d95a1c8aba0be083545417bdd";
-    git-hooks.url = "github:cachix/git-hooks.nix?rev=6e34e97ed9788b17796ee43ccdbaf871a5c2b476";
+    git-hooks.url = "github:cachix/git-hooks.nix?rev=39f53203a8458c330f61cc0759fe243f0ac0d198";
 
     # ── Desktop / NixOS applications ───────────────────────────────────────
     # affinity apps
@@ -111,9 +111,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Ghostty terminal
-    ghostty.url = "github:ghostty-org/ghostty?rev=619e33a4febec871c0d655f51d85e7f5f21ba289";
+    ghostty.url = "github:ghostty-org/ghostty?rev=055ed28580e140f2a21b752946349750b963a7aa";
     # Zed editor (built from source via flake)
-    zed-editor.url = "github:zed-industries/zed?ref=v0.226.4-pre";
+    zed-editor.url = "github:zed-industries/zed?ref=v0.227.1-pre";
     # KDE configuration
     plasma-manager = {
       url = "github:nix-community/plasma-manager?rev=a4b33606111c9c5dcd10009042bb710307174f51";
@@ -124,7 +124,7 @@
     # ── Claude / LLM tooling ───────────────────────────────────────────────
     # Claude Desktop for Linux
     claude-desktop-debian = {
-      url = "github:aaddrick/claude-desktop-debian?rev=a0456a4972069470cb31cd3d1ab945463ded07a7";
+      url = "github:aaddrick/claude-desktop-debian?rev=c31329e3da7ef8daa2cf14f75e390f3aabee1c53";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Claude Code configuration library
@@ -133,7 +133,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, gemini-cli)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=705bb4900230a4e7bdd42bd8f34cb3a4558e593b";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=a90b7a43af62a0732c7aba479fd493c777956aa0";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
