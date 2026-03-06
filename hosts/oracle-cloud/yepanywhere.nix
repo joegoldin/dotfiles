@@ -1,4 +1,4 @@
-# YepAnywhere relay server on bastion (behind Cloudflare tunnel)
+# YepAnywhere relay server on bastion with Caddy HTTPS
 {
   dotfiles-secrets,
   ...
@@ -16,8 +16,8 @@ in
     port = 4400;
   };
 
-  # Caddy reverse proxy + config endpoint
-  services.caddy.virtualHosts."http://${yepRelayDomain}" = {
+  # Caddy with automatic HTTPS (Let's Encrypt)
+  services.caddy.virtualHosts.${yepRelayDomain} = {
     extraConfig = ''
       # Config endpoint for relay discovery
       handle /api/config {
@@ -37,4 +37,10 @@ in
       reverse_proxy localhost:${internalPort}
     '';
   };
+
+  # Open ports for HTTPS and ACME challenge
+  networking.firewall.allowedTCPPorts = [
+    80
+    443
+  ];
 }
