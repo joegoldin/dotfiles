@@ -8,6 +8,7 @@
   pnpmConfigHook,
   python3,
   makeWrapper,
+  nodePackages,
 }:
 
 let
@@ -29,6 +30,7 @@ stdenv.mkDerivation {
     pnpm_9
     pnpmConfigHook
     python3 # needed by node-gyp for better-sqlite3
+    nodePackages.node-gyp
     makeWrapper
   ];
 
@@ -41,7 +43,12 @@ stdenv.mkDerivation {
 
   buildPhase = ''
     runHook preBuild
-    pnpm rebuild better-sqlite3
+
+    # Build better-sqlite3 native addon (pnpm install skips scripts in offline mode)
+    pushd node_modules/.pnpm/better-sqlite3@11.10.0/node_modules/better-sqlite3
+    node-gyp rebuild
+    popd
+
     pnpm --filter @yep-anywhere/shared build
     pnpm --filter @yep-anywhere/relay build
     runHook postBuild
