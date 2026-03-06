@@ -23,6 +23,7 @@
       "elisp"
       "elixir"
       "erlang"
+      "fish"
       "git-firefly"
       "groovy"
       "helm"

@@ -12,5 +12,6 @@
     ./wallpaper.nix
     ./app-autostart.nix
     ./mounts.nix
+    ./data-drives.nix
   ];
 }
