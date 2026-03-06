@@ -28,7 +28,6 @@ let
       clojure
       codex
       comma
-      happy-cli
       coreutils
       cowsay
       unstable.devenv
@@ -108,6 +107,7 @@ let
       xdg-utils
       xz
       unstable.yarn-berry_3
+      yepanywhere
       yq-go # yaml processer https://github.com/mikefarah/yq
       yt-dlp
       zellij

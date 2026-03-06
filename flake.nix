@@ -439,12 +439,6 @@
             (
               { specialArgs, ... }:
               {
-                age.secrets.happy-secrets = {
-                  file = "${dotfiles-secrets}/happy-secrets.env.age";
-                  mode = "400";
-                  owner = "root";
-                  group = "root";
-                };
                 age.secrets.attic-netrc = {
                   file = "${dotfiles-secrets}/attic-netrc.age";
                   mode = "0400";

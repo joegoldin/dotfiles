@@ -334,11 +334,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1772173962,
-        "narHash": "sha256-gTGPa5dTkUoDvgDALb+1DtF0/B55WSwSfJ8PYWYbr1A=",
+        "lastModified": 1772788562,
+        "narHash": "sha256-ptndDxbjT14JY/RsRKJm2JzbH2mkgDH3VSpnMg6YO0s=",
         "ref": "refs/heads/main",
-        "rev": "589ec0e49407347c42d06da9eec2ea7f7319d731",
-        "revCount": 140,
+        "rev": "27b50703d2b19555201424093bad4702eceb2ca5",
+        "revCount": 154,
         "type": "git",
         "url": "file:///home/joe/Development/claude-container"
       },
