@@ -15,6 +15,7 @@ in
 
   # ssh with 1password
   environment.plasma6.excludePackages = with pkgs.kdePackages; [
+    discover
     elisa
     kate
   ];
