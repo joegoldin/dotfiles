@@ -69,5 +69,6 @@ pkgs: {
     electron = pkgs.electron_37;
   };
 
-  happy-cli = pkgs.callPackage ./happy-cli { };
+  yepanywhere = pkgs.callPackage ./yepanywhere { };
+  yepanywhere-relay = pkgs.callPackage ./yepanywhere-relay { };
 }

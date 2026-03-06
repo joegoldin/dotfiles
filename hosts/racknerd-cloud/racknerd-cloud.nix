@@ -29,14 +29,9 @@
   # RackNerd VPS doesn't have its own firewall, so we need to use NixOS firewall
   networking.firewall = {
     enable = true;
-    # Allow SSH, HTTP (for ACME/Let's Encrypt), HTTPS, and Happy Server HTTPS on 3006
     allowedTCPPorts = [
       22
-      80
-      443
-      3006
     ];
-    # Allow Tailscale and Docker bridge
     trustedInterfaces = [
       "tailscale0"
       "docker0"
