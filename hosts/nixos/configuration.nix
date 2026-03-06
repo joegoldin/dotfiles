@@ -158,6 +158,11 @@ in
     };
   };
 
+  services.locate = {
+    enable = true;
+    localuser = null;
+  };
+
   services.udev.packages = [
     litra-rules
     streamcontroller-rules
