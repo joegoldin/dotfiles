@@ -51,8 +51,8 @@ stdenv.mkDerivation {
 
     mkdir -p $out/lib/yepanywhere-relay $out/bin
 
-    cp -r packages/shared $out/lib/yepanywhere-relay/
-    cp -r packages/relay $out/lib/yepanywhere-relay/
+    # Copy full monorepo layout so pnpm workspace symlinks resolve
+    cp -r packages $out/lib/yepanywhere-relay/
     cp -r node_modules $out/lib/yepanywhere-relay/
     cp package.json $out/lib/yepanywhere-relay/
 
