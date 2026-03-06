@@ -25,7 +25,15 @@ in
         respond `{"relay":{"servers":[{"url":"wss://${yepRelayDomain}","region":"us"}],"minVersion":"0.3.0","maxVersion":null}}` 200
       }
 
-      # Proxy everything else to the relay server
+      # Rewrite root WebSocket upgrades to /ws for the relay
+      @websocket_root {
+        path /
+        header Connection *Upgrade*
+        header Upgrade websocket
+      }
+      rewrite @websocket_root /ws
+
+      # Proxy everything to the relay server
       reverse_proxy localhost:${internalPort}
     '';
   };
