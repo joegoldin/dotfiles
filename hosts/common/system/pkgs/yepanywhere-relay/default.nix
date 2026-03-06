@@ -41,6 +41,7 @@ stdenv.mkDerivation {
 
   buildPhase = ''
     runHook preBuild
+    pnpm rebuild better-sqlite3
     pnpm --filter @yep-anywhere/shared build
     pnpm --filter @yep-anywhere/relay build
     runHook postBuild
