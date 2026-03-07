@@ -100,6 +100,7 @@ let
       unstable.just
       unzip
       uv
+      uxplay
       vhs
       watch
       wget
