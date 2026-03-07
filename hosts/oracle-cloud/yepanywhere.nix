@@ -31,7 +31,7 @@ in
       handle_path /remote/* {
         root * ${yepanywhere-remote}
         file_server
-        try_files {path} /index.html
+        try_files {path} /remote.html
       }
 
       # Rewrite root WebSocket upgrades to /ws for the relay
