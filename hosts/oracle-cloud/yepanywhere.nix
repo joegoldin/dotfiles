@@ -8,7 +8,9 @@ let
   domains = import "${dotfiles-secrets}/domains.nix";
   yepRelayDomain = domains.yepRelayDomain;
   internalPort = "4400";
-  yepanywhere-remote = pkgs.callPackage ../common/system/pkgs/yepanywhere-remote { };
+  yepanywhere-remote = pkgs.callPackage ../common/system/pkgs/yepanywhere-remote {
+    defaultRelayUrl = "wss://${yepRelayDomain}/ws";
+  };
 in
 {
   imports = [ ../common/system/pkgs/yepanywhere-relay/module.nix ];
