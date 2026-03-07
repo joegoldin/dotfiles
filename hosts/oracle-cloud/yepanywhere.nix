@@ -23,6 +23,12 @@ in
   # Caddy with automatic HTTPS (Let's Encrypt)
   services.caddy.virtualHosts.${yepRelayDomain} = {
     extraConfig = ''
+      # Structured access logging for fail2ban
+      log {
+        output file /var/log/caddy/yep-access.log
+        format json
+      }
+
       # Config endpoint for relay discovery
       handle /api/config {
         header Content-Type application/json
@@ -60,6 +66,41 @@ in
       }
     '';
   };
+
+  # fail2ban for rate limiting repeated WebSocket connection attempts
+  services.fail2ban = {
+    enable = true;
+    bantime = "1h";
+    bantime-increment = {
+      enable = true;
+      maxtime = "24h";
+    };
+    jails = {
+      yep-relay = {
+        settings = {
+          enabled = true;
+          filter = "yep-relay";
+          backend = "auto";
+          logpath = "/var/log/caddy/yep-access.log";
+          maxretry = 20;
+          findtime = 60;
+          bantime = 3600;
+        };
+      };
+    };
+  };
+
+  # fail2ban filter: match rapid WebSocket upgrade requests
+  environment.etc."fail2ban/filter.d/yep-relay.conf".text = ''
+    [Definition]
+    failregex = ^.*"request":\{[^}]*"client_ip":"<HOST>".*"uri":"/ws".*$
+    ignoreregex =
+  '';
+
+  # Ensure log directory exists
+  systemd.tmpfiles.rules = [
+    "d /var/log/caddy 0755 caddy caddy -"
+  ];
 
   # Open ports for HTTPS and ACME challenge
   networking.firewall.allowedTCPPorts = [
