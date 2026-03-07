@@ -27,23 +27,27 @@ in
         respond `{"relay":{"servers":[{"url":"wss://${yepRelayDomain}","region":"us"}],"minVersion":"0.3.0","maxVersion":null}}` 200
       }
 
-      # Remote client static UI
-      handle_path /remote/* {
+      # WebSocket traffic goes to the relay
+      @websocket {
+        header Connection *Upgrade*
+        header Upgrade websocket
+      }
+      handle @websocket {
+        rewrite / /ws
+        reverse_proxy localhost:${internalPort}
+      }
+
+      # Relay API endpoints
+      handle /ws {
+        reverse_proxy localhost:${internalPort}
+      }
+
+      # Everything else serves the remote client UI
+      handle {
         root * ${yepanywhere-remote}
         file_server
         try_files {path} /remote.html
       }
-
-      # Rewrite root WebSocket upgrades to /ws for the relay
-      @websocket_root {
-        path /
-        header Connection *Upgrade*
-        header Upgrade websocket
-      }
-      rewrite @websocket_root /ws
-
-      # Proxy everything to the relay server
-      reverse_proxy localhost:${internalPort}
     '';
   };
 
