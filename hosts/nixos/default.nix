@@ -13,6 +13,6 @@
     ./app-autostart.nix
     ./mounts.nix
     ./yepanywhere.nix
-    ./data-drives.nix
+    # ./data-drives.nix
   ];
 }

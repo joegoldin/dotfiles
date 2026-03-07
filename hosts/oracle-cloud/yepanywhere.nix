@@ -1,5 +1,6 @@
 # YepAnywhere relay server on bastion with Caddy HTTPS
 {
+  pkgs,
   dotfiles-secrets,
   ...
 }:
@@ -7,6 +8,7 @@ let
   domains = import "${dotfiles-secrets}/domains.nix";
   yepRelayDomain = domains.yepRelayDomain;
   internalPort = "4400";
+  yepanywhere-remote = pkgs.callPackage ../common/system/pkgs/yepanywhere-remote { };
 in
 {
   imports = [ ../common/system/pkgs/yepanywhere-relay/module.nix ];
@@ -23,6 +25,13 @@ in
       handle /api/config {
         header Content-Type application/json
         respond `{"relay":{"servers":[{"url":"wss://${yepRelayDomain}","region":"us"}],"minVersion":"0.3.0","maxVersion":null}}` 200
+      }
+
+      # Remote client static UI
+      handle_path /remote/* {
+        root * ${yepanywhere-remote}
+        file_server
+        try_files {path} /index.html
       }
 
       # Rewrite root WebSocket upgrades to /ws for the relay
