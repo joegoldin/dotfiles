@@ -34,7 +34,6 @@ in
 {
   system.stateVersion = "${stateVersion}";
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-  time.timeZone = "America/Los_Angeles";
 
   # Lanzaboote replaces systemd-boot for secure boot
   boot = {
