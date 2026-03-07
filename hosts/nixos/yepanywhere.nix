@@ -18,16 +18,17 @@ in
   };
 
   # Copy agenix-decrypted secrets to ~/.yep-anywhere/ on activation
-  home-manager.users.${username} = {
-    home.activation.yepanywhereConfig =
-      { lib, ... }:
-      lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        mkdir -p ${yepConfigDir}
-        cp /run/agenix/yep-remote-access-json ${yepConfigDir}/remote-access.json
-        chmod 600 ${yepConfigDir}/remote-access.json
-        echo '{"complete":true}' > ${yepConfigDir}/onboarding.json
-      '';
-  };
+  home-manager.users.${username} =
+    { lib, ... }:
+    {
+      home.activation.yepanywhereConfig =
+        lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          mkdir -p ${yepConfigDir}
+          cp /run/agenix/yep-remote-access-json ${yepConfigDir}/remote-access.json
+          chmod 600 ${yepConfigDir}/remote-access.json
+          echo '{"complete":true}' > ${yepConfigDir}/onboarding.json
+        '';
+    };
 
   systemd.services.yepanywhere = {
     description = "YepAnywhere client";
