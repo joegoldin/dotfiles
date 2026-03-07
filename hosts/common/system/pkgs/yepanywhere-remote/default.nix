@@ -38,7 +38,13 @@ stdenv.mkDerivation {
   buildPhase = ''
     runHook preBuild
     pnpm --filter @yep-anywhere/shared build
-    pnpm --filter @yep-anywhere/client build:remote -- --base /remote/
+
+    # Build remote client with /remote/ base path so asset URLs are correct
+    pushd packages/client
+    pnpm exec tsc
+    pnpm exec vite build --config vite.config.remote.ts --base /remote/
+    popd
+
     runHook postBuild
   '';
 
