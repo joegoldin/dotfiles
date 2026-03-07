@@ -6,6 +6,7 @@
   nodejs,
   pnpm_9,
   pnpmConfigHook,
+  defaultRelayUrl ? "wss://relay.yepanywhere.com/ws",
 }:
 
 let
@@ -38,6 +39,10 @@ stdenv.mkDerivation {
   buildPhase = ''
     runHook preBuild
     pnpm --filter @yep-anywhere/shared build
+
+    # Patch default relay URL
+    substituteInPlace packages/client/src/pages/RelayLoginPage.tsx \
+      --replace-fail 'wss://relay.yepanywhere.com/ws' '${defaultRelayUrl}'
 
     pushd packages/client
     pnpm exec tsc
