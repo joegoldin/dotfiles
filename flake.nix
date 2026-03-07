@@ -133,7 +133,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, gemini-cli)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=a90b7a43af62a0732c7aba479fd493c777956aa0";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=856b24f862d0a19b7764f35ee9a7546309e605a0";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
