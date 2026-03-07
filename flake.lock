@@ -371,11 +371,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1772788562,
-        "narHash": "sha256-ptndDxbjT14JY/RsRKJm2JzbH2mkgDH3VSpnMg6YO0s=",
+        "lastModified": 1772874939,
+        "narHash": "sha256-ykl20OZmc1ITKVYDFbZh2kUln42LzAMukzL4oqCu0L0=",
         "ref": "refs/heads/main",
-        "rev": "27b50703d2b19555201424093bad4702eceb2ca5",
-        "revCount": 154,
+        "rev": "a8961966d881f43d60b4489aac5adcf0655457a9",
+        "revCount": 161,
         "type": "git",
         "url": "file:///home/joe/Development/claude-container"
       },
@@ -1947,17 +1947,17 @@
         "treefmt-nix": "treefmt-nix_4"
       },
       "locked": {
-        "lastModified": 1772806698,
-        "narHash": "sha256-hc6NZ0UlY5V1hHlrsCG+fJClReMJQCqW4SJ3Kq1SVK8=",
+        "lastModified": 1772864581,
+        "narHash": "sha256-+AiWgqbKkjU1W/S/U7ktSoScMa4+z9APtJx+3gEDcCQ=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "a90b7a43af62a0732c7aba479fd493c777956aa0",
+        "rev": "856b24f862d0a19b7764f35ee9a7546309e605a0",
         "type": "github"
       },
       "original": {
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "a90b7a43af62a0732c7aba479fd493c777956aa0",
+        "rev": "856b24f862d0a19b7764f35ee9a7546309e605a0",
         "type": "github"
       }
     },
