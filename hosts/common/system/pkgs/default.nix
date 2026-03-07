@@ -71,4 +71,5 @@ pkgs: {
 
   yepanywhere = pkgs.callPackage ./yepanywhere { };
   yepanywhere-relay = pkgs.callPackage ./yepanywhere-relay { };
+  yepanywhere-remote = pkgs.callPackage ./yepanywhere-remote { };
 }
