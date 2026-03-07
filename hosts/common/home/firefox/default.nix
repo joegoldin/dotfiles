@@ -382,8 +382,9 @@ in
         "browser.newtabpage.activity-stream.showSponsoredTopSites" = false;
 
         ### PRIVACY ###
-        "privacy.resistFingerprinting" = true;
+        "privacy.resistFingerprinting" = false;
         "privacy.fingerprintingProtection" = true;
+        "privacy.fingerprintingProtection.overrides" = "+AllTargets,-JSDateTimeUTC";
         "privacy.globalprivacycontrol.enabled" = true;
         "privacy.donottrackheader.enabled" = true;
         "browser.safebrowsing.downloads.remote.enabled" = false;
