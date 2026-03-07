@@ -29,6 +29,14 @@ in
         respond `{"relay":{"servers":[{"url":"wss://${yepRelayDomain}","region":"us"}],"minVersion":"0.3.0","maxVersion":null}}` 200
       }
 
+      # Block relay endpoints that leak connection info
+      handle /status {
+        respond 404
+      }
+      handle /online/* {
+        respond 404
+      }
+
       # WebSocket traffic goes to the relay
       @websocket {
         header Connection *Upgrade*
