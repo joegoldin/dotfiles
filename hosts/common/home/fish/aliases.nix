@@ -61,5 +61,7 @@ in
 
     k = mkIf hasKubectl "kubectl";
     lzd = mkIf hasLazydocker "lazydocker";
+
+    uxplay = "uxplay -p";
   };
 }
