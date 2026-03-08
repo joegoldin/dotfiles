@@ -162,17 +162,6 @@ in
     enable = true;
   };
 
-  services.avahi = {
-    enable = true;
-    nssmdns4 = true;
-    publish = {
-      enable = true;
-      addresses = true;
-      userServices = true;
-      workstation = true;
-    };
-  };
-
   services.udev.packages = [
     litra-rules
     streamcontroller-rules
