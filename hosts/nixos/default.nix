@@ -12,6 +12,7 @@
     ./wallpaper.nix
     ./app-autostart.nix
     ./mounts.nix
+    ./uxplay.nix
     ./yepanywhere.nix
     # ./data-drives.nix
   ];
