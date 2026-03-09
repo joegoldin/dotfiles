@@ -340,6 +340,15 @@ in
 
         # Disable Firefox AI features
         "browser.ml.enable" = false;
+        "browser.ml.chat.enabled" = false;
+        "browser.ml.chat.page.footerBadge" = false;
+        "browser.ml.chat.page.menuBadge" = false;
+        "browser.ml.chat.shortcuts" = false;
+        "browser.ml.chat.shortcuts.custom" = false;
+        "browser.ml.chat.sidebar" = false;
+        "browser.ml.checkForMemory" = false;
+        "browser.ml.linkPreview.enabled" = false;
+        "browser.ml.linkPreview.shift" = false;
 
         "browser.sessionstore.resume_from_crash" = true;
 
