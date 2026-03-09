@@ -90,7 +90,7 @@
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.7.0";
     # pre-built nix-index database
     nix-index-database = {
-      url = "github:nix-community/nix-index-database?rev=a2051ff239ce2e8a0148fa7a152903d9a78e854f";
+      url = "github:nix-community/nix-index-database?rev=1c1d8ea87b047788fd7567adf531418c5da321ec";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # fast x86_64-linux builds on Apple Silicon
@@ -102,7 +102,7 @@
     # ── Development tools ──────────────────────────────────────────────────
     devenv.url = "github:cachix/devenv?ref=v2.0.3";
     nixpkgs-python.url = "github:cachix/nixpkgs-python?rev=188ffc273f679a2d95a1c8aba0be083545417bdd";
-    git-hooks.url = "github:cachix/git-hooks.nix?rev=39f53203a8458c330f61cc0759fe243f0ac0d198";
+    git-hooks.url = "github:cachix/git-hooks.nix?rev=8baab586afc9c9b57645a734c820e4ac0a604af9";
 
     # ── Desktop / NixOS applications ───────────────────────────────────────
     # affinity apps
@@ -111,7 +111,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Ghostty terminal
-    ghostty.url = "github:ghostty-org/ghostty?rev=055ed28580e140f2a21b752946349750b963a7aa";
+    ghostty.url = "github:ghostty-org/ghostty?rev=9dc6f6763f12d056e286ca62e02f960b19a8fb9e";
     # Zed editor (built from source via flake)
     zed-editor.url = "github:zed-industries/zed?ref=v0.227.1-pre";
     # KDE configuration
@@ -124,7 +124,7 @@
     # ── Claude / LLM tooling ───────────────────────────────────────────────
     # Claude Desktop for Linux
     claude-desktop-debian = {
-      url = "github:aaddrick/claude-desktop-debian?rev=c31329e3da7ef8daa2cf14f75e390f3aabee1c53";
+      url = "github:aaddrick/claude-desktop-debian?rev=6035523c59b7dab94e22daba6f8be08af2025863";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Claude Code configuration library
@@ -133,7 +133,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, gemini-cli)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=856b24f862d0a19b7764f35ee9a7546309e605a0";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=f17d31cd025cdd10c8a72e1813e567cf0d06fcbd";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
