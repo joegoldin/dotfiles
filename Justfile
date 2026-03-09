@@ -110,6 +110,7 @@ update-pins dry_run='':
      {{ if dry_run == "--dry-run" { "DRY_RUN=true" } else { "" } }} scripts/update-flake-pins.sh
     @{{ if dry_run == "--dry-run" { "true" } else { "just _record-history update-pins" } }}
     @echo "✅  Pins updated!"
+    just flake-update
 
 [unix]
 setup-python-packages packages='':
