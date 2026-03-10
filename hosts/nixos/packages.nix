@@ -26,6 +26,7 @@ in
       docker-buildx
       unstable.dumbpipe
       inotify-tools
+      unstable.jdk25_headless
       unstable.jellyfin-desktop
       # cargoModule.packages.litra
       # cargoModule.packages.litra-autotoggle
