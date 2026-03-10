@@ -79,8 +79,8 @@ let
       p7zip
       pinentry-curses
       pipenv
-      playwright-driver
-      playwright-driver.browsers
+      unstable.playwright-driver
+      unstable.playwright-driver.browsers
       popeye
       pre-commit
       pueue
