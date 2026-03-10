@@ -44,7 +44,9 @@ in
       unstable.tailscale
       ungoogled-chromium
       mpv
-      # unstable.vllm # disabled: torchaudio/compressed-tensors build failures in nixpkgs-unstable
+      unstable.vllm
+      rocmPackages.amdsmi
+      rocmPackages.rocminfo
       wl-clipboard
       xclip
     ]
