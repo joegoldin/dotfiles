@@ -5,8 +5,8 @@
     set -Ux nvm_default_version lts
     set -Ux sponge_delay 5
 
-    set -Ux PLAYWRIGHT_BROWSERS_PATH ${pkgs.unstable.playwright-driver.browsers}
-    set -Ux PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS true
+    set -gx PLAYWRIGHT_BROWSERS_PATH ${pkgs.unstable.playwright-driver.browsers}
+    set -gx PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS true
 
     direnv hook fish | source
 
