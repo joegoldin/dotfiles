@@ -528,7 +528,7 @@ let
 
       src = pkgs.fetchurl {
         url = "https://files.pythonhosted.org/packages/source/s/scrapy_playwright/scrapy_playwright-0.0.46.tar.gz";
-        sha256 = "sha256-na06jj7ilQU57hyGd2IHzEWse7mrliR13QobujEu77s=";
+        sha256 = "sha256-Lv4xFVsru9E/sBHzwYnCGm80QJx/e5WIgXgFCc4Uprs=";
       };
 
       nativeBuildInputs = with pythonBase.pkgs; [
