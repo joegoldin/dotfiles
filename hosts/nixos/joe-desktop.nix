@@ -126,7 +126,7 @@ in
     clinfo
     mesa-demos # replaces glxinfo
     gparted
-    htop
+    btop-rocm
     ntfs3g
     pciutils
     usbutils

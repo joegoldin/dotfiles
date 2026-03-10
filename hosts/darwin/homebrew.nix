@@ -84,7 +84,7 @@
       "glow"
       "gum"
       "helmfile"
-      "htop"
+      "btop"
       "httpie"
       "jenv"
       "jj"
