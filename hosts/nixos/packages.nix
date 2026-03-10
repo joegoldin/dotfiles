@@ -38,15 +38,16 @@ in
       unstable.pulsemixer
       rclone
       reptyr
+      rocmPackages.amdsmi
+      rocmPackages.rocminfo
       unstable.slack
       streamcontroller.package
       sublime-merge
       unstable.tailscale
       ungoogled-chromium
       mpv
+      nvtopPackages.amd
       unstable.vllm
-      rocmPackages.amdsmi
-      rocmPackages.rocminfo
       wl-clipboard
       xclip
     ]
