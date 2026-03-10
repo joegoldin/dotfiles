@@ -28,6 +28,7 @@ let
       brotlipy
       colorama
       cryptography
+      datasets
       dbus-python
       extruct
       fake-useragent
@@ -54,6 +55,8 @@ let
       setuptools
       soupsieve
       tabulate
+      transformers
+      wandb
       watchdog
       wheel
       wxpython
