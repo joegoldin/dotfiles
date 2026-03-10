@@ -65,7 +65,6 @@ let
       requests
       scikit-learn
       scrapy
-      # scrapy-fake-useragent
       sentry-sdk
       setuptools
       soupsieve
@@ -112,6 +111,7 @@ let
       # customPackages.llm-ollama
       # customPackages.llm-perplexity
       customPackages.lmstudio
+      customPackages.scrapy-playwright
       customPackages.scrapfly-sdk
     ]
     ++ (

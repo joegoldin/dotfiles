@@ -521,6 +521,37 @@ let
         license = licenses.mit;
       };
     };
+    scrapy-playwright = pythonBase.pkgs.buildPythonPackage {
+      pname = "scrapy-playwright";
+      version = "0.0.46";
+      format = "pyproject";
+
+      src = pkgs.fetchurl {
+        url = "https://files.pythonhosted.org/packages/source/s/scrapy_playwright/scrapy_playwright-0.0.46.tar.gz";
+        sha256 = "sha256-na06jj7ilQU57hyGd2IHzEWse7mrliR13QobujEu77s=";
+      };
+
+      nativeBuildInputs = with pythonBase.pkgs; [
+        setuptools
+        wheel
+      ];
+
+      propagatedBuildInputs = with pythonBase.pkgs; [
+        scrapy
+        playwright
+      ];
+
+      doCheck = false;
+
+      pythonImportsCheck = [ "scrapy_playwright" ];
+
+      meta = with lib; {
+        description = "Scrapy with Playwright for JavaScript rendering";
+        homepage = "https://github.com/scrapy-plugins/scrapy-playwright";
+        license = licenses.bsd2;
+      };
+    };
+
     scrapfly-sdk = pythonBase.pkgs.buildPythonPackage {
       pname = "scrapfly-sdk";
       version = "0.8.23";
