@@ -25,6 +25,7 @@ in
       unstable.discord
       docker-buildx
       unstable.dumbpipe
+      unstable.gradle_9
       inotify-tools
       unstable.jdk25_headless
       unstable.jellyfin-desktop
@@ -32,6 +33,7 @@ in
       # cargoModule.packages.litra-autotoggle
       localsend
       lotion
+      unstable.maven
       unstable.obsidian
       unstable.parsec-bin
       pulseaudio # pactl required by pulsemeeter's pmctl script
