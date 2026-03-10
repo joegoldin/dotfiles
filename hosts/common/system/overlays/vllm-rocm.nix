@@ -24,8 +24,8 @@ let
   tritonKernelsSrc = final.fetchFromGitHub {
     owner = "triton-lang";
     repo = "triton";
-    tag = "v3.5.0";
-    hash = "sha256-F6T0n37Lbs+B7UHNYzoIQHjNNv3TcMtoXjNrT8ZUlxY=";
+    tag = "v3.6.0";
+    hash = "sha256-JFSpQn+WsNnh7CAPlcpOcUp0nyKXNbJEANdXqmkt4Tc=";
   };
 
   # Flash Attention with Composable Kernel (CK) support for gfx12 (RDNA 4)
