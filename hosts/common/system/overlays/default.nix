@@ -33,72 +33,7 @@
         rocmSupport = true;
       };
       overlays = [
-        # (import ./vllm-rocm.nix)
-
-        # Temporary build fixes until upstream nixpkgs resolves these
-        (
-          xFinal: xPrev:
-          let
-            tritonKernelsSrc = xFinal.fetchFromGitHub {
-              owner = "triton-lang";
-              repo = "triton";
-              tag = "v3.5.0";
-              hash = "sha256-F6T0n37Lbs+B7UHNYzoIQHjNNv3TcMtoXjNrT8ZUlxY=";
-            };
-            # Torch's C++ headers include `thrust/complex.h` when built with ROCm,
-            # but rocThrust isn't reliably pulled into the compile include path.
-            rocmThrustIncludeTree = xFinal.symlinkJoin {
-              name = "vllm-rocm-thrust-includes";
-              paths = with xFinal.rocmPackages; [
-                rocthrust
-                rocprim
-                hipcub
-              ];
-            };
-          in
-          {
-            python3 = xPrev.python3.override {
-              packageOverrides = pyFinal: pyPrev: {
-                # xgrammar: test_structural_tag_converter needs HuggingFace network access
-                xgrammar = pyPrev.xgrammar.overrideAttrs (old: {
-                  disabledTestPaths = (old.disabledTestPaths or [ ]) ++ [
-                    "tests/python/test_structural_tag_converter.py"
-                  ];
-                });
-
-                # vllm: set ROCM_PATH, add ROCm build deps, thrust includes, and pre-fetch triton kernels
-                vllm = pyPrev.vllm.overrideAttrs (old: {
-                  buildInputs =
-                    (old.buildInputs or [ ])
-                    ++ (with xFinal.rocmPackages; [
-                      rocrand
-                      hiprand
-                      rocblas
-                      miopen
-                      hipfft
-                      hipcub
-                      hipsolver
-                      rocsolver
-                      hipblaslt
-                      rocm-runtime
-                    ]);
-                  cmakeFlags = (old.cmakeFlags or [ ]) ++ [
-                    (xFinal.lib.cmakeFeature "CMAKE_CXX_FLAGS" "-I${rocmThrustIncludeTree}/include")
-                    (xFinal.lib.cmakeFeature "CMAKE_HIP_FLAGS" "-I${rocmThrustIncludeTree}/include")
-                  ];
-                  env = (old.env or { }) // {
-                    ROCM_PATH = "${xFinal.rocmPackages.clr}";
-                    ROCM_HOME = "${xFinal.rocmPackages.clr}";
-                    TRITON_KERNELS_SRC_DIR = "${xFinal.lib.getDev tritonKernelsSrc}/python/triton_kernels/triton_kernels";
-                  };
-                  # tensorizer, runai-model-streamer, conch-triton-kernels not in nixpkgs
-                  dontCheckRuntimeDeps = true;
-                });
-              };
-            };
-            python3Packages = xFinal.python3.pkgs;
-          }
-        )
+        (import ./vllm-rocm.nix)
       ];
     };
   };
