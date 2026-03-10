@@ -421,7 +421,7 @@
       "kcminputrc"."Keyboard"."NumLock" = 0; # 0 = on, 1 = off, 2 = unchanged
       "kcminputrc"."Libinput/4815/3077/Mad Catz Global MADCATZ R.A.T. 8+ gaming mouse"."PointerAccelerationProfile" =
         1;
-      "kcminputrc"."Libinput/4815/3077/Mad Catz Global MADCATZ R.A.T. 8+ gaming mouse"."ScrollMethod" = 0;
+      "kcminputrc"."Libinput/4815/3077/Mad Catz Global MADCATZ R.A.T. 8+ gaming mouse"."ScrollMethod" = 2;
       "kded5rc"."Module-browserintegrationreminder"."autoload" = false;
       "kded5rc"."Module-checksums"."Disabled" = true;
       "kded5rc"."Module-device_automounter"."autoload" = false;
