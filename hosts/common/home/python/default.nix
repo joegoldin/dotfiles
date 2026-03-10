@@ -62,6 +62,7 @@ let
       pip
       playwright
       playwright-stealth
+      pytest
       requests
       scikit-learn
       scrapy
