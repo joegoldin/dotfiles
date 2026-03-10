@@ -5,7 +5,22 @@
   ...
 }:
 let
-  pythonBase = unstable.python3;
+  pythonBase = unstable.python3.override {
+    packageOverrides = pyFinal: pyPrev: {
+      # plotly: tests fail with pytest 9.x due to deprecated py.path.local API
+      plotly = pyPrev.plotly.overrideAttrs (old: {
+        doInstallCheck = false;
+      });
+
+      # wandb: test_printer_asyncio spinner tests are flaky in the sandbox
+      wandb = pyPrev.wandb.overrideAttrs (old: {
+        disabledTestPaths = (old.disabledTestPaths or [ ]) ++ [
+          "tests/unit_tests/test_lib/test_printer_asyncio.py"
+        ];
+      });
+
+    };
+  };
 
   # Import custom package definitions
   customPackages = import ./custom-pypi-packages.nix {
