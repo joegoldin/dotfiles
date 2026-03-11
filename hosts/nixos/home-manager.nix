@@ -5,6 +5,7 @@
     ../common/home/firefox
     ./android.nix
     ./packages.nix
+    ./python.nix
     ./ghostty.nix
     ../common/home/zed.nix
     ../common/home/default-apps.nix

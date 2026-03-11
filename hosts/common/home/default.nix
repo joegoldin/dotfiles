@@ -23,7 +23,7 @@
 
     # You can also split up your configuration and import pieces of it here:
     ./fish
-    (import ./packages.nix { inherit pkgs lib config; })
+    ./packages.nix
     ./gh.nix
     ./git.nix
     ./attic.nix

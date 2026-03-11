@@ -21,6 +21,7 @@ in
   imports = [
     ../common/home
     ./packages.nix
+    ./python.nix
     ./ghostty.nix
   ];
 
