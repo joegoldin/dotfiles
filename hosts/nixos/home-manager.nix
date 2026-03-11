@@ -215,15 +215,21 @@
       "kwin"."Switch to Screen to the Left" = "none,,Switch to Screen to the Left";
       "kwin"."Switch to Screen to the Right" = "none,,Switch to Screen to the Right";
       "kwin"."Toggle Night Color" = [ ];
-      "kwin"."Toggle Present Windows (All desktops)" = "Meta+Tab";
+      "kwin"."Toggle Present Windows (All desktops)" = [ ];
       "kwin"."Toggle Window Raise/Lower" = "none,,Toggle Window Raise/Lower";
       "kwin"."Walk Through Windows" = "Alt+Tab";
       "kwin"."Walk Through Windows (Reverse)" = "Alt+Shift+Tab";
       "kwin"."Walk Through Windows Alternative" = "none,,Walk Through Windows Alternative";
       "kwin"."Walk Through Windows Alternative (Reverse)" =
         "none,,Walk Through Windows Alternative (Reverse)";
-      "kwin"."Walk Through Windows of Current Application" = "Alt+`";
-      "kwin"."Walk Through Windows of Current Application (Reverse)" = "Alt+~";
+      "kwin"."Walk Through Windows of Current Application" = [
+        "Alt+`"
+        "Meta+Tab"
+      ];
+      "kwin"."Walk Through Windows of Current Application (Reverse)" = [
+        "Alt+~"
+        "Meta+Shift+Tab"
+      ];
       "kwin"."Walk Through Windows of Current Application Alternative" =
         "none,,Walk Through Windows of Current Application Alternative";
       "kwin"."Walk Through Windows of Current Application Alternative (Reverse)" =
