@@ -112,6 +112,7 @@ let
       # customPackages.llm-ollama
       # customPackages.llm-perplexity
       customPackages.lmstudio
+      customPackages.modal
       customPackages.scrapy-playwright
       customPackages.scrapfly-sdk
     ]

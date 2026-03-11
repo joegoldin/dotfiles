@@ -521,6 +521,92 @@ let
         license = licenses.mit;
       };
     };
+    types-certifi = pythonBase.pkgs.buildPythonPackage {
+      pname = "types-certifi";
+      version = "2021.10.8.3";
+      format = "wheel";
+
+      src = pkgs.fetchurl {
+        url = "https://files.pythonhosted.org/packages/b5/63/2463d89481e811f007b0e1cd0a91e52e141b47f9de724d20db7b861dcfec/types_certifi-2021.10.8.3-py3-none-any.whl";
+        sha256 = "sha256-stHjJeafcffHjllD1BDmULRwe7DvMuTd89o39UF26Io=";
+      };
+
+      doCheck = false;
+
+      meta = with lib; {
+        description = "Typing stubs for certifi";
+        homepage = "https://github.com/python/typeshed";
+        license = licenses.asl20;
+      };
+    };
+
+    synchronicity = pythonBase.pkgs.buildPythonPackage {
+      pname = "synchronicity";
+      version = "0.11.1";
+      format = "pyproject";
+
+      src = pkgs.fetchurl {
+        url = "https://files.pythonhosted.org/packages/source/s/synchronicity/synchronicity-0.11.1.tar.gz";
+        sha256 = "sha256-NijfmrNL176JtykQQRSEHGJhLF1exDt29LeyQxhewag=";
+      };
+
+      nativeBuildInputs = with pythonBase.pkgs; [
+        hatchling
+      ];
+      propagatedBuildInputs = with pythonBase.pkgs; [
+        typing-extensions
+      ];
+
+      doCheck = false;
+
+      pythonImportsCheck = [ "synchronicity" ];
+
+      meta = with lib; {
+        description = "Primitives for managing the synchronicity of Python code";
+        homepage = "https://github.com/modal-labs/synchronicity";
+        license = licenses.asl20;
+      };
+    };
+
+    modal = pythonBase.pkgs.buildPythonPackage {
+      pname = "modal";
+      version = "1.3.5";
+      format = "wheel";
+
+      src = pkgs.fetchurl {
+        url = "https://files.pythonhosted.org/packages/10/39/aa5c773a4dddef833f1c846bb4204b442588b99a1d15ab7818157e66b32c/modal-1.3.5-py3-none-any.whl";
+        sha256 = "sha256-Z+XTY1wsNV1js+MPkBLdK8nDjVdHNJM1x7qdpl7cocs=";
+      };
+
+      propagatedBuildInputs = with pythonBase.pkgs; [
+        aiohttp
+        cbor2
+        certifi
+        click
+        grpclib
+        protobuf
+        rich
+        toml
+        typer
+        watchfiles
+        typing-extensions
+        types-toml
+      ] ++ [
+        pythonPackages.synchronicity
+        pythonPackages.types-certifi
+      ];
+
+      doCheck = false;
+
+      pythonImportsCheck = [ "modal" ];
+
+      meta = with lib; {
+        description = "Python client library for Modal";
+        homepage = "https://github.com/modal-labs/modal-client";
+        license = licenses.asl20;
+      };
+    };
+
     scrapy-playwright = pythonBase.pkgs.buildPythonPackage {
       pname = "scrapy-playwright";
       version = "0.0.46";
