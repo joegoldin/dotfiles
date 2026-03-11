@@ -44,7 +44,6 @@ let
       brotlipy
       colorama
       cryptography
-      datasets
       dbus-python
       extruct
       fake-useragent
@@ -65,14 +64,11 @@ let
       playwright-stealth
       pytest
       requests
-      scikit-learn
       scrapy
       sentry-sdk
       setuptools
       soupsieve
       tabulate
-      transformers
-      wandb
       watchdog
       wheel
       wxpython
@@ -109,17 +105,6 @@ let
       customPackages.scrapy-playwright
       customPackages.scrapfly-sdk
     ]
-    ++ (
-      if (pkgs.stdenv.isDarwin && pkgs.stdenv.isAarch64) then
-        [
-          customPackages.mlx
-          # customPackages.mlx-lm
-          # customPackages.llm-mlx
-        ]
-      else
-        [
-        ]
-    )
   );
 
   # Create an FHS environment for Python

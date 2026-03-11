@@ -2,7 +2,11 @@
 {
   custom.python.extraPackages =
     ps: with ps; [
+      datasets
+      scikit-learn
       torch
       torchvision
+      transformers
+      wandb
     ];
 }
