@@ -7,6 +7,7 @@
   ...
 }:
 let
+  domains = import "${dotfiles-secrets}/domains.nix";
   yepanywhere = pkgs.callPackage ../common/system/pkgs/yepanywhere { };
   yepConfigDir = "/home/${username}/.yep-anywhere";
 in
@@ -39,7 +40,10 @@ in
       User = username;
       Group = "users";
       WorkingDirectory = "/home/${username}";
-      Environment = [ "HOME=/home/${username}" ];
+      Environment = [
+        "HOME=/home/${username}"
+        "ALLOWED_HOSTS=${domains.yepRelayDomain}"
+      ];
       ExecStart = "${yepanywhere}/bin/yepanywhere";
       Restart = "on-failure";
       RestartSec = 5;
