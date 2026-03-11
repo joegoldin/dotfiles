@@ -455,6 +455,24 @@
             hostname = "joe-desktop";
           };
           modules = [
+            # ROCm support only on desktop (has AMD GPU)
+            {
+              nixpkgs.overlays = [
+                (final: prev: {
+                  unstable = import inputs.nixpkgs-unstable {
+                    inherit (final.stdenv.hostPlatform) system;
+                    config = {
+                      allowUnfree = true;
+                      android_sdk.accept_license = true;
+                      rocmSupport = true;
+                    };
+                    overlays = [
+                      (import ./hosts/common/system/overlays/vllm-rocm.nix)
+                    ];
+                  };
+                })
+              ];
+            }
             nix-index-database.nixosModules.default
             # > Our main nixos configuration <
             ./hosts/nixos
