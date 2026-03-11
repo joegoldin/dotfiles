@@ -58,11 +58,16 @@ in
         reverse_proxy localhost:${internalPort}
       }
 
-      # Everything else serves the remote client UI
-      handle {
+      # Serve remote client UI at /remote (where the frontend expects it)
+      handle_path /remote/* {
         root * ${yepanywhere-remote}
         file_server
         try_files {path} /remote.html
+      }
+
+      # Redirect root to /remote
+      handle {
+        redir / /remote/ permanent
       }
     '';
   };
