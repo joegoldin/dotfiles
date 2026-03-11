@@ -2,6 +2,7 @@
   pkgs,
   lib,
   unstable,
+  extraPackages ? (_ps: [ ]),
   ...
 }:
 let
@@ -77,27 +78,19 @@ let
       wxpython
       zlib-ng
     ]
-    ++ (
-      if (pkgs.stdenv.isDarwin && pkgs.stdenv.isAarch64) then
-        with pythonBase.pkgs;
-        [
-          torch-bin
-          torchvision-bin
-        ]
-      else
-        with pythonBase.pkgs;
-        [
-          torch
-          torchvision
-          screeninfo
-          xcffib
-        ]
+    ++ lib.optionals (!pkgs.stdenv.isDarwin) (
+      with pythonBase.pkgs;
+      [
+        screeninfo
+        xcffib
+      ]
     );
 
   # Final Python environment with all packages
   pythonWithPackages = pythonBase.withPackages (
     ps:
     nixPythonPackages
+    ++ (extraPackages pythonBase.pkgs)
     ++ [
       # Custom packages from PyPI
       customPackages.deepgram-sdk

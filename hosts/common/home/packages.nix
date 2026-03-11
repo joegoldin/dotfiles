@@ -1,11 +1,15 @@
 {
   pkgs,
   lib,
+  config,
   ...
 }:
 let
   inherit (pkgs) unstable;
-  pythonModule = import ./python { inherit pkgs lib unstable; };
+  pythonModule = import ./python {
+    inherit pkgs lib unstable;
+    extraPackages = config.custom.python.extraPackages;
+  };
   spritesModule = import ./sprites.nix { inherit pkgs lib; };
 
   # Common packages for all systems
@@ -119,11 +123,17 @@ let
     ];
 in
 {
-  home.packages = commonPackages;
+  options.custom.python.extraPackages = lib.mkOption {
+    type = lib.types.functionTo (lib.types.listOf lib.types.package);
+    default = _ps: [ ];
+    description = "Extra Python packages to include in the common environment";
+  };
 
-  home.activation.pythonPostInstall = pythonModule.pythonPostInstall;
+  config.home.packages = commonPackages;
 
-  programs = {
+  config.home.activation.pythonPostInstall = pythonModule.pythonPostInstall;
+
+  config.programs = {
     audiomemo = {
       enable = true;
       settings = {
