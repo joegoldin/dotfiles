@@ -43,6 +43,7 @@ in
       Environment = [
         "HOME=/home/${username}"
         "ALLOWED_HOSTS=${domains.yepRelayDomain}"
+        "PATH=${pkgs.lib.makeBinPath [ pkgs.nodejs pkgs.llm-agents.claude-code ]}:/run/current-system/sw/bin"
       ];
       ExecStart = "${yepanywhere}/bin/yepanywhere";
       Restart = "on-failure";
