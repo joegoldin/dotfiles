@@ -30,11 +30,7 @@
       config = {
         allowUnfree = true;
         android_sdk.accept_license = true;
-        rocmSupport = true;
       };
-      overlays = [
-        (import ./vllm-rocm.nix)
-      ];
     };
   };
 
