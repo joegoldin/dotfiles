@@ -7,6 +7,7 @@
   pnpm_9,
   pnpmConfigHook,
   defaultRelayUrl ? "wss://relay.yepanywhere.com/ws",
+  basePath ? "/remote/",
 }:
 
 let
@@ -46,7 +47,7 @@ stdenv.mkDerivation {
 
     pushd packages/client
     pnpm exec tsc
-    pnpm exec vite build --config vite.config.remote.ts
+    pnpm exec vite build --config vite.config.remote.ts --base '${basePath}'
     popd
 
     runHook postBuild
