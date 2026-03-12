@@ -1,0 +1,128 @@
+# hosts/office-pc/configuration.nix
+{
+  inputs,
+  commonOverlays,
+  lib,
+  config,
+  pkgs,
+  username,
+  hostname,
+  stateVersion,
+  agenix,
+  ...
+}:
+{
+  system.stateVersion = "${stateVersion}";
+
+  # Lanzaboote replaces systemd-boot for secure boot
+  boot = {
+    loader = {
+      systemd-boot.enable = lib.mkForce false;
+      efi.canTouchEfiVariables = true;
+    };
+    lanzaboote = {
+      enable = true;
+      pkiBundle = "/var/lib/sbctl";
+    };
+  };
+
+  nixpkgs = {
+    overlays = commonOverlays;
+    config = {
+      allowUnfree = true;
+      allowUnsupportedSystem = true;
+      experimental-features = "nix-command flakes";
+    };
+  };
+
+  nix =
+    let
+      flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
+    in
+    {
+      settings = {
+        experimental-features = [
+          "nix-command"
+          "flakes"
+        ];
+        nix-path = config.nix.nixPath;
+        trusted-users = [ "${username}" ];
+        auto-optimise-store = false;
+        builders-use-substitutes = true;
+      };
+
+      gc = {
+        automatic = lib.mkDefault true;
+        options = lib.mkDefault "--delete-older-than 7d";
+      };
+
+      extraOptions = lib.optionalString (
+        config.nix.package == pkgs.nixVersions.stable
+      ) "experimental-features = nix-command flakes";
+
+      registry = lib.mapAttrs (_: flake: { inherit flake; }) flakeInputs;
+      nixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
+
+      channel.enable = false;
+    };
+
+  time.timeZone = "America/Los_Angeles";
+
+  networking.networkmanager.enable = true;
+  networking.hostName = hostname;
+
+  users.users = {
+    "${username}" = {
+      uid = 1000;
+      shell = pkgs.fish;
+      isNormalUser = true;
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP0vgzxNgZd51jZ3K/s64jltFRSyVLxjLPWM4Q6747Zw"
+      ];
+      extraGroups = [
+        "wheel"
+        "audio"
+        "video"
+        "docker"
+        "networkmanager"
+        "input"
+      ];
+    };
+  };
+
+  programs = {
+    zsh.enable = true;
+    fish.enable = true;
+    _1password.enable = true;
+    _1password-gui = {
+      enable = true;
+      polkitPolicyOwners = [ "${username}" ];
+    };
+    nix-ld.enable = true;
+    nh = {
+      enable = true;
+      flake = "/home/${username}/dotfiles";
+    };
+  };
+
+  environment.systemPackages = with pkgs; [
+    agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
+    git
+    unstable.sbctl
+    wget
+  ];
+
+  services.openssh = {
+    enable = true;
+    settings = {
+      PermitRootLogin = "no";
+      PasswordAuthentication = false;
+    };
+  };
+
+  services.tailscale.enable = true;
+
+  services.locate = {
+    enable = true;
+  };
+}

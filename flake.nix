@@ -523,6 +523,77 @@
             lanzaboote.nixosModules.lanzaboote
           ];
         };
+
+        # office-pc compute/training machine
+        office-pc = nixpkgs.lib.nixosSystem {
+          specialArgs = commonSpecialArgs // {
+            hostname = "office-pc";
+          };
+          modules = [
+            # ROCm support (AMD GPU)
+            {
+              nixpkgs.overlays = [
+                (final: prev: {
+                  unstable = import inputs.nixpkgs-unstable {
+                    inherit (final.stdenv.hostPlatform) system;
+                    config = {
+                      allowUnfree = true;
+                      rocmSupport = true;
+                    };
+                    overlays = [
+                      (import ./hosts/common/system/overlays/vllm-rocm.nix)
+                    ];
+                  };
+                })
+              ];
+            }
+            nix-index-database.nixosModules.default
+            ./hosts/office-pc
+            home-manager.nixosModules.home-manager
+            (
+              { specialArgs, ... }:
+              {
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  extraSpecialArgs = specialArgs;
+                  backupFileExtension = "backup";
+                  sharedModules = [
+                    plasma-manager.homeModules.plasma-manager
+                  ];
+                  users.${specialArgs.username} = import ./hosts/office-pc/home-manager.nix;
+                };
+              }
+            )
+            inputs.nix-attic-infra.nixosModules.attic-post-build-hook
+            agenix.nixosModules.default
+            (
+              { specialArgs, ... }:
+              {
+                age.secrets.deepgram_api_key = {
+                  file = "${dotfiles-secrets}/deepgram_api_key.age";
+                  mode = "0400";
+                  owner = specialArgs.username;
+                };
+                age.secrets.anthropic_api_key = {
+                  file = "${dotfiles-secrets}/anthropic_api_key.age";
+                  mode = "0400";
+                  owner = specialArgs.username;
+                };
+                age.secrets.attic-token = {
+                  file = "${dotfiles-secrets}/attic.token.age";
+                  mode = "0400";
+                  owner = specialArgs.username;
+                };
+                age.secrets.attic-netrc = {
+                  file = "${dotfiles-secrets}/attic-netrc.age";
+                  mode = "0400";
+                };
+              }
+            )
+            lanzaboote.nixosModules.lanzaboote
+          ];
+        };
       };
 
       # Darwin/macOS configuration entrypoint
