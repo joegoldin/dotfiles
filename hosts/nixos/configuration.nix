@@ -166,5 +166,6 @@ in
     litra-rules
     streamcontroller-rules
     (import ./streamcontroller.nix { inherit pkgs; }).package
+    pkgs.vial
   ];
 }

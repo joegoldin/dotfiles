@@ -139,6 +139,9 @@ in
     kdePackages.konsole
     kdePackages.spectacle
     kdotool
+
+    # Keyboard configurator
+    vial
   ];
 
   # Fonts
