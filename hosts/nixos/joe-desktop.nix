@@ -22,6 +22,7 @@ in
 
   environment.sessionVariables = {
     SSH_AUTH_SOCK = "/home/${username}/.1password/agent.sock";
+    LIBRARY_PATH = "${pkgs.glibc}/lib:${pkgs.gcc.cc.lib}/lib";
   };
 
   systemd = {

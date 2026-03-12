@@ -12,6 +12,7 @@
     ./dolphin.nix
   ];
 
+
   # TODO: git signing with 1password
   # programs.git = {
   #   enable = true;
