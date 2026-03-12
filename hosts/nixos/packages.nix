@@ -26,11 +26,15 @@ in
       docker-buildx
       unstable.dumbpipe
       unstable.gradle_9
+      gcc15
+      glibc
       inotify-tools
       unstable.jdk25_headless
       unstable.jellyfin-desktop
       # cargoModule.packages.litra
       # cargoModule.packages.litra-autotoggle
+      libgcc
+      libgccjit
       localsend
       lotion
       unstable.maven
@@ -44,6 +48,7 @@ in
       rocmPackages.amdsmi
       rocmPackages.rocminfo
       unstable.slack
+      rocmPackages.rocm-smi
       streamcontroller.package
       sublime-merge
       unstable.tailscale
