@@ -30,6 +30,14 @@ let
     '';
     destination = "/etc/udev/rules.d/99-streamcontroller-osplugin.rules";
   };
+  # Priority 59 to run before systemd's default rules (systemd/systemd#39056)
+  vial-rules = pkgs.writeTextFile {
+    name = "59-vial.rules";
+    text = ''
+      KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{serial}=="*vial:f64c2b3c*", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
+    '';
+    destination = "/etc/udev/rules.d/59-vial.rules";
+  };
 in
 {
   system.stateVersion = "${stateVersion}";
@@ -166,6 +174,6 @@ in
     litra-rules
     streamcontroller-rules
     (import ./streamcontroller.nix { inherit pkgs; }).package
-    pkgs.vial
+    vial-rules
   ];
 }
