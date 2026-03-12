@@ -100,7 +100,7 @@
     };
 
     # ── Development tools ──────────────────────────────────────────────────
-    devenv.url = "github:cachix/devenv?ref=v2.0.3";
+    devenv.url = "github:cachix/devenv?ref=v2.0.4";
     nixpkgs-python.url = "github:cachix/nixpkgs-python?rev=188ffc273f679a2d95a1c8aba0be083545417bdd";
     git-hooks.url = "github:cachix/git-hooks.nix?rev=8baab586afc9c9b57645a734c820e4ac0a604af9";
 
@@ -111,9 +111,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Ghostty terminal
-    ghostty.url = "github:ghostty-org/ghostty?rev=9dc6f6763f12d056e286ca62e02f960b19a8fb9e";
+    ghostty.url = "github:ghostty-org/ghostty?rev=ab269e2c79d1540cd6d5aea74562ea4634c0104a";
     # Zed editor (built from source via flake)
-    zed-editor.url = "github:zed-industries/zed?ref=v0.227.1-pre";
+    zed-editor.url = "github:zed-industries/zed?ref=v0.228.0-pre";
     # KDE configuration
     plasma-manager = {
       url = "github:nix-community/plasma-manager?rev=a4b33606111c9c5dcd10009042bb710307174f51";
@@ -124,7 +124,7 @@
     # ── Claude / LLM tooling ───────────────────────────────────────────────
     # Claude Desktop for Linux
     claude-desktop-debian = {
-      url = "github:aaddrick/claude-desktop-debian?rev=6035523c59b7dab94e22daba6f8be08af2025863";
+      url = "github:aaddrick/claude-desktop-debian?rev=f9df6effbd0a5df68ccdc23c45ffd3edd4befcf2";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Claude Code configuration library
@@ -133,7 +133,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, gemini-cli)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=f17d31cd025cdd10c8a72e1813e567cf0d06fcbd";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=6f1514d13eb203b774b1c8485bde5282956fff96";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
