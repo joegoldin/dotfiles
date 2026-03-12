@@ -49,6 +49,7 @@
         trusted-users = [ "${username}" ];
         auto-optimise-store = false;
         builders-use-substitutes = true;
+        cores = 20;
       };
 
       gc = {
