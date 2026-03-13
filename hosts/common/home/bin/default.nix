@@ -1,7 +1,8 @@
 { pkgs, ... }:
 let
   # ── Import all script definitions from ./scripts/ ──────────────────
-  scriptFiles = builtins.attrNames (builtins.readDir ./scripts);
+  scriptDir = builtins.readDir ./scripts;
+  scriptFiles = builtins.filter (f: scriptDir.${f} == "regular") (builtins.attrNames scriptDir);
   scripts = builtins.sort (a: b: a.name < b.name) (
     map (
       f:
@@ -11,6 +12,28 @@ let
       if builtins.isFunction raw then raw { inherit pkgs; } else raw
     ) scriptFiles
   );
+
+  # ── Import subcommand groups from subdirectories ───────────────────
+  subcommandDirs = builtins.filter (f: scriptDir.${f} == "directory") (builtins.attrNames scriptDir);
+  subcommandGroups = map (
+    dir:
+    let
+      subFiles = builtins.attrNames (builtins.readDir (./scripts + "/${dir}"));
+      subs = builtins.sort (a: b: a.name < b.name) (
+        map (
+          f:
+          let
+            raw = import (./scripts + "/${dir}/${f}");
+          in
+          if builtins.isFunction raw then raw { inherit pkgs; } else raw
+        ) subFiles
+      );
+    in
+    {
+      name = dir;
+      inherit subs;
+    }
+  ) subcommandDirs;
 
   # ── Flag helpers ─────────────────────────────────────────────────────
   lib = pkgs.lib;
@@ -73,9 +96,13 @@ let
   hasParams = s: s ? params && s.params != [ ];
   hasFlags = s: s ? flags && s.flags != [ ];
 
+  # Display name for help text (defaults to s.name, can be overridden for subcommands)
+  getDisplayName = s: s.displayName or s.name;
+
   getUsage =
     s:
     let
+      dn = getDisplayName s;
       flagStr =
         if hasFlags s then
           builtins.concatStringsSep " " (
@@ -95,7 +122,7 @@ let
         paramStr
       ];
     in
-    if hasParams s || hasFlags s then "${s.name} ${builtins.concatStringsSep " " parts}" else s.usage;
+    if hasParams s || hasFlags s then "${dn} ${builtins.concatStringsSep " " parts}" else s.usage or "${dn} [args...]";
 
   hasRequiredParams = s: hasParams s && builtins.any (p: p.required or true) s.params;
 
@@ -226,7 +253,8 @@ let
         flagStr
         paramStr
       ];
-      usageLine = "${s.name} ${builtins.concatStringsSep " " usageParts}";
+      dn = getDisplayName s;
+      usageLine = "${dn} ${builtins.concatStringsSep " " usageParts}";
 
       # Build param help lines
       paramHelpLines =
@@ -262,7 +290,7 @@ let
     in
     ''
       usage() {
-        echo "''${BOLD}${escBashDQ s.name}''${RESET} - ${escBashDQ s.desc}"
+        echo "''${BOLD}${escBashDQ dn}''${RESET} - ${escBashDQ s.desc}"
         echo ""
         echo "Usage: ${usageLine}"
       ${builtins.concatStringsSep "\n" allHelpLines}
@@ -515,7 +543,7 @@ let
     in
     ''
       import argparse as _argparse
-      _parser = _argparse.ArgumentParser(prog="${escPyStr s.name}", description="${escPyStr s.desc}")
+      _parser = _argparse.ArgumentParser(prog="${escPyStr (getDisplayName s)}", description="${escPyStr s.desc}")
       _parser.add_argument("-v", "--verbose", action="store_true", default=bool(_os.environ.get("POG_VERBOSE", "")), help="show debug output")
       ${flagArgs}
       ${paramArgs}
@@ -527,6 +555,7 @@ let
   mkFishBin =
     s:
     let
+      dn = getDisplayName s;
       usage = getUsage s;
       flags = s.flags or [ ];
       enhanced = hasEnhancedFeatures s;
@@ -550,7 +579,7 @@ let
         ${lib.optionalString enhanced fishHelpers}
 
         ${helpCond}
-          echo "${escFishDQ s.name} - ${escFishDQ s.desc}"
+          echo "${escFishDQ dn} - ${escFishDQ s.desc}"
           echo ""
           echo "Usage: ${escFishDQ usage}"
         ${paramHelp}
@@ -663,7 +692,7 @@ let
           #!${pythonWithPkgs}/bin/python3
           import sys
           ${helpCond}
-              print("${escPyStr s.name} - ${escPyStr s.desc}")
+              print("${escPyStr (getDisplayName s)} - ${escPyStr s.desc}")
               print()
               print("Usage: ${usage}")
           ${pythonParamHelp}
@@ -759,15 +788,88 @@ let
     else
       mkPythonArgparseBin s;
 
+  # ── Subcommand group builder ────────────────────────────────────────
+  mkSubcommandGroup =
+    group:
+    let
+      parentName = group.name;
+      subs = group.subs;
+
+      # Build each subcommand as a standalone script with name "<parent>--<sub>"
+      # Set displayName so help text shows "parent sub" instead of "parent--sub"
+      subDerivations = map (
+        sub: mkBin (sub // {
+          name = "${parentName}--${sub.name}";
+          displayName = "${parentName} ${sub.name}";
+        })
+      ) (builtins.filter isBin subs);
+
+      # Build help lines for subcommands
+      subHelpLines = builtins.concatStringsSep "\n" (
+        map (sub: "  printf '  %-18s %s\\n' '${escSQ sub.name}' '${escSQ sub.desc}'") subs
+      );
+
+      # Parent dispatch script
+      dispatchScript = pkgs.writeTextFile {
+        name = parentName;
+        executable = true;
+        destination = "/bin/${parentName}";
+        text = ''
+          #!/usr/bin/env fish
+
+          if test (count $argv) -eq 0; or contains -- --help $argv; or contains -- -h $argv
+            echo "${escFishDQ parentName} - subcommands"
+            echo ""
+            echo "Usage: ${escFishDQ parentName} <command> [args...]"
+            echo ""
+            echo "Commands:"
+          ${subHelpLines}
+            exit 0
+          end
+
+          set -l subcmd $argv[1]
+          set -e argv[1]
+
+          set -l bin "${parentName}--$subcmd"
+          if command -q $bin
+            exec $bin $argv
+          else
+            echo "Unknown command: ${escFishDQ parentName} $subcmd" >&2
+            echo "Run '${escFishDQ parentName} --help' for available commands." >&2
+            exit 1
+          end
+        '';
+      };
+    in
+    {
+      derivations = subDerivations ++ [ dispatchScript ];
+      inherit parentName subs;
+    };
+
+  builtGroups = map mkSubcommandGroup subcommandGroups;
+  subcommandDerivations = builtins.concatLists (map (g: g.derivations) builtGroups);
+
   # ── Derivations ────────────────────────────────────────────────────
   binScripts = builtins.filter isBin scripts;
   functionScripts = builtins.filter isFunction scripts;
   scriptDerivations = map mkBin binScripts;
 
   # ── bins command ───────────────────────────────────────────────────
-  binsLines = builtins.concatStringsSep "\n" (
-    map (s: "  printf '  %-12s %s\\n' '${escSQ s.name}' '${escSQ s.desc}'") scripts
+  flatBinsLines = builtins.concatStringsSep "\n" (
+    map (s: "  printf '  %-18s %s\\n' '${escSQ s.name}' '${escSQ s.desc}'") scripts
   );
+  groupBinsLines = builtins.concatStringsSep "\n" (
+    builtins.concatLists (
+      map (
+        g:
+        [ "  echo ''" "  printf '  %-18s %s\\n' '${escSQ g.parentName}' 'subcommands:'" ]
+        ++ (map (
+          sub: "  printf '    %-16s %s\\n' '${escSQ sub.name}' '${escSQ sub.desc}'"
+        ) g.subs)
+      ) builtGroups
+    )
+  );
+  binsLines = flatBinsLines + "\n" + groupBinsLines;
 
   binsScript = pkgs.writeTextFile {
     name = "bins";
@@ -849,13 +951,79 @@ let
     '';
   };
 
+  # ── Subcommand completions ──────────────────────────────────────────
+  mkSubcommandCompletion =
+    g:
+    let
+      parentName = g.parentName;
+      # Complete subcommand names when no subcommand given yet
+      subLines = builtins.concatStringsSep "\n" (
+        map (
+          sub:
+          "complete -c ${parentName} -f -n '__fish_use_subcommand' -a '${sub.name}' -d '${escFishDQ sub.desc}'"
+        ) g.subs
+      );
+      # Complete flags/params for each subcommand
+      subFlagLines = builtins.concatStringsSep "\n" (
+        builtins.concatLists (
+          map (
+            sub:
+            let
+              cond = "-n '__fish_seen_subcommand_from ${sub.name}'";
+              flagLines =
+                if hasFlags sub then
+                  map (
+                    f:
+                    let
+                      longName = normalizeFlagName f.name;
+                      sh = flagShort f;
+                      shortPart = if sh != "" then " -s ${sh}" else "";
+                      requiresArg = if !(flagIsBool f) then " -r" else "";
+                    in
+                    "complete -c ${parentName} -f ${cond} -l ${longName}${shortPart}${requiresArg} -d '${escFishDQ (f.desc or "a flag")}'"
+                  ) (sub.flags or [ ])
+                else
+                  [ ];
+              paramLines =
+                if hasParams sub then
+                  builtins.filter (l: l != "") (
+                    map (
+                      p:
+                      if p ? completions && p.completions != "" then
+                        let
+                          escaped = builtins.replaceStrings [ "'" ] [ "'\\''" ] p.completions;
+                        in
+                        "complete -c ${parentName} -f ${cond} -a '(${escaped})'"
+                      else
+                        ""
+                    ) sub.params
+                  )
+                else
+                  [ ];
+            in
+            flagLines ++ paramLines
+          ) g.subs
+        )
+      );
+    in
+    {
+      "fish/completions/${parentName}.fish".text =
+        "complete -c ${parentName} -f -l help -s h -d 'Show help'\n"
+        + subLines
+        + (if subFlagLines != "" then "\n" + subFlagLines else "")
+        + "\n";
+    };
+
+  subcommandCompletions = builtins.foldl' (acc: g: acc // mkSubcommandCompletion g) { } builtGroups;
+
   allCompletions =
     (builtins.foldl' (acc: s: acc // mkCompletion s) { } (builtins.filter isBin scripts))
+    // subcommandCompletions
     // binsCompletion;
 
 in
 {
-  home.packages = scriptDerivations ++ [ binsScript ];
+  home.packages = scriptDerivations ++ subcommandDerivations ++ [ binsScript ];
 
   programs.fish.functions = builtins.listToAttrs (
     map (s: {
