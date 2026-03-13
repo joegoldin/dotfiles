@@ -107,11 +107,11 @@
     # ── Desktop / NixOS applications ───────────────────────────────────────
     # affinity apps
     affinity-nix = {
-      url = "github:mrshmllow/affinity-nix?rev=cd7bed5b72ceeb50b862c550cc16c6f1b11a2d84";
+      url = "github:mrshmllow/affinity-nix?rev=6117ea7c0ca0e641b4ad1df89d7f47568eacb4b3";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Ghostty terminal
-    ghostty.url = "github:ghostty-org/ghostty?rev=ab269e2c79d1540cd6d5aea74562ea4634c0104a";
+    ghostty.url = "github:ghostty-org/ghostty?rev=d4019fa484c821b8d3a1ef73d42357ae8d86f2b7";
     # Zed editor (built from source via flake)
     zed-editor.url = "github:zed-industries/zed?ref=v0.228.0-pre";
     # KDE configuration
@@ -124,7 +124,7 @@
     # ── Claude / LLM tooling ───────────────────────────────────────────────
     # Claude Desktop for Linux
     claude-desktop-debian = {
-      url = "github:aaddrick/claude-desktop-debian?rev=f9df6effbd0a5df68ccdc23c45ffd3edd4befcf2";
+      url = "github:aaddrick/claude-desktop-debian?rev=fef878d0db4cad5e2add39b30fcc06c247b96c41";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Claude Code configuration library
@@ -133,7 +133,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, gemini-cli)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=6f1514d13eb203b774b1c8485bde5282956fff96";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=fb16f8035819135fb0dc6c276fb75a3db2da3378";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
