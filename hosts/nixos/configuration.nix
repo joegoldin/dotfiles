@@ -170,6 +170,8 @@ in
     enable = true;
   };
 
+  services.tailscale.enable = true;
+
   services.udev.packages = [
     litra-rules
     streamcontroller-rules
