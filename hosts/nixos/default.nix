@@ -7,6 +7,7 @@
     ./configuration.nix
     ./hardware-configuration.nix
     ./drag-shift.nix
+    ./double-tap-overview.nix
     ./gaming.nix
     ./joe-desktop.nix
     ./wallpaper.nix
