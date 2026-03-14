@@ -21,7 +21,7 @@ in
       claude-desktop-fhs
       unstable.cloudflared
       unstable.darktable
-      # unstable.davinci-resolve
+      unstable.davinci-resolve
       unstable.discord
       docker-buildx
       unstable.dumbpipe
