@@ -51,7 +51,6 @@ let
       flake8
       flask
       isort
-      jupyter
       lxml
       msgpack
       numpy
