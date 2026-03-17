@@ -68,5 +68,12 @@ in
     packages = [
       "us.zoom.Zoom"
     ];
+    overrides."us.zoom.Zoom" = {
+      Context.sockets = [ "session-bus" ];
+      "Session Bus Policy" = {
+        "org.freedesktop.secrets" = "talk";
+        "org.kde.kwalletd6" = "talk";
+      };
+    };
   };
 }
