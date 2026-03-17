@@ -23,8 +23,16 @@
         "sd_mod"
       ];
       kernelModules = [ "amdgpu" ];
-      luks.devices."luks-bf7e5885-6a8e-447b-bb6d-b682b2991325".device =
-        "/dev/disk/by-uuid/bf7e5885-6a8e-447b-bb6d-b682b2991325";
+      luks.devices = {
+        "luks-bf7e5885-6a8e-447b-bb6d-b682b2991325".device =
+          "/dev/disk/by-uuid/bf7e5885-6a8e-447b-bb6d-b682b2991325";
+        "luks-60b66d17-ac9f-4df3-a9fe-d7aeb9a2a966".device =
+          "/dev/disk/by-uuid/60b66d17-ac9f-4df3-a9fe-d7aeb9a2a966";
+        "luks-63ba694c-a286-432d-bef5-954daf856ca5".device =
+          "/dev/disk/by-uuid/63ba694c-a286-432d-bef5-954daf856ca5";
+        "luks-15d8d13e-00ff-4657-93ac-1401f40853e7".device =
+          "/dev/disk/by-uuid/15d8d13e-00ff-4657-93ac-1401f40853e7";
+      };
     };
     kernelModules = [ "kvm-intel" ];
     extraModulePackages = [ ];
@@ -44,9 +52,29 @@
         "dmask=0077"
       ];
     };
+
+    "/mnt/data1" = {
+      device = "/dev/mapper/luks-60b66d17-ac9f-4df3-a9fe-d7aeb9a2a966";
+      fsType = "ext4";
+    };
+
+    "/mnt/data2" = {
+      device = "/dev/mapper/luks-63ba694c-a286-432d-bef5-954daf856ca5";
+      fsType = "ext4";
+    };
+
+    "/mnt/data3" = {
+      device = "/dev/mapper/luks-15d8d13e-00ff-4657-93ac-1401f40853e7";
+      fsType = "ext4";
+    };
   };
 
-  swapDevices = [ ];
+  swapDevices = [
+    {
+      device = "/dev/disk/by-partuuid/0a44e123-0bfa-48c5-80c0-7215f00162b1";
+      randomEncryption.enable = true;
+    }
+  ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
