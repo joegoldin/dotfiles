@@ -4,6 +4,7 @@
   imports = [
     ../common/system/attic.nix
     ../common/system/attic-post-build-hook.nix
+    ../common/system/howdy.nix
     ./configuration.nix
     ./hardware-configuration.nix
     ./office-pc.nix
