@@ -335,8 +335,8 @@
       "kwinrc"."Wayland"."EnablePrimarySelection" = false;
       "kwinrc"."Xwayland"."Scale" = 1;
       # Window decoration buttons
-      "kwinrc"."org.kde.kdecoration2"."ButtonsOnLeft" = "XAI";
-      "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "FSM";
+      "kwinrc"."org.kde.kdecoration2"."ButtonsOnLeft" = "MSFB";
+      "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "IAX";
       # Caps -> Ctrl
       "kxkbrc"."Layout"."Options" = "caps:ctrl_modifier";
       "kxkbrc"."Layout"."ResetOldOptions" = true;
