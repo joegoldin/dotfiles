@@ -65,9 +65,6 @@ in
   # Flatpak packages (installed via nix-flatpak)
   services.flatpak = {
     enable = true;
-    packages = [
-      # Zoom removed — Flatpak sandbox breaks encrypted DB login persistence.
-      # Using native FHS package via zoom.nix instead.
-    ];
+    packages = [ ];
   };
 }
