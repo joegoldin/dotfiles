@@ -21,12 +21,16 @@ let
   howdy = pkgs.unstable.howdy;
   pam = config.security.pam.package;
 
-  # Udev rule: create stable /dev/howdy-camera symlink for the Lenovo Performance Camera
-  # so howdy isn't affected by /dev/videoN reordering across boots
+  # Udev rules: stable symlinks for both cameras on the Lenovo Performance Camera.
+  # The device exposes two USB interfaces: 00 = color (RGB), 02 = IR.
+  # Both have index==0 and the same vendor/product, so bInterfaceNumber is required
+  # to tell them apart (without it, both match and /dev/howdy-camera is ambiguous).
+  # Howdy uses the IR camera (/dev/howdy-camera-ir) for lighting-invariant recognition.
   howdy-camera-rules = pkgs.writeTextFile {
     name = "99-howdy-camera.rules";
     text = ''
-      SUBSYSTEM=="video4linux", ATTR{index}=="0", ATTRS{idVendor}=="17ef", ATTRS{idProduct}=="4839", SYMLINK+="howdy-camera", TAG+="uaccess"
+      SUBSYSTEM=="video4linux", ATTR{index}=="0", ATTRS{idVendor}=="17ef", ATTRS{idProduct}=="4839", ENV{ID_USB_INTERFACE_NUM}=="00", SYMLINK+="howdy-camera", TAG+="uaccess"
+      SUBSYSTEM=="video4linux", ATTR{index}=="0", ATTRS{idVendor}=="17ef", ATTRS{idProduct}=="4839", ENV{ID_USB_INTERFACE_NUM}=="02", SYMLINK+="howdy-camera-ir", TAG+="uaccess"
     '';
     destination = "/etc/udev/rules.d/99-howdy-camera.rules";
   };
@@ -70,7 +74,7 @@ let
     [video]
     certainty = 3.5
     timeout = 4
-    device_path = /dev/howdy-camera
+    device_path = /dev/howdy-camera-ir
     recording_plugin = v4l2
 
     [snapshots]
