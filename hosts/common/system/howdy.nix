@@ -112,18 +112,24 @@ let
           control = "sufficient";
           modulePath = "${howdy}/lib/security/pam_howdy.so";
         };
-      };
-      # Enable howdy gate after successful auth (session runs after auth succeeds,
-      # unlike auth stack where sufficient pam_unix stops processing)
-      rules.session = {
+        # Override pam_unix: change from "sufficient" (stops stack on success)
+        # to "[success=ok default=die]" so gate-enable can run after it
+        unix.control = lib.mkForce "[success=ok default=die]";
+        # After successful password auth, enable howdy for subsequent unlocks
         howdy-gate-enable = {
-          order = 10150;
+          order = config.security.pam.services.${name}.rules.auth.unix.order + 10;
           control = "optional";
           modulePath = "${pam}/lib/security/pam_exec.so";
           args = [
             "quiet"
             "${howdy-gate-enable}"
           ];
+        };
+        # Finalize auth after gate-enable (replaces the short-circuit that "sufficient" used to do)
+        howdy-permit = {
+          order = config.security.pam.services.${name}.rules.auth.unix.order + 20;
+          control = "sufficient";
+          modulePath = "${pam}/lib/security/pam_permit.so";
         };
       };
     };
@@ -141,6 +147,24 @@ in
   systemd.tmpfiles.rules = [
     "d /run/howdy 0777 root root -"
   ];
+
+  # Allow managing howdy-gate systemd units without polkit auth popup
+  security.polkit.extraConfig = ''
+    polkit.addRule(function(action, subject) {
+      if (action.id == "org.freedesktop.systemd1.manage-units" &&
+          (action.lookup("unit") == "howdy-gate-timeout.timer" ||
+           action.lookup("unit") == "howdy-gate-timeout-disable.service")) {
+        return polkit.Result.YES;
+      }
+    });
+  '';
+
+  # polkit-127 runs polkit-agent-helper in a sandboxed unit that blocks camera access.
+  # https://github.com/NixOS/nixpkgs/issues/483867
+  systemd.services."polkit-agent-helper@".serviceConfig = {
+    DeviceAllow = "char-video4linux rw";
+    PrivateDevices = "no";
+  };
 
   environment.etc."howdy/config.ini" = {
     source = howdyConfig;
