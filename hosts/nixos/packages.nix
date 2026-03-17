@@ -8,7 +8,7 @@ let
   inherit (pkgs) unstable;
   goModule = import ../common/home/go.nix { inherit pkgs lib; };
   appImagePackages = import ../common/home/appimages.nix { inherit pkgs; };
-  streamcontroller = import ./streamcontroller.nix { inherit pkgs; };
+  streamcontroller = import ../common/system/streamcontroller.nix { inherit pkgs; };
 in
 {
   home.packages =

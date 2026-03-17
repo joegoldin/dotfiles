@@ -1,4 +1,4 @@
-# hosts/nixos/gaming.nix
+# hosts/common/system/gaming.nix
 # Steam, GameMode, Lutris, and gaming performance tools
 {
   pkgs,
@@ -21,15 +21,10 @@
 
   environment.systemPackages = with pkgs; [
     (unstable.lutris.override {
-      extraPkgs = pkgs: [
-        # Additional packages for game installers/runners
-      ];
-      extraLibraries = pkgs: [
-        # Additional libraries for game compatibility
-      ];
+      extraPkgs = pkgs: [ ];
+      extraLibraries = pkgs: [ ];
     })
     adwaita-icon-theme
-    wowup-cf
   ];
 
   users.users."${username}".extraGroups = [ "gamemode" ];

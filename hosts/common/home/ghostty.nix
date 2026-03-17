@@ -5,7 +5,7 @@
   ...
 }:
 let
-  ghosttySettings = import ../common/home/ghostty-settings.nix { inherit lib; };
+  ghosttySettings = import ./ghostty-settings.nix { inherit lib; };
 in
 {
   programs.ghostty = {
