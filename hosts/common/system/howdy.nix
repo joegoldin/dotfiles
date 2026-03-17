@@ -20,6 +20,16 @@ let
   howdy = pkgs.unstable.howdy;
   pam = config.security.pam.package;
 
+  # Udev rule: create stable /dev/howdy-camera symlink for the Lenovo Performance Camera
+  # so howdy isn't affected by /dev/videoN reordering across boots
+  howdy-camera-rules = pkgs.writeTextFile {
+    name = "99-howdy-camera.rules";
+    text = ''
+      SUBSYSTEM=="video4linux", ATTR{index}=="0", ATTRS{idVendor}=="17ef", ATTRS{idProduct}=="4839", SYMLINK+="howdy-camera", TAG+="uaccess"
+    '';
+    destination = "/etc/udev/rules.d/99-howdy-camera.rules";
+  };
+
   howdy-gate-check = pkgs.writeShellScript "howdy-gate-check" ''
     if [ -f /run/howdy-enabled ]; then
       exit 0
@@ -57,7 +67,7 @@ let
     [video]
     certainty = 3.5
     timeout = 4
-    device_path = /dev/video0
+    device_path = /dev/howdy-camera
     recording_plugin = v4l2
 
     [snapshots]
@@ -119,6 +129,9 @@ in
 {
   # Install howdy and its config
   environment.systemPackages = [ howdy ];
+
+  # Persistent camera symlink
+  services.udev.packages = [ howdy-camera-rules ];
 
   environment.etc."howdy/config.ini" = {
     source = howdyConfig;
