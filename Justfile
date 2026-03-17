@@ -38,6 +38,8 @@ build: system-info _check-maintenance
       just _build-wsl; \
     elif [ "{{ arch() }}" = "aarch64" ]; then \
       just _build-bastion; \
+    elif [ "{{ arch() }}" = "x86_64" ] && [ "$(hostname)" = "office-pc" ]; then \
+      just _build-office-pc; \
     elif [ "{{ arch() }}" = "x86_64" ]; then \
       just _build-nixos; \
     else \
@@ -58,6 +60,13 @@ _build-bastion:
     @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
      nh os switch . -H oracle-cloud-bastion --accept-flake-config
     @echo "✅  Built for Oracle Cloud!"
+
+[private]
+_build-office-pc:
+    @echo "🔨  Building for office PC 🐧..."
+    @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
+     nh os switch . -H office-pc --accept-flake-config
+    @echo "✅  Built for office PC!"
 
 [private]
 _build-nixos:
