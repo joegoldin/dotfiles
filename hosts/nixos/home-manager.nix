@@ -6,6 +6,7 @@
     ../common/home/firefox
     ./android.nix
     ./packages.nix
+    ./zoom.nix
     ./python.nix
     ./ghostty.nix
     ../common/home/zed.nix
@@ -59,7 +60,7 @@
                 "applications:parsecd.desktop"
                 "applications:discord.desktop"
                 "applications:steam.desktop"
-                "applications:us.zoom.Zoom.desktop"
+                "applications:Zoom.desktop"
                 "applications:claude-desktop.desktop"
                 "applications:obsidian.desktop"
                 "applications:slack.desktop"
