@@ -3,7 +3,8 @@
 #
 # Behavior:
 #   - Boot/sleep/hibernate/lock → howdy disabled (password required)
-#   - After successful password auth → howdy enabled for 1 hour
+#   - After successful login/sudo (PAM session open) → howdy enabled for 1 hour
+#   - After screen unlock (ScreenSaver ActiveChanged=false) → howdy enabled for 1 hour
 #   - Manual or auto lock → howdy disabled immediately
 #
 # Note: howdy is only in nixpkgs-unstable, so we use pkgs.unstable.howdy.
@@ -52,6 +53,8 @@ let
       while read -r line; do
         if echo "$line" | ${lib.getExe pkgs.gnugrep} -q "boolean true"; then
           ${howdy-gate-disable}
+        elif echo "$line" | ${lib.getExe pkgs.gnugrep} -q "boolean false"; then
+          ${howdy-gate-enable}
         fi
       done
   '';
@@ -112,24 +115,21 @@ let
           control = "sufficient";
           modulePath = "${howdy}/lib/security/pam_howdy.so";
         };
-        # Override pam_unix: change from "sufficient" (stops stack on success)
-        # to "[success=ok default=die]" so gate-enable can run after it
-        unix.control = lib.mkForce "[success=ok default=die]";
-        # After successful password auth, enable howdy for subsequent unlocks
+        # pam_unix left as default "sufficient" - stack terminates here on password success
+      };
+      # Session phase: enable howdy after successful auth opens a session (login, sudo)
+      # pam_exec in auth phase after pam_unix does not run in PAM 1.7.x due to
+      # sufficient short-circuiting. Session phase is reliable for login/sudo.
+      # Lock screen unlock is handled by howdy-lock-monitor watching ActiveChanged=false.
+      rules.session = {
         howdy-gate-enable = {
-          order = config.security.pam.services.${name}.rules.auth.unix.order + 10;
+          order = 1000;
           control = "optional";
           modulePath = "${pam}/lib/security/pam_exec.so";
           args = [
             "quiet"
             "${howdy-gate-enable}"
           ];
-        };
-        # Finalize auth after gate-enable (replaces the short-circuit that "sufficient" used to do)
-        howdy-permit = {
-          order = config.security.pam.services.${name}.rules.auth.unix.order + 20;
-          control = "sufficient";
-          modulePath = "${pam}/lib/security/pam_permit.so";
         };
       };
     };
