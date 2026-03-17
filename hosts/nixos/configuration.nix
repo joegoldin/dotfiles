@@ -178,7 +178,7 @@ in
   services.udev.packages = [
     litra-rules
     streamcontroller-rules
-    (import ./streamcontroller.nix { inherit pkgs; }).package
+    (import ../common/system/streamcontroller.nix { inherit pkgs; }).package
     vial-rules
   ];
 }

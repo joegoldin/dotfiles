@@ -9,10 +9,10 @@
     ./hardware-configuration.nix
     ./drag-shift.nix
     ./double-tap-overview.nix
-    ./gaming.nix
+    ../common/system/app-autostart.nix
+    ../common/system/gaming.nix
     ./joe-desktop.nix
     ./wallpaper.nix
-    ./app-autostart.nix
     ./mounts.nix
     ./uxplay.nix
     ./yepanywhere.nix

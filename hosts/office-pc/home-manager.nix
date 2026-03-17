@@ -3,7 +3,11 @@
 {
   imports = [
     ../common/home
+    ../common/home/default-apps.nix
+    ../common/home/firefox
     ../common/home/plasma.nix
+    ../common/home/zed.nix
+    ../common/home/ghostty.nix
     ./packages.nix
     ./python.nix
   ];
@@ -27,7 +31,10 @@
               behavior.grouping.clickAction = "showTooltips";
               launchers = [
                 "preferred://filemanager"
-                "applications:org.kde.konsole.desktop"
+                "applications:com.mitchellh.ghostty.desktop"
+                "applications:firefox.desktop"
+                "applications:discord.desktop"
+                "applications:steam.desktop"
               ];
             };
           }
@@ -52,9 +59,14 @@
     # office-pc specific hotkeys
     hotkeys.commands = {
       "launch-terminal" = {
-        name = "Launch Konsole";
+        name = "Launch Ghostty";
         key = "Meta+Return";
-        command = "konsole";
+        command = "ghostty";
+      };
+      "launch-browser" = {
+        name = "Launch Firefox";
+        key = "Meta+B";
+        command = "firefox";
       };
     };
   };

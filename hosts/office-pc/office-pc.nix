@@ -9,6 +9,13 @@
 }:
 let
   fonts = import ../common/system/fonts { inherit pkgs lib dotfiles-assets; };
+  streamcontroller-rules = pkgs.writeTextFile {
+    name = "99-streamcontroller-osplugin.rules";
+    text = ''
+      KERNEL=="uinput", SUBSYSTEM=="misc", OPTIONS+="static_node=uinput", TAG+="uaccess", GROUP="input", MODE="0660"
+    '';
+    destination = "/etc/udev/rules.d/99-streamcontroller-osplugin.rules";
+  };
 in
 {
   environment.plasma6.excludePackages = with pkgs.kdePackages; [
@@ -74,6 +81,11 @@ in
 
   security.rtkit.enable = true;
 
+  services.udev.packages = [
+    streamcontroller-rules
+    (import ../common/system/streamcontroller.nix { inherit pkgs; }).package
+  ];
+
   environment.systemPackages = with pkgs; [
     clinfo
     mesa-demos
@@ -81,7 +93,10 @@ in
     pciutils
     usbutils
 
+    kdePackages.ark
     kdePackages.dolphin
+    kdePackages.gwenview
+    kdePackages.kdotool
     kdePackages.konsole
     kdePackages.spectacle
   ];

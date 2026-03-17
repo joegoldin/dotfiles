@@ -7,7 +7,7 @@
     ./android.nix
     ./packages.nix
     ./python.nix
-    ./ghostty.nix
+    ../common/home/ghostty.nix
     ../common/home/zed.nix
     ../common/home/default-apps.nix
     ./dolphin.nix
