@@ -57,6 +57,7 @@ in
       unstable.vllm
       wl-clipboard
       xclip
+      unstable.zoom-us
     ]
     ++ appImagePackages;
 

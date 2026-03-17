@@ -6,7 +6,6 @@
     ../common/home/firefox
     ./android.nix
     ./packages.nix
-    ./zoom.nix
     ./python.nix
     ./ghostty.nix
     ../common/home/zed.nix
