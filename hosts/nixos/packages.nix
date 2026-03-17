@@ -21,7 +21,7 @@ in
       claude-desktop-fhs
       unstable.cloudflared
       unstable.darktable
-      unstable.davinci-resolve
+      # unstable.davinci-resolve
       unstable.discord
       docker-buildx
       unstable.dumbpipe
@@ -66,14 +66,8 @@ in
   services.flatpak = {
     enable = true;
     packages = [
-      "us.zoom.Zoom"
+      # Zoom removed — Flatpak sandbox breaks encrypted DB login persistence.
+      # Using native FHS package via zoom.nix instead.
     ];
-    overrides."us.zoom.Zoom" = {
-      Context.sockets = [ "session-bus" ];
-      "Session Bus Policy" = {
-        "org.freedesktop.secrets" = "talk";
-        "org.kde.kwalletd6" = "talk";
-      };
-    };
   };
 }
