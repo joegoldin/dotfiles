@@ -31,19 +31,19 @@ let
   };
 
   howdy-gate-check = pkgs.writeShellScript "howdy-gate-check" ''
-    if [ -f /run/howdy-enabled ]; then
+    if [ -f /run/howdy/enabled ]; then
       exit 0
     fi
     exit 1
   '';
 
   howdy-gate-enable = pkgs.writeShellScript "howdy-gate-enable" ''
-    touch /run/howdy-enabled
+    touch /run/howdy/enabled
     systemctl restart howdy-gate-timeout.timer 2>/dev/null || true
   '';
 
   howdy-gate-disable = pkgs.writeShellScript "howdy-gate-disable" ''
-    rm -f /run/howdy-enabled
+    rm -f /run/howdy/enabled
     systemctl stop howdy-gate-timeout.timer 2>/dev/null || true
   '';
 
@@ -112,9 +112,12 @@ let
           control = "sufficient";
           modulePath = "${howdy}/lib/security/pam_howdy.so";
         };
-        # After successful password auth, enable howdy for subsequent unlocks
+      };
+      # Enable howdy gate after successful auth (session runs after auth succeeds,
+      # unlike auth stack where sufficient pam_unix stops processing)
+      rules.session = {
         howdy-gate-enable = {
-          order = config.security.pam.services.${name}.rules.auth.unix.order + 10;
+          order = 10150;
           control = "optional";
           modulePath = "${pam}/lib/security/pam_exec.so";
           args = [
@@ -132,6 +135,12 @@ in
 
   # Persistent camera symlink
   services.udev.packages = [ howdy-camera-rules ];
+
+  # Create /run/howdy with open write permissions so pam_exec scripts
+  # (which run as the authenticating user) can create/remove the gate flag
+  systemd.tmpfiles.rules = [
+    "d /run/howdy 0777 root root -"
+  ];
 
   environment.etc."howdy/config.ini" = {
     source = howdyConfig;
