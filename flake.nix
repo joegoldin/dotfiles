@@ -635,18 +635,20 @@
                     fi
                     echo "$LUKS_PASS" > /tmp/luks-password
 
-                    # Copy flake to writable location (nix needs write access for lock/eval)
-                    cp -r /etc/dotfiles /tmp/dotfiles
-                    chmod -R u+w /tmp/dotfiles
+                    # Copy flake to writable temp dir (store paths are read-only)
+                    FLAKE=/tmp/dotfiles
+                    cp -a /etc/dotfiles "$FLAKE"
+                    find "$FLAKE" -type d -exec chmod u+w {} +
+                    find "$FLAKE" -type f -exec chmod u+w {} +
 
                     echo "Partitioning /dev/nvme1n1 with disko..."
-                    sudo disko --mode destroy,format,mount --flake /tmp/dotfiles#office-pc
+                    sudo disko --mode destroy,format,mount --flake "$FLAKE#office-pc"
 
                     echo "Building system closure..."
-                    nix build /tmp/dotfiles#nixosConfigurations.office-pc.config.system.build.toplevel --no-link
+                    nix build "$FLAKE#nixosConfigurations.office-pc.config.system.build.toplevel" --no-link
 
                     echo "Installing NixOS..."
-                    sudo nixos-install --flake /tmp/dotfiles#office-pc --no-root-passwd --no-channel-check
+                    sudo nixos-install --flake "$FLAKE#office-pc" --no-root-passwd --no-channel-check
 
                     rm -f /tmp/luks-password
                     echo "Done! You can reboot now."
