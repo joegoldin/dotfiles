@@ -16,7 +16,7 @@ in
     lib.optionals pkgs.stdenv.hostPlatform.isx86_64 [
       affinity-nix.packages.x86_64-linux.v3
       unstable.calcurse
-      cameractrlsgtk4
+      cameractrls-gtk3
       chromedriver
       goModule.packages.claude-squad
       claude-desktop-fhs
