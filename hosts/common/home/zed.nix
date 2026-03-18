@@ -112,6 +112,9 @@
       ensure_final_newline_on_save = true;
 
       edit_predictions = {
+        sweep = {
+          privacy_mode = true;
+        };
         provider = "zed";
         mode = "eager";
       };
@@ -136,8 +139,15 @@
         elixir = [ "*.ex" ];
       };
 
+      diff_view_style = "split";
+
+      git_panel = {
+        tree_view = false;
+      };
+
       agent_servers = {
-        claude = {
+        claude-acp = {
+          type = "registry";
           default_mode = "plan";
         };
       };
