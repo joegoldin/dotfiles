@@ -555,6 +555,7 @@
                 })
               ];
             }
+            disko.nixosModules.disko
             nix-index-database.nixosModules.default
             ./hosts/office-pc
             home-manager.nixosModules.home-manager
@@ -600,6 +601,7 @@
               }
             )
             lanzaboote.nixosModules.lanzaboote
+            inputs.hoopsnake.nixosModules.default
           ];
         };
       };
