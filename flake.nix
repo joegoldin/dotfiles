@@ -95,7 +95,7 @@
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.7.0";
     # pre-built nix-index database
     nix-index-database = {
-      url = "github:nix-community/nix-index-database?rev=1c1d8ea87b047788fd7567adf531418c5da321ec";
+      url = "github:nix-community/nix-index-database?rev=8faeb68130df077450451b6734a221ba0d6cde42";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # fast x86_64-linux builds on Apple Silicon
@@ -105,8 +105,8 @@
     };
 
     # ── Development tools ──────────────────────────────────────────────────
-    devenv.url = "github:cachix/devenv?ref=v2.0.4";
-    nixpkgs-python.url = "github:cachix/nixpkgs-python?rev=188ffc273f679a2d95a1c8aba0be083545417bdd";
+    devenv.url = "github:cachix/devenv?ref=v2.0.5";
+    nixpkgs-python.url = "github:cachix/nixpkgs-python?rev=f31232bde73682c38a6f60dd52f8ae861ef9594a";
     git-hooks.url = "github:cachix/git-hooks.nix?rev=8baab586afc9c9b57645a734c820e4ac0a604af9";
 
     # ── Desktop / NixOS applications ───────────────────────────────────────
@@ -116,7 +116,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Ghostty terminal
-    ghostty.url = "github:ghostty-org/ghostty?rev=d4019fa484c821b8d3a1ef73d42357ae8d86f2b7";
+    ghostty.url = "github:ghostty-org/ghostty?rev=d3bd224081d3c7c5ee54df6815e44f0b5d25357b";
     # Zed editor (built from source via flake)
     zed-editor.url = "github:zed-industries/zed?ref=v0.228.0-pre";
     # KDE configuration
@@ -129,7 +129,7 @@
     # ── Claude / LLM tooling ───────────────────────────────────────────────
     # Claude Desktop for Linux
     claude-desktop-debian = {
-      url = "github:aaddrick/claude-desktop-debian?rev=fef878d0db4cad5e2add39b30fcc06c247b96c41";
+      url = "github:aaddrick/claude-desktop-debian?rev=d6e6c9c7ffd3bbf9a22a01cb0dc3535a11422575";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Claude Code configuration library
@@ -138,7 +138,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, gemini-cli)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=fb16f8035819135fb0dc6c276fb75a3db2da3378";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=7509c7ed545ea3b5f11f8ed8a7efa7591157c9c8";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
@@ -154,7 +154,7 @@
     # ── Homebrew (macOS) ───────────────────────────────────────────────────
     nix-homebrew.url = "github:zhaofengli/nix-homebrew?rev=a5409abd0d5013d79775d3419bcac10eacb9d8c5";
     brew-nix = {
-      url = "github:BatteredBunny/brew-nix?rev=b314426c17667bcebd73ed7e57ecae2bac9755cf";
+      url = "github:BatteredBunny/brew-nix?rev=6fcb48f460c97ba65a9ce94f8c841b36f53122fc";
       inputs.brew-api.follows = "brew-api";
     };
     brew-api = {
