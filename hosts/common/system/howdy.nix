@@ -121,9 +121,22 @@ let
         };
         # pam_unix left as default "sufficient" - stack terminates here on password success
       };
-      # Session phase: enable howdy after successful auth opens a session (login, sudo)
-      # pam_exec in auth phase after pam_unix does not run in PAM 1.7.x due to
-      # sufficient short-circuiting. Session phase is reliable for login/sudo.
+      # Account phase: enable howdy after successful auth.
+      # GUI auth agents (polkit) call pam_acct_mgmt() but not pam_open_session(),
+      # so the session phase alone misses GUI password prompts.
+      rules.account = {
+        howdy-gate-enable = {
+          order = 1000;
+          control = "optional";
+          modulePath = "${pam}/lib/security/pam_exec.so";
+          args = [
+            "quiet"
+            "${howdy-gate-enable}"
+          ];
+        };
+      };
+      # Session phase: also enable here for services that open full sessions
+      # (login, sudo) as a belt-and-suspenders approach.
       # Lock screen unlock is handled by howdy-lock-monitor watching ActiveChanged=false.
       rules.session = {
         howdy-gate-enable = {
