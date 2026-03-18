@@ -4,8 +4,8 @@
 # Behavior:
 #   - Boot/sleep/hibernate/lock → howdy disabled (password required)
 #   - After successful login/sudo (PAM session open) → howdy enabled for 1 hour
-#   - After screen unlock (ScreenSaver ActiveChanged=false) → howdy enabled for 1 hour
-#   - Manual or auto lock → howdy disabled immediately
+#   - After successful auth (PAM account/session phase) → howdy enabled for 1 hour
+#   - Manual or auto lock, or screen lock signal → howdy disabled immediately
 #
 # Note: howdy is only in nixpkgs-unstable, so we use pkgs.unstable.howdy.
 # The upstream NixOS module (services.howdy) is not available in 25.11,
@@ -57,8 +57,6 @@ let
       while read -r line; do
         if echo "$line" | ${lib.getExe pkgs.gnugrep} -q "boolean true"; then
           ${howdy-gate-disable}
-        elif echo "$line" | ${lib.getExe pkgs.gnugrep} -q "boolean false"; then
-          ${howdy-gate-enable}
         fi
       done
   '';
