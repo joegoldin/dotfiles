@@ -606,23 +606,16 @@
             (
               { pkgs, ... }:
               let
-                # Pre-build the disko script at ISO build time
                 diskoScript = self.nixosConfigurations.office-pc.config.system.build.diskoScript;
-                # Deep copy of flake source so it's not symlinks into the store
-                dotfilesSrc = pkgs.runCommand "dotfiles-src" { } ''
-                  cp -rL ${self} $out
-                '';
               in
               {
                 nixpkgs.hostPlatform = "x86_64-linux";
                 networking.wireless.enable = nixpkgs.lib.mkForce false;
                 networking.networkmanager.enable = true;
 
-                # Bake flake source (with all inputs in lock) into the ISO
-                environment.etc."dotfiles".source = dotfilesSrc;
-
                 environment.systemPackages = [
                   pkgs.git
+                  pkgs.gh
                   disko.packages.x86_64-linux.disko
                   (pkgs.writeShellScriptBin "install-office-pc" ''
                     set -euo pipefail
@@ -642,12 +635,9 @@
 
                     rm -f /tmp/luks-password
 
-                    # Copy flake to writable location for nixos-install
-                    cp -r /etc/dotfiles /tmp/dotfiles
-                    chmod -R u+w /tmp/dotfiles
-
                     echo "Installing NixOS..."
-                    sudo nixos-install --flake /tmp/dotfiles#office-pc --no-root-passwd
+                    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '''')"
+                    sudo --preserve-env=NIX_CONFIG nixos-install --flake github:joegoldin/dotfiles#office-pc --no-root-passwd
 
                     echo "Done! You can reboot now."
                   '')
