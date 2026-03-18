@@ -612,19 +612,28 @@
             ./hosts/office-pc/disk-config.nix
             (
               { pkgs, ... }:
+              let
+                # Pre-build the disko script at ISO build time
+                diskoScript = self.nixosConfigurations.office-pc.config.system.build.diskoScript;
+                # Deep copy of flake source so it's not symlinks into the store
+                dotfilesSrc = pkgs.runCommand "dotfiles-src" { } ''
+                  cp -rL ${self} $out
+                '';
+              in
               {
                 nixpkgs.hostPlatform = "x86_64-linux";
                 networking.wireless.enable = nixpkgs.lib.mkForce false;
                 networking.networkmanager.enable = true;
 
-                # Bake the dotfiles flake (including secrets submodule) into the ISO
-                environment.etc."dotfiles".source = self;
+                # Bake flake source (with all inputs in lock) into the ISO
+                environment.etc."dotfiles".source = dotfilesSrc;
 
                 environment.systemPackages = [
                   pkgs.git
                   disko.packages.x86_64-linux.disko
                   (pkgs.writeShellScriptBin "install-office-pc" ''
                     set -euo pipefail
+
                     read -s -p "Enter LUKS password: " LUKS_PASS
                     echo
                     read -s -p "Confirm LUKS password: " LUKS_PASS2
@@ -635,22 +644,18 @@
                     fi
                     echo "$LUKS_PASS" > /tmp/luks-password
 
-                    # Copy flake to writable temp dir (store paths are read-only)
-                    FLAKE=/tmp/dotfiles
-                    cp -a /etc/dotfiles "$FLAKE"
-                    find "$FLAKE" -type d -exec chmod u+w {} +
-                    find "$FLAKE" -type f -exec chmod u+w {} +
-
                     echo "Partitioning /dev/nvme1n1 with disko..."
-                    sudo disko --mode destroy,format,mount --flake "$FLAKE#office-pc"
-
-                    echo "Building system closure..."
-                    nix build "$FLAKE#nixosConfigurations.office-pc.config.system.build.toplevel" --no-link
-
-                    echo "Installing NixOS..."
-                    sudo nixos-install --flake "$FLAKE#office-pc" --no-root-passwd --no-channel-check
+                    sudo ${diskoScript}
 
                     rm -f /tmp/luks-password
+
+                    # Copy flake to writable location for nixos-install
+                    cp -r /etc/dotfiles /tmp/dotfiles
+                    chmod -R u+w /tmp/dotfiles
+
+                    echo "Installing NixOS..."
+                    sudo nixos-install --flake /tmp/dotfiles#office-pc --no-root-passwd
+
                     echo "Done! You can reboot now."
                   '')
                 ];
