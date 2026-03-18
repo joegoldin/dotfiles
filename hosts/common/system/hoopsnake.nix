@@ -3,6 +3,7 @@
 {
   config,
   dotfiles-secrets,
+  keys,
   ...
 }:
 {
@@ -26,7 +27,7 @@
 
       ssh = {
         authorizedKeysFile = builtins.toFile "hoopsnake-authorized-keys"
-          (import "${dotfiles-secrets}/keys.nix").joe;
+          keys.joe;
         privateHostKey = config.age.secrets.hoopsnake-host-key.path;
       };
 

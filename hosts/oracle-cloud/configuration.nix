@@ -10,7 +10,7 @@
   hostname,
   stateVersion,
   agenix,
-  dotfiles-secrets,
+  keys,
   ...
 }:
 {
@@ -74,7 +74,7 @@
       # hashedPassword = "";
       isNormalUser = true;
       openssh.authorizedKeys.keys = [
-        (import "${dotfiles-secrets}/keys.nix").joe
+        keys.joe
       ];
       extraGroups = [
         "wheel"

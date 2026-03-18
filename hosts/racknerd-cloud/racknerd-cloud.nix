@@ -4,12 +4,12 @@
 {
   lib,
   username,
-  dotfiles-secrets,
+  keys,
   ...
 }:
 {
   users.users.root.openssh.authorizedKeys.keys = [
-    (import "${dotfiles-secrets}/keys.nix").joe
+    keys.joe
   ];
 
   # Set your time zone.

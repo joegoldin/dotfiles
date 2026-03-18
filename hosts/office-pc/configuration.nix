@@ -9,7 +9,7 @@
   hostname,
   stateVersion,
   agenix,
-  dotfiles-secrets,
+  keys,
   ...
 }:
 {
@@ -79,7 +79,7 @@
       shell = pkgs.fish;
       isNormalUser = true;
       openssh.authorizedKeys.keys = [
-        (import "${dotfiles-secrets}/keys.nix").joe
+        keys.joe
       ];
       extraGroups = [
         "wheel"
