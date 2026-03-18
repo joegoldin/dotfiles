@@ -46,7 +46,7 @@
     # claude-code wrapper in docker container with sandboxing
     claude-container = {
       type = "git";
-      url = "file:///home/joe/Development/claude-container";
+      url = "git+ssh://git@github.com/joegoldin/claude-container.git";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # game server management
