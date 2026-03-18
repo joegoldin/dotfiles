@@ -614,14 +614,42 @@
             "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-calamares-plasma6.nix"
             disko.nixosModules.disko
             ./hosts/office-pc/disk-config.nix
-            {
-              nixpkgs.hostPlatform = "x86_64-linux";
-              environment.systemPackages = [
-                nixpkgs.legacyPackages.x86_64-linux.git
-              ];
-              networking.wireless.enable = nixpkgs.lib.mkForce false;
-              networking.networkmanager.enable = true;
-            }
+            (
+              { pkgs, ... }:
+              {
+                nixpkgs.hostPlatform = "x86_64-linux";
+                networking.wireless.enable = nixpkgs.lib.mkForce false;
+                networking.networkmanager.enable = true;
+
+                # Bake the dotfiles flake (including secrets submodule) into the ISO
+                environment.etc."dotfiles".source = self;
+
+                environment.systemPackages = [
+                  pkgs.git
+                  (pkgs.writeShellScriptBin "install-office-pc" ''
+                    set -euo pipefail
+                    read -s -p "Enter LUKS password: " LUKS_PASS
+                    echo
+                    read -s -p "Confirm LUKS password: " LUKS_PASS2
+                    echo
+                    if [ "$LUKS_PASS" != "$LUKS_PASS2" ]; then
+                      echo "Passwords do not match!"
+                      exit 1
+                    fi
+                    echo "$LUKS_PASS" > /tmp/luks-password
+
+                    echo "Partitioning /dev/nvme1n1 with disko..."
+                    sudo disko --mode destroy,format,mount --flake /etc/dotfiles#office-pc
+
+                    echo "Installing NixOS..."
+                    sudo nixos-install --flake /etc/dotfiles#office-pc --no-root-passwd
+
+                    rm -f /tmp/luks-password
+                    echo "Done! You can reboot now."
+                  '')
+                ];
+              }
+            )
           ];
         };
       };
