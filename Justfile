@@ -100,7 +100,7 @@ save-launchpad:
 [unix]
 build-office-pc-iso:
     @echo "💿  Building office-pc installer ISO..."
-    @nix build .#nixosConfigurations.office-pc-installer.config.system.build.isoImage --show-trace
+    @nix build .#nixosConfigurations.office-pc-installer.config.system.build.isoImage --log-format internal-json -v |& nom --json
     @echo "✅  ISO built: $(ls result/iso/*.iso)"
 
 # ── Remote hosts ─────────────────────────────────────────────────────────
