@@ -431,15 +431,15 @@
       "locked": {
         "lastModified": 1773050052,
         "narHash": "sha256-F+EtnszdXd4EP9WGWDTMPM8KtvZheBXI64IJvQiJ69U=",
-        "ref": "refs/heads/main",
+        "owner": "joegoldin",
+        "repo": "claude-container",
         "rev": "998bc509d65061b311d273329bd31f83dc01feec",
-        "revCount": 165,
-        "type": "git",
-        "url": "git+ssh://git@github.com/joegoldin/claude-container.git"
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "git+ssh://git@github.com/joegoldin/claude-container.git"
+        "owner": "joegoldin",
+        "repo": "claude-container",
+        "type": "github"
       }
     },
     "claude-desktop-debian": {
