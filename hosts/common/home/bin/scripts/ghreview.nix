@@ -1,10 +1,9 @@
 {
   name = "ghreview";
   desc = "Wrapper for gh-pr-review with auto-detection, bot filtering, and code context";
-  usage = "ghreview [--pretty] [--no-bots] [--no-code] [--raw] [subcommand] [args...]";
+  usage = "ghreview [--pretty] [--no-code] [--raw] [subcommand] [args...]";
   type = "fish";
   body = ''
-    set -l no_bots false
     set -l raw false
     set -l with_code true
     set -l pretty false
@@ -13,8 +12,6 @@
     # Parse custom flags, pass everything else through
     for arg in $argv
       switch $arg
-        case '--no-bots'
-          set no_bots true
         case '--raw'
           set raw true
         case '--no-code'
@@ -93,12 +90,6 @@
       end
       mv "$tmpfile.tmp" $tmpfile
       rm -f $ctxfile $ctxlookup
-    end
-
-    # Filter bots if --no-bots (reviews output has author_login)
-    if $no_bots; and test "$output_type" = reviews
-      jq 'walk(if type == "array" then map(select(if .author_login? then (.author_login | test("\\[bot\\]$") | not) else true end)) else . end)' $tmpfile > "$tmpfile.tmp"
-      mv "$tmpfile.tmp" $tmpfile
     end
 
     # Output
