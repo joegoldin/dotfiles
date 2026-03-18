@@ -607,9 +607,6 @@
 
         # Installer ISO for office-pc with disko
         office-pc-installer = nixpkgs.lib.nixosSystem {
-          specialArgs = commonSpecialArgs // {
-            hostname = "office-pc";
-          };
           modules = [
             "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-calamares-plasma6.nix"
             disko.nixosModules.disko
@@ -626,6 +623,7 @@
 
                 environment.systemPackages = [
                   pkgs.git
+                  disko.packages.x86_64-linux.disko
                   (pkgs.writeShellScriptBin "install-office-pc" ''
                     set -euo pipefail
                     read -s -p "Enter LUKS password: " LUKS_PASS
