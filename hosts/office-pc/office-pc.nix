@@ -96,7 +96,7 @@ in
     kdePackages.ark
     kdePackages.dolphin
     kdePackages.gwenview
-    kdePackages.kdotool
+    kdotool
     kdePackages.konsole
     kdePackages.spectacle
   ];
