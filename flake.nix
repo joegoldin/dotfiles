@@ -267,6 +267,7 @@
       homeDirectory = nixpkgs.lib.mkForce "/home/${username}";
       stateVersion = "24.11";
       commonOverlays = builtins.attrValues self.overlays;
+      keys = import "${dotfiles-secrets}/keys.nix";
       commonSpecialArgs = inputs // {
         inherit
           inputs
@@ -279,6 +280,7 @@
           homeDirectory
           dotfiles-assets
           dotfiles-secrets
+          keys
           ;
       };
       eachSystem = nixpkgs.lib.genAttrs (import systems);
