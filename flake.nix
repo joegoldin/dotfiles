@@ -85,11 +85,6 @@
       url = "github:nix-community/lanzaboote/v1.0.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # remote LUKS unlock via SSH over Tailscale
-    hoopsnake = {
-      url = "github:boinkor-net/hoopsnake?rev=9a0f65949da8f2b62870a267dbae7e6e2e6fe326";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     # declarative flatpak management
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.7.0";
     # pre-built nix-index database
@@ -527,7 +522,6 @@
               }
             )
             lanzaboote.nixosModules.lanzaboote
-            inputs.hoopsnake.nixosModules.default
           ];
         };
 
@@ -600,7 +594,6 @@
               }
             )
             lanzaboote.nixosModules.lanzaboote
-            inputs.hoopsnake.nixosModules.default
           ];
         };
 

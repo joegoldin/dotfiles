@@ -5,7 +5,6 @@
     ../common/system/attic.nix
     ../common/system/attic-post-build-hook.nix
     ../common/system/howdy.nix
-    ../common/system/hoopsnake.nix
     ./configuration.nix
     ./hardware-configuration.nix
     ./drag-shift.nix
