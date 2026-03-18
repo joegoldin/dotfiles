@@ -124,6 +124,12 @@
 
   services.tailscale.enable = true;
 
+  # Hoopsnake initrd networking
+  boot.initrd.network.hoopsnake.tailscale.name = "office-pc-boot";
+
+  # USB ethernet NIC driver for initrd networking
+  boot.initrd.availableKernelModules = [ "r8152" ];
+
   services.locate = {
     enable = true;
   };
