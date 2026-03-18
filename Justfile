@@ -95,6 +95,14 @@ save-launchpad:
     @lporg save --config $(pwd)/hosts/common/system/dotconfig/lporg.yaml
     @echo "✅  Saved Launchpad!"
 
+# ── ISO images ──────────────────────────────────────────────────────────
+
+[unix]
+build-office-pc-iso:
+    @echo "💿  Building office-pc installer ISO..."
+    @nix build .#nixosConfigurations.office-pc-installer.config.system.build.isoImage --show-trace
+    @echo "✅  ISO built: $(ls result/iso/*.iso)"
+
 # ── Remote hosts ─────────────────────────────────────────────────────────
 
 [unix]

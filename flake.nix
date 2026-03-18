@@ -611,10 +611,11 @@
             hostname = "office-pc";
           };
           modules = [
-            "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-plasma6-new-kernel.nix"
+            "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-calamares-plasma6.nix"
             disko.nixosModules.disko
             ./hosts/office-pc/disk-config.nix
             {
+              nixpkgs.hostPlatform = "x86_64-linux";
               environment.systemPackages = [
                 nixpkgs.legacyPackages.x86_64-linux.git
               ];
