@@ -528,6 +528,7 @@
               }
             )
             lanzaboote.nixosModules.lanzaboote
+            inputs.hoopsnake.nixosModules.default
           ];
         };
 

@@ -176,6 +176,9 @@ in
     package = pkgs.unstable.tailscale;
   };
 
+  # Hoopsnake initrd networking
+  boot.initrd.network.hoopsnake.tailscale.name = "joe-desktop-boot";
+
   services.udev.packages = [
     litra-rules
     streamcontroller-rules
