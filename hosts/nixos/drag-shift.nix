@@ -6,28 +6,36 @@
   ...
 }:
 let
-  python = pkgs.python3.withPackages (ps: [ ps.evdev ]);
+  python = pkgs.python3.withPackages (ps: [
+    ps.evdev
+    ps.inotify-simple
+  ]);
 
   drag-shift = pkgs.writeScriptBin "drag-shift" ''
     #!${python}/bin/python3
     import asyncio
     import evdev
     from evdev import UInput, ecodes
+    from inotify_simple import INotify, flags
+    from pathlib import Path
 
     SHIFT_KEY = ecodes.KEY_LEFTSHIFT
+    INPUT_DIR = "/dev/input"
 
-    def find_mice():
-        mice = []
-        for path in evdev.list_devices():
+    def is_mouse(path):
+        try:
             dev = evdev.InputDevice(path)
             caps = dev.capabilities(verbose=False)
             if ecodes.EV_REL in caps and ecodes.EV_KEY in caps:
                 keys = caps[ecodes.EV_KEY]
                 if ecodes.BTN_LEFT in keys and ecodes.BTN_RIGHT in keys:
-                    mice.append(dev)
-        return mice
+                    return dev
+        except (OSError, PermissionError):
+            pass
+        return None
 
-    async def monitor_mouse(mouse, ui, state):
+    async def monitor_mouse(mouse, ui, state, tracked):
+        print(f"  Monitoring: {mouse.name} ({mouse.path})")
         try:
             async for event in mouse.async_read_loop():
                 if event.type != ecodes.EV_KEY:
@@ -47,22 +55,41 @@ let
                         ui.write(ecodes.EV_KEY, SHIFT_KEY, 1 if state["shift"] else 0)
                         ui.syn()
         except OSError:
-            pass
-    async def main():
-        mice = find_mice()
-        if not mice:
-            print("No mouse devices found")
-            return
+            print(f"  Disconnected: {mouse.name} ({mouse.path})")
+        finally:
+            tracked.discard(mouse.path)
 
+    async def watch_devices(ui, state, tracked):
+        inotify = INotify()
+        inotify.add_watch(INPUT_DIR, flags.CREATE)
+        loop = asyncio.get_event_loop()
+        while True:
+            await loop.run_in_executor(None, inotify.read)
+            await asyncio.sleep(0.5)  # let device settle
+            for path in evdev.list_devices():
+                if path in tracked:
+                    continue
+                dev = is_mouse(path)
+                if dev:
+                    tracked.add(path)
+                    asyncio.create_task(monitor_mouse(dev, ui, state, tracked))
+
+    async def main():
         ui = UInput({ecodes.EV_KEY: [SHIFT_KEY]}, name="drag-shift-injector")
         state = {"left": False, "shift": False}
+        tracked = set()
 
-        print(f"Monitoring {len(mice)} mouse device(s):")
-        for m in mice:
-            print(f"  {m.name} ({m.path})")
+        print("Scanning for mouse devices...")
+        for path in evdev.list_devices():
+            dev = is_mouse(path)
+            if dev:
+                tracked.add(path)
+                asyncio.create_task(monitor_mouse(dev, ui, state, tracked))
 
-        tasks = [asyncio.create_task(monitor_mouse(m, ui, state)) for m in mice]
-        await asyncio.gather(*tasks)
+        if not tracked:
+            print("No mouse devices found yet, watching for new ones...")
+
+        await watch_devices(ui, state, tracked)
 
     asyncio.run(main())
   '';
