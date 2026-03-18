@@ -636,7 +636,7 @@
                     rm -f /tmp/luks-password
 
                     echo "Installing NixOS..."
-                    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '''')"
+                    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '''''')"
                     sudo --preserve-env=NIX_CONFIG nixos-install --flake github:joegoldin/dotfiles#office-pc --no-root-passwd
 
                     echo "Done! You can reboot now."
