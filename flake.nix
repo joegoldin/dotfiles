@@ -45,8 +45,7 @@
     };
     # claude-code wrapper in docker container with sandboxing
     claude-container = {
-      type = "git";
-      url = "git+ssh://git@github.com/joegoldin/claude-container.git";
+      url = "github:joegoldin/claude-container";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # game server management
@@ -636,11 +635,18 @@
                     fi
                     echo "$LUKS_PASS" > /tmp/luks-password
 
+                    # Copy flake to writable location (nix needs write access for lock/eval)
+                    cp -r /etc/dotfiles /tmp/dotfiles
+                    chmod -R u+w /tmp/dotfiles
+
                     echo "Partitioning /dev/nvme1n1 with disko..."
-                    sudo disko --mode destroy,format,mount --flake /etc/dotfiles#office-pc
+                    sudo disko --mode destroy,format,mount --flake /tmp/dotfiles#office-pc
+
+                    echo "Building system closure..."
+                    nix build /tmp/dotfiles#nixosConfigurations.office-pc.config.system.build.toplevel --no-link
 
                     echo "Installing NixOS..."
-                    sudo nixos-install --flake /etc/dotfiles#office-pc --no-root-passwd
+                    sudo nixos-install --flake /tmp/dotfiles#office-pc --no-root-passwd --no-channel-check
 
                     rm -f /tmp/luks-password
                     echo "Done! You can reboot now."
