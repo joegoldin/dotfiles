@@ -435,11 +435,11 @@
         "rev": "998bc509d65061b311d273329bd31f83dc01feec",
         "revCount": 165,
         "type": "git",
-        "url": "file:///home/joe/Development/claude-container"
+        "url": "git+ssh://git@github.com/joegoldin/claude-container.git"
       },
       "original": {
         "type": "git",
-        "url": "file:///home/joe/Development/claude-container"
+        "url": "git+ssh://git@github.com/joegoldin/claude-container.git"
       }
     },
     "claude-desktop-debian": {
