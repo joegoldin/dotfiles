@@ -103,6 +103,40 @@ build-office-pc-iso:
     @nix build .#nixosConfigurations.office-pc-installer.config.system.build.isoImage --log-format internal-json -v |& nom --json
     @echo "✅  ISO built: $(ls result/iso/*.iso)"
 
+[unix, confirm("This will ERASE the target device. Continue?")]
+write-iso device="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    ISO=$(ls result/iso/*.iso 2>/dev/null | head -1)
+    if [ -z "$ISO" ]; then
+      echo "❌  No ISO found. Run 'just build-office-pc-iso' first."
+      exit 1
+    fi
+    DEV="{{ device }}"
+    if [ -z "$DEV" ]; then
+      if lsblk /dev/sdb &>/dev/null; then
+        echo "Found /dev/sdb:"
+        lsblk /dev/sdb
+        DEV="/dev/sdb"
+      else
+        echo "❌  No device specified and /dev/sdb not found."
+        echo "Usage: just write-iso /dev/sdX"
+        exit 1
+      fi
+    fi
+    # Strip partition number if given (e.g. /dev/sdb1 -> /dev/sdb)
+    DEV=$(echo "$DEV" | sed 's/[0-9]*$//')
+    echo "📀  Writing $ISO -> $DEV"
+    # Unmount any mounted partitions on the device
+    for part in $(lsblk -ln -o NAME "$DEV" | tail -n +2); do
+      if mountpoint -q "/dev/$part" 2>/dev/null || findmnt "/dev/$part" &>/dev/null; then
+        echo "Unmounting /dev/$part..."
+        sudo umount "/dev/$part" || true
+      fi
+    done
+    sudo dd if="$ISO" of="$DEV" bs=4M status=progress oflag=sync
+    echo "✅  ISO written to $DEV"
+
 # ── Remote hosts ─────────────────────────────────────────────────────────
 
 [unix]
