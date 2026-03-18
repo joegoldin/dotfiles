@@ -14,7 +14,6 @@
   config,
   pkgs,
   lib,
-  username,
   ...
 }:
 let
@@ -135,7 +134,7 @@ let
       };
       # Session phase: also enable here for services that open full sessions
       # (login, sudo) as a belt-and-suspenders approach.
-      # Lock screen unlock is handled by howdy-lock-monitor watching ActiveChanged=false.
+      # Lock screen re-enable is also handled here (account phase fires before session).
       rules.session = {
         howdy-gate-enable = {
           order = 1000;
@@ -218,19 +217,6 @@ in
       };
     };
 
-    howdy-lock-monitor = {
-      description = "Monitor screen lock to disable howdy";
-      wantedBy = [ "graphical-session.target" ];
-      after = [ "graphical-session.target" ];
-      serviceConfig = {
-        Type = "simple";
-        ExecStart = "${howdy-lock-monitor}";
-        Restart = "on-failure";
-        RestartSec = 5;
-        User = username;
-      };
-    };
-
     howdy-gate-timeout-disable = {
       description = "Disable howdy after 1hr timeout";
       serviceConfig = {
@@ -246,6 +232,19 @@ in
       OnActiveSec = "1h";
       AccuracySec = "1min";
       Unit = "howdy-gate-timeout-disable.service";
+    };
+  };
+
+  # Lock monitor must be a user service to access the session D-Bus
+  systemd.user.services.howdy-lock-monitor = {
+    description = "Monitor screen lock to disable howdy";
+    wantedBy = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${howdy-lock-monitor}";
+      Restart = "on-failure";
+      RestartSec = 5;
     };
   };
 }
