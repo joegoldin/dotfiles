@@ -73,8 +73,10 @@ _build-office-pc:
 [private]
 _build-racknerd:
     @echo "🔨  Building for RackNerd VPS 🐧..."
-    @git config --global url."ssh://git@github.com/".insteadOf "https://github.com/"
-    @nh os switch . -H racknerd-cloud-agent --accept-flake-config
+    @GIT_CONFIG_COUNT=1 \
+     GIT_CONFIG_KEY_0="url.ssh://git@github.com/.insteadOf" \
+     GIT_CONFIG_VALUE_0="https://github.com/" \
+     nh os switch . -H racknerd-cloud-agent --accept-flake-config
     @echo "✅  Built for RackNerd!"
 
 [private]
