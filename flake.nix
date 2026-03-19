@@ -627,6 +627,7 @@
                   pkgs.gh
                   disko.packages.x86_64-linux.disko
                   pkgs.nix-output-monitor
+                  pkgs.sbctl
                   (pkgs.writeShellScriptBin "install-office-pc" ''
                     set -euo pipefail
 
@@ -689,7 +690,11 @@
                       rm -f /tmp/luks-password
                     fi
 
-                    # Step 4: Install NixOS
+                    # Step 4: Create Secure Boot keys for Lanzaboote
+                    sudo mkdir -p /mnt/var/lib/sbctl
+                    sudo sbctl create-keys --database-path /mnt/var/lib/sbctl/keys
+
+                    # Step 5: Install NixOS
                     echo "Installing NixOS..."
                     NIX_CONFIG="extra-experimental-features = nix-command flakes"
                     NIX_CONFIG="$NIX_CONFIG"$'\n'"access-tokens = github.com=$(gh auth token)"
