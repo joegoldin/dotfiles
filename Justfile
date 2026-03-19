@@ -40,6 +40,8 @@ build: system-info _check-maintenance
       just _build-bastion; \
     elif [ "{{ arch() }}" = "x86_64" ] && [ "$(hostname)" = "office-pc" ]; then \
       just _build-office-pc; \
+    elif [ "{{ arch() }}" = "x86_64" ] && [ "$(hostname)" = "racknerd-cloud-agent" ]; then \
+      just _build-racknerd; \
     elif [ "{{ arch() }}" = "x86_64" ]; then \
       just _build-nixos; \
     else \
@@ -67,6 +69,13 @@ _build-office-pc:
     @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
      nh os switch . -H office-pc --accept-flake-config
     @echo "✅  Built for office PC!"
+
+[private]
+_build-racknerd:
+    @echo "🔨  Building for RackNerd VPS 🐧..."
+    @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
+     nh os switch . -H racknerd-cloud-agent --accept-flake-config
+    @echo "✅  Built for RackNerd!"
 
 [private]
 _build-nixos:
