@@ -15,6 +15,7 @@
     ../common/home/fish
     ../common/home/gh.nix
     ../common/home/git.nix
+    ../common/home/gpg.nix
     ../common/home/starship.nix
   ];
 
@@ -61,10 +62,4 @@
   # lorri for nix-shell
   services.lorri.enable = true;
 
-  # gnupg gpg stuff
-  programs.gpg.enable = true;
-  services.gpg-agent = {
-    enable = true;
-    pinentry.package = pkgs.pinentry-curses;
-  };
 }
