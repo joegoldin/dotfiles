@@ -620,6 +620,12 @@
                   (pkgs.writeShellScriptBin "install-office-pc" ''
                     set -euo pipefail
 
+                    echo "Authenticating with GitHub..."
+                    gh auth login
+
+                    echo "Cloning dotfiles repo..."
+                    git clone https://github.com/joegoldin/dotfiles.git /tmp/dotfiles
+
                     read -s -p "Enter LUKS password: " LUKS_PASS
                     echo
                     read -s -p "Confirm LUKS password: " LUKS_PASS2
@@ -636,8 +642,7 @@
                     rm -f /tmp/luks-password
 
                     echo "Installing NixOS..."
-                    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '''''')"
-                    sudo --preserve-env=NIX_CONFIG nixos-install --flake github:joegoldin/dotfiles#office-pc --no-root-passwd
+                    sudo nixos-install --flake /tmp/dotfiles#office-pc --no-root-passwd
 
                     echo "Done! You can reboot now."
                   '')
