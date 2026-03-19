@@ -622,6 +622,25 @@
                 networking.wireless.enable = nixpkgs.lib.mkForce false;
                 networking.networkmanager.enable = true;
 
+                # Disable Calamares installer autostart
+                services.calamares.enable = nixpkgs.lib.mkForce false;
+
+                # Disable sleep/suspend on live ISO
+                services.logind.lidSwitch = "ignore";
+                systemd.targets.sleep.enable = false;
+                systemd.targets.suspend.enable = false;
+                systemd.targets.hibernate.enable = false;
+                systemd.targets.hybrid-sleep.enable = false;
+
+                # Auto-launch install-office-pc in Konsole on login
+                environment.etc."xdg/autostart/install-office-pc.desktop".text = ''
+                  [Desktop Entry]
+                  Type=Application
+                  Name=Install Office PC
+                  Exec=konsole -e install-office-pc
+                  X-KDE-autostart-phase=2
+                '';
+
                 environment.systemPackages = [
                   pkgs.git
                   pkgs.gh
@@ -632,7 +651,15 @@
                   (pkgs.writeShellScriptBin "install-office-pc" ''
                     set -euo pipefail
 
-                    # Step 1: Authenticate with GitHub
+                    header() {
+                      echo ""
+                      echo "========================================"
+                      echo "  $1"
+                      echo "========================================"
+                      echo ""
+                    }
+
+                    header "Step 1/7: GitHub Authentication"
                     NEW_KEY_ID=""
                     if gh auth status &>/dev/null; then
                       echo "Already authenticated with GitHub."
@@ -652,8 +679,9 @@
                       KEYS_AFTER=$(gh api /user/keys --jq '.[].id')
                       NEW_KEY_ID=$(comm -13 <(echo "$KEYS_BEFORE" | sort) <(echo "$KEYS_AFTER" | sort))
                     fi
+                    echo "Done."
 
-                    # Step 2: Clone dotfiles and sync submodules
+                    header "Step 2/7: Clone Dotfiles"
                     DOTFILES=/tmp/dotfiles
                     if [ -d "$DOTFILES" ]; then
                       echo "Dotfiles already cloned, pulling latest..."
@@ -663,10 +691,12 @@
                       git clone https://github.com/joegoldin/dotfiles.git "$DOTFILES"
                     fi
                     cd "$DOTFILES"
+                    echo "Syncing submodules..."
                     git submodule sync --recursive
                     git submodule update --init --recursive
+                    echo "Done."
 
-                    # Step 3: Partition disk (skip if already mounted)
+                    header "Step 3/7: Partition Disk"
                     if findmnt /mnt &>/dev/null; then
                       echo "Disk already mounted at /mnt, skipping format."
                     else
@@ -689,25 +719,27 @@
                       sudo ${diskoScript}
 
                       rm -f /tmp/luks-password
+                      echo "Partitioning complete."
                     fi
 
-                    # Step 4: Create Secure Boot keys for Lanzaboote
-                    # sbctl doesn't work on live ISO, generate keys manually
+                    header "Step 4/7: Secure Boot Keys"
                     SBKEYS=/mnt/var/lib/sbctl/keys
                     if [ ! -f "$SBKEYS/db/db.key" ]; then
+                      echo "Generating Secure Boot keys for Lanzaboote..."
                       sudo mkdir -p "$SBKEYS"/{PK,KEK,db}
                       for name in PK KEK db; do
+                        echo "  Generating $name key..."
                         sudo openssl req -new -x509 -subj "/CN=$name/" -days 3650 -nodes \
                           -newkey rsa:4096 -sha256 \
-                          -keyout "$SBKEYS/$name/$name.key" -out "$SBKEYS/$name/$name.pem"
+                          -keyout "$SBKEYS/$name/$name.key" -out "$SBKEYS/$name/$name.pem" 2>/dev/null
                       done
                       echo "Secure Boot keys generated."
                     else
                       echo "Secure Boot keys already exist, skipping."
-                    fi || true
+                    fi
 
-                    # Step 5: Install NixOS
-                    echo "Installing NixOS..."
+                    header "Step 5/7: Install NixOS"
+                    echo "Configuring nix..."
                     NIX_CONFIG="extra-experimental-features = nix-command flakes"
                     NIX_CONFIG="$NIX_CONFIG"$'\n'"access-tokens = github.com=$(gh auth token)"
                     NIX_CONFIG="$NIX_CONFIG"$'\n'"accept-flake-config = true"
@@ -716,32 +748,44 @@
                     NIX_CONFIG="$NIX_CONFIG"$'\n'"netrc-file = ${netrc}"
                     export NIX_CONFIG
 
+                    echo "Setting up SSH for root..."
                     sudo mkdir -p /root/.ssh
                     sudo cp ~/.ssh/id_ed25519 /root/.ssh/
                     sudo chmod 600 /root/.ssh/id_ed25519
                     sudo ssh-keyscan github.com 2>/dev/null | sudo tee /root/.ssh/known_hosts >/dev/null
 
-                    # Move nix store writable layer to target disk to avoid tmpfs space issues
+                    echo "Mounting nix store overlay on target disk..."
                     sudo mkdir -p /mnt/nix-rw-store
                     sudo mount --bind /mnt/nix-rw-store /nix/.rw-store
                     sudo prlimit --nofile=1048576 --pid=$$
 
+                    echo "Running nixos-install..."
                     sudo --preserve-env=NIX_CONFIG nixos-install --flake "$DOTFILES#office-pc" --no-root-passwd --no-channel-copy 2>&1 | nom
 
-                    # Step 5: Clean up
+                    header "Step 6/7: Cleanup"
+                    echo "Unmounting nix store overlay..."
                     sudo umount /nix/.rw-store || true
-                    sudo rm -rf /mnt/nix-rw-store
+                    echo "Removing temp dirs..."
+                    sudo rm -rf /mnt/nix-rw-store /mnt/nix-store-overlay /mnt/tmp
 
                     if [ -n "$NEW_KEY_ID" ]; then
-                      echo "Removing temporary SSH key from GitHub"
+                      echo "Removing temporary SSH key from GitHub..."
                       gh ssh-key delete "$NEW_KEY_ID" --yes
+                      echo "SSH key deleted."
                     fi
 
-                    # Step 6: Set user password
+                    header "Step 7/7: Set User Password"
                     echo "Set password for ${username}:"
                     sudo nixos-enter --root /mnt -- passwd ${username}
 
-                    echo "Done! You can reboot now."
+                    header "Installation Complete!"
+                    echo "Rebooting in 10 seconds... (Ctrl+C to cancel)"
+                    for i in $(seq 10 -1 1); do
+                      printf "\r  %d..." "$i"
+                      sleep 1
+                    done
+                    echo ""
+                    sudo reboot
                   '')
                 ];
               }
