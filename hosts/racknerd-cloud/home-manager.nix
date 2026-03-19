@@ -12,11 +12,9 @@
 }:
 {
   imports = [
-    inputs.nix-attic-infra.homeManagerModules.attic-client
     ../common/home/fish
     ../common/home/gh.nix
     ../common/home/git.nix
-    ../common/home/attic.nix
     ../common/home/starship.nix
   ];
 
@@ -27,7 +25,6 @@
     inherit stateVersion username homeDirectory;
 
     packages = with pkgs; [
-      attic-client
       comma
       coreutils
       direnv

@@ -440,10 +440,6 @@
                   owner = "root";
                   group = "root";
                 };
-                age.secrets.attic-netrc = {
-                  file = "${dotfiles-secrets}/attic-netrc.age";
-                  mode = "0400";
-                };
                 age.identityPaths = [ "/home/${specialArgs.username}/.ssh/id_rsa" ];
               }
             )
