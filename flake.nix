@@ -628,6 +628,7 @@
                   disko.packages.x86_64-linux.disko
                   pkgs.nix-output-monitor
                   pkgs.sbctl
+                  pkgs.openssl
                   (pkgs.writeShellScriptBin "install-office-pc" ''
                     set -euo pipefail
 
