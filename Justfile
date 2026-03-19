@@ -165,7 +165,7 @@ deploy-racknerd IP:
     @echo "✅  Deployed to RackNerd VPS!"
 
 [unix]
-rebuild-racknerd:
+build-to-racknerd:
     #!/usr/bin/env bash
     set -euo pipefail
     echo "🔨  Rebuilding NixOS on RackNerd VPS (build locally, deploy remote)..."
@@ -177,7 +177,7 @@ rebuild-racknerd:
     echo "✅  Rebuilt RackNerd VPS!"
 
 [unix]
-rebuild-bastion:
+build-to-bastion:
     #!/usr/bin/env bash
     set -euo pipefail
     echo "🔨  Rebuilding NixOS on Oracle Cloud bastion (build locally, deploy remote)..."

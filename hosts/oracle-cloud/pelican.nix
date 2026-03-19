@@ -67,7 +67,6 @@ in
 
   # Caddy reverse proxy for Pelican Panel
   services.caddy.enable = true;
-  networking.firewall.allowedTCPPorts = [ 80 443 ];
   services.caddy.virtualHosts."http://${domains.pelicanDomain}" = {
     extraConfig = ''
       root * ${panelCfg.package}/public
@@ -101,6 +100,8 @@ in
   # Open firewall ports for Wings API, SFTP, and game servers
   networking.firewall = {
     allowedTCPPorts = [
+      80
+      443
       8080
       2022
     ];
