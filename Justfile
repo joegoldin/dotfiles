@@ -142,9 +142,13 @@ install-office-pc:
     rm -f /tmp/luks-password
 
     echo "Installing NixOS..."
-    NIX_CONFIG="access-tokens = github.com=$(gh auth token)"
+    NIX_CONFIG="extra-experimental-features = nix-command flakes"
+    NIX_CONFIG="$NIX_CONFIG"$'\n'"access-tokens = github.com=$(gh auth token)"
     NIX_CONFIG="$NIX_CONFIG"$'\n'"accept-flake-config = true"
     export NIX_CONFIG
+    # Rewrite SSH URLs to HTTPS so submodules use gh auth token
+    sudo git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
+    sudo git config --global url."https://github.com/".insteadOf "git@github.com:"
     sudo --preserve-env=NIX_CONFIG nixos-install --flake .#office-pc --no-root-passwd
 
     if [ -n "$NEW_KEY_ID" ]; then
