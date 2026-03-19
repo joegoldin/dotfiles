@@ -736,6 +736,10 @@
                       gh ssh-key delete "$NEW_KEY_ID" --yes
                     fi
 
+                    # Step 6: Set user password
+                    echo "Set password for ${username}:"
+                    sudo nixos-enter --root /mnt -- passwd ${username}
+
                     echo "Done! You can reboot now."
                   '')
                 ];
