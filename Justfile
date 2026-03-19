@@ -137,7 +137,7 @@ install-office-pc:
     echo "$LUKS_PASS" > /tmp/luks-password
 
     echo "Partitioning /dev/nvme1n1 with disko..."
-    sudo nix --extra-experimental-features 'nix-command flakes' run github:nix-community/disko --accept-flake-config -- --mode destroy,format,mount ./hosts/office-pc/disk-config.nix
+    sudo nix --extra-experimental-features 'nix-command flakes' run github:nix-community/disko --accept-flake-config -- --mode destroy,format,mount --yes-wipe-all-disks ./hosts/office-pc/disk-config.nix
 
     rm -f /tmp/luks-password
 
