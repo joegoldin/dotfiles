@@ -160,7 +160,10 @@ install-office-pc:
     sudo cp ~/.ssh/id_ed25519 /root/.ssh/
     sudo chmod 600 /root/.ssh/id_ed25519
     sudo ssh-keyscan github.com 2>/dev/null | sudo tee /root/.ssh/known_hosts >/dev/null
-    sudo --preserve-env=NIX_CONFIG nixos-install --flake .#office-pc --no-root-passwd --no-channel-copy 2>&1 | nix run nixpkgs#nix-output-monitor
+    # Use target disk for temp files to avoid ISO tmpfs running out of space
+    sudo mkdir -p /mnt/tmp
+    export TMPDIR=/mnt/tmp
+    sudo --preserve-env=NIX_CONFIG,TMPDIR nixos-install --flake .#office-pc --no-root-passwd --no-channel-copy 2>&1 | nix run nixpkgs#nix-output-monitor
 
     if [ -n "$NEW_KEY_ID" ]; then
       echo "Removing temporary SSH key from GitHub"
