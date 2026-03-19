@@ -610,7 +610,10 @@
                 domains = import "${dotfiles-secrets}/domains.nix";
                 attic = import "${dotfiles-secrets}/attic.nix";
                 # Netrc is decrypted before build via Justfile (1Password flow) and placed at /tmp/attic-netrc
-                netrc = builtins.path { path = /tmp/attic-netrc; name = "attic-netrc"; };
+                netrc = builtins.path {
+                  path = /tmp/attic-netrc;
+                  name = "attic-netrc";
+                };
                 atticUrl = "https://${domains.atticDomain}/${attic.cacheName}";
                 atticKey = attic.publicKey;
               in
@@ -710,7 +713,7 @@
 
                     # Step 5: Clean up
                     sudo umount /nix/.rw-store || true
-                    sudo rm -rf /mnt/nix-rw-store /mnt/nix-store-overlay /mnt/tmp
+                    sudo rm -rf /mnt/nix-rw-store
 
                     if [ -n "$NEW_KEY_ID" ]; then
                       echo "Removing temporary SSH key from GitHub"
