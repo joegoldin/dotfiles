@@ -73,8 +73,8 @@ _build-office-pc:
 [private]
 _build-racknerd:
     @echo "🔨  Building for RackNerd VPS 🐧..."
-    @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
-     nh os switch . -H racknerd-cloud-agent --accept-flake-config
+    @git config --global url."ssh://git@github.com/".insteadOf "https://github.com/"
+    @nh os switch . -H racknerd-cloud-agent --accept-flake-config
     @echo "✅  Built for RackNerd!"
 
 [private]
