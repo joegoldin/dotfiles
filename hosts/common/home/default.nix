@@ -26,6 +26,7 @@
     ./packages.nix
     ./gh.nix
     ./git.nix
+    ./1password.nix
     ./attic.nix
     ./starship.nix
     ./claude
