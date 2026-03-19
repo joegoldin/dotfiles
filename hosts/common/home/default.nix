@@ -1,9 +1,7 @@
 # This is your home-manager configuration file
 # Use this to configure your home environment (it replaces ~/.config/nixpkgs/home.nix)
 {
-  lib,
   config,
-  pkgs,
   inputs,
   username,
   homeDirectory,
@@ -36,7 +34,6 @@
 
   # Enable home-manager
   programs.home-manager.enable = true;
-
 
   # Nicely reload system units when changing configs
   systemd.user.startServices = "sd-switch";
