@@ -160,19 +160,7 @@ install-office-pc:
     sudo cp ~/.ssh/id_ed25519 /root/.ssh/
     sudo chmod 600 /root/.ssh/id_ed25519
     sudo ssh-keyscan github.com 2>/dev/null | sudo tee /root/.ssh/known_hosts >/dev/null
-    # Use target disk for nix store writes (overlay over ISO's read-only store)
-    sudo mkdir -p /mnt/tmp /mnt/nix-store-overlay/upper /mnt/nix-store-overlay/work
-    export TMPDIR=/mnt/tmp
-    sudo mount -t overlay overlay -o lowerdir=/nix/store,upperdir=/mnt/nix-store-overlay/upper,workdir=/mnt/nix-store-overlay/work /nix/store
-    ulimit -n 1048576
-    echo "Building NixOS configuration..."
-    sudo --preserve-env=NIX_CONFIG,TMPDIR nix build .#nixosConfigurations.office-pc.config.system.build.toplevel --log-format internal-json -v 2>&1 | nix run nixpkgs#nix-output-monitor -- --json
-    echo "Installing NixOS to /mnt..."
-    sudo --preserve-env=NIX_CONFIG,TMPDIR nixos-install --flake .#office-pc --no-root-passwd --no-channel-copy
-
-    # Clean up overlay and tmp from target disk
-    sudo umount /nix/store || true
-    sudo rm -rf /mnt/nix-store-overlay /mnt/tmp
+    sudo --preserve-env=NIX_CONFIG nixos-install --flake .#office-pc --no-root-passwd --no-channel-copy 2>&1 | nix run nixpkgs#nix-output-monitor
 
     if [ -n "$NEW_KEY_ID" ]; then
       echo "Removing temporary SSH key from GitHub"
