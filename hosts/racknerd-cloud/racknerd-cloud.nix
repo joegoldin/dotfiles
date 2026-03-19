@@ -9,7 +9,7 @@
 }:
 {
   users.users.root.openssh.authorizedKeys.keys = [
-    keys.joe
+    keys.${username}
   ];
 
   # Set your time zone.

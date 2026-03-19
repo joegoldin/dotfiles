@@ -112,7 +112,7 @@ in
       # hashedPassword = "";
       isNormalUser = true;
       openssh.authorizedKeys.keys = [
-        keys.joe
+        keys.${username}
       ];
       extraGroups = [
         "wheel"
