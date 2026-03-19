@@ -171,7 +171,7 @@ rebuild-racknerd:
     echo "🔨  Rebuilding NixOS on RackNerd VPS (build locally, deploy remote)..."
     SSH_DOMAIN=$(nix eval --impure --expr '(import ./secrets/domains.nix).sshDomain' --raw)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nixos-rebuild switch --flake .#racknerd-cloud-agent --target-host "joe@$SSH_DOMAIN" --build-host localhost --accept-flake-config
+    nixos-rebuild switch --flake .#racknerd-cloud-agent --target-host "joe@$SSH_DOMAIN" --build-host localhost --accept-flake-config --log-format internal-json -v |& nom --json
     echo "✅  Rebuilt RackNerd VPS!"
 
 # ── Package management ───────────────────────────────────────────────────
