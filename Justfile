@@ -151,9 +151,15 @@ install-office-pc:
     fi
 
     echo "Installing NixOS..."
+    # Read attic cache config from secrets
+    ATTIC_DOMAIN=$(nix eval --extra-experimental-features 'nix-command flakes' --impure --expr '(import ./secrets/domains.nix).atticDomain' --raw)
+    ATTIC_CACHE=$(nix eval --extra-experimental-features 'nix-command flakes' --impure --expr '(import ./secrets/attic.nix).cacheName' --raw)
+    ATTIC_KEY=$(nix eval --extra-experimental-features 'nix-command flakes' --impure --expr '(import ./secrets/attic.nix).publicKey' --raw)
     NIX_CONFIG="extra-experimental-features = nix-command flakes"
     NIX_CONFIG="$NIX_CONFIG"$'\n'"access-tokens = github.com=$(gh auth token)"
     NIX_CONFIG="$NIX_CONFIG"$'\n'"accept-flake-config = true"
+    NIX_CONFIG="$NIX_CONFIG"$'\n'"extra-substituters = https://$ATTIC_DOMAIN/$ATTIC_CACHE"
+    NIX_CONFIG="$NIX_CONFIG"$'\n'"extra-trusted-public-keys = $ATTIC_KEY"
     export NIX_CONFIG
     # Copy SSH key to root so nixos-install can fetch private submodules
     sudo mkdir -p /root/.ssh
