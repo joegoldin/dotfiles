@@ -129,6 +129,11 @@ install-office-pc:
     if findmnt /mnt &>/dev/null; then
       echo "Disk already mounted at /mnt, skipping format."
     else
+      read -p "This will ERASE /dev/nvme1n1. Continue? [y/N] " CONFIRM
+      if [[ "$CONFIRM" != [yY] ]]; then
+        echo "Aborted."
+        exit 1
+      fi
       read -s -p "Enter LUKS password: " LUKS_PASS
       echo
       read -s -p "Confirm LUKS password: " LUKS_PASS2
