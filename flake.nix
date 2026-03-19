@@ -597,6 +597,138 @@
           ];
         };
 
+        # Installer ISO for office-pc
+        office-pc-installer = nixpkgs.lib.nixosSystem {
+          modules = [
+            "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-calamares-plasma6.nix"
+            disko.nixosModules.disko
+            ./hosts/office-pc/disk-config.nix
+            (
+              { pkgs, ... }:
+              let
+                diskoScript = self.nixosConfigurations.office-pc.config.system.build.diskoScript;
+                domains = import "${dotfiles-secrets}/domains.nix";
+                attic = import "${dotfiles-secrets}/attic.nix";
+                # Decrypt netrc at ISO build time so the installer can auth to the cache
+                sshKey = builtins.path { path = /home + "/${username}/.ssh/id_ed25519"; name = "age-key"; };
+                netrc = pkgs.runCommand "attic-netrc" {
+                  nativeBuildInputs = [ pkgs.age ];
+                } ''
+                  age -d -i ${sshKey} -o $out ${dotfiles-secrets}/attic-netrc.age
+                '';
+                atticUrl = "https://${domains.atticDomain}/${attic.cacheName}";
+                atticKey = attic.publicKey;
+              in
+              {
+                nixpkgs.hostPlatform = "x86_64-linux";
+                networking.wireless.enable = nixpkgs.lib.mkForce false;
+                networking.networkmanager.enable = true;
+
+                environment.systemPackages = [
+                  pkgs.git
+                  pkgs.gh
+                  disko.packages.x86_64-linux.disko
+                  pkgs.nix-output-monitor
+                  (pkgs.writeShellScriptBin "install-office-pc" ''
+                    set -euo pipefail
+
+                    # Step 1: Authenticate with GitHub
+                    NEW_KEY_ID=""
+                    if gh auth status &>/dev/null; then
+                      echo "Already authenticated with GitHub."
+                      if ! gh api /user/keys &>/dev/null || ! gh api /user/ssh_signing_keys &>/dev/null; then
+                        echo "Missing required scopes, refreshing..."
+                        gh auth refresh -s admin:public_key -s admin:ssh_signing_key
+                      fi
+                      echo ""
+                      echo "SSH keys on your account:"
+                      gh ssh-key list
+                      echo ""
+                      read -p "Enter key ID to delete after install (or leave blank to skip): " NEW_KEY_ID
+                    else
+                      echo "Authenticating with GitHub..."
+                      KEYS_BEFORE=$(gh api /user/keys --jq '.[].id' 2>/dev/null || true)
+                      gh auth login -p ssh -s admin:public_key -s admin:ssh_signing_key
+                      KEYS_AFTER=$(gh api /user/keys --jq '.[].id')
+                      NEW_KEY_ID=$(comm -13 <(echo "$KEYS_BEFORE" | sort) <(echo "$KEYS_AFTER" | sort))
+                    fi
+
+                    # Step 2: Clone dotfiles and sync submodules
+                    DOTFILES=/tmp/dotfiles
+                    if [ -d "$DOTFILES" ]; then
+                      echo "Dotfiles already cloned, pulling latest..."
+                      git -C "$DOTFILES" pull
+                    else
+                      echo "Cloning dotfiles..."
+                      git clone https://github.com/joegoldin/dotfiles.git "$DOTFILES"
+                    fi
+                    cd "$DOTFILES"
+                    git submodule sync --recursive
+                    git submodule update --init --recursive
+
+                    # Step 3: Partition disk (skip if already mounted)
+                    if findmnt /mnt &>/dev/null; then
+                      echo "Disk already mounted at /mnt, skipping format."
+                    else
+                      read -p "This will ERASE /dev/nvme1n1. Continue? [y/N] " CONFIRM
+                      if [[ "$CONFIRM" != [yY] ]]; then
+                        echo "Aborted."
+                        exit 1
+                      fi
+                      read -s -p "Enter LUKS password: " LUKS_PASS
+                      echo
+                      read -s -p "Confirm LUKS password: " LUKS_PASS2
+                      echo
+                      if [ "$LUKS_PASS" != "$LUKS_PASS2" ]; then
+                        echo "Passwords do not match!"
+                        exit 1
+                      fi
+                      echo "$LUKS_PASS" > /tmp/luks-password
+
+                      echo "Partitioning /dev/nvme1n1 with disko..."
+                      sudo ${diskoScript}
+
+                      rm -f /tmp/luks-password
+                    fi
+
+                    # Step 4: Install NixOS
+                    echo "Installing NixOS..."
+                    NIX_CONFIG="extra-experimental-features = nix-command flakes"
+                    NIX_CONFIG="$NIX_CONFIG"$'\n'"access-tokens = github.com=$(gh auth token)"
+                    NIX_CONFIG="$NIX_CONFIG"$'\n'"accept-flake-config = true"
+                    NIX_CONFIG="$NIX_CONFIG"$'\n'"extra-substituters = ${atticUrl}"
+                    NIX_CONFIG="$NIX_CONFIG"$'\n'"extra-trusted-public-keys = ${atticKey}"
+                    NIX_CONFIG="$NIX_CONFIG"$'\n'"netrc-file = ${netrc}"
+                    export NIX_CONFIG
+
+                    sudo mkdir -p /root/.ssh
+                    sudo cp ~/.ssh/id_ed25519 /root/.ssh/
+                    sudo chmod 600 /root/.ssh/id_ed25519
+                    sudo ssh-keyscan github.com 2>/dev/null | sudo tee /root/.ssh/known_hosts >/dev/null
+
+                    # Move nix store writable layer to target disk to avoid tmpfs space issues
+                    sudo mkdir -p /mnt/nix-rw-store
+                    sudo mount --bind /mnt/nix-rw-store /nix/.rw-store
+                    sudo prlimit --nofile=1048576 --pid=$$
+
+                    sudo --preserve-env=NIX_CONFIG nixos-install --flake "$DOTFILES#office-pc" --no-root-passwd --no-channel-copy 2>&1 | nom
+
+                    # Step 5: Clean up
+                    sudo umount /nix/.rw-store || true
+                    sudo rm -rf /mnt/nix-rw-store /mnt/nix-store-overlay /mnt/tmp
+
+                    if [ -n "$NEW_KEY_ID" ]; then
+                      echo "Removing temporary SSH key from GitHub"
+                      gh ssh-key delete "$NEW_KEY_ID" --yes
+                    fi
+
+                    echo "Done! You can reboot now."
+                  '')
+                ];
+              }
+            )
+          ];
+        };
       };
 
       # Darwin/macOS configuration entrypoint

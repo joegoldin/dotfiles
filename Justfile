@@ -95,93 +95,45 @@ save-launchpad:
     @lporg save --config $(pwd)/hosts/common/system/dotconfig/lporg.yaml
     @echo "✅  Saved Launchpad!"
 
-# ── Install ─────────────────────────────────────────────────────────────
-# Usage: boot generic NixOS ISO, clone dotfiles, then:
-#   nix-shell -p just
-#   just install-office-pc
+# ── ISO images ──────────────────────────────────────────────────────────
 
 [unix]
-install-office-pc:
+build-office-pc-iso:
+    @echo "Building office-pc installer ISO..."
+    @nix build .#nixosConfigurations.office-pc-installer.config.system.build.isoImage --log-format internal-json -v |& nom --json
+    @echo "ISO built: $(ls result/iso/*.iso)"
+
+[unix, confirm("This will ERASE the target device. Continue?")]
+write-iso device="":
     #!/usr/bin/env bash
     set -euo pipefail
-
-    NEW_KEY_ID=""
-    if gh auth status &>/dev/null; then
-      echo "Already authenticated with GitHub."
-      # Ensure we have the required scopes for listing/deleting SSH keys
-      if ! gh api /user/keys &>/dev/null || ! gh api /user/ssh_signing_keys &>/dev/null; then
-        echo "Missing required scopes, refreshing..."
-        gh auth refresh -s admin:public_key -s admin:ssh_signing_key
-      fi
-      echo ""
-      echo "SSH keys on your account:"
-      gh ssh-key list
-      echo ""
-      read -p "Enter key ID to delete after install (or leave blank to skip): " NEW_KEY_ID
-    else
-      echo "Authenticating with GitHub..."
-      KEYS_BEFORE=$(gh api /user/keys --jq '.[].id' 2>/dev/null || true)
-      gh auth login -p ssh -s admin:public_key -s admin:ssh_signing_key
-      KEYS_AFTER=$(gh api /user/keys --jq '.[].id')
-      NEW_KEY_ID=$(comm -13 <(echo "$KEYS_BEFORE" | sort) <(echo "$KEYS_AFTER" | sort))
+    ISO=$(ls result/iso/*.iso 2>/dev/null | head -1)
+    if [ -z "$ISO" ]; then
+      echo "No ISO found. Run 'just build-office-pc-iso' first."
+      exit 1
     fi
-
-    if findmnt /mnt &>/dev/null; then
-      echo "Disk already mounted at /mnt, skipping format."
-    else
-      read -p "This will ERASE /dev/nvme1n1. Continue? [y/N] " CONFIRM
-      if [[ "$CONFIRM" != [yY] ]]; then
-        echo "Aborted."
+    DEV="{{ device }}"
+    if [ -z "$DEV" ]; then
+      if lsblk /dev/sdb &>/dev/null; then
+        echo "Found /dev/sdb:"
+        lsblk /dev/sdb
+        DEV="/dev/sdb"
+      else
+        echo "No device specified and /dev/sdb not found."
+        echo "Usage: just write-iso /dev/sdX"
         exit 1
       fi
-      read -s -p "Enter LUKS password: " LUKS_PASS
-      echo
-      read -s -p "Confirm LUKS password: " LUKS_PASS2
-      echo
-      if [ "$LUKS_PASS" != "$LUKS_PASS2" ]; then
-        echo "Passwords do not match!"
-        exit 1
+    fi
+    DEV=$(echo "$DEV" | sed 's/[0-9]*$//')
+    echo "Writing $ISO -> $DEV"
+    for part in $(lsblk -ln -o NAME "$DEV" | tail -n +2); do
+      if mountpoint -q "/dev/$part" 2>/dev/null || findmnt "/dev/$part" &>/dev/null; then
+        echo "Unmounting /dev/$part..."
+        sudo umount "/dev/$part" || true
       fi
-      echo "$LUKS_PASS" > /tmp/luks-password
-
-      echo "Partitioning /dev/nvme1n1 with disko..."
-      sudo nix --extra-experimental-features 'nix-command flakes' run github:nix-community/disko --accept-flake-config -- --mode destroy,format,mount --yes-wipe-all-disks ./hosts/office-pc/disk-config.nix
-
-      rm -f /tmp/luks-password
-    fi
-
-    echo "Installing NixOS..."
-    # Read attic cache config from secrets
-    ATTIC_DOMAIN=$(nix eval --extra-experimental-features 'nix-command flakes' --impure --expr '(import ./secrets/domains.nix).atticDomain' --raw)
-    ATTIC_CACHE=$(nix eval --extra-experimental-features 'nix-command flakes' --impure --expr '(import ./secrets/attic.nix).cacheName' --raw)
-    ATTIC_KEY=$(nix eval --extra-experimental-features 'nix-command flakes' --impure --expr '(import ./secrets/attic.nix).publicKey' --raw)
-    NIX_CONFIG="extra-experimental-features = nix-command flakes"
-    NIX_CONFIG="$NIX_CONFIG"$'\n'"access-tokens = github.com=$(gh auth token)"
-    NIX_CONFIG="$NIX_CONFIG"$'\n'"accept-flake-config = true"
-    NIX_CONFIG="$NIX_CONFIG"$'\n'"extra-substituters = https://$ATTIC_DOMAIN/$ATTIC_CACHE"
-    NIX_CONFIG="$NIX_CONFIG"$'\n'"extra-trusted-public-keys = $ATTIC_KEY"
-    export NIX_CONFIG
-    # Copy SSH key to root so nixos-install can fetch private submodules
-    sudo mkdir -p /root/.ssh
-    sudo cp ~/.ssh/id_ed25519 /root/.ssh/
-    sudo chmod 600 /root/.ssh/id_ed25519
-    sudo ssh-keyscan github.com 2>/dev/null | sudo tee /root/.ssh/known_hosts >/dev/null
-    # Move nix store writable layer to target disk to avoid tmpfs space/permission issues
-    sudo mkdir -p /mnt/nix-rw-store
-    sudo mount --bind /mnt/nix-rw-store /nix/.rw-store
-    # Raise file descriptor limit for large nix store
-    sudo prlimit --nofile=1048576 --pid=$$
-    sudo --preserve-env=NIX_CONFIG nixos-install --flake .#office-pc --no-root-passwd --no-channel-copy 2>&1 | nix run nixpkgs#nix-output-monitor
-    # Clean up all temp dirs from this and previous install attempts
-    sudo umount /nix/.rw-store || true
-    sudo rm -rf /mnt/nix-rw-store /mnt/nix-store-overlay /mnt/tmp
-
-    if [ -n "$NEW_KEY_ID" ]; then
-      echo "Removing temporary SSH key from GitHub"
-      gh ssh-key delete "$NEW_KEY_ID" --yes
-    fi
-
-    echo "Done! You can reboot now."
+    done
+    sudo dd if="$ISO" of="$DEV" bs=4M status=progress oflag=sync
+    echo "ISO written to $DEV"
 
 # ── Remote hosts ─────────────────────────────────────────────────────────
 
