@@ -99,9 +99,15 @@ save-launchpad:
 
 [unix]
 build-office-pc-iso:
-    @echo "Building office-pc installer ISO..."
-    @nix build .#nixosConfigurations.office-pc-installer.config.system.build.isoImage --impure --log-format internal-json -v |& nom --json
-    @echo "ISO built: $(ls result/iso/*.iso)"
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "Decrypting attic netrc from 1Password..."
+    trap 'rm -f /tmp/attic-netrc' EXIT
+    secrets/secret-helper.sh decrypt attic-netrc /tmp/attic-netrc
+    echo "Building office-pc installer ISO..."
+    nix build .#nixosConfigurations.office-pc-installer.config.system.build.isoImage --impure --log-format internal-json -v |& nom --json
+    rm -f /tmp/attic-netrc
+    echo "ISO built: $(ls result/iso/*.iso)"
 
 [unix, confirm("This will ERASE the target device. Continue?")]
 write-iso device="":

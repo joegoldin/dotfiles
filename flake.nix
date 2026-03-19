@@ -609,13 +609,8 @@
                 diskoScript = self.nixosConfigurations.office-pc.config.system.build.diskoScript;
                 domains = import "${dotfiles-secrets}/domains.nix";
                 attic = import "${dotfiles-secrets}/attic.nix";
-                # Decrypt netrc at ISO build time so the installer can auth to the cache
-                sshKey = builtins.path { path = /home + "/${username}/.ssh/id_ed25519"; name = "age-key"; };
-                netrc = pkgs.runCommand "attic-netrc" {
-                  nativeBuildInputs = [ pkgs.age ];
-                } ''
-                  age -d -i ${sshKey} -o $out ${dotfiles-secrets}/attic-netrc.age
-                '';
+                # Netrc is decrypted before build via Justfile (1Password flow) and placed at /tmp/attic-netrc
+                netrc = builtins.path { path = /tmp/attic-netrc; name = "attic-netrc"; };
                 atticUrl = "https://${domains.atticDomain}/${attic.cacheName}";
                 atticKey = attic.publicKey;
               in
