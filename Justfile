@@ -95,47 +95,57 @@ save-launchpad:
     @lporg save --config $(pwd)/hosts/common/system/dotconfig/lporg.yaml
     @echo "✅  Saved Launchpad!"
 
-# ── ISO images ──────────────────────────────────────────────────────────
+# ── Install ─────────────────────────────────────────────────────────────
+# Usage: boot generic NixOS ISO, clone dotfiles, then:
+#   nix-shell -p just
+#   just install-office-pc
 
-[unix]
-build-office-pc-iso:
-    @echo "💿  Building office-pc installer ISO..."
-    @nix build .#nixosConfigurations.office-pc-installer.config.system.build.isoImage --log-format internal-json -v |& nom --json
-    @echo "✅  ISO built: $(ls result/iso/*.iso)"
-
-[unix, confirm("This will ERASE the target device. Continue?")]
-write-iso device="":
+[unix, confirm("This will ERASE /dev/nvme1n1. Continue?")]
+install-office-pc:
     #!/usr/bin/env bash
     set -euo pipefail
-    ISO=$(ls result/iso/*.iso 2>/dev/null | head -1)
-    if [ -z "$ISO" ]; then
-      echo "❌  No ISO found. Run 'just build-office-pc-iso' first."
+
+    NEW_KEY_ID=""
+    if gh auth status &>/dev/null; then
+      echo "Already authenticated with GitHub."
+      echo ""
+      echo "SSH keys on your account:"
+      gh ssh-key list
+      echo ""
+      read -p "Enter key ID to delete after install (or leave blank to skip): " NEW_KEY_ID
+    else
+      echo "Authenticating with GitHub..."
+      KEYS_BEFORE=$(gh api /user/keys --jq '.[].id' 2>/dev/null || true)
+      gh auth login -p ssh -s admin:public_key
+      KEYS_AFTER=$(gh api /user/keys --jq '.[].id')
+      NEW_KEY_ID=$(comm -13 <(echo "$KEYS_BEFORE" | sort) <(echo "$KEYS_AFTER" | sort))
+    fi
+
+    read -s -p "Enter LUKS password: " LUKS_PASS
+    echo
+    read -s -p "Confirm LUKS password: " LUKS_PASS2
+    echo
+    if [ "$LUKS_PASS" != "$LUKS_PASS2" ]; then
+      echo "Passwords do not match!"
       exit 1
     fi
-    DEV="{{ device }}"
-    if [ -z "$DEV" ]; then
-      if lsblk /dev/sdb &>/dev/null; then
-        echo "Found /dev/sdb:"
-        lsblk /dev/sdb
-        DEV="/dev/sdb"
-      else
-        echo "❌  No device specified and /dev/sdb not found."
-        echo "Usage: just write-iso /dev/sdX"
-        exit 1
-      fi
+    echo "$LUKS_PASS" > /tmp/luks-password
+
+    echo "Partitioning /dev/nvme1n1 with disko..."
+    sudo nix run github:nix-community/disko -- --mode disko ./hosts/office-pc/disk-config.nix
+
+    rm -f /tmp/luks-password
+
+    echo "Installing NixOS..."
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token)"
+    sudo --preserve-env=NIX_CONFIG nixos-install --flake .#office-pc --no-root-passwd
+
+    if [ -n "$NEW_KEY_ID" ]; then
+      echo "Removing temporary SSH key from GitHub..."
+      gh ssh-key delete "$NEW_KEY_ID" --yes
     fi
-    # Strip partition number if given (e.g. /dev/sdb1 -> /dev/sdb)
-    DEV=$(echo "$DEV" | sed 's/[0-9]*$//')
-    echo "📀  Writing $ISO -> $DEV"
-    # Unmount any mounted partitions on the device
-    for part in $(lsblk -ln -o NAME "$DEV" | tail -n +2); do
-      if mountpoint -q "/dev/$part" 2>/dev/null || findmnt "/dev/$part" &>/dev/null; then
-        echo "Unmounting /dev/$part..."
-        sudo umount "/dev/$part" || true
-      fi
-    done
-    sudo dd if="$ISO" of="$DEV" bs=4M status=progress oflag=sync
-    echo "✅  ISO written to $DEV"
+
+    echo "Done! You can reboot now."
 
 # ── Remote hosts ─────────────────────────────────────────────────────────
 

@@ -597,60 +597,6 @@
           ];
         };
 
-        # Installer ISO for office-pc with disko
-        office-pc-installer = nixpkgs.lib.nixosSystem {
-          modules = [
-            "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-calamares-plasma6.nix"
-            disko.nixosModules.disko
-            ./hosts/office-pc/disk-config.nix
-            (
-              { pkgs, ... }:
-              let
-                diskoScript = self.nixosConfigurations.office-pc.config.system.build.diskoScript;
-              in
-              {
-                nixpkgs.hostPlatform = "x86_64-linux";
-                networking.wireless.enable = nixpkgs.lib.mkForce false;
-                networking.networkmanager.enable = true;
-
-                environment.systemPackages = [
-                  pkgs.git
-                  pkgs.gh
-                  disko.packages.x86_64-linux.disko
-                  (pkgs.writeShellScriptBin "install-office-pc" ''
-                    set -euo pipefail
-
-                    echo "Authenticating with GitHub..."
-                    gh auth login
-
-                    echo "Cloning dotfiles repo..."
-                    git clone https://github.com/joegoldin/dotfiles.git /tmp/dotfiles
-
-                    read -s -p "Enter LUKS password: " LUKS_PASS
-                    echo
-                    read -s -p "Confirm LUKS password: " LUKS_PASS2
-                    echo
-                    if [ "$LUKS_PASS" != "$LUKS_PASS2" ]; then
-                      echo "Passwords do not match!"
-                      exit 1
-                    fi
-                    echo "$LUKS_PASS" > /tmp/luks-password
-
-                    echo "Partitioning /dev/nvme1n1 with disko..."
-                    sudo ${diskoScript}
-
-                    rm -f /tmp/luks-password
-
-                    echo "Installing NixOS..."
-                    sudo nixos-install --flake /tmp/dotfiles#office-pc --no-root-passwd
-
-                    echo "Done! You can reboot now."
-                  '')
-                ];
-              }
-            )
-          ];
-        };
       };
 
       # Darwin/macOS configuration entrypoint
