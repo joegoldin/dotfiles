@@ -166,9 +166,9 @@ deploy-racknerd IP:
 
 [unix]
 rebuild-racknerd:
-    @echo "🔨  Rebuilding NixOS on RackNerd VPS..."
+    @echo "🔨  Rebuilding NixOS on RackNerd VPS (build locally, deploy remote)..."
     @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
-     nh os switch . -H racknerd-cloud-agent --accept-flake-config
+     nixos-rebuild switch --flake .#racknerd-cloud-agent --target-host joe@racknerd-cloud-agent --build-host localhost --accept-flake-config
     @echo "✅  Rebuilt RackNerd VPS!"
 
 # ── Package management ───────────────────────────────────────────────────
