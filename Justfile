@@ -100,7 +100,7 @@ save-launchpad:
 #   nix-shell -p just
 #   just install-office-pc
 
-[unix, confirm("This will ERASE /dev/nvme1n1. Continue?")]
+[unix]
 install-office-pc:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -126,20 +126,24 @@ install-office-pc:
       NEW_KEY_ID=$(comm -13 <(echo "$KEYS_BEFORE" | sort) <(echo "$KEYS_AFTER" | sort))
     fi
 
-    read -s -p "Enter LUKS password: " LUKS_PASS
-    echo
-    read -s -p "Confirm LUKS password: " LUKS_PASS2
-    echo
-    if [ "$LUKS_PASS" != "$LUKS_PASS2" ]; then
-      echo "Passwords do not match!"
-      exit 1
+    if findmnt /mnt &>/dev/null; then
+      echo "Disk already mounted at /mnt, skipping format."
+    else
+      read -s -p "Enter LUKS password: " LUKS_PASS
+      echo
+      read -s -p "Confirm LUKS password: " LUKS_PASS2
+      echo
+      if [ "$LUKS_PASS" != "$LUKS_PASS2" ]; then
+        echo "Passwords do not match!"
+        exit 1
+      fi
+      echo "$LUKS_PASS" > /tmp/luks-password
+
+      echo "Partitioning /dev/nvme1n1 with disko..."
+      sudo nix --extra-experimental-features 'nix-command flakes' run github:nix-community/disko --accept-flake-config -- --mode destroy,format,mount --yes-wipe-all-disks ./hosts/office-pc/disk-config.nix
+
+      rm -f /tmp/luks-password
     fi
-    echo "$LUKS_PASS" > /tmp/luks-password
-
-    echo "Partitioning /dev/nvme1n1 with disko..."
-    sudo nix --extra-experimental-features 'nix-command flakes' run github:nix-community/disko --accept-flake-config -- --mode destroy,format,mount --yes-wipe-all-disks ./hosts/office-pc/disk-config.nix
-
-    rm -f /tmp/luks-password
 
     echo "Installing NixOS..."
     NIX_CONFIG="extra-experimental-features = nix-command flakes"
