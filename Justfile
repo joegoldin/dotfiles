@@ -169,10 +169,24 @@ rebuild-racknerd:
     #!/usr/bin/env bash
     set -euo pipefail
     echo "🔨  Rebuilding NixOS on RackNerd VPS (build locally, deploy remote)..."
-    SSH_DOMAIN=$(nix eval --impure --expr '(import ./secrets/domains.nix).sshDomain' --raw)
+    DOMAINS="import ./secrets/domains.nix"
+    SSH_DOMAIN=$(nix eval --impure --expr "($DOMAINS).racknerdSshDomain" --raw)
+    SSH_USER=$(nix eval --impure --expr "($DOMAINS).sshUser" --raw)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nixos-rebuild switch --flake .#racknerd-cloud-agent --target-host "joe@$SSH_DOMAIN" --build-host localhost --use-remote-sudo --accept-flake-config --log-format internal-json -v |& nom --json
+    nixos-rebuild switch --flake .#racknerd-cloud-agent --target-host "$SSH_USER@$SSH_DOMAIN" --build-host localhost --use-remote-sudo --accept-flake-config --log-format internal-json -v |& nom --json
     echo "✅  Rebuilt RackNerd VPS!"
+
+[unix]
+rebuild-bastion:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "🔨  Rebuilding NixOS on Oracle Cloud bastion (build locally, deploy remote)..."
+    DOMAINS="import ./secrets/domains.nix"
+    BASTION_DOMAIN=$(nix eval --impure --expr "($DOMAINS).bastionDomain" --raw)
+    SSH_USER=$(nix eval --impure --expr "($DOMAINS).sshUser" --raw)
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    nixos-rebuild switch --flake .#oracle-cloud-bastion --target-host "$SSH_USER@$BASTION_DOMAIN" --build-host localhost --use-remote-sudo --accept-flake-config --log-format internal-json -v |& nom --json
+    echo "✅  Rebuilt Oracle Cloud bastion!"
 
 # ── Package management ───────────────────────────────────────────────────
 
