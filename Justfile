@@ -185,7 +185,7 @@ build-to-bastion:
     BASTION_DOMAIN=$(nix eval --impure --expr "($DOMAINS).bastionDomain" --raw)
     SSH_USER=$(nix eval --impure --expr "($DOMAINS).sshUser" --raw)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nixos-rebuild switch --flake .#oracle-cloud-bastion --target-host "$SSH_USER@$BASTION_DOMAIN" --build-host localhost --sudo --accept-flake-config --log-format internal-json -v |& nom --json
+    nixos-rebuild switch --flake .#oracle-cloud-bastion --target-host "$SSH_USER@$BASTION_DOMAIN" --build-host localhost --sudo --ask-sudo-password --accept-flake-config --log-format internal-json -v |& nom --json
     echo "✅  Rebuilt Oracle Cloud bastion!"
 
 # ── Package management ───────────────────────────────────────────────────
