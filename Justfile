@@ -164,6 +164,7 @@ install-office-pc:
     sudo mkdir -p /mnt/tmp /mnt/nix-store-overlay/upper /mnt/nix-store-overlay/work
     export TMPDIR=/mnt/tmp
     sudo mount -t overlay overlay -o lowerdir=/nix/store,upperdir=/mnt/nix-store-overlay/upper,workdir=/mnt/nix-store-overlay/work /nix/store
+    ulimit -n 1048576
     echo "Building NixOS configuration..."
     sudo --preserve-env=NIX_CONFIG,TMPDIR nix build .#nixosConfigurations.office-pc.config.system.build.toplevel --log-format internal-json -v 2>&1 | nix run nixpkgs#nix-output-monitor -- --json
     echo "Installing NixOS to /mnt..."
