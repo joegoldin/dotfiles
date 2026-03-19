@@ -103,7 +103,7 @@ build-office-pc-iso:
     set -euo pipefail
     echo "Decrypting attic netrc from 1Password..."
     trap 'rm -f /tmp/attic-netrc' EXIT
-    secrets/secret-helper.sh decrypt attic-netrc /tmp/attic-netrc
+    scripts/secret-helper.sh decrypt attic-netrc /tmp/attic-netrc
     echo "Building office-pc installer ISO..."
     nix build .#nixosConfigurations.office-pc-installer.config.system.build.isoImage --impure --log-format internal-json -v |& nom --json
     rm -f /tmp/attic-netrc
@@ -140,6 +140,12 @@ write-iso device="":
     done
     sudo dd if="$ISO" of="$DEV" bs=4M status=progress oflag=sync
     echo "ISO written to $DEV"
+
+# ── Secrets ──────────────────────────────────────────────────────────────
+
+[unix]
+secret *args:
+    @scripts/secret-helper.sh {{ args }}
 
 # ── Remote hosts ─────────────────────────────────────────────────────────
 
