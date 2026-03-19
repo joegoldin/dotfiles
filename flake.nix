@@ -691,8 +691,19 @@
                     fi
 
                     # Step 4: Create Secure Boot keys for Lanzaboote
-                    sudo mkdir -p /mnt/var/lib/sbctl
-                    sudo sbctl create-keys --database-path /mnt/var/lib/sbctl/keys
+                    # sbctl doesn't work on live ISO, generate keys manually
+                    SBKEYS=/mnt/var/lib/sbctl/keys
+                    if [ ! -f "$SBKEYS/db/db.key" ]; then
+                      sudo mkdir -p "$SBKEYS"/{PK,KEK,db}
+                      for name in PK KEK db; do
+                        sudo openssl req -new -x509 -subj "/CN=$name/" -days 3650 -nodes \
+                          -newkey rsa:4096 -sha256 \
+                          -keyout "$SBKEYS/$name/$name.key" -out "$SBKEYS/$name/$name.pem"
+                      done
+                      echo "Secure Boot keys generated."
+                    else
+                      echo "Secure Boot keys already exist, skipping."
+                    fi || true
 
                     # Step 5: Install NixOS
                     echo "Installing NixOS..."
