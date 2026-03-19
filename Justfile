@@ -108,6 +108,11 @@ install-office-pc:
     NEW_KEY_ID=""
     if gh auth status &>/dev/null; then
       echo "Already authenticated with GitHub."
+      # Ensure we have the admin:public_key scope
+      if ! gh api /user/keys &>/dev/null; then
+        echo "Missing admin:public_key scope, refreshing..."
+        gh auth refresh -s admin:public_key
+      fi
       echo ""
       echo "SSH keys on your account:"
       gh ssh-key list
@@ -132,13 +137,13 @@ install-office-pc:
     echo "$LUKS_PASS" > /tmp/luks-password
 
     echo "Partitioning /dev/nvme1n1 with disko..."
-    sudo nix run github:nix-community/disko -- --mode disko ./hosts/office-pc/disk-config.nix
+    sudo nix --extra-experimental-features 'nix-command flakes' run github:nix-community/disko -- --mode disko ./hosts/office-pc/disk-config.nix --accept-flake-config
 
     rm -f /tmp/luks-password
 
     echo "Installing NixOS..."
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token)"
-    sudo --preserve-env=NIX_CONFIG nixos-install --flake .#office-pc --no-root-passwd
+    sudo --preserve-env=NIX_CONFIG nixos-install --flake .#office-pc --no-root-passwd --accept-flake-config
 
     if [ -n "$NEW_KEY_ID" ]; then
       echo "Removing temporary SSH key from GitHub..."
