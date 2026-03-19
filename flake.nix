@@ -652,6 +652,9 @@
                   (pkgs.writeShellScriptBin "install-office-pc" ''
                     set -euo pipefail
 
+                    # Kill Calamares if it's running
+                    pkill -f calamares 2>/dev/null || true
+
                     header() {
                       echo ""
                       echo "========================================"
