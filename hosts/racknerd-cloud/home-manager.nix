@@ -1,18 +1,65 @@
-# This is your home-manager configuration file for headless servers
-# Use this to configure your home environment (it replaces ~/.config/nixpkgs/home.nix)
+# Lightweight home-manager config for headless server
+# Does NOT import ../common/home (too large for VPS disk)
+# Instead, imports only the modules a server needs
 {
   lib,
   pkgs,
+  inputs,
+  username,
+  homeDirectory,
+  stateVersion,
   ...
 }:
 {
   imports = [
-    ../common/home
+    inputs.nix-attic-infra.homeManagerModules.attic-client
+    ../common/home/fish
+    ../common/home/gh.nix
+    ../common/home/git.nix
+    ../common/home/attic.nix
+    ../common/home/starship.nix
   ];
 
-  # Disable fish-ai installation for headless server
-  xdg.dataFile."fish-ai".enable = lib.mkForce false;
-  home.activation.fishAiCleanup = lib.mkForce (lib.hm.dag.entryAnywhere "");
+  programs.home-manager.enable = true;
+  systemd.user.startServices = "sd-switch";
+
+  home = {
+    inherit stateVersion username homeDirectory;
+
+    packages = with pkgs; [
+      attic-client
+      comma
+      coreutils
+      direnv
+      dua
+      file
+      fish
+      fzf
+      gawk
+      git
+      gnumake
+      gnupg
+      gnused
+      gnutar
+      httpie
+      jq
+      lazydocker
+      nix-output-monitor
+      nix-your-shell
+      nixfmt
+      ripgrep
+      tmux
+      tree
+      unstable.just
+      unzip
+      watch
+      wget
+      which
+      yq-go
+      zip
+      zstd
+    ];
+  };
 
   # lorri for nix-shell
   services.lorri.enable = true;
