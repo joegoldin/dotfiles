@@ -169,6 +169,10 @@ install-office-pc:
     echo "Installing NixOS to /mnt..."
     sudo --preserve-env=NIX_CONFIG,TMPDIR nixos-install --flake .#office-pc --no-root-passwd --no-channel-copy
 
+    # Clean up overlay and tmp from target disk
+    sudo umount /nix/store || true
+    sudo rm -rf /mnt/nix-store-overlay /mnt/tmp
+
     if [ -n "$NEW_KEY_ID" ]; then
       echo "Removing temporary SSH key from GitHub"
       gh ssh-key delete "$NEW_KEY_ID" --yes
