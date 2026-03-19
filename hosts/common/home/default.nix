@@ -36,6 +36,13 @@
   # Enable home-manager
   programs.home-manager.enable = true;
 
+  # GPG
+  programs.gpg.enable = true;
+  services.gpg-agent = {
+    enable = true;
+    pinentry.package = pkgs.pinentry-curses;
+  };
+
   # Nicely reload system units when changing configs
   systemd.user.startServices = "sd-switch";
 
