@@ -166,10 +166,13 @@ deploy-racknerd IP:
 
 [unix]
 rebuild-racknerd:
-    @echo "🔨  Rebuilding NixOS on RackNerd VPS (build locally, deploy remote)..."
-    @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
-     nixos-rebuild switch --flake .#racknerd-cloud-agent --target-host joe@racknerd-cloud-agent --build-host localhost --accept-flake-config
-    @echo "✅  Rebuilt RackNerd VPS!"
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "🔨  Rebuilding NixOS on RackNerd VPS (build locally, deploy remote)..."
+    SSH_DOMAIN=$(nix eval --impure --expr '(import ./secrets/domains.nix).sshDomain' --raw)
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    nixos-rebuild switch --flake .#racknerd-cloud-agent --target-host "joe@$SSH_DOMAIN" --build-host localhost --accept-flake-config
+    echo "✅  Rebuilt RackNerd VPS!"
 
 # ── Package management ───────────────────────────────────────────────────
 
