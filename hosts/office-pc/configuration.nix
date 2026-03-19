@@ -27,6 +27,9 @@
     };
   };
 
+  # Enable aarch64 cross-compilation via QEMU
+  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+
   nixpkgs = {
     overlays = commonOverlays;
     config = {
