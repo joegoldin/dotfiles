@@ -163,7 +163,10 @@ install-office-pc:
     # Use target disk for temp files to avoid ISO tmpfs running out of space
     sudo mkdir -p /mnt/tmp
     export TMPDIR=/mnt/tmp
-    sudo --preserve-env=NIX_CONFIG,TMPDIR nixos-install --flake .#office-pc --no-root-passwd --no-channel-copy 2>&1 | nix run nixpkgs#nix-output-monitor
+    echo "Building NixOS configuration..."
+    sudo --preserve-env=NIX_CONFIG,TMPDIR nix build .#nixosConfigurations.office-pc.config.system.build.toplevel --log-format internal-json -v 2>&1 | nix run nixpkgs#nix-output-monitor -- --json
+    echo "Installing NixOS to /mnt..."
+    sudo --preserve-env=NIX_CONFIG,TMPDIR nixos-install --flake .#office-pc --no-root-passwd --no-channel-copy
 
     if [ -n "$NEW_KEY_ID" ]; then
       echo "Removing temporary SSH key from GitHub"
