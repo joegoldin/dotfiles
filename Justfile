@@ -146,9 +146,11 @@ install-office-pc:
     NIX_CONFIG="$NIX_CONFIG"$'\n'"access-tokens = github.com=$(gh auth token)"
     NIX_CONFIG="$NIX_CONFIG"$'\n'"accept-flake-config = true"
     export NIX_CONFIG
-    # Rewrite SSH URLs to HTTPS so submodules use gh auth token
-    sudo git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
-    sudo git config --global url."https://github.com/".insteadOf "git@github.com:"
+    # Copy SSH key to root so nixos-install can fetch private submodules
+    sudo mkdir -p /root/.ssh
+    sudo cp ~/.ssh/id_ed25519 /root/.ssh/
+    sudo chmod 600 /root/.ssh/id_ed25519
+    sudo ssh-keyscan github.com 2>/dev/null | sudo tee /root/.ssh/known_hosts >/dev/null
     sudo --preserve-env=NIX_CONFIG nixos-install --flake .#office-pc --no-root-passwd
 
     if [ -n "$NEW_KEY_ID" ]; then
