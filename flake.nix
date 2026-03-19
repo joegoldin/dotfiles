@@ -754,19 +754,12 @@
                     sudo chmod 600 /root/.ssh/id_ed25519
                     sudo ssh-keyscan github.com 2>/dev/null | sudo tee /root/.ssh/known_hosts >/dev/null
 
-                    echo "Mounting nix store overlay on target disk..."
-                    sudo mkdir -p /mnt/nix-rw-store
-                    sudo mount --bind /mnt/nix-rw-store /nix/.rw-store
                     sudo prlimit --nofile=1048576 --pid=$$
 
                     echo "Running nixos-install..."
                     sudo --preserve-env=NIX_CONFIG nixos-install --flake "$DOTFILES#office-pc" --no-root-passwd --no-channel-copy 2>&1 | nom
 
                     header "Step 6/7: Cleanup"
-                    echo "Unmounting nix store overlay..."
-                    sudo umount /nix/.rw-store || true
-                    echo "Removing temp dirs..."
-                    sudo rm -rf /mnt/nix-rw-store /mnt/nix-store-overlay /mnt/tmp
 
                     if [ -n "$NEW_KEY_ID" ]; then
                       echo "Removing temporary SSH key from GitHub..."
