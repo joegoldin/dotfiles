@@ -160,9 +160,10 @@ install-office-pc:
     sudo cp ~/.ssh/id_ed25519 /root/.ssh/
     sudo chmod 600 /root/.ssh/id_ed25519
     sudo ssh-keyscan github.com 2>/dev/null | sudo tee /root/.ssh/known_hosts >/dev/null
-    # Use target disk for temp files to avoid ISO tmpfs running out of space
-    sudo mkdir -p /mnt/tmp
+    # Use target disk for nix store writes (overlay over ISO's read-only store)
+    sudo mkdir -p /mnt/tmp /mnt/nix-store-overlay/upper /mnt/nix-store-overlay/work
     export TMPDIR=/mnt/tmp
+    sudo mount -t overlay overlay -o lowerdir=/nix/store,upperdir=/mnt/nix-store-overlay/upper,workdir=/mnt/nix-store-overlay/work /nix/store
     echo "Building NixOS configuration..."
     sudo --preserve-env=NIX_CONFIG,TMPDIR nix build .#nixosConfigurations.office-pc.config.system.build.toplevel --log-format internal-json -v 2>&1 | nix run nixpkgs#nix-output-monitor -- --json
     echo "Installing NixOS to /mnt..."
