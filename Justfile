@@ -142,13 +142,13 @@ install-office-pc:
     rm -f /tmp/luks-password
 
     echo "Installing NixOS..."
-    export NIX_CONFIG="access-tokens = github.com=$(gh auth token)"
-    export NIX_CONFIG="$NIX_CONFIG
-accept-flake-config = true"
+    NIX_CONFIG="access-tokens = github.com=$(gh auth token)"
+    NIX_CONFIG="$NIX_CONFIG"$'\n'"accept-flake-config = true"
+    export NIX_CONFIG
     sudo --preserve-env=NIX_CONFIG nixos-install --flake .#office-pc --no-root-passwd
 
     if [ -n "$NEW_KEY_ID" ]; then
-      echo "Removing temporary SSH key from GitHub..."
+      echo "Removing temporary SSH key from GitHub"
       gh ssh-key delete "$NEW_KEY_ID" --yes
     fi
 
