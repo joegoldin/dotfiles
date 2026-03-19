@@ -108,10 +108,10 @@ install-office-pc:
     NEW_KEY_ID=""
     if gh auth status &>/dev/null; then
       echo "Already authenticated with GitHub."
-      # Ensure we have the admin:public_key scope
-      if ! gh api /user/keys &>/dev/null; then
-        echo "Missing admin:public_key scope, refreshing..."
-        gh auth refresh -s admin:public_key
+      # Ensure we have the required scopes for listing/deleting SSH keys
+      if ! gh api /user/keys &>/dev/null || ! gh api /user/ssh_signing_keys &>/dev/null; then
+        echo "Missing required scopes, refreshing..."
+        gh auth refresh -s admin:public_key -s admin:ssh_signing_key
       fi
       echo ""
       echo "SSH keys on your account:"
@@ -121,7 +121,7 @@ install-office-pc:
     else
       echo "Authenticating with GitHub..."
       KEYS_BEFORE=$(gh api /user/keys --jq '.[].id' 2>/dev/null || true)
-      gh auth login -p ssh -s admin:public_key
+      gh auth login -p ssh -s admin:public_key -s admin:ssh_signing_key
       KEYS_AFTER=$(gh api /user/keys --jq '.[].id')
       NEW_KEY_ID=$(comm -13 <(echo "$KEYS_BEFORE" | sort) <(echo "$KEYS_AFTER" | sort))
     fi
