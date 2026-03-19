@@ -152,7 +152,7 @@ install-office-pc:
     sudo chmod 600 /root/.ssh/id_ed25519
     sudo ssh-keyscan github.com 2>/dev/null | sudo tee /root/.ssh/known_hosts >/dev/null
     echo "Building NixOS configuration..."
-    nix build .#nixosConfigurations.office-pc.config.system.build.toplevel --log-format internal-json -v 2>&1 | nix run nixpkgs#nix-output-monitor -- --json
+    sudo --preserve-env=NIX_CONFIG nix build .#nixosConfigurations.office-pc.config.system.build.toplevel --store /mnt --log-format internal-json -v 2>&1 | nix run nixpkgs#nix-output-monitor -- --json
     echo "Installing NixOS to /mnt..."
     sudo --preserve-env=NIX_CONFIG nixos-install --flake .#office-pc --no-root-passwd --no-channel-copy
 
