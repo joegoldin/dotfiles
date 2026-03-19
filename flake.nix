@@ -372,7 +372,6 @@
             nix-index-database.nixosModules.default
             pelican.nixosModules.default
             { nixpkgs.overlays = [ pelican.overlays.default ]; }
-            inputs.attic.nixosModules.atticd
             # > Our main nixos configuration <
             ./hosts/oracle-cloud
             home-manager.nixosModules.home-manager
@@ -398,12 +397,6 @@
                   owner = specialArgs.username;
                   group = "users";
                 };
-                age.secrets.atticd-env = {
-                  file = "${dotfiles-secrets}/atticd.env.age";
-                  mode = "0400";
-                  owner = "root";
-                  group = "root";
-                };
                 age.secrets.attic-netrc = {
                   file = "${dotfiles-secrets}/attic-netrc.age";
                   mode = "0400";
@@ -421,6 +414,7 @@
           modules = [
             disko.nixosModules.disko
             nix-index-database.nixosModules.default
+            inputs.attic.nixosModules.atticd
             # > Our main nixos configuration <
             ./hosts/racknerd-cloud
             home-manager.nixosModules.home-manager
@@ -440,6 +434,12 @@
             (
               { specialArgs, ... }:
               {
+                age.secrets.atticd-env = {
+                  file = "${dotfiles-secrets}/atticd.env.age";
+                  mode = "0400";
+                  owner = "root";
+                  group = "root";
+                };
                 age.secrets.attic-netrc = {
                   file = "${dotfiles-secrets}/attic-netrc.age";
                   mode = "0400";
@@ -622,8 +622,10 @@
                 networking.wireless.enable = nixpkgs.lib.mkForce false;
                 networking.networkmanager.enable = true;
 
-                # Disable Calamares installer autostart
-                services.calamares.enable = nixpkgs.lib.mkForce false;
+                # Remove Calamares installer autostart
+                system.activationScripts.removeCalamares = ''
+                  rm -f /etc/xdg/autostart/calamares.desktop
+                '';
 
                 # Disable sleep/suspend on live ISO
                 services.logind.lidSwitch = "ignore";
