@@ -2,9 +2,7 @@
 # Does NOT import ../common/home (too large for VPS disk)
 # Instead, imports only the modules a server needs
 {
-  lib,
   pkgs,
-  inputs,
   username,
   homeDirectory,
   stateVersion,
