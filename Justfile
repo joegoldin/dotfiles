@@ -151,7 +151,10 @@ install-office-pc:
     sudo cp ~/.ssh/id_ed25519 /root/.ssh/
     sudo chmod 600 /root/.ssh/id_ed25519
     sudo ssh-keyscan github.com 2>/dev/null | sudo tee /root/.ssh/known_hosts >/dev/null
-    sudo --preserve-env=NIX_CONFIG nixos-install --flake .#office-pc --no-root-passwd 2>&1 | nix --extra-experimental-features 'nix-command flakes' run nixpkgs#nix-output-monitor
+    echo "Building NixOS configuration..."
+    nix build .#nixosConfigurations.office-pc.config.system.build.toplevel --log-format internal-json -v 2>&1 | nix run nixpkgs#nix-output-monitor -- --json
+    echo "Installing NixOS to /mnt..."
+    sudo --preserve-env=NIX_CONFIG nixos-install --flake .#office-pc --no-root-passwd --no-channel-copy
 
     if [ -n "$NEW_KEY_ID" ]; then
       echo "Removing temporary SSH key from GitHub"
