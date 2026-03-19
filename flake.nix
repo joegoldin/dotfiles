@@ -618,9 +618,12 @@
                 networking.wireless.enable = nixpkgs.lib.mkForce false;
                 networking.networkmanager.enable = true;
 
-                # Remove Calamares installer autostart
-                system.activationScripts.removeCalamares = ''
-                  rm -f /etc/xdg/autostart/calamares.desktop
+                # Disable Calamares installer autostart
+                environment.etc."xdg/autostart/calamares.desktop".text = ''
+                  [Desktop Entry]
+                  Type=Application
+                  Name=Calamares
+                  Hidden=true
                 '';
 
                 # Disable sleep/suspend on live ISO
