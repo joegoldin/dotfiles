@@ -66,6 +66,8 @@ in
   };
 
   # Caddy reverse proxy for Pelican Panel
+  services.caddy.enable = true;
+  networking.firewall.allowedTCPPorts = [ 80 443 ];
   services.caddy.virtualHosts."http://${domains.pelicanDomain}" = {
     extraConfig = ''
       root * ${panelCfg.package}/public
