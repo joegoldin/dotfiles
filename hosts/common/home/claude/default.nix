@@ -50,9 +50,28 @@ let
   # Get the agent-skills plugin (includes all skills, commands, agents, hooks, MCP, LSP)
   agentSkillsPlugin = inputs.agent-skills.packages.${pkgs.system}.default;
 
+  # Local skills defined in this repo
+  localSkill =
+    name:
+    claudeLib.mkSkill {
+      inherit name;
+      description = "";
+    } (builtins.readFile ./skills/${name}/SKILL.md);
+
+  localPlugin = claudeLib.mkPlugin {
+    name = "local";
+    description = "Local skills from dotfiles";
+    skills = [
+      (localSkill "git-hunk")
+    ];
+  };
+
   # Create wrapped claude binary with plugins
   claudeWithPluginsBase = claudeLib.mkClaude {
-    plugins = [ agentSkillsPlugin ];
+    plugins = [
+      agentSkillsPlugin
+      localPlugin
+    ];
   };
 
   # Wrap claude to always pass --verbose
