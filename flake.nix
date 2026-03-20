@@ -716,8 +716,16 @@
                       echo ""
                       qrencode -t ANSIUTF8 "https://github.com/login/device?skip_account_picker=true" 2>/dev/null || true
                       echo ""
-                      KEYS_BEFORE=$(gh api /user/keys --jq '.[].id' 2>/dev/null || true)
-                      BROWSER=false GH_BROWSER=false gh auth login -p ssh -s admin:public_key -s admin:ssh_signing_key
+
+                      # Generate SSH key, upload to GitHub, and add to agent
+                      ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N "" -q
+                      eval "$(ssh-agent -s)"
+                      ssh-add ~/.ssh/id_ed25519
+                      ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null
+
+                      KEYS_BEFORE=$(BROWSER=false GH_BROWSER=false gh auth login -p https -s admin:public_key -s admin:ssh_signing_key && gh api /user/keys --jq '.[].id' 2>/dev/null || true)
+                      echo "Uploading SSH key to GitHub..."
+                      gh ssh-key add ~/.ssh/id_ed25519.pub -t "nixos-installer"
                       KEYS_AFTER=$(gh api /user/keys --jq '.[].id')
                       NEW_KEY_ID=$(comm -13 <(echo "$KEYS_BEFORE" | sort) <(echo "$KEYS_AFTER" | sort))
                     fi
