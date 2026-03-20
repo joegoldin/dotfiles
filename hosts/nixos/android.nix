@@ -18,6 +18,7 @@ in
 {
   home.packages = [
     (unstable.android-studio.withSdk androidSdk)
+    androidSdk
     unstable.android-tools
   ];
 }

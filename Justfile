@@ -177,15 +177,19 @@ build-to-racknerd:
     echo "✅  Rebuilt RackNerd VPS!"
 
 [unix]
-build-to-bastion:
+build-to-bastion local="":
     #!/usr/bin/env bash
     set -euo pipefail
-    echo "🔨  Rebuilding NixOS on Oracle Cloud bastion (build locally, deploy remote)..."
+    echo "🔨  Rebuilding NixOS on Oracle Cloud bastion..."
     DOMAINS="import ./secrets/domains.nix"
     BASTION_DOMAIN=$(nix eval --impure --expr "($DOMAINS).bastionDomain" --raw)
     SSH_USER=$(nix eval --impure --expr "($DOMAINS).sshUser" --raw)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nixos-rebuild switch --flake .#oracle-cloud-bastion --target-host "$SSH_USER@$BASTION_DOMAIN" --build-host localhost --sudo --ask-sudo-password --accept-flake-config --log-format internal-json -v |& nom --json
+    BUILD_HOST_ARGS=()
+    if [ "{{ local }}" = "--local" ]; then
+      BUILD_HOST_ARGS=(--build-host localhost)
+    fi
+    nixos-rebuild switch --flake .#oracle-cloud-bastion --target-host "$SSH_USER@$BASTION_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --ask-sudo-password --accept-flake-config
     echo "✅  Rebuilt Oracle Cloud bastion!"
 
 # ── Package management ───────────────────────────────────────────────────
