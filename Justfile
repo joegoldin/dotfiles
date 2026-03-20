@@ -189,7 +189,7 @@ build-to-bastion local="":
     if [ "{{ local }}" = "--local" ]; then
       BUILD_HOST_ARGS=(--build-host localhost)
     fi
-    nixos-rebuild switch --flake .#oracle-cloud-bastion --target-host "$SSH_USER@$BASTION_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --ask-sudo-password --accept-flake-config --log-format internal-json -v |& nom --json
+    nixos-rebuild switch --flake .#oracle-cloud-bastion --target-host "$SSH_USER@$BASTION_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --ask-sudo-password --accept-flake-config
     echo "✅  Rebuilt Oracle Cloud bastion!"
 
 # ── Package management ───────────────────────────────────────────────────
