@@ -666,7 +666,24 @@
                   pkgs.nix-output-monitor
                   pkgs.sbctl
                   pkgs.openssl
+                  pkgs.qrencode
                   (pkgs.writeShellScriptBin "install-office-pc" ''
+                    LOGFILE="/tmp/install-office-pc.log"
+                    exec > >(tee -a "$LOGFILE") 2>&1
+
+                    on_error() {
+                      echo ""
+                      echo "========================================"
+                      echo "  INSTALLATION FAILED"
+                      echo "  Log saved to: $LOGFILE"
+                      echo "========================================"
+                      echo ""
+                      echo "Press Enter to close..."
+                      read -r
+                      exit 1
+                    }
+                    trap on_error ERR
+
                     set -euo pipefail
 
                     # Kill Calamares if it's running
@@ -695,8 +712,12 @@
                       read -p "Enter key ID to delete after install (or leave blank to skip): " NEW_KEY_ID
                     else
                       echo "Authenticating with GitHub..."
+                      echo "Scan the QR code or visit the URL below to authenticate:"
+                      echo ""
+                      qrencode -t ANSIUTF8 "https://github.com/login/device?skip_account_picker=true" 2>/dev/null || true
+                      echo ""
                       KEYS_BEFORE=$(gh api /user/keys --jq '.[].id' 2>/dev/null || true)
-                      gh auth login -p ssh -s admin:public_key -s admin:ssh_signing_key
+                      BROWSER=false GH_BROWSER=false gh auth login -p ssh -s admin:public_key -s admin:ssh_signing_key
                       KEYS_AFTER=$(gh api /user/keys --jq '.[].id')
                       NEW_KEY_ID=$(comm -13 <(echo "$KEYS_BEFORE" | sort) <(echo "$KEYS_AFTER" | sort))
                     fi
