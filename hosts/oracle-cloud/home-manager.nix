@@ -6,7 +6,7 @@
     ../common/home
   ];
 
-  # Disable fish-ai installation for headless server
+  # Disable desktop packages for headless server
   xdg.dataFile."fish-ai".enable = lib.mkForce false;
   home.activation.fishAiCleanup = lib.mkForce (lib.hm.dag.entryAnywhere "");
 

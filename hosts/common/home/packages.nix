@@ -28,7 +28,7 @@ let
       cachix
       caddy
       # claude-code is provided by ./claude module with plugins
-      claude-container
+      # claude-container is added per-host (needs native build, no QEMU)
       clojure
       codex
       comma

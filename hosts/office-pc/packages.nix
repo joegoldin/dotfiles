@@ -11,6 +11,7 @@ in
   home.packages =
     with pkgs;
     lib.optionals pkgs.stdenv.hostPlatform.isx86_64 [
+      claude-container
       docker-buildx
       inotify-tools
       localsend
