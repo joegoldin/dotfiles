@@ -69,6 +69,8 @@ pkgs: {
     electron = pkgs.electron_37;
   };
 
+  git-hunk = pkgs.callPackage ./git-hunk.nix { };
+
   yepanywhere = pkgs.callPackage ./yepanywhere { };
   yepanywhere-relay = pkgs.callPackage ./yepanywhere-relay { };
   yepanywhere-remote = pkgs.callPackage ./yepanywhere-remote { };

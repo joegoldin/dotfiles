@@ -46,6 +46,7 @@ let
       gawk
       # gh is managed by programs.gh in gh.nix
       git
+      git-hunk
       gitleaks
       git-stack
       git-worktree-switcher
