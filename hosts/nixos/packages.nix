@@ -19,6 +19,7 @@ in
       cameractrls-gtk3
       chromedriver
       goModule.packages.claude-squad
+      claude-container
       claude-desktop-fhs
       unstable.cloudflared
       unstable.darktable

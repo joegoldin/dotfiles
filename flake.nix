@@ -626,12 +626,29 @@
                   Hidden=true
                 '';
 
-                # Disable sleep/suspend on live ISO
+                # Enable flakes
+                nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+                # Disable sleep/suspend/screen-off on live ISO
                 services.logind.lidSwitch = "ignore";
                 systemd.targets.sleep.enable = false;
                 systemd.targets.suspend.enable = false;
                 systemd.targets.hibernate.enable = false;
                 systemd.targets.hybrid-sleep.enable = false;
+                services.xserver.serverFlagsSection = ''
+                  Option "BlankTime" "0"
+                  Option "StandbyTime" "0"
+                  Option "SuspendTime" "0"
+                  Option "OffTime" "0"
+                '';
+                # Disable KDE power management screen off
+                environment.etc."xdg/powermanagementprofilesrc".text = ''
+                  [AC][DPMSControl]
+                  idleTimeout=0
+                  [AC][SuspendSession]
+                  idleTimeout=0
+                  suspendType=0
+                '';
 
                 # Auto-launch install-office-pc in Konsole on login
                 environment.etc."xdg/autostart/install-office-pc.desktop".text = ''
