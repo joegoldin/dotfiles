@@ -650,12 +650,12 @@
                   suspendType=0
                 '';
 
-                # Auto-launch install-office-pc in Konsole on login
+                # Auto-launch install-office-pc in Konsole on primary screen
                 environment.etc."xdg/autostart/install-office-pc.desktop".text = ''
                   [Desktop Entry]
                   Type=Application
                   Name=Install Office PC
-                  Exec=konsole -e install-office-pc
+                  Exec=env QT_SCREEN_SCALE_FACTORS= kstart --screen 0 konsole -e install-office-pc
                   X-KDE-autostart-phase=2
                 '';
 
@@ -717,13 +717,16 @@
                       qrencode -t ANSIUTF8 "https://github.com/login/device?skip_account_picker=true" 2>/dev/null || true
                       echo ""
 
+                      # Authenticate with GitHub via HTTPS (headless)
+                      BROWSER=false GH_BROWSER=false gh auth login -p https -s admin:public_key -s admin:ssh_signing_key
+
                       # Generate SSH key, upload to GitHub, and add to agent
+                      KEYS_BEFORE=$(gh api /user/keys --jq '.[].id' 2>/dev/null || true)
+                      mkdir -p ~/.ssh
                       ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N "" -q
-                      eval "$(ssh-agent -s)"
+                      eval "$(ssh-agent -s)" > /dev/null
                       ssh-add ~/.ssh/id_ed25519
                       ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null
-
-                      KEYS_BEFORE=$(BROWSER=false GH_BROWSER=false gh auth login -p https -s admin:public_key -s admin:ssh_signing_key && gh api /user/keys --jq '.[].id' 2>/dev/null || true)
                       echo "Uploading SSH key to GitHub..."
                       gh ssh-key add ~/.ssh/id_ed25519.pub -t "nixos-installer"
                       KEYS_AFTER=$(gh api /user/keys --jq '.[].id')
