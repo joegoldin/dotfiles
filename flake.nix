@@ -635,19 +635,19 @@
                 systemd.targets.suspend.enable = false;
                 systemd.targets.hibernate.enable = false;
                 systemd.targets.hybrid-sleep.enable = false;
-                services.xserver.serverFlagsSection = ''
-                  Option "BlankTime" "0"
-                  Option "StandbyTime" "0"
-                  Option "SuspendTime" "0"
-                  Option "OffTime" "0"
-                '';
-                # Disable KDE power management screen off
-                environment.etc."xdg/powermanagementprofilesrc".text = ''
+                # Disable KDE powerdevil screen off (DPMS)
+                environment.etc."xdg/powerdevilrc".text = ''
                   [AC][DPMSControl]
                   idleTimeout=0
-                  [AC][SuspendSession]
-                  idleTimeout=0
-                  suspendType=0
+                  lockBeforeTurnOff=0
+                  [AC][SuspendAndShutdown]
+                  AutoSuspendAction=0
+                  PowerButtonAction=0
+                '';
+                # Disable DPMS via logind (works for both X11 and Wayland)
+                services.logind.extraConfig = ''
+                  IdleAction=ignore
+                  HandlePowerKey=ignore
                 '';
 
                 # Auto-launch install-office-pc in Konsole on primary screen
