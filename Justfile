@@ -145,7 +145,7 @@ write-iso device="":
     done
     START=$(date +%s)
     if command -v pv &>/dev/null; then
-      sudo pv -petab -s "$ISO_SIZE" < "$ISO" | sudo dd of="$DEV" bs=4M oflag=sync 2>/dev/null
+      pv -petab -s "$ISO_SIZE" < "$ISO" | sudo dd of="$DEV" bs=4M oflag=sync 2>/dev/null
     else
       sudo dd if="$ISO" of="$DEV" bs=4M status=progress oflag=sync
     fi
