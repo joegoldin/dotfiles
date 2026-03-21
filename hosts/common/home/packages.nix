@@ -89,6 +89,7 @@ let
       popeye
       pre-commit
       pueue
+      pv
       pythonModule.packages
       ripgrep # recursively searches directories for a regex pattern
       # rustup
