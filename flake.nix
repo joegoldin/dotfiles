@@ -811,7 +811,7 @@
                     sudo prlimit --nofile=1048576 --pid=$$
 
                     echo "Running nixos-install..."
-                    sudo --preserve-env=NIX_CONFIG nixos-install --flake "$DOTFILES#office-pc" --no-root-passwd --no-channel-copy 2>&1 | nom
+                    sudo --preserve-env=NIX_CONFIG nixos-install --flake "$DOTFILES#office-pc" --no-root-passwd --no-channel-copy
 
                     header "Step 6/7: Cleanup"
 
