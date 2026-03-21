@@ -71,6 +71,7 @@ let
       kubent
       lazydocker
       leiningen
+      lsof
       nil
       nix
       nix-output-monitor # nom: pretty nix build progress with percentage
