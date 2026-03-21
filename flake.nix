@@ -655,7 +655,7 @@
                   [Desktop Entry]
                   Type=Application
                   Name=Install Office PC
-                  Exec=env QT_SCREEN_SCALE_FACTORS= kstart --screen 0 konsole -e install-office-pc
+                  Exec=kstart konsole -e install-office-pc
                   X-KDE-autostart-phase=2
                 '';
 
@@ -667,6 +667,7 @@
                   pkgs.sbctl
                   pkgs.openssl
                   pkgs.qrencode
+                  pkgs.kdePackages.kde-cli-tools
                   (pkgs.writeShellScriptBin "install-office-pc" ''
                     LOGFILE="/tmp/install-office-pc.log"
                     exec > >(tee -a "$LOGFILE") 2>&1
