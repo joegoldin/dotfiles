@@ -599,26 +599,6 @@
             targetSystem = self.nixosConfigurations.office-pc;
             targetToplevel = targetSystem.config.system.build.toplevel;
             targetDisko = targetSystem.config.system.build.diskoScript;
-
-            # Collect all flake input outPaths so disko-install can evaluate offline
-            flakeOutPaths =
-              let
-                collector = parent:
-                  nixpkgs.lib.concatMap (child:
-                    [ child.outPath ] ++ (if child ? inputs && child.inputs != { } then (collector child) else [ ])
-                  ) (nixpkgs.lib.attrValues parent.inputs);
-              in
-              nixpkgs.lib.unique (nixpkgs.lib.flatten (collector self));
-
-            dependencies = [
-              targetToplevel
-              targetDisko
-              targetDisko.drvPath
-              targetSystem.pkgs.stdenv.drvPath
-              targetSystem.pkgs.perlPackages.ConfigIniFiles
-              targetSystem.pkgs.perlPackages.FileSlurp
-              (targetSystem.pkgs.closureInfo { rootPaths = [ ]; }).drvPath
-            ] ++ flakeOutPaths;
           in
           nixpkgs.lib.nixosSystem {
             modules = [
@@ -627,9 +607,6 @@
               ./hosts/office-pc/disk-config.nix
               (
                 { pkgs, ... }:
-                let
-                  closureInfo = pkgs.closureInfo { rootPaths = dependencies; };
-                in
                 {
                   nixpkgs.hostPlatform = "x86_64-linux";
                   networking.wireless.enable = nixpkgs.lib.mkForce false;
@@ -647,7 +624,7 @@
                   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
                   # Disable sleep/suspend/screen-off on live ISO
-                  services.logind.lidSwitch = "ignore";
+                  services.logind.settings.Login.HandleLidSwitch = "ignore";
                   systemd.targets.sleep.enable = false;
                   systemd.targets.suspend.enable = false;
                   systemd.targets.hibernate.enable = false;
@@ -779,8 +756,7 @@
 
                   # Force the target system closure into the ISO by referencing it
                   # This makes nix include all store paths in the squashfs
-                  # Include the full closure info so all store paths are in the ISO
-                  environment.etc."install-closure".source = "${closureInfo}/store-paths";
+                  # Bake the target system closure into the ISO squashfs
                   isoImage.storeContents = [ targetToplevel targetDisko ];
                 }
               )
