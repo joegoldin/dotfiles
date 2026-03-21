@@ -134,15 +134,25 @@ write-iso device="":
       fi
     fi
     DEV=$(echo "$DEV" | sed 's/[0-9]*$//')
-    echo "Writing $ISO -> $DEV"
+    ISO_SIZE=$(stat --format=%s "$ISO" 2>/dev/null || stat -f%z "$ISO")
+    ISO_SIZE_MB=$(( ISO_SIZE / 1024 / 1024 ))
+    echo "Writing $ISO (${ISO_SIZE_MB}MB) -> $DEV"
     for part in $(lsblk -ln -o NAME "$DEV" | tail -n +2); do
       if mountpoint -q "/dev/$part" 2>/dev/null || findmnt "/dev/$part" &>/dev/null; then
         echo "Unmounting /dev/$part..."
         sudo umount "/dev/$part" || true
       fi
     done
-    sudo dd if="$ISO" of="$DEV" bs=4M status=progress oflag=sync
-    echo "ISO written to $DEV"
+    START=$(date +%s)
+    if command -v pv &>/dev/null; then
+      sudo pv -petab -s "$ISO_SIZE" < "$ISO" | sudo dd of="$DEV" bs=4M oflag=sync 2>/dev/null
+    else
+      sudo dd if="$ISO" of="$DEV" bs=4M status=progress oflag=sync
+    fi
+    ELAPSED=$(( $(date +%s) - START ))
+    MINS=$(( ELAPSED / 60 ))
+    SECS=$(( ELAPSED % 60 ))
+    echo "✅  ISO written to $DEV in ${MINS}m${SECS}s"
 
 # ── Secrets ──────────────────────────────────────────────────────────────
 
