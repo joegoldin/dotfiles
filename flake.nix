@@ -643,11 +643,11 @@
                   AutoSuspendAction=0
                   PowerButtonAction=0
                 '';
-                # Disable DPMS via logind (works for both X11 and Wayland)
-                services.logind.extraConfig = ''
-                  IdleAction=ignore
-                  HandlePowerKey=ignore
-                '';
+                # Disable idle/power actions via logind
+                services.logind.settings.Login = {
+                  IdleAction = "ignore";
+                  HandlePowerKey = "ignore";
+                };
 
                 # Auto-launch install-office-pc in Konsole on primary screen
                 environment.etc."xdg/autostart/install-office-pc.desktop".text = ''
