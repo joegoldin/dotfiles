@@ -733,8 +733,7 @@
                       echo ""
                       sudo disko-install \
                         --flake "${self}#office-pc" \
-                        --disk main /dev/nvme1n1 \
-                        --option substituters ""
+                        --disk main /dev/nvme1n1
 
                       rm -f /tmp/luks-password
 
