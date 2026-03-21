@@ -594,270 +594,176 @@
         };
 
         # Installer ISO for office-pc
-        office-pc-installer = nixpkgs.lib.nixosSystem {
-          modules = [
-            "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-calamares-plasma6.nix"
-            disko.nixosModules.disko
-            ./hosts/office-pc/disk-config.nix
-            (
-              { pkgs, ... }:
-              let
-                diskoScript = self.nixosConfigurations.office-pc.config.system.build.diskoScript;
-                domains = import "${dotfiles-secrets}/domains.nix";
-                attic = import "${dotfiles-secrets}/attic.nix";
-                # Netrc is decrypted before build via Justfile (1Password flow) and placed at /tmp/attic-netrc
-                netrc = builtins.path {
-                  path = /tmp/attic-netrc;
-                  name = "attic-netrc";
-                };
-                atticUrl = "https://${domains.atticDomain}/${attic.cacheName}";
-                atticKey = attic.publicKey;
-              in
-              {
-                nixpkgs.hostPlatform = "x86_64-linux";
-                networking.wireless.enable = nixpkgs.lib.mkForce false;
-                networking.networkmanager.enable = true;
+        office-pc-installer =
+          let
+            # Reference the target system so its entire closure is baked into the ISO
+            targetSystem = self.nixosConfigurations.office-pc;
+            targetToplevel = targetSystem.config.system.build.toplevel;
+            targetDisko = targetSystem.config.system.build.diskoScript;
+          in
+          nixpkgs.lib.nixosSystem {
+            modules = [
+              "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-calamares-plasma6.nix"
+              disko.nixosModules.disko
+              ./hosts/office-pc/disk-config.nix
+              (
+                { pkgs, ... }:
+                {
+                  nixpkgs.hostPlatform = "x86_64-linux";
+                  networking.wireless.enable = nixpkgs.lib.mkForce false;
+                  networking.networkmanager.enable = true;
 
-                # Disable Calamares installer autostart
-                environment.etc."xdg/autostart/calamares.desktop".text = ''
-                  [Desktop Entry]
-                  Type=Application
-                  Name=Calamares
-                  Hidden=true
-                '';
+                  # Disable Calamares installer autostart
+                  environment.etc."xdg/autostart/calamares.desktop".text = ''
+                    [Desktop Entry]
+                    Type=Application
+                    Name=Calamares
+                    Hidden=true
+                  '';
 
-                # Enable flakes
-                nix.settings.experimental-features = [ "nix-command" "flakes" ];
+                  # Enable flakes
+                  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-                # Disable sleep/suspend/screen-off on live ISO
-                services.logind.lidSwitch = "ignore";
-                systemd.targets.sleep.enable = false;
-                systemd.targets.suspend.enable = false;
-                systemd.targets.hibernate.enable = false;
-                systemd.targets.hybrid-sleep.enable = false;
-                # Disable KDE powerdevil screen off (DPMS)
-                environment.etc."xdg/powerdevilrc".text = ''
-                  [AC][DPMSControl]
-                  idleTimeout=0
-                  lockBeforeTurnOff=0
-                  [AC][SuspendAndShutdown]
-                  AutoSuspendAction=0
-                  PowerButtonAction=0
-                '';
-                # Disable idle/power actions via logind
-                services.logind.settings.Login = {
-                  IdleAction = "ignore";
-                  HandlePowerKey = "ignore";
-                };
+                  # Disable sleep/suspend/screen-off on live ISO
+                  services.logind.lidSwitch = "ignore";
+                  systemd.targets.sleep.enable = false;
+                  systemd.targets.suspend.enable = false;
+                  systemd.targets.hibernate.enable = false;
+                  systemd.targets.hybrid-sleep.enable = false;
+                  environment.etc."xdg/powerdevilrc".text = ''
+                    [AC][DPMSControl]
+                    idleTimeout=0
+                    lockBeforeTurnOff=0
+                    [AC][SuspendAndShutdown]
+                    AutoSuspendAction=0
+                    PowerButtonAction=0
+                  '';
+                  services.logind.settings.Login = {
+                    IdleAction = "ignore";
+                    HandlePowerKey = "ignore";
+                  };
 
-                # Auto-launch install-office-pc in Konsole on primary screen
-                environment.etc."xdg/autostart/install-office-pc.desktop".text = ''
-                  [Desktop Entry]
-                  Type=Application
-                  Name=Install Office PC
-                  Exec=kstart5 konsole -e install-office-pc
-                  X-KDE-autostart-phase=2
-                '';
+                  # Auto-launch install-office-pc in Konsole
+                  environment.etc."xdg/autostart/install-office-pc.desktop".text = ''
+                    [Desktop Entry]
+                    Type=Application
+                    Name=Install Office PC
+                    Exec=kstart5 konsole -e install-office-pc
+                    X-KDE-autostart-phase=2
+                  '';
 
-                environment.systemPackages = [
-                  pkgs.git
-                  pkgs.gh
-                  disko.packages.x86_64-linux.disko
-                  pkgs.nix-output-monitor
-                  pkgs.sbctl
-                  pkgs.openssl
-                  pkgs.qrencode
-                  pkgs.kdePackages.kde-cli-tools
-                  (pkgs.writeShellScriptBin "install-office-pc" ''
-                    LOGFILE="/tmp/install-office-pc.log"
-                    exec > >(tee -a "$LOGFILE") 2>&1
+                  environment.systemPackages = [
+                    pkgs.git
+                    pkgs.gh
+                    disko.packages.x86_64-linux.disko
+                    pkgs.sbctl
+                    pkgs.openssl
+                    pkgs.qrencode
+                    pkgs.kdePackages.kde-cli-tools
+                    (pkgs.writeShellScriptBin "install-office-pc" ''
+                      LOGFILE="/tmp/install-office-pc.log"
+                      exec > >(tee -a "$LOGFILE") 2>&1
 
-                    on_error() {
-                      echo ""
-                      echo "========================================"
-                      echo "  INSTALLATION FAILED"
-                      echo "  Log saved to: $LOGFILE"
-                      echo "========================================"
-                      echo ""
-                      # Copy log to installed disk if mounted
-                      if findmnt /mnt &>/dev/null; then
-                        sudo cp "$LOGFILE" /mnt/var/log/install-office-pc.log 2>/dev/null || true
-                        echo "  Log also saved to /mnt/var/log/install-office-pc.log"
-                      fi
-                      echo ""
-                      echo "Press Enter to close..."
-                      read -r
-                      exit 1
-                    }
-                    trap on_error ERR
+                      on_error() {
+                        echo ""
+                        echo "========================================"
+                        echo "  INSTALLATION FAILED"
+                        echo "  Log saved to: $LOGFILE"
+                        echo "========================================"
+                        echo ""
+                        if findmnt /mnt &>/dev/null; then
+                          sudo cp "$LOGFILE" /mnt/var/log/install-office-pc.log 2>/dev/null || true
+                          echo "  Log also saved to /mnt/var/log/install-office-pc.log"
+                        fi
+                        echo ""
+                        echo "Press Enter to close..."
+                        read -r
+                        exit 1
+                      }
+                      trap on_error ERR
 
-                    set -euo pipefail
+                      set -euo pipefail
 
-                    # Kill Calamares if it's running
-                    pkill -f calamares 2>/dev/null || true
+                      pkill -f calamares 2>/dev/null || true
 
-                    header() {
-                      echo ""
-                      echo "========================================"
-                      echo "  $1"
-                      echo "========================================"
-                      echo ""
-                    }
+                      header() {
+                        echo ""
+                        echo "========================================"
+                        echo "  $1"
+                        echo "========================================"
+                        echo ""
+                      }
 
-                    header "Step 1/8: GitHub Authentication"
-                    NEW_KEY_ID=""
-                    if gh auth status &>/dev/null; then
-                      echo "Already authenticated with GitHub."
-                      if ! gh api /user/keys &>/dev/null || ! gh api /user/ssh_signing_keys &>/dev/null; then
-                        echo "Missing required scopes, refreshing..."
-                        gh auth refresh -s admin:public_key -s admin:ssh_signing_key
-                      fi
-                      echo ""
-                      echo "SSH keys on your account:"
-                      gh ssh-key list
-                      echo ""
-                      read -p "Enter key ID to delete after install (or leave blank to skip): " NEW_KEY_ID
-                    else
-                      echo "Authenticating with GitHub..."
-                      echo "Scan the QR code or visit the URL below to authenticate:"
-                      echo ""
-                      qrencode -t ANSIUTF8 "https://github.com/login/device?skip_account_picker=true" 2>/dev/null || true
-                      echo ""
-
-                      # Authenticate with GitHub via HTTPS (headless)
-                      BROWSER=false GH_BROWSER=false gh auth login -p https -s admin:public_key -s admin:ssh_signing_key
-
-                      # Generate SSH key, upload to GitHub, and add to agent
-                      KEYS_BEFORE=$(gh api /user/keys --jq '.[].id' 2>/dev/null || true)
-                      mkdir -p ~/.ssh
-                      ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N "" -q
-                      eval "$(ssh-agent -s)" > /dev/null
-                      ssh-add ~/.ssh/id_ed25519
-                      ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null
-                      echo "Uploading SSH key to GitHub..."
-                      gh ssh-key add ~/.ssh/id_ed25519.pub -t "nixos-installer"
-                      KEYS_AFTER=$(gh api /user/keys --jq '.[].id')
-                      NEW_KEY_ID=$(comm -13 <(echo "$KEYS_BEFORE" | sort) <(echo "$KEYS_AFTER" | sort))
-                    fi
-                    echo "Done."
-
-                    header "Step 2/8: Clone Dotfiles"
-                    DOTFILES=/tmp/dotfiles
-                    if [ -d "$DOTFILES" ]; then
-                      echo "Dotfiles already cloned, pulling latest..."
-                      git -C "$DOTFILES" pull
-                    else
-                      echo "Cloning dotfiles..."
-                      git clone https://github.com/joegoldin/dotfiles.git "$DOTFILES"
-                    fi
-                    cd "$DOTFILES"
-                    echo "Syncing submodules..."
-                    git submodule sync --recursive
-                    git submodule update --init --recursive
-                    echo "Done."
-
-                    header "Step 3/8: Configure Installation"
-                    read -s -p "Enter LUKS password: " LUKS_PASS
-                    echo
-                    read -s -p "Confirm LUKS password: " LUKS_PASS2
-                    echo
-                    if [ "$LUKS_PASS" != "$LUKS_PASS2" ]; then
-                      echo "Passwords do not match!"
-                      exit 1
-                    fi
-                    echo "$LUKS_PASS" > /tmp/luks-password
-
-                    echo "Configuring nix..."
-                    NIX_CONFIG="extra-experimental-features = nix-command flakes"
-                    NIX_CONFIG="$NIX_CONFIG"$'\n'"access-tokens = github.com=$(gh auth token)"
-                    NIX_CONFIG="$NIX_CONFIG"$'\n'"accept-flake-config = true"
-                    NIX_CONFIG="$NIX_CONFIG"$'\n'"extra-substituters = ${atticUrl}"
-                    NIX_CONFIG="$NIX_CONFIG"$'\n'"extra-trusted-public-keys = ${atticKey}"
-                    NIX_CONFIG="$NIX_CONFIG"$'\n'"netrc-file = ${netrc}"
-                    export NIX_CONFIG
-
-                    echo "Setting up SSH for root..."
-                    sudo mkdir -p /root/.ssh
-                    sudo cp ~/.ssh/id_ed25519 /root/.ssh/
-                    sudo chmod 600 /root/.ssh/id_ed25519
-                    sudo ssh-keyscan github.com 2>/dev/null | sudo tee /root/.ssh/known_hosts >/dev/null
-
-                    sudo prlimit --nofile=1048576 --pid=$$
-
-                    header "Step 4/8: Partition Disk"
-                    if findmnt /mnt &>/dev/null; then
-                      echo "Disk already mounted at /mnt, skipping format."
-                    else
-                      read -p "This will ERASE /dev/nvme1n1. Continue? [y/N] " CONFIRM
-                      if [[ "$CONFIRM" != [yY] ]]; then
-                        echo "Aborted."
+                      header "Step 1/5: LUKS Password"
+                      read -s -p "Enter LUKS password: " LUKS_PASS
+                      echo
+                      read -s -p "Confirm LUKS password: " LUKS_PASS2
+                      echo
+                      if [ "$LUKS_PASS" != "$LUKS_PASS2" ]; then
+                        echo "Passwords do not match!"
                         exit 1
                       fi
+                      echo "$LUKS_PASS" > /tmp/luks-password
 
-                      echo "Partitioning /dev/nvme1n1 with disko..."
-                      sudo ${diskoScript}
-                      echo "Partitioning complete."
-                    fi
+                      header "Step 2/5: Install NixOS (offline disko-install)"
+                      echo "All store paths are baked into this ISO — no network needed."
+                      echo "Target system: ${targetToplevel}"
+                      echo ""
+                      sudo disko-install \
+                        --flake ${targetToplevel}/etc/nix/flake#office-pc \
+                        --disk main /dev/nvme1n1 \
+                        --option substituters "" \
+                        --system ${targetToplevel}
 
-                    rm -f /tmp/luks-password
+                      rm -f /tmp/luks-password
 
-                    header "Step 5/8: Secure Boot Keys"
-                    SBKEYS=/mnt/var/lib/sbctl/keys
-                    if [ ! -f "$SBKEYS/db/db.key" ]; then
-                      echo "Generating Secure Boot keys for Lanzaboote..."
-                      sudo mkdir -p "$SBKEYS"/{PK,KEK,db}
-                      for name in PK KEK db; do
-                        echo "  Generating $name key..."
-                        sudo openssl req -new -x509 -subj "/CN=$name/" -days 3650 -nodes \
-                          -newkey rsa:4096 -sha256 \
-                          -keyout "$SBKEYS/$name/$name.key" -out "$SBKEYS/$name/$name.pem" 2>/dev/null
+                      header "Step 3/5: Secure Boot Keys"
+                      SBKEYS=/mnt/var/lib/sbctl/keys
+                      if [ ! -f "$SBKEYS/db/db.key" ]; then
+                        echo "Generating Secure Boot keys for Lanzaboote..."
+                        sudo mkdir -p "$SBKEYS"/{PK,KEK,db}
+                        for name in PK KEK db; do
+                          echo "  Generating $name key..."
+                          sudo openssl req -new -x509 -subj "/CN=$name/" -days 3650 -nodes \
+                            -newkey rsa:4096 -sha256 \
+                            -keyout "$SBKEYS/$name/$name.key" -out "$SBKEYS/$name/$name.pem" 2>/dev/null
+                        done
+                        echo "Secure Boot keys generated."
+                        sudo nixos-enter --root /mnt -- /nix/var/nix/profiles/system/bin/switch-to-configuration boot
+                      fi
+
+                      # Verify
+                      if [ ! -e /mnt/nix/var/nix/profiles/system ]; then
+                        echo "ERROR: system profile missing!"
+                        exit 1
+                      fi
+                      echo "Verified: system profile exists."
+
+                      sudo mkdir -p /mnt/var/log
+                      sudo cp "$LOGFILE" /mnt/var/log/install-office-pc.log 2>/dev/null || true
+
+                      header "Step 4/5: Set User Password"
+                      echo "Set password for ${username}:"
+                      sudo nixos-enter --root /mnt -- passwd ${username}
+
+                      header "Step 5/5: Done!"
+                      echo "Rebooting in 10 seconds... (Ctrl+C to cancel)"
+                      for i in $(seq 10 -1 1); do
+                        printf "\r  %d..." "$i"
+                        sleep 1
                       done
-                      echo "Secure Boot keys generated."
-                    fi
+                      echo ""
+                      sudo reboot
+                    '')
+                  ];
 
-                    header "Step 6/8: Install NixOS"
-                    echo "Running nixos-install..."
-                    sudo --preserve-env=NIX_CONFIG nixos-install --flake "$DOTFILES#office-pc" --no-root-passwd --no-channel-copy
-
-                    # Verify the install
-                    if [ ! -e /mnt/nix/var/nix/profiles/system ]; then
-                      echo "ERROR: system profile missing after nixos-install!"
-                      echo "Store contents:"
-                      ls /mnt/nix/store/ | head -20
-                      exit 1
-                    fi
-                    echo "Verified: system profile exists."
-
-                    # Save log to installed disk
-                    sudo mkdir -p /mnt/var/log
-                    sudo cp "$LOGFILE" /mnt/var/log/install-office-pc.log 2>/dev/null || true
-
-                    header "Step 7/8: Cleanup"
-
-                    if [ -n "$NEW_KEY_ID" ]; then
-                      echo "Removing temporary SSH key from GitHub..."
-                      gh ssh-key delete "$NEW_KEY_ID" --yes
-                      echo "SSH key deleted."
-                    fi
-
-                    header "Step 8/8: Set User Password"
-                    echo "Set password for ${username}:"
-                    sudo nixos-enter --root /mnt -- passwd ${username}
-
-                    header "Installation Complete!"
-                    echo "Rebooting in 10 seconds... (Ctrl+C to cancel)"
-                    for i in $(seq 10 -1 1); do
-                      printf "\r  %d..." "$i"
-                      sleep 1
-                    done
-                    echo ""
-                    sudo reboot
-                  '')
-                ];
-              }
-            )
-          ];
-        };
+                  # Force the target system closure into the ISO by referencing it
+                  # This makes nix include all store paths in the squashfs
+                  isoImage.storeContents = [ targetToplevel targetDisko ];
+                }
+              )
+            ];
+          };
       };
 
       # Darwin/macOS configuration entrypoint
