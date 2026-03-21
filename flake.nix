@@ -602,7 +602,6 @@
             (
               { pkgs, ... }:
               let
-                diskoScript = self.nixosConfigurations.office-pc.config.system.build.diskoScript;
                 domains = import "${dotfiles-secrets}/domains.nix";
                 attic = import "${dotfiles-secrets}/attic.nix";
                 # Netrc is decrypted before build via Justfile (1Password flow) and placed at /tmp/attic-netrc
@@ -679,6 +678,12 @@
                       echo "  Log saved to: $LOGFILE"
                       echo "========================================"
                       echo ""
+                      # Copy log to installed disk if mounted
+                      if findmnt /mnt &>/dev/null; then
+                        sudo cp "$LOGFILE" /mnt/var/log/install-office-pc.log 2>/dev/null || true
+                        echo "  Log also saved to /mnt/var/log/install-office-pc.log"
+                      fi
+                      echo ""
                       echo "Press Enter to close..."
                       read -r
                       exit 1
@@ -750,49 +755,17 @@
                     git submodule update --init --recursive
                     echo "Done."
 
-                    header "Step 3/7: Partition Disk"
-                    if findmnt /mnt &>/dev/null; then
-                      echo "Disk already mounted at /mnt, skipping format."
-                    else
-                      read -p "This will ERASE /dev/nvme1n1. Continue? [y/N] " CONFIRM
-                      if [[ "$CONFIRM" != [yY] ]]; then
-                        echo "Aborted."
-                        exit 1
-                      fi
-                      read -s -p "Enter LUKS password: " LUKS_PASS
-                      echo
-                      read -s -p "Confirm LUKS password: " LUKS_PASS2
-                      echo
-                      if [ "$LUKS_PASS" != "$LUKS_PASS2" ]; then
-                        echo "Passwords do not match!"
-                        exit 1
-                      fi
-                      echo "$LUKS_PASS" > /tmp/luks-password
-
-                      echo "Partitioning /dev/nvme1n1 with disko..."
-                      sudo ${diskoScript}
-
-                      rm -f /tmp/luks-password
-                      echo "Partitioning complete."
+                    header "Step 3/6: Configure Installation"
+                    read -s -p "Enter LUKS password: " LUKS_PASS
+                    echo
+                    read -s -p "Confirm LUKS password: " LUKS_PASS2
+                    echo
+                    if [ "$LUKS_PASS" != "$LUKS_PASS2" ]; then
+                      echo "Passwords do not match!"
+                      exit 1
                     fi
+                    echo "$LUKS_PASS" > /tmp/luks-password
 
-                    header "Step 4/7: Secure Boot Keys"
-                    SBKEYS=/mnt/var/lib/sbctl/keys
-                    if [ ! -f "$SBKEYS/db/db.key" ]; then
-                      echo "Generating Secure Boot keys for Lanzaboote..."
-                      sudo mkdir -p "$SBKEYS"/{PK,KEK,db}
-                      for name in PK KEK db; do
-                        echo "  Generating $name key..."
-                        sudo openssl req -new -x509 -subj "/CN=$name/" -days 3650 -nodes \
-                          -newkey rsa:4096 -sha256 \
-                          -keyout "$SBKEYS/$name/$name.key" -out "$SBKEYS/$name/$name.pem" 2>/dev/null
-                      done
-                      echo "Secure Boot keys generated."
-                    else
-                      echo "Secure Boot keys already exist, skipping."
-                    fi
-
-                    header "Step 5/7: Install NixOS"
                     echo "Configuring nix..."
                     NIX_CONFIG="extra-experimental-features = nix-command flakes"
                     NIX_CONFIG="$NIX_CONFIG"$'\n'"access-tokens = github.com=$(gh auth token)"
@@ -810,10 +783,40 @@
 
                     sudo prlimit --nofile=1048576 --pid=$$
 
-                    echo "Running nixos-install..."
-                    sudo --preserve-env=NIX_CONFIG nixos-install --flake "$DOTFILES#office-pc" --no-root-passwd --no-channel-copy
+                    header "Step 4/6: Install NixOS (disko-install)"
+                    echo "Running disko-install (partitions, copies store, installs bootloader)..."
+                    sudo --preserve-env=NIX_CONFIG disko-install --flake "$DOTFILES#office-pc" --disk main /dev/nvme1n1 --no-root-passwd
 
-                    header "Step 6/7: Cleanup"
+                    rm -f /tmp/luks-password
+
+                    # Generate Secure Boot keys if needed
+                    SBKEYS=/mnt/var/lib/sbctl/keys
+                    if [ ! -f "$SBKEYS/db/db.key" ]; then
+                      echo "Generating Secure Boot keys for Lanzaboote..."
+                      sudo mkdir -p "$SBKEYS"/{PK,KEK,db}
+                      for name in PK KEK db; do
+                        echo "  Generating $name key..."
+                        sudo openssl req -new -x509 -subj "/CN=$name/" -days 3650 -nodes \
+                          -newkey rsa:4096 -sha256 \
+                          -keyout "$SBKEYS/$name/$name.key" -out "$SBKEYS/$name/$name.pem" 2>/dev/null
+                      done
+                      echo "Secure Boot keys generated."
+                      # Re-run bootloader installation with the keys in place
+                      sudo nixos-enter --root /mnt -- /nix/var/nix/profiles/system/bin/switch-to-configuration boot
+                    fi
+
+                    # Verify the install
+                    if [ ! -e /mnt/nix/var/nix/profiles/system ]; then
+                      echo "ERROR: system profile missing!"
+                      exit 1
+                    fi
+                    echo "Verified: system profile exists."
+
+                    # Save log to installed disk
+                    sudo mkdir -p /mnt/var/log
+                    sudo cp "$LOGFILE" /mnt/var/log/install-office-pc.log 2>/dev/null || true
+
+                    header "Step 5/6: Cleanup"
 
                     if [ -n "$NEW_KEY_ID" ]; then
                       echo "Removing temporary SSH key from GitHub..."
@@ -821,7 +824,7 @@
                       echo "SSH key deleted."
                     fi
 
-                    header "Step 7/7: Set User Password"
+                    header "Step 6/6: Set User Password"
                     echo "Set password for ${username}:"
                     sudo nixos-enter --root /mnt -- passwd ${username}
 
