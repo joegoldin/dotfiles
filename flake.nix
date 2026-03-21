@@ -654,7 +654,7 @@
                   [Desktop Entry]
                   Type=Application
                   Name=Install Office PC
-                  Exec=kstart konsole -e install-office-pc
+                  Exec=kstart5 konsole -e install-office-pc
                   X-KDE-autostart-phase=2
                 '';
 
@@ -785,7 +785,7 @@
 
                     header "Step 4/6: Install NixOS (disko-install)"
                     echo "Running disko-install (partitions, copies store, installs bootloader)..."
-                    sudo --preserve-env=NIX_CONFIG disko-install --flake "$DOTFILES#office-pc" --disk main /dev/nvme1n1 --no-root-passwd
+                    sudo --preserve-env=NIX_CONFIG disko-install --flake "$DOTFILES#office-pc" --disk main /dev/nvme1n1
 
                     rm -f /tmp/luks-password
 
