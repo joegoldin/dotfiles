@@ -599,6 +599,8 @@
             targetSystem = self.nixosConfigurations.office-pc;
             targetToplevel = targetSystem.config.system.build.toplevel;
             targetDisko = targetSystem.config.system.build.diskoScript;
+            # Collect all flake input sources for offline evaluation
+            allInputs = nixpkgs.lib.collect (x: x ? outPath) self.inputs;
           in
           nixpkgs.lib.nixosSystem {
             modules = [
@@ -710,7 +712,8 @@
                       echo ""
                       sudo disko-install \
                         --flake "${self}#office-pc" \
-                        --disk main /dev/nvme1n1
+                        --disk main /dev/nvme1n1 \
+                        --write-efi-boot-entries
 
                       rm -f /tmp/luks-password
 
@@ -756,8 +759,8 @@
 
                   # Force the target system closure into the ISO by referencing it
                   # This makes nix include all store paths in the squashfs
-                  # Bake the target system closure into the ISO squashfs
-                  isoImage.storeContents = [ targetToplevel targetDisko ];
+                  # Bake the target system closure and all flake inputs into the ISO
+                  isoImage.storeContents = [ targetToplevel targetDisko ] ++ allInputs;
                 }
               )
             ];
