@@ -4,6 +4,7 @@
     ps: with ps; [
       datasets
       scikit-learn
+      tinygrad
       torch
       torchvision
       transformers
