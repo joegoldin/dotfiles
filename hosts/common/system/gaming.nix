@@ -25,6 +25,7 @@
       extraLibraries = pkgs: [ ];
     })
     adwaita-icon-theme
+    unstable.cockatrice
     wowup-cf
   ];
 
