@@ -106,7 +106,7 @@
     # ── ML / GPU compute ────────────────────────────────────────────────────
     # tinygrad with ROCm/CUDA support
     tinygrad-nix = {
-      url = "github:wozeparrot/tinygrad-nix?rev=c3d021778ffcb7112d3640ed00a380824557eaa3";
+      url = "github:joegoldin/tinygrad-nix?rev=99c52bfdc5108c08d26d3d379368f9abd9d96b4d";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };

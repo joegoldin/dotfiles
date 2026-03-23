@@ -3914,17 +3914,17 @@
         "tinygrad": "tinygrad"
       },
       "locked": {
-        "lastModified": 1774203167,
-        "narHash": "sha256-/r9+jiAl2CPEU4YRub9rbKtMAw6C6FecipVPS32gUvg=",
-        "owner": "wozeparrot",
+        "lastModified": 1774244421,
+        "narHash": "sha256-1f2qO6acVudkXYh05/DzIFkRw+cKswnhxh/EgbPCqF4=",
+        "owner": "joegoldin",
         "repo": "tinygrad-nix",
-        "rev": "c3d021778ffcb7112d3640ed00a380824557eaa3",
+        "rev": "99c52bfdc5108c08d26d3d379368f9abd9d96b4d",
         "type": "github"
       },
       "original": {
-        "owner": "wozeparrot",
+        "owner": "joegoldin",
         "repo": "tinygrad-nix",
-        "rev": "c3d021778ffcb7112d3640ed00a380824557eaa3",
+        "rev": "99c52bfdc5108c08d26d3d379368f9abd9d96b4d",
         "type": "github"
       }
     },
