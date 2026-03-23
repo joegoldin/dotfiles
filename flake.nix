@@ -715,31 +715,28 @@
                       fi
                       echo "$LUKS_PASS" > /tmp/luks-password
 
-                      header "Step 2/5: Install NixOS (offline disko-install)"
+                      header "Step 2/5: Generate Secure Boot Keys"
+                      SBKEYS_TMP=/tmp/sbctl-keys
+                      sudo mkdir -p "$SBKEYS_TMP"/{PK,KEK,db}
+                      for name in PK KEK db; do
+                        echo "  Generating $name key..."
+                        sudo openssl req -new -x509 -subj "/CN=$name/" -days 3650 -nodes \
+                          -newkey rsa:4096 -sha256 \
+                          -keyout "$SBKEYS_TMP/$name/$name.key" -out "$SBKEYS_TMP/$name/$name.pem" 2>/dev/null
+                      done
+                      echo "Secure Boot keys generated."
+
+                      header "Step 3/5: Install NixOS (offline disko-install)"
                       echo "All store paths are baked into this ISO — no network needed."
                       echo "Target system: ${targetToplevel}"
                       echo ""
                       sudo disko-install \
                         --flake "${self}#office-pc" \
                         --disk main /dev/nvme1n1 \
-                        --write-efi-boot-entries
+                        --write-efi-boot-entries \
+                        --extra-files "$SBKEYS_TMP" /var/lib/sbctl/keys
 
                       rm -f /tmp/luks-password
-
-                      header "Step 3/5: Secure Boot Keys"
-                      SBKEYS=/mnt/var/lib/sbctl/keys
-                      if [ ! -f "$SBKEYS/db/db.key" ]; then
-                        echo "Generating Secure Boot keys for Lanzaboote..."
-                        sudo mkdir -p "$SBKEYS"/{PK,KEK,db}
-                        for name in PK KEK db; do
-                          echo "  Generating $name key..."
-                          sudo openssl req -new -x509 -subj "/CN=$name/" -days 3650 -nodes \
-                            -newkey rsa:4096 -sha256 \
-                            -keyout "$SBKEYS/$name/$name.key" -out "$SBKEYS/$name/$name.pem" 2>/dev/null
-                        done
-                        echo "Secure Boot keys generated."
-                        sudo nixos-enter --root /mnt -- /nix/var/nix/profiles/system/bin/switch-to-configuration boot
-                      fi
 
                       # Verify
                       if [ ! -e /mnt/nix/var/nix/profiles/system ]; then
