@@ -472,6 +472,7 @@
                       rocmSupport = true;
                     };
                     overlays = [
+                      inputs.tinygrad-nix.overlays.default
                       (import ./hosts/common/system/overlays/vllm-rocm.nix)
                     ];
                   };
