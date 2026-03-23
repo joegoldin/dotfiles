@@ -103,6 +103,14 @@
     nixpkgs-python.url = "github:cachix/nixpkgs-python?rev=f31232bde73682c38a6f60dd52f8ae861ef9594a";
     git-hooks.url = "github:cachix/git-hooks.nix?rev=8baab586afc9c9b57645a734c820e4ac0a604af9";
 
+    # ── ML / GPU compute ────────────────────────────────────────────────────
+    # tinygrad with ROCm/CUDA support
+    tinygrad-nix = {
+      url = "github:wozeparrot/tinygrad-nix?rev=c3d021778ffcb7112d3640ed00a380824557eaa3";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
+
     # ── Desktop / NixOS applications ───────────────────────────────────────
     # affinity apps
     affinity-nix = {

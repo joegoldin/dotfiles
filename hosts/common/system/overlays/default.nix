@@ -34,6 +34,9 @@
     };
   };
 
+  # tinygrad with ROCm/CUDA/OpenCL support
+  tinygrad-packages = inputs.tinygrad-nix.overlays.default;
+
   # Claude Desktop for Linux
   claude-desktop-packages = inputs.claude-desktop-debian.overlays.default;
 
