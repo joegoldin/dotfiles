@@ -15,7 +15,6 @@ in
     with pkgs;
     lib.optionals pkgs.stdenv.hostPlatform.isx86_64 [
       affinity-nix.packages.x86_64-linux.v3
-      unstable.bambu-studio
       unstable.calcurse
       cameractrls-gtk3
       chromedriver
@@ -69,6 +68,7 @@ in
   # Flatpak packages (installed via nix-flatpak)
   services.flatpak = {
     enable = true;
-    packages = [ ];
+    packages = [ "com.bambulab.BambuStudio" ];
+    update.onActivation = true;
   };
 }
