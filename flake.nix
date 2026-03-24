@@ -738,19 +738,33 @@
 
                       rm -f /tmp/luks-password
 
+                      # Find where disko-install mounted the root
+                      MOUNT_POINT=$(findmnt -n -o TARGET /dev/pool/root 2>/dev/null || echo "/mnt")
+
                       # Verify
-                      if [ ! -e /mnt/nix/var/nix/profiles/system ]; then
-                        echo "ERROR: system profile missing!"
+                      if [ ! -e "$MOUNT_POINT/nix/var/nix/profiles/system" ]; then
+                        echo "ERROR: system profile missing at $MOUNT_POINT!"
+                        echo "Checking mount points..."
+                        findmnt | grep -E "pool|nvme"
                         exit 1
                       fi
-                      echo "Verified: system profile exists."
+                      echo "Verified: system profile exists at $MOUNT_POINT."
 
-                      sudo mkdir -p /mnt/var/log
-                      sudo cp "$LOGFILE" /mnt/var/log/install-office-pc.log 2>/dev/null || true
+                      sudo mkdir -p "$MOUNT_POINT/var/log"
+                      sudo cp "$LOGFILE" "$MOUNT_POINT/var/log/install-office-pc.log" 2>/dev/null || true
 
                       header "Step 4/5: Set User Password"
                       echo "Set password for ${username}:"
-                      sudo nixos-enter --root /mnt -- passwd ${username}
+                      # Find where disko-install mounted the root
+                      MOUNT_POINT=$(findmnt -n -o TARGET /dev/pool/root 2>/dev/null || echo "/mnt")
+                      echo "Using mount point: $MOUNT_POINT"
+                      if sudo nixos-enter --root "$MOUNT_POINT" -- passwd ${username}; then
+                        echo "Password set successfully."
+                      else
+                        echo "nixos-enter failed, trying chroot..."
+                        sudo chroot "$MOUNT_POINT" /bin/sh -c "echo '${username}:changeme' | chpasswd"
+                        echo "Password set to 'changeme' — change it after first login!"
+                      fi
 
                       header "Step 5/5: Done!"
                       echo "Rebooting in 10 seconds... (Ctrl+C to cancel)"
