@@ -7,3 +7,6 @@
 [submodule "snippets"]
 	path = snippets
 	url = git@github.com:joegoldin/dotfiles-snippets.git
+[submodule "agent-skills"]
+	path = agent-skills
+	url = git@github.com:joegoldin/agent-skills.git

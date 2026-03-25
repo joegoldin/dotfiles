@@ -1,6 +1,6 @@
 {
   name = "ghreview";
-  desc = "Wrapper for gh-pr-review with auto-detection, bot filtering, and code context";
+  desc = "Wrapper for gh-pr-review with auto-detection and code context";
   usage = "ghreview [--pretty] [--no-code] [--raw] [subcommand] [args...]";
   type = "fish";
   body = ''
