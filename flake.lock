@@ -61,18 +61,14 @@
         ]
       },
       "locked": {
-        "lastModified": 1772440046,
-        "narHash": "sha256-E6crzc1mWUiPcq5ImkORwMPE9HUuYrQak21q70z6Imw=",
-        "owner": "joegoldin",
-        "repo": "agent-skills",
-        "rev": "a483d2d47cf92b00a598fba81e63e7ddb4bdc7c1",
-        "type": "github"
+        "path": "./agent-skills",
+        "type": "path"
       },
       "original": {
-        "owner": "joegoldin",
-        "repo": "agent-skills",
-        "type": "github"
-      }
+        "path": "./agent-skills",
+        "type": "path"
+      },
+      "parent": []
     },
     "attic": {
       "inputs": {
