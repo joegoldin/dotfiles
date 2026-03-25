@@ -149,7 +149,7 @@
     };
     # Claude Code agent skills
     agent-skills = {
-      url = "github:joegoldin/agent-skills";
+      url = "path:./agent-skills";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
