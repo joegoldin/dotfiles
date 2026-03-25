@@ -9,6 +9,7 @@
 
   env = {
     DISABLE_AUTOUPDATER = "1";
+    CLAUDE_CODE_DISABLE_AUTO_MEMORY = "1";
   };
 
   permissions = {
@@ -31,6 +32,23 @@
       "Skill(writing-plans)"
       "Skill(executing-plans)"
       "Skill(subagent-driven-development)"
+      "Skill(update-config)"
+      "Skill(keybindings-help)"
+      "Skill(simplify)"
+      "Skill(loop)"
+      "Skill(claude-api)"
+      "Skill(agent-skills:gh-pr-review)"
+      "Skill(agent-skills:test-driven-development)"
+      "Skill(agent-skills:nix-helper)"
+      "Skill(agent-skills:requesting-code-review)"
+      "Skill(agent-skills:receiving-code-review)"
+      "Skill(agent-skills:using-git-worktrees)"
+      "Skill(agent-skills:writing-skills)"
+      "Skill(agent-skills:obsidian-cli)"
+      "Skill(agent-skills:claude-nix-config)"
+      "Skill(agent-skills:brainstorming)"
+      "Skill(agent-skills:systematic-debugging)"
+      "Skill(agent-skills:verification-before-completion)"
     ];
     deny = [
       "Read(./.env)"
