@@ -36,11 +36,13 @@ in
       "graphical-session.target"
       "pipewire.service"
       "wireplumber.service"
+      "ydotool.service"
     ];
     wantedBy = [ "graphical-session.target" ];
     wants = [
       "pipewire.service"
       "wireplumber.service"
+      "ydotool.service"
     ];
 
     serviceConfig = {
