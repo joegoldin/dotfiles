@@ -4,28 +4,17 @@
   python3Packages,
   fetchFromGitHub,
   makeWrapper,
+  wrapGAppsHook4,
   wtype,
   ydotool,
   gobject-introspection,
   gtk4,
   gtk4-layer-shell,
-  glib,
-  graphene,
-  gdk-pixbuf,
-  pango,
   wl-clipboard,
   pulseaudio,
 }:
 let
   pywhispercpp = pkgs.callPackage ./pywhispercpp.nix { };
-  giTypelibPath = lib.concatMapStringsSep ":" (p: "${p}/lib/girepository-1.0") [
-    gtk4
-    gtk4-layer-shell
-    glib
-    graphene
-    gdk-pixbuf
-    pango
-  ];
   python = python3Packages.python.withPackages (
     ps: with ps; [
       sounddevice
@@ -61,18 +50,24 @@ python3Packages.buildPythonApplication rec {
 
   nativeBuildInputs = [
     makeWrapper
+    wrapGAppsHook4
     gobject-introspection
+  ];
+
+  buildInputs = [
+    gtk4
+    gtk4-layer-shell
   ];
 
   dontBuild = true;
 
+  # wrapGAppsHook4 would wrap the bin, but we need the GI_TYPELIB_PATH value
+  # for the mic-osd subprocess too — extract it after wrapping
+  dontWrapGApps = true;
+
   postPatch = ''
     substituteInPlace lib/mic_osd/runner.py \
       --replace-fail "/usr/bin/python3" "${python}/bin/python3"
-
-    # Inject GI_TYPELIB_PATH and LD_PRELOAD into mic-osd daemon subprocess env
-    sed -i 's|env = os.environ.copy()|env = os.environ.copy(); env["GI_TYPELIB_PATH"] = "${giTypelibPath}"; env["LD_PRELOAD"] = "${gtk4-layer-shell}/lib/libgtk4-layer-shell.so"|' \
-      lib/mic_osd/runner.py
   '';
 
   installPhase = ''
@@ -112,7 +107,25 @@ python3Packages.buildPythonApplication rec {
     WRAPPER
     chmod +x $out/bin/hyprwhspr
 
+    runHook postInstall
+  '';
+
+  preFixup = ''
+    # Inject GI_TYPELIB_PATH and LD_PRELOAD into mic-osd daemon subprocess env
+    # gappsWrapperArgs is populated by wrapGAppsHook4 with all transitive typelib paths
+    local gi_path=""
+    for arg in "''${gappsWrapperArgs[@]}"; do
+      if [[ "$arg" == */girepository-1.0* ]]; then
+        gi_path="$arg"
+      fi
+    done
+
+    sed -i "s|env = os.environ.copy()|env = os.environ.copy(); env[\"GI_TYPELIB_PATH\"] = \"$gi_path\"; env[\"LD_PRELOAD\"] = \"${gtk4-layer-shell}/lib/libgtk4-layer-shell.so\"|" \
+      $out/lib/hyprwhspr/mic_osd/runner.py
+
+    # Now wrap the binary with everything
     wrapProgram $out/bin/hyprwhspr \
+      "''${gappsWrapperArgs[@]}" \
       --prefix PATH : ${
         lib.makeBinPath [
           wtype
@@ -120,10 +133,7 @@ python3Packages.buildPythonApplication rec {
           wl-clipboard
           pulseaudio
         ]
-      } \
-      --prefix GI_TYPELIB_PATH : "${giTypelibPath}"
-
-    runHook postInstall
+      }
   '';
 
   meta = {
