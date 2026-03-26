@@ -19,6 +19,9 @@ let
     audio_ducking = false;
     mic_osd_enabled = true;
     audio_device_name = "default";
+    paste_mode = "ctrl";
+    clipboard_behavior = true;
+    clipboard_clear_delay = 10;
   };
 
   configFile = pkgs.writeText "hyprwhspr-config.json" (builtins.toJSON settings);
