@@ -18,6 +18,7 @@ let
     audio_feedback = true;
     audio_ducking = false;
     mic_osd_enabled = true;
+    audio_device_name = "default";
   };
 
   configFile = pkgs.writeText "hyprwhspr-config.json" (builtins.toJSON settings);
