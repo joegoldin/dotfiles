@@ -15,6 +15,7 @@
     ./wallpaper.nix
     ./mounts.nix
     ./uxplay.nix
+    ./hyprwhspr.nix
     ./yepanywhere.nix
     # ./data-drives.nix
   ];
