@@ -237,11 +237,33 @@ nix-gc:
 
 [unix]
 sync-submodules:
-    @echo "🔄  Syncing submodules..."
-    @git submodule sync --recursive
-    @git submodule update --init --recursive --remote
-    @just _record-history sync-submodules
-    @echo "✅  Submodules synced!"
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "🔄  Syncing submodules..."
+    git submodule sync --recursive
+    # First pass: push local commits and check for problems
+    git submodule foreach --recursive '
+      git fetch origin 2>/dev/null || { echo "❌  $name: failed to fetch — aborting"; exit 1; }
+      local_ahead="$(git log --oneline @{u}..HEAD 2>/dev/null || true)"
+      remote_ahead="$(git log --oneline HEAD..@{u} 2>/dev/null || true)"
+      dirty="$(git status --porcelain 2>/dev/null || true)"
+      if [ -n "$dirty" ]; then
+        echo "❌  $name: has uncommitted changes — aborting"
+        exit 1
+      fi
+      if [ -n "$local_ahead" ] && [ -n "$remote_ahead" ]; then
+        echo "❌  $name: local and remote have diverged — aborting (resolve manually)"
+        exit 1
+      fi
+      if [ -n "$local_ahead" ]; then
+        echo "  ⬆️  Pushing $name..."
+        git push || { echo "❌  $name: push failed — aborting"; exit 1; }
+      fi
+    '
+    # Second pass: pull remote updates
+    git submodule update --init --recursive --remote
+    just _record-history sync-submodules
+    echo "✅  Submodules synced!"
 
 # ── History tracking ─────────────────────────────────────────────────
 
