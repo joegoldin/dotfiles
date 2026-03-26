@@ -44,8 +44,9 @@ in
 
     serviceConfig = {
       Type = "simple";
+      ExecStartPre = "${hyprwhspr}/bin/hyprwhspr model download ${settings.model}";
       ExecStart = "${hyprwhspr}/bin/hyprwhspr";
-      ExecStopPost = "${pkgs.procps}/bin/pkill -9 -f 'hyprwhspr-virtual-keyboard' || true";
+      ExecStopPost = "-${pkgs.procps}/bin/pkill -9 -f hyprwhspr-virtual-keyboard";
       Environment = [
         "PYTHONUNBUFFERED=1"
       ];
