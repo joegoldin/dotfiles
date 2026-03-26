@@ -1,11 +1,32 @@
 {
   pkgs,
+  username,
   ...
 }:
 let
   hyprwhspr = pkgs.callPackage ../common/system/pkgs/hyprwhspr { };
+
+  # Declarative config — only include overrides, hyprwhspr uses sparse storage
+  settings = {
+    primary_shortcut = "SUPER+ALT+D";
+    cancel_shortcut = "ESCAPE";
+    recording_mode = "auto";
+    transcription_backend = "pywhispercpp";
+    model = "base.en";
+    language = "en";
+    filter_filler_words = true;
+    audio_feedback = true;
+    audio_ducking = true;
+    mic_osd_enabled = true;
+  };
+
+  configFile = pkgs.writeText "hyprwhspr-config.json" (builtins.toJSON settings);
 in
 {
+  home-manager.users.${username} = {
+    xdg.configFile."hyprwhspr/config.json".source = configFile;
+  };
+
   systemd.user.services.hyprwhspr = {
     description = "hyprwhspr speech-to-text";
     documentation = [ "https://github.com/goodroot/hyprwhspr" ];
