@@ -16,7 +16,7 @@ let
     language = "en";
     filter_filler_words = true;
     audio_feedback = true;
-    audio_ducking = true;
+    audio_ducking = false;
     mic_osd_enabled = true;
   };
 

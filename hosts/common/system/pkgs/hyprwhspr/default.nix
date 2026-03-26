@@ -8,6 +8,7 @@
   ydotool,
   gobject-introspection,
   gtk4,
+  gtk4-layer-shell,
   glib,
   wl-clipboard,
   pulseaudio,
@@ -53,6 +54,11 @@ python3Packages.buildPythonApplication rec {
   ];
 
   dontBuild = true;
+
+  postPatch = ''
+    substituteInPlace lib/mic_osd/runner.py \
+      --replace-fail "/usr/bin/python3" "${python}/bin/python3"
+  '';
 
   installPhase = ''
     runHook preInstall
@@ -100,7 +106,7 @@ python3Packages.buildPythonApplication rec {
           pulseaudio
         ]
       } \
-      --prefix GI_TYPELIB_PATH : "${gtk4}/lib/girepository-1.0:${glib}/lib/girepository-1.0"
+      --prefix GI_TYPELIB_PATH : "${gtk4}/lib/girepository-1.0:${glib}/lib/girepository-1.0:${gtk4-layer-shell}/lib/girepository-1.0"
 
     runHook postInstall
   '';
