@@ -25,6 +25,7 @@ in
       unstable.darktable
       # unstable.davinci-resolve
       unstable.discord
+      hyprwhspr
       docker-buildx
       unstable.dumbpipe
       unstable.gradle_9
