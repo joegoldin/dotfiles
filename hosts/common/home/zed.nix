@@ -70,6 +70,8 @@
       {
         bindings = {
           "ctrl-shift-`" = "terminal_panel::ToggleFocus";
+          "cmd-q" = null;
+          "cmd-q cmd-q" = "zed::Quit";
         };
       }
     ];
@@ -109,6 +111,7 @@
       auto_indent_on_paste = true;
       linked_edits = true;
       show_edit_predictions = true;
+      confirm_quit = true;
       ensure_final_newline_on_save = true;
 
       edit_predictions = {
