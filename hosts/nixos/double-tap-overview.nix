@@ -1,6 +1,5 @@
 # Double-tap F6 or double-click middle mouse to trigger KDE Overview (mission control).
 # Monitors keyboard/mouse input via evdev; fires Overview on two presses within 300ms.
-# While Overview is active, middle mouse button is blocked to prevent closing windows.
 {
   pkgs,
   username,
@@ -13,10 +12,11 @@ let
   double-tap-overview = pkgs.writeScriptBin "double-tap-overview" ''
     #!${python}/bin/python3
     import asyncio
+    import os
     import subprocess
     import time
     import evdev
-    from evdev import ecodes, UInput
+    from evdev import ecodes
 
     TRIGGER_KEYS = {ecodes.KEY_F6, ecodes.BTN_MIDDLE}
     DOUBLE_TAP_WINDOW = 0.3  # seconds
@@ -46,71 +46,18 @@ let
             stderr=subprocess.DEVNULL,
         )
 
-    def is_overview_active():
-        try:
-            result = subprocess.run(
-                [QDBUS, "org.kde.KWin", "/Effects",
-                 "org.kde.KWin.Effects.isEffectActive", "overview"],
-                capture_output=True, text=True, timeout=1,
-            )
-            return result.stdout.strip() == "true"
-        except Exception:
-            return False
-
-    def grab_mice(state):
-        for dev in state["mice"]:
-            if dev.path in state["grabbed"]:
-                continue
-            try:
-                caps = dev.capabilities()
-                caps.pop(ecodes.EV_SYN, None)
-                virtual = UInput(events=caps, name=f"{dev.name} (filtered)")
-                dev.grab()
-                state["grabbed"][dev.path] = virtual
-            except Exception as e:
-                print(f"Failed to grab {dev.name}: {e}")
-
-    def ungrab_mice(state):
-        for dev in state["mice"]:
-            virtual = state["grabbed"].pop(dev.path, None)
-            if virtual:
-                try:
-                    dev.ungrab()
-                except Exception:
-                    pass
-                try:
-                    virtual.close()
-                except Exception:
-                    pass
-
-    async def watch_overview_close(state):
-        await asyncio.sleep(0.4)
-        while is_overview_active():
-            await asyncio.sleep(0.15)
-        ungrab_mice(state)
-
     async def monitor_device(dev, state):
         try:
             async for event in dev.async_read_loop():
-                # While grabbed, forward all events except BTN_MIDDLE
-                if dev.path in state["grabbed"]:
-                    if event.type == ecodes.EV_KEY and event.code == ecodes.BTN_MIDDLE:
-                        continue
-                    state["grabbed"][dev.path].write_event(event)
-                    continue
-
-                # Double-tap detection
                 if event.type != ecodes.EV_KEY or event.code not in TRIGGER_KEYS:
                     continue
+                # Only act on key-down (value 1), ignore repeat (2) and release (0)
                 if event.value != 1:
                     continue
                 now = time.monotonic()
                 if now - state["last_press"] <= DOUBLE_TAP_WINDOW:
                     trigger_overview()
-                    state["last_press"] = 0
-                    if not state["grabbed"]:
-                        grab_mice(state)
-                        asyncio.create_task(watch_overview_close(state))
+                    state["last_press"] = 0  # reset so triple-tap doesn't re-fire
                 else:
                     state["last_press"] = now
         except OSError:
@@ -122,19 +69,11 @@ let
             print("No devices with F6 or middle mouse button found")
             return
 
-        mice = [d for d in devices
-                if ecodes.BTN_MIDDLE in d.capabilities(verbose=False).get(ecodes.EV_KEY, [])]
-
-        state = {
-            "last_press": 0,
-            "mice": mice,
-            "grabbed": {},
-        }
+        state = {"last_press": 0}
 
         print(f"Monitoring {len(devices)} device(s) for double-tap F6 / middle-click:")
         for dev in devices:
-            kind = "mouse" if dev in mice else "keyboard"
-            print(f"  [{kind}] {dev.name} ({dev.path})")
+            print(f"  {dev.name} ({dev.path})")
 
         tasks = [asyncio.create_task(monitor_device(dev, state)) for dev in devices]
         await asyncio.gather(*tasks)
