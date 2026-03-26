@@ -10,6 +10,7 @@
   gtk4,
   glib,
   wl-clipboard,
+  pulseaudio,
 }:
 let
   pywhispercpp = pkgs.callPackage ./pywhispercpp.nix { };
@@ -60,11 +61,9 @@ python3Packages.buildPythonApplication rec {
     mkdir -p $out/lib/hyprwhspr
     cp -r lib/* $out/lib/hyprwhspr/
 
-    # Install assets and config
-    mkdir -p $out/share/hyprwhspr
-    cp -r share/* $out/share/hyprwhspr/
-    mkdir -p $out/share/hyprwhspr/config
-    cp -r config/* $out/share/hyprwhspr/config/
+    # Install assets and config under HYPRWHSPR_ROOT (code expects share/assets/)
+    cp -r share $out/share
+    cp -r config $out/config
 
     # Create launcher that bypasses upstream bash script (uses #!/bin/bash)
     mkdir -p $out/bin
@@ -98,6 +97,7 @@ python3Packages.buildPythonApplication rec {
           wtype
           ydotool
           wl-clipboard
+          pulseaudio
         ]
       } \
       --prefix GI_TYPELIB_PATH : "${gtk4}/lib/girepository-1.0:${glib}/lib/girepository-1.0"
