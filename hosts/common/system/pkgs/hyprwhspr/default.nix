@@ -10,11 +10,22 @@
   gtk4,
   gtk4-layer-shell,
   glib,
+  graphene,
+  gdk-pixbuf,
+  pango,
   wl-clipboard,
   pulseaudio,
 }:
 let
   pywhispercpp = pkgs.callPackage ./pywhispercpp.nix { };
+  giTypelibPath = lib.concatMapStringsSep ":" (p: "${p}/lib/girepository-1.0") [
+    gtk4
+    gtk4-layer-shell
+    glib
+    graphene
+    gdk-pixbuf
+    pango
+  ];
   python = python3Packages.python.withPackages (
     ps: with ps; [
       sounddevice
@@ -58,6 +69,10 @@ python3Packages.buildPythonApplication rec {
   postPatch = ''
     substituteInPlace lib/mic_osd/runner.py \
       --replace-fail "/usr/bin/python3" "${python}/bin/python3"
+
+    # Inject GI_TYPELIB_PATH and LD_PRELOAD into mic-osd daemon subprocess env
+    sed -i 's|env = os.environ.copy()|env = os.environ.copy(); env["GI_TYPELIB_PATH"] = "${giTypelibPath}"; env["LD_PRELOAD"] = "${gtk4-layer-shell}/lib/libgtk4-layer-shell.so"|' \
+      lib/mic_osd/runner.py
   '';
 
   installPhase = ''
@@ -106,7 +121,7 @@ python3Packages.buildPythonApplication rec {
           pulseaudio
         ]
       } \
-      --prefix GI_TYPELIB_PATH : "${gtk4}/lib/girepository-1.0:${glib}/lib/girepository-1.0:${gtk4-layer-shell}/lib/girepository-1.0"
+      --prefix GI_TYPELIB_PATH : "${giTypelibPath}"
 
     runHook postInstall
   '';
