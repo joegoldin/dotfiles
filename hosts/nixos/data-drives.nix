@@ -1,5 +1,6 @@
 {
   dotfiles-secrets,
+  username,
   ...
 }:
 let
@@ -21,9 +22,12 @@ let
       fsType = "ext4";
     };
   };
+
+  mkTmpfilesRule = drive: "d ${drive.mountPoint} 0755 ${username} users -";
 in
 {
   boot.initrd.secrets."/etc/secrets/luks-data.key" = "/etc/secrets/luks-data.key";
   boot.initrd.luks.devices = builtins.listToAttrs (map mkLuksDevice drivesCfg);
   fileSystems = builtins.listToAttrs (map mkFileSystem drivesCfg);
+  systemd.tmpfiles.rules = map mkTmpfilesRule drivesCfg;
 }
