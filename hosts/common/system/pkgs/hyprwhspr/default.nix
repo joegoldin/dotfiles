@@ -132,6 +132,7 @@ python3Packages.buildPythonApplication rec {
           ydotool
           wl-clipboard
           pulseaudio
+          pkgs.pipewire
         ]
       }
   '';
