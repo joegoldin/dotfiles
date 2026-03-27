@@ -76,4 +76,6 @@ pkgs: {
   yepanywhere-remote = pkgs.callPackage ./yepanywhere-remote { };
 
   hyprwhspr = pkgs.callPackage ./hyprwhspr { };
+
+  mkWindowsApp = pkgs.callPackage ./mkwindowsapp { };
 }
