@@ -629,6 +629,26 @@
         "type": "github"
       }
     },
+    "desk-phone": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1774856542,
+        "narHash": "sha256-pqlPqx5B7881nlUcTrCYYqewpwmd5S6Yn97nIzhKADs=",
+        "owner": "joegoldin",
+        "repo": "desk-phone-cit200",
+        "rev": "b55fef826a4fe5cbf9feb059e8b44059e61d9bbe",
+        "type": "github"
+      },
+      "original": {
+        "owner": "joegoldin",
+        "repo": "desk-phone-cit200",
+        "type": "github"
+      }
+    },
     "devenv": {
       "inputs": {
         "cachix": "cachix",
@@ -3546,6 +3566,7 @@
         "claude-container": "claude-container",
         "claude-desktop-debian": "claude-desktop-debian",
         "claude-nix": "claude-nix_2",
+        "desk-phone": "desk-phone",
         "devenv": "devenv",
         "disko": "disko",
         "dotfiles-assets": "dotfiles-assets",
