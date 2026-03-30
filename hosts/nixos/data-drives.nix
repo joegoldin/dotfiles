@@ -28,7 +28,10 @@ let
   mkTmpfilesRule = drive: "d ${drive.mountPoint} 0755 ${username} users -";
 in
 {
-  environment.etc.crypttab.text = builtins.concatStringsSep "\n" (map mkCryptTab drivesCfg);
+  environment.etc.crypttab = {
+    mode = "0600";
+    text = builtins.concatStringsSep "\n" (map mkCryptTab drivesCfg);
+  };
   fileSystems = builtins.listToAttrs (map mkFileSystem drivesCfg);
   systemd.tmpfiles.rules = map mkTmpfilesRule drivesCfg;
 }
