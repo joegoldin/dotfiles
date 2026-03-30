@@ -17,6 +17,7 @@
     ./uxplay.nix
     # ./hyprwhspr.nix
     ./yepanywhere.nix
+    ./desk-phone.nix
     # ./data-drives.nix
   ];
 }

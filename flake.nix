@@ -48,6 +48,11 @@
       url = "github:joegoldin/claude-container";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # CIT200 desk phone — reactive dataflow engine
+    desk-phone = {
+      url = "github:joegoldin/desk-phone-cit200";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # game server management
     pelican = {
       url = "github:joegoldin/nix-pelican?rev=900716d90d01a27666d65c9c112acde4c725ae9f";
@@ -526,6 +531,7 @@
                 };
               }
             )
+            inputs.desk-phone.nixosModules.default
             lanzaboote.nixosModules.lanzaboote
           ];
         };
@@ -737,34 +743,29 @@
                         --extra-files "$SBKEYS_TMP" /var/lib/sbctl/keys
 
                       rm -f /tmp/luks-password
-
-                      # Find where disko-install mounted the root
-                      MOUNT_POINT=$(findmnt -n -o TARGET /dev/pool/root 2>/dev/null || echo "/mnt")
-
-                      # Verify
-                      if [ ! -e "$MOUNT_POINT/nix/var/nix/profiles/system" ]; then
-                        echo "ERROR: system profile missing at $MOUNT_POINT!"
-                        echo "Checking mount points..."
-                        findmnt | grep -E "pool|nvme"
-                        exit 1
-                      fi
-                      echo "Verified: system profile exists at $MOUNT_POINT."
-
-                      sudo mkdir -p "$MOUNT_POINT/var/log"
-                      sudo cp "$LOGFILE" "$MOUNT_POINT/var/log/install-office-pc.log" 2>/dev/null || true
+                      echo "disko-install succeeded."
 
                       header "Step 4/5: Set User Password"
+                      echo "Re-mounting installed system..."
+                      # disko-install may unmount after finishing — re-mount for password step
+                      if ! findmnt /mnt &>/dev/null; then
+                        sudo cryptsetup open /dev/disk/by-partlabel/disk-main-luks cryptroot 2>/dev/null || true
+                        sudo vgchange -ay 2>/dev/null || true
+                        sudo mount /dev/pool/root /mnt
+                        sudo mount /dev/disk/by-partlabel/disk-main-ESP /mnt/boot
+                      fi
+
                       echo "Set password for ${username}:"
-                      # Find where disko-install mounted the root
-                      MOUNT_POINT=$(findmnt -n -o TARGET /dev/pool/root 2>/dev/null || echo "/mnt")
-                      echo "Using mount point: $MOUNT_POINT"
-                      if sudo nixos-enter --root "$MOUNT_POINT" -- passwd ${username}; then
+                      if sudo nixos-enter --root /mnt -- passwd ${username}; then
                         echo "Password set successfully."
                       else
                         echo "nixos-enter failed, trying chroot..."
-                        sudo chroot "$MOUNT_POINT" /bin/sh -c "echo '${username}:changeme' | chpasswd"
+                        sudo chroot /mnt /bin/sh -c "echo '${username}:changeme' | chpasswd"
                         echo "Password set to 'changeme' — change it after first login!"
                       fi
+
+                      sudo mkdir -p /mnt/var/log
+                      sudo cp "$LOGFILE" /mnt/var/log/install-office-pc.log 2>/dev/null || true
 
                       header "Step 5/5: Done!"
                       echo "Rebooting in 10 seconds... (Ctrl+C to cancel)"
