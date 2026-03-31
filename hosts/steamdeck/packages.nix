@@ -3,6 +3,8 @@
 { pkgs, ... }:
 {
   home.packages = with pkgs; [
+    direnv
+    grc
     ripgrep
     fzf
     jq
