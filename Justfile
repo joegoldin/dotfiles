@@ -113,15 +113,6 @@ save-launchpad:
     @lporg save --config $(pwd)/hosts/common/system/dotconfig/lporg.yaml
     @echo "✅  Saved Launchpad!"
 
-# ── First-time setup ────────────────────────────────────────────────────
-
-[linux]
-bootstrap-hardware:
-    @echo "🔧  Generating hardware-configuration.nix for $(hostname)..."
-    @sudo nixos-generate-config --show-hardware-config > hosts/steamdeck/hardware-configuration.nix
-    @echo "✅  Hardware config written to hosts/steamdeck/hardware-configuration.nix"
-    @echo "Now run: just build"
-
 # ── ISO images ──────────────────────────────────────────────────────────
 
 [unix]
