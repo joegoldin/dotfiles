@@ -46,6 +46,7 @@ in
     };
     autoLogin.relogin = true;
     settings.General.InputMethod = "qtvirtualkeyboard";
+    extraPackages = [ pkgs.kdePackages.qtvirtualkeyboard ];
   };
 
   # Session switching: steamos-manager writes to /etc/sddm.conf.d/ at runtime.
