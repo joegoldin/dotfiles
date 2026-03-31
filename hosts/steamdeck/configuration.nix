@@ -95,6 +95,9 @@
     wget
   ];
 
+  # KDE Plasma desktop (for switching out of Game Mode)
+  services.desktopManager.plasma6.enable = true;
+
   services.openssh = {
     enable = true;
     settings = {
