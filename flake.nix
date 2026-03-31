@@ -620,7 +620,6 @@
           };
           modules = [
             inputs.jovian-nixos.nixosModules.default
-            disko.nixosModules.disko
             nix-index-database.nixosModules.default
             ./hosts/steamdeck
             home-manager.nixosModules.home-manager
