@@ -13,7 +13,6 @@
     ../common/home/gh.nix
     ../common/home/starship.nix
     ../common/home/gpg.nix
-    ../common/home/attic.nix
     ../common/home/bin
     ../common/home/plasma.nix
     ../common/home/default-apps.nix
