@@ -9,7 +9,15 @@
   ...
 }:
 let
-  inherit (lib) attrValues makeSearchPathOutput;
+  inherit (lib) attrValues makeSearchPathOutput getExe;
+
+  restartNetwork = getExe (
+    pkgs.writeShellApplication {
+      name = "restart-network";
+      runtimeInputs = with pkgs; [ systemd ];
+      text = "systemctl restart NetworkManager";
+    }
+  );
 in
 {
   # Steam Deck hardware
@@ -51,6 +59,22 @@ in
 
   # Disable getty on tty1 for seamless session transitions
   systemd.services.display-manager.conflicts = [ "getty@tty1.service" ];
+
+  # Allow passwordless network restart on session switch
+  security.sudo.extraRules = [
+    {
+      users = [ username ];
+      commands = [
+        {
+          command = restartNetwork;
+          options = [
+            "SETENV"
+            "NOPASSWD"
+          ];
+        }
+      ];
+    }
+  ];
 
   # Additional Steam config (merged with gaming.nix)
   programs.steam = {
