@@ -633,18 +633,25 @@
                   backupFileExtension = "backup";
                   sharedModules = [
                     plasma-manager.homeModules.plasma-manager
+                    inputs.nix-attic-infra.homeManagerModules.attic-client
                   ];
                   users.${specialArgs.username} = import ./hosts/steamdeck/home-manager.nix;
                 };
               }
             )
+            inputs.nix-attic-infra.nixosModules.attic-post-build-hook
             agenix.nixosModules.default
             (
-              { ... }:
+              { specialArgs, ... }:
               {
                 age.secrets.attic-netrc = {
                   file = "${dotfiles-secrets}/attic-netrc.age";
                   mode = "0400";
+                };
+                age.secrets.attic-token = {
+                  file = "${dotfiles-secrets}/attic.token.age";
+                  mode = "0400";
+                  owner = specialArgs.username;
                 };
               }
             )
