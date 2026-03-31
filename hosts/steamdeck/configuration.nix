@@ -93,13 +93,11 @@
     agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
     git
     wget
+    maliit-keyboard
   ];
 
   # KDE Plasma desktop (for switching out of Game Mode)
   services.desktopManager.plasma6.enable = true;
-
-  # Virtual keyboard for touchscreen use in Desktop Mode
-  programs.maliit-keyboard.enable = true;
 
   # Strip default KDE bloat — keep it lean for a gaming device
   environment.plasma6.excludePackages = with pkgs.kdePackages; [
