@@ -77,9 +77,14 @@ in
     }
   ];
 
+  # Steam hardware udev rules
+  hardware.steam-hardware.enable = true;
+
   # Additional Steam config (merged with gaming.nix)
   programs.steam = {
     protontricks.enable = true;
+    dedicatedServer.openFirewall = true;
+    localNetworkGameTransfers.openFirewall = true;
     extraCompatPackages = [
       pkgs.proton-ge-bin
     ];
