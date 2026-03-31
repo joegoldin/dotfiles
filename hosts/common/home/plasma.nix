@@ -313,6 +313,7 @@
       "powerdevilrc"."AC/Display"."TurnOffDisplayIdleTimeoutWhenLockedSec" = 20;
       "powerdevilrc"."AC/SuspendAndShutdown"."AutoSuspendAction" = 0;
       "powerdevilrc"."AC/SuspendAndShutdown"."PowerButtonAction" = 1;
+      "powerdevilrc"."AC/SuspendAndShutdown"."SleepButtonAction" = 1;
       # Disable Baloo file indexing
       "baloofilerc"."Basic Settings"."Indexing-Enabled" = false;
       # Input
