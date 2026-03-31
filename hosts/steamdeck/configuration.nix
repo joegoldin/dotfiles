@@ -98,6 +98,22 @@
   # KDE Plasma desktop (for switching out of Game Mode)
   services.desktopManager.plasma6.enable = true;
 
+  # Strip default KDE bloat — keep it lean for a gaming device
+  environment.plasma6.excludePackages = with pkgs.kdePackages; [
+    discover
+    elisa
+    kate
+    khelpcenter
+    kmailtransport
+    konsole
+    krdp
+    kwallet
+    kwallet-pam
+    oxygen
+    plasma-welcome
+    print-manager
+  ];
+
   services.openssh = {
     enable = true;
     settings = {
