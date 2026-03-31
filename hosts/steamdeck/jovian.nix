@@ -11,12 +11,9 @@
   jovian.devices.steamdeck.enable = true;
   jovian.hardware.has.amd.gpu = true;
   jovian.steam.enable = true;
+  jovian.steam.autoStart = true;
+  jovian.steam.user = username;
   jovian.steam.desktopSession = "plasma";
-
-  services.displayManager.sddm.settings.Autologin = {
-    Session = "gamescope-wayland.desktop";
-    User = username;
-  };
 
   fonts.packages =
     let
