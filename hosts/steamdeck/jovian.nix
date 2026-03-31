@@ -9,7 +9,26 @@
   ...
 }:
 let
-  inherit (lib) attrValues makeSearchPathOutput;
+  inherit (lib) attrValues makeSearchPathOutput mkForce;
+
+  defaultSession = "plasma";
+
+  switch-session = pkgs.writeShellApplication {
+    name = "switch-session";
+    text = ''
+      mkdir -p /etc/sddm.conf.d
+      cat <<EOF | tee /etc/sddm.conf.d/autologin.conf
+      [Autologin]
+      User=${username}
+      Session=$1
+      Relogin=true
+      EOF
+    '';
+  };
+
+  gaming-mode = pkgs.writeShellScriptBin "gaming-mode" ''
+    sudo ${pkgs.systemd}/bin/systemctl start to-gaming-mode.service
+  '';
 in
 {
   # Steam Deck hardware
@@ -21,7 +40,7 @@ in
   jovian.steam = {
     enable = true;
     user = username;
-    desktopSession = "plasma";
+    desktopSession = defaultSession;
 
     environment = {
       STEAM_EXTRA_COMPAT_TOOLS_PATHS =
@@ -30,8 +49,64 @@ in
     };
   };
 
-  # Jovian autoStart handles session switching without a display manager
-  jovian.steam.autoStart = true;
+  # SDDM with auto-login and relogin for seamless session switching
+  services.displayManager.sddm = {
+    enable = true;
+    autoLogin.relogin = true;
+    wayland = {
+      enable = true;
+      compositorCommand = "kwin";
+    };
+    settings.General.InputMethod = "qtvirtualkeyboard";
+  };
+
+  # Set default session at boot
+  systemd.services."set-session" = {
+    wantedBy = [ "multi-user.target" ];
+    before = [ "display-manager.service" ];
+    path = [ switch-session ];
+    script = ''
+      switch-session "${defaultSession}"
+    '';
+  };
+
+  # Disable getty on tty1 for seamless session transitions
+  systemd.services.display-manager.conflicts = [ "getty@tty1.service" ];
+
+  # Switch to gaming mode service
+  systemd.services."to-gaming-mode" = {
+    wantedBy = mkForce [ ];
+    path = [ switch-session ];
+    script = ''
+      switch-session "gamescope-wayland"
+      systemctl restart display-manager
+      sleep 10
+      switch-session "${defaultSession}"
+    '';
+  };
+
+  # Allow user to switch to gaming mode without password
+  security.sudo.extraRules = [
+    {
+      users = [ username ];
+      commands = [
+        {
+          command = "${pkgs.systemd}/bin/systemctl start to-gaming-mode.service";
+          options = [
+            "SETENV"
+            "NOPASSWD"
+          ];
+        }
+      ];
+    }
+  ];
+
+  # Gaming Mode desktop shortcut
+  environment.systemPackages = with pkgs; [
+    gaming-mode
+    steam-rom-manager
+    r2modman
+  ];
 
   # Additional Steam config (merged with gaming.nix)
   programs.steam = {
@@ -68,12 +143,6 @@ in
 
     extraPythonPackages = p: with p; [ click ];
   };
-
-  # Extra gaming packages
-  environment.systemPackages = with pkgs; [
-    steam-rom-manager
-    r2modman
-  ];
 
   # Fonts
   fonts.packages =

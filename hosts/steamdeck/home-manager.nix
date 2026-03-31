@@ -86,4 +86,13 @@
       };
     };
   };
+
+  # Gaming Mode desktop entry and desktop shortcut
+  xdg.desktopEntries."gaming-mode" = {
+    name = "Gaming Mode";
+    exec = "gaming-mode";
+    icon = "steam";
+    terminal = false;
+    type = "Application";
+  };
 }
