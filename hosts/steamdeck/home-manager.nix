@@ -17,6 +17,7 @@
     ../common/home/plasma.nix
     ../common/home/default-apps.nix
     ../common/home/firefox
+    ../common/home/attic.nix
     ./packages.nix
   ];
 
