@@ -31,7 +31,12 @@ in
   };
 
   # SDDM with autologin to Game Mode (enables proper desktop session switching)
-  services.displayManager.sddm.enable = true;
+  services.displayManager.sddm = {
+    enable = true;
+    wayland.enable = true;
+    enableHidpi = true;
+    settings.General.InputMethod = "qtvirtualkeyboard";
+  };
   services.displayManager.autoLogin = {
     enable = true;
     user = username;
