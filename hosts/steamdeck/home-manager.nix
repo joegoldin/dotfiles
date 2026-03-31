@@ -59,6 +59,7 @@
             };
           }
           "org.kde.plasma.marginsseparator"
+          "org.kde.plasma.manageinputmethod"
           "org.kde.plasma.systemtray"
           {
             digitalClock = {
