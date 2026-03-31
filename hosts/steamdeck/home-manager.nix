@@ -1,6 +1,8 @@
 # hosts/steamdeck/home-manager.nix
 # Lean home-manager for Steam Deck — cherry-picked modules, no dev tools
 {
+  lib,
+  pkgs,
   username,
   homeDirectory,
   stateVersion,
@@ -104,4 +106,25 @@
     Terminal=false
     Type=Application
   '';
+
+  # Fix remote control prompt showing up every time + autostart steam in desktop mode
+  xdg.configFile =
+    let
+      mkAutostart = name: exe: {
+        "autostart/${name}.desktop".text = "[Desktop Entry]\nType=Application\nExec=${exe}";
+      };
+    in
+    (mkAutostart "steam" "steam -silent %U")
+    // (mkAutostart "krfb" "krfb --nodialog %c")
+    // (mkAutostart "kde-authorize-steam" (
+      lib.getExe (
+        pkgs.writeShellApplication {
+          name = "kde-authorize-steam";
+          text = ''
+            flatpak permission-set kde-authorized remote-desktop org.kde.krdpserver yes
+            flatpak permission-set kde-authorized remote-desktop "" yes
+          '';
+        }
+      )
+    ));
 }
