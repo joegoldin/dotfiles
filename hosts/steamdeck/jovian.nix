@@ -42,11 +42,12 @@ in
 
   # Seed the SDDM autologin config that steamos-manager expects
   # steamos-manager needs a writable /etc/sddm.conf.d/ to switch sessions at runtime
-  # (NixOS /etc is read-only, so we use a tmpfiles rule to create a writable directory
-  # and seed it with the default gamescope autologin config on boot)
+  # (NixOS /etc is read-only, so we use a tmpfiles rule to create a writable directory)
+  # steamos.conf is minimal — just enables SessionManagement1 detection
+  # steamos-manager writes zz-steamos-autologin.conf and zzt-steamos-temp-login.conf
   systemd.tmpfiles.rules = [
     "d /etc/sddm.conf.d 0755 root root -"
-    "f /etc/sddm.conf.d/steamos.conf 0644 root root - [Autologin]\\nUser=${username}\\nSession=gamescope-wayland\\nRelogin=true"
+    "f /etc/sddm.conf.d/steamos.conf 0644 root root - [Autologin]\\nUser=${username}\\nRelogin=true"
   ];
 
   # Default to gamescope on boot
