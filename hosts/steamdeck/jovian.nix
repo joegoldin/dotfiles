@@ -17,11 +17,10 @@ in
   jovian.devices.steamdeck.enableVendorDrivers = true;
   jovian.hardware.has.amd.gpu = true;
 
-  # Steam + gamescope session
+  # Steam + gamescope session (SDDM handles session switching, not autoStart)
   jovian.steam = {
     enable = true;
     user = username;
-    desktopSession = "plasma";
 
     environment = {
       STEAM_EXTRA_COMPAT_TOOLS_PATHS =
