@@ -107,14 +107,22 @@
     Type=Application
   '';
 
-  # Fix remote control prompt showing up every time + autostart steam in desktop mode
+  # Autostart entries for desktop mode
   xdg.configFile =
     let
       mkAutostart = name: exe: {
         "autostart/${name}.desktop".text = "[Desktop Entry]\nType=Application\nExec=${exe}";
       };
+      restartNetwork = lib.getExe (
+        pkgs.writeShellApplication {
+          name = "restart-network";
+          runtimeInputs = with pkgs; [ systemd ];
+          text = "systemctl restart NetworkManager";
+        }
+      );
     in
-    (mkAutostart "steam" "steam -silent %U")
+    (mkAutostart "restart-network" "sudo ${restartNetwork}")
+    // (mkAutostart "steam" "steam -silent %U")
     // (mkAutostart "krfb" "krfb --nodialog %c")
     // (mkAutostart "kde-authorize-steam" (
       lib.getExe (
