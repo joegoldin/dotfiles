@@ -87,12 +87,21 @@
     };
   };
 
-  # Gaming Mode desktop entry and desktop shortcut
-  xdg.desktopEntries."gaming-mode" = {
-    name = "Gaming Mode";
-    exec = "gaming-mode";
+  # Return to Gaming Mode desktop entry + desktop shortcut icon
+  xdg.desktopEntries."return-to-gaming-mode" = {
+    name = "Return to Gaming Mode";
+    exec = "steamosctl switch-to-game-mode";
     icon = "steam";
     terminal = false;
     type = "Application";
   };
+
+  home.file."Desktop/Return to Gaming Mode.desktop".text = ''
+    [Desktop Entry]
+    Name=Return to Gaming Mode
+    Exec=steamosctl switch-to-game-mode
+    Icon=steam
+    Terminal=false
+    Type=Application
+  '';
 }

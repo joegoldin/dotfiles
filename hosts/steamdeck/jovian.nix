@@ -40,22 +40,14 @@ in
     settings.General.InputMethod = "qtvirtualkeyboard";
   };
 
-  # Seed the SDDM autologin config that steamos-manager expects
-  # steamos-manager needs a writable /etc/sddm.conf.d/ to switch sessions at runtime
-  # (NixOS /etc is read-only, so we use a tmpfiles rule to create a writable directory)
-  # steamos.conf is minimal — just enables SessionManagement1 detection
-  # steamos-manager writes zz-steamos-autologin.conf and zzt-steamos-temp-login.conf
+  # Session switching: steamos-manager writes to /etc/sddm.conf.d/ at runtime.
+  # We do NOT use services.displayManager.autoLogin or defaultSession because
+  # they write Session= into the read-only /etc/sddm.conf which can't be overridden.
+  # Instead, steamos.conf in the writable conf.d/ handles autologin + session selection.
   systemd.tmpfiles.rules = [
     "d /etc/sddm.conf.d 0755 root root -"
-    "f /etc/sddm.conf.d/steamos.conf 0644 root root - [Autologin]\\nUser=${username}\\nRelogin=true"
+    "f /etc/sddm.conf.d/steamos.conf 0644 root root - [Autologin]\\nUser=${username}\\nSession=gamescope-wayland\\nRelogin=true"
   ];
-
-  # Default to gamescope on boot
-  services.displayManager.autoLogin = {
-    enable = true;
-    user = username;
-  };
-  services.displayManager.defaultSession = "gamescope-wayland";
 
   # Disable getty on tty1 for seamless session transitions
   systemd.services.display-manager.conflicts = [ "getty@tty1.service" ];
