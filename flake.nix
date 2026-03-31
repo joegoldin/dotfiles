@@ -24,6 +24,11 @@
     };
     # wsl
     nixos-wsl.url = "github:nix-community/NixOS-WSL/release-25.11";
+    # jovian (Steam Deck)
+    jovian-nixos = {
+      url = "github:Jovian-Experiments/Jovian-NixOS?rev=8ffb6db9322542ec3cb541a232864084422f7e90";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # ── Local sources ───────────────────────────────────────────────────────
     # assets (fonts, etc.)
@@ -638,7 +643,10 @@
                   '';
 
                   # Enable flakes
-                  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+                  nix.settings.experimental-features = [
+                    "nix-command"
+                    "flakes"
+                  ];
 
                   # Disable sleep/suspend/screen-off on live ISO
                   services.logind.settings.Login.HandleLidSwitch = "ignore";
@@ -781,7 +789,11 @@
                   # Force the target system closure into the ISO by referencing it
                   # This makes nix include all store paths in the squashfs
                   # Bake the target system closure and all flake inputs into the ISO
-                  isoImage.storeContents = [ targetToplevel targetDisko ] ++ allInputs;
+                  isoImage.storeContents = [
+                    targetToplevel
+                    targetDisko
+                  ]
+                  ++ allInputs;
                 }
               )
             ];
