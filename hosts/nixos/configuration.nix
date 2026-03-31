@@ -54,6 +54,8 @@ in
       enable = true;
       pkiBundle = "/var/lib/sbctl";
     };
+    # Kingston NV3 (SM2268XT2) NVMe returns EBUSY on suspend without this
+    kernelParams = [ "nvme_core.default_ps_max_latency_us=4000" ];
   };
 
   # Enable aarch64 cross-compilation via QEMU
