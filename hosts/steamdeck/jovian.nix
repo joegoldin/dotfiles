@@ -30,18 +30,8 @@ in
     };
   };
 
-  # SDDM with autologin to Game Mode (enables proper desktop session switching)
-  services.displayManager.sddm = {
-    enable = true;
-    wayland.enable = true;
-    enableHidpi = true;
-    settings.General.InputMethod = "qtvirtualkeyboard";
-  };
-  services.displayManager.autoLogin = {
-    enable = true;
-    user = username;
-  };
-  services.displayManager.defaultSession = "gamescope-wayland";
+  # Jovian autoStart handles session switching without a display manager
+  jovian.steam.autoStart = true;
 
   # Additional Steam config (merged with gaming.nix)
   programs.steam = {
