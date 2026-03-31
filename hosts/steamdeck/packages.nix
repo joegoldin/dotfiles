@@ -3,7 +3,6 @@
 { pkgs, ... }:
 {
   home.packages = with pkgs; [
-    # Essentials
     ripgrep
     fzf
     jq
@@ -12,14 +11,9 @@
     curl
     unzip
     zip
-
-    # System
     htop
     pciutils
     usbutils
-
-    # Nix
-    nh
     nix-output-monitor
     nixfmt
     comma
