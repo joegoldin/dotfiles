@@ -2282,8 +2282,8 @@
       },
       "original": {
         "owner": "Jovian-Experiments",
-        "ref": "development",
         "repo": "Jovian-NixOS",
+        "rev": "8ffb6db9322542ec3cb541a232864084422f7e90",
         "type": "github"
       }
     },
