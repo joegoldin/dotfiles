@@ -38,6 +38,8 @@ build: system-info _check-maintenance
       just _build-wsl; \
     elif [ "{{ arch() }}" = "aarch64" ]; then \
       just _build-bastion; \
+    elif [ "{{ arch() }}" = "x86_64" ] && [ "$(hostname)" = "joe-steamdeck" ]; then \
+      just _build-steamdeck; \
     elif [ "{{ arch() }}" = "x86_64" ] && [ "$(hostname)" = "office-pc" ]; then \
       just _build-office-pc; \
     elif [ "{{ arch() }}" = "x86_64" ] && [ "$(hostname)" = "racknerd-cloud-agent" ]; then \
@@ -76,6 +78,13 @@ _build-racknerd:
     @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
      nh os switch . -H racknerd-cloud-agent --accept-flake-config
     @echo "✅  Built for RackNerd!"
+
+[private]
+_build-steamdeck:
+    @echo "🔨  Building for Steam Deck 🎮..."
+    @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
+     nh os switch . -H joe-steamdeck --accept-flake-config
+    @echo "✅  Built for Steam Deck!"
 
 [private]
 _build-nixos:
