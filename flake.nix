@@ -613,6 +613,45 @@
           ];
         };
 
+        # Steam Deck with Jovian NixOS
+        joe-steamdeck = nixpkgs.lib.nixosSystem {
+          specialArgs = commonSpecialArgs // {
+            hostname = "joe-steamdeck";
+          };
+          modules = [
+            jovian-nixos.nixosModules.default
+            disko.nixosModules.disko
+            nix-index-database.nixosModules.default
+            ./hosts/steamdeck
+            home-manager.nixosModules.home-manager
+            (
+              { specialArgs, ... }:
+              {
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  extraSpecialArgs = specialArgs;
+                  backupFileExtension = "backup";
+                  sharedModules = [
+                    plasma-manager.homeModules.plasma-manager
+                  ];
+                  users.${specialArgs.username} = import ./hosts/steamdeck/home-manager.nix;
+                };
+              }
+            )
+            agenix.nixosModules.default
+            (
+              { ... }:
+              {
+                age.secrets.attic-netrc = {
+                  file = "${dotfiles-secrets}/attic-netrc.age";
+                  mode = "0400";
+                };
+              }
+            )
+          ];
+        };
+
         # Installer ISO for office-pc
         office-pc-installer =
           let

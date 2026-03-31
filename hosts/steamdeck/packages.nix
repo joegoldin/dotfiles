@@ -17,5 +17,6 @@
     nix-output-monitor
     nixfmt
     comma
+    unstable.just
   ];
 }
