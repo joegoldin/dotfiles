@@ -20,7 +20,6 @@ in
   # Steam + gamescope session
   jovian.steam = {
     enable = true;
-    autoStart = true;
     user = username;
     desktopSession = "plasma";
 
@@ -30,6 +29,14 @@ in
           config.programs.steam.extraCompatPackages;
     };
   };
+
+  # SDDM with autologin to Game Mode (enables proper desktop session switching)
+  services.displayManager.sddm.enable = true;
+  services.displayManager.autoLogin = {
+    enable = true;
+    user = username;
+  };
+  services.displayManager.defaultSession = "gamescope-wayland";
 
   # Additional Steam config (merged with gaming.nix)
   programs.steam = {
