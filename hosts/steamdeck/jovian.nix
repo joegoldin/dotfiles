@@ -9,26 +9,7 @@
   ...
 }:
 let
-  inherit (lib) attrValues makeSearchPathOutput mkForce;
-
-  defaultSession = "plasma";
-
-  switch-session = pkgs.writeShellApplication {
-    name = "switch-session";
-    text = ''
-      mkdir -p /etc/sddm.conf.d
-      cat <<EOF | tee /etc/sddm.conf.d/autologin.conf
-      [Autologin]
-      User=${username}
-      Session=$1
-      Relogin=true
-      EOF
-    '';
-  };
-
-  gaming-mode = pkgs.writeShellScriptBin "gaming-mode" ''
-    sudo ${pkgs.systemd}/bin/systemctl start to-gaming-mode.service
-  '';
+  inherit (lib) attrValues makeSearchPathOutput;
 in
 {
   # Steam Deck hardware
@@ -40,7 +21,7 @@ in
   jovian.steam = {
     enable = true;
     user = username;
-    desktopSession = defaultSession;
+    desktopSession = "plasma";
 
     environment = {
       STEAM_EXTRA_COMPAT_TOOLS_PATHS =
@@ -49,64 +30,35 @@ in
     };
   };
 
-  # SDDM with auto-login and relogin for seamless session switching
+  # SDDM manages session switching (steamos-manager writes to /etc/sddm.conf.d/)
   services.displayManager.sddm = {
     enable = true;
-    autoLogin.relogin = true;
     wayland = {
       enable = true;
       compositorCommand = "kwin";
     };
+    autoLogin.relogin = true;
     settings.General.InputMethod = "qtvirtualkeyboard";
   };
 
-  # Set default session at boot
-  systemd.services."set-session" = {
-    wantedBy = [ "multi-user.target" ];
-    before = [ "display-manager.service" ];
-    path = [ switch-session ];
-    script = ''
-      switch-session "${defaultSession}"
-    '';
+  # Seed the SDDM autologin config that steamos-manager expects
+  # steamos-manager checks for /etc/sddm.conf.d/steamos.conf to enable SessionManagement1
+  environment.etc."sddm.conf.d/steamos.conf".text = ''
+    [Autologin]
+    User=${username}
+    Session=gamescope-wayland
+    Relogin=true
+  '';
+
+  # Default to gamescope on boot
+  services.displayManager.autoLogin = {
+    enable = true;
+    user = username;
   };
+  services.displayManager.defaultSession = "gamescope-wayland";
 
   # Disable getty on tty1 for seamless session transitions
   systemd.services.display-manager.conflicts = [ "getty@tty1.service" ];
-
-  # Switch to gaming mode service
-  systemd.services."to-gaming-mode" = {
-    wantedBy = mkForce [ ];
-    path = [ switch-session ];
-    script = ''
-      switch-session "gamescope-wayland"
-      systemctl restart display-manager
-      sleep 10
-      switch-session "${defaultSession}"
-    '';
-  };
-
-  # Allow user to switch to gaming mode without password
-  security.sudo.extraRules = [
-    {
-      users = [ username ];
-      commands = [
-        {
-          command = "${pkgs.systemd}/bin/systemctl start to-gaming-mode.service";
-          options = [
-            "SETENV"
-            "NOPASSWD"
-          ];
-        }
-      ];
-    }
-  ];
-
-  # Gaming Mode desktop shortcut
-  environment.systemPackages = with pkgs; [
-    gaming-mode
-    steam-rom-manager
-    r2modman
-  ];
 
   # Additional Steam config (merged with gaming.nix)
   programs.steam = {
@@ -143,6 +95,12 @@ in
 
     extraPythonPackages = p: with p; [ click ];
   };
+
+  # Extra gaming packages
+  environment.systemPackages = with pkgs; [
+    steam-rom-manager
+    r2modman
+  ];
 
   # Fonts
   fonts.packages =
