@@ -29,8 +29,7 @@ flake-update:
 
 [macos]
 build: system-info _check-maintenance
-    @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
-     nh darwin switch . --accept-flake-config
+    @just _timed-build "darwin" "export NIX_CONFIG=\"access-tokens = github.com=\$(gh auth token 2>/dev/null || echo '')\"; nh darwin switch . --accept-flake-config"
 
 [linux]
 build: system-info _check-maintenance
@@ -54,44 +53,32 @@ build: system-info _check-maintenance
 [private]
 _build-wsl:
     @echo "🔨  Building for WSL 🪟..."
-    @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
-     nh os switch . -H joe-wsl --accept-flake-config
-    @echo "✅  Built for WSL!"
+    @just _timed-build "joe-wsl" "export NIX_CONFIG=\"access-tokens = github.com=\$(gh auth token 2>/dev/null || echo '')\"; nh os switch . -H joe-wsl --accept-flake-config"
 
 [private]
 _build-bastion:
     @echo "🔨  Building for Oracle Cloud bastion 🐧..."
-    @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
-     nh os switch . -H oracle-cloud-bastion --accept-flake-config
-    @echo "✅  Built for Oracle Cloud!"
+    @just _timed-build "oracle-cloud-bastion" "export NIX_CONFIG=\"access-tokens = github.com=\$(gh auth token 2>/dev/null || echo '')\"; nh os switch . -H oracle-cloud-bastion --accept-flake-config"
 
 [private]
 _build-office-pc:
     @echo "🔨  Building for office PC 🐧..."
-    @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
-     nh os switch . -H office-pc --accept-flake-config
-    @echo "✅  Built for office PC!"
+    @just _timed-build "office-pc" "export NIX_CONFIG=\"access-tokens = github.com=\$(gh auth token 2>/dev/null || echo '')\"; nh os switch . -H office-pc --accept-flake-config"
 
 [private]
 _build-racknerd:
     @echo "🔨  Building for RackNerd VPS 🐧..."
-    @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
-     nh os switch . -H racknerd-cloud-agent --accept-flake-config
-    @echo "✅  Built for RackNerd!"
+    @just _timed-build "racknerd-cloud-agent" "export NIX_CONFIG=\"access-tokens = github.com=\$(gh auth token 2>/dev/null || echo '')\"; nh os switch . -H racknerd-cloud-agent --accept-flake-config"
 
 [private]
 _build-steamdeck:
     @echo "🔨  Building for Steam Deck 🎮..."
-    @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
-     nh os switch . -H joe-steamdeck --accept-flake-config
-    @echo "✅  Built for Steam Deck!"
+    @just _timed-build "joe-steamdeck" "export NIX_CONFIG=\"access-tokens = github.com=\$(gh auth token 2>/dev/null || echo '')\"; nh os switch . -H joe-steamdeck --accept-flake-config"
 
 [private]
 _build-nixos:
     @echo "🔨  Building for NixOS desktop 🐧..."
-    @export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"; \
-     nh os switch . -H joe-desktop --accept-flake-config
-    @echo "✅  Built for NixOS!"
+    @just _timed-build "joe-desktop" "export NIX_CONFIG=\"access-tokens = github.com=\$(gh auth token 2>/dev/null || echo '')\"; nh os switch . -H joe-desktop --accept-flake-config"
 
 # ── macOS-specific ───────────────────────────────────────────────────────
 
@@ -273,6 +260,64 @@ sync-submodules:
     git submodule update --init --recursive --remote
     just _record-history sync-submodules
     echo "✅  Submodules synced!"
+
+# ── Build timing ─────────────────────────────────────────────────────
+
+build_times_file := ".build-times"
+
+[private]
+_show-build-prediction host:
+    #!/usr/bin/env bash
+    file="{{ build_times_file }}"
+    if [[ ! -f "$file" ]]; then exit 0; fi
+    times=$(grep "^{{ host }}:" "$file" 2>/dev/null | cut -d: -f2)
+    if [[ -z "$times" ]]; then exit 0; fi
+    last=$(echo "$times" | tail -1)
+    avg=$(echo "$times" | awk '{s+=$1; n++} END {printf "%.0f", s/n}')
+    fmt_time() {
+      local s=$1
+      if (( s >= 60 )); then
+        printf "%dm%02ds" $((s/60)) $((s%60))
+      else
+        printf "%ds" "$s"
+      fi
+    }
+    echo "⏱️  Last build: $(fmt_time $last) (avg: $(fmt_time $avg))"
+
+[private]
+_record-build-time host seconds:
+    #!/usr/bin/env bash
+    file="{{ build_times_file }}"
+    touch "$file"
+    # Keep last 10 entries per host
+    existing=$(grep "^{{ host }}:" "$file" 2>/dev/null | tail -9)
+    grep -v "^{{ host }}:" "$file" > "$file.tmp" 2>/dev/null || true
+    if [[ -n "$existing" ]]; then
+      echo "$existing" >> "$file.tmp"
+    fi
+    echo "{{ host }}:{{ seconds }}" >> "$file.tmp"
+    mv "$file.tmp" "$file"
+
+[private]
+_timed-build host +cmd:
+    #!/usr/bin/env bash
+    just _show-build-prediction "{{ host }}"
+    start=$(date +%s)
+    eval {{ cmd }}
+    rc=$?
+    elapsed=$(( $(date +%s) - start ))
+    if (( elapsed >= 60 )); then
+      fmt=$(printf "%dm%02ds" $((elapsed/60)) $((elapsed%60)))
+    else
+      fmt="${elapsed}s"
+    fi
+    if [[ $rc -eq 0 ]]; then
+      just _record-build-time "{{ host }}" "$elapsed"
+      echo "✅  Built! ⏱️  ${fmt}"
+    else
+      echo "❌  Build failed after ⏱️  ${fmt}"
+      exit $rc
+    fi
 
 # ── History tracking ─────────────────────────────────────────────────
 
