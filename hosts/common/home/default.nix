@@ -29,6 +29,7 @@
     ./gpg.nix
     ./starship.nix
     ./claude
+    ./wakatime.nix
     ./bin
   ];
 
