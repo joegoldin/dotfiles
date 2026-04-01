@@ -92,6 +92,13 @@
     configFile."kwinrc"."Wayland"."VirtualKeyboardEnabled" = true;
     configFile."kwinrc"."Wayland"."InputMethod" =
       "${pkgs.maliit-keyboard}/share/applications/com.github.maliit.keyboard.desktop";
+
+    # Fix Steam keyboard scaling in Desktop Mode (cropped at sides)
+    configFile."kwinrulesrc"."Steam Keyboard Fix"."Description" = "Steam Keyboard Fix";
+    configFile."kwinrulesrc"."Steam Keyboard Fix"."title" = "Steam Input On-screen Keyboard";
+    configFile."kwinrulesrc"."Steam Keyboard Fix"."titlematch" = 2; # substring match
+    configFile."kwinrulesrc"."Steam Keyboard Fix"."size" = "1280,800";
+    configFile."kwinrulesrc"."Steam Keyboard Fix"."sizerule" = 3; # force
   };
 
   # Return to Gaming Mode desktop entry + desktop shortcut icon
