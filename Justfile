@@ -143,7 +143,8 @@ build-office-pc-iso:
     @nix build .#nixosConfigurations.office-pc-installer.config.system.build.isoImage --log-format internal-json -v |& nom --json
     echo "ISO built: $(ls result/iso/*.iso)"
 
-[unix, confirm("This will ERASE the target device. Continue?")]
+[confirm("This will ERASE the target device. Continue?")]
+[unix]
 write-iso device="":
     #!/usr/bin/env bash
     set -euo pipefail
@@ -317,7 +318,7 @@ _show-build-prediction host:
         printf "%ds" "$s"
       fi
     }
-    echo "⏱️  Last build: $(fmt_time $last) (avg: $(fmt_time $avg))"
+    echo "⏱ est. $(fmt_time $last) (∅ $(fmt_time $avg))"
 
 [private]
 _record-build-time host seconds:
