@@ -47,6 +47,9 @@ let
   # Build code-notify package
   codeNotify = pkgs.callPackage ./code-notify.nix { };
 
+  # WakaTime plugin for Claude Code (uses system wakatime-cli)
+  wakatimePlugin = pkgs.callPackage ./wakatime-plugin { };
+
   # Get the agent-skills plugin (includes all skills, commands, agents, hooks, MCP, LSP)
   agentSkillsPlugin = inputs.agent-skills.packages.${pkgs.system}.default;
 
@@ -71,6 +74,7 @@ let
     plugins = [
       agentSkillsPlugin
       localPlugin
+      wakatimePlugin
     ];
   };
 
