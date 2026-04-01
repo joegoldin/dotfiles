@@ -21,6 +21,7 @@ result
 
 # Local maintenance history
 .history
+.build-times
 
 # ai-gen docs
 docs/
