@@ -17,9 +17,7 @@ let
       device = "/dev/mapper/${drive.luksName}";
       fsType = "ext4";
       options = [
-        "noauto"
         "nofail"
-        "x-systemd.automount"
         "x-systemd.device-timeout=10s"
         "x-systemd.mount-timeout=10s"
       ];
