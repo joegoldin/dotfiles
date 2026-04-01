@@ -22,6 +22,7 @@ in
       claude-container
       claude-desktop-fhs
       unstable.cloudflared
+      desktop-wakatime
       unstable.darktable
       # unstable.davinci-resolve
       unstable.discord

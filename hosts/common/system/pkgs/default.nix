@@ -75,6 +75,8 @@ pkgs: {
   yepanywhere-relay = pkgs.callPackage ./yepanywhere-relay { };
   yepanywhere-remote = pkgs.callPackage ./yepanywhere-remote { };
 
+  desktop-wakatime = pkgs.callPackage ./desktop-wakatime.nix { };
+
   hyprwhspr = pkgs.callPackage ./hyprwhspr { };
 
   mkWindowsApp = pkgs.callPackage ./mkwindowsapp { };
