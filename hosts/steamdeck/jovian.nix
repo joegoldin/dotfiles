@@ -46,7 +46,6 @@ in
     };
     autoLogin.relogin = true;
     settings.General.InputMethod = "qtvirtualkeyboard";
-    extraPackages = [ pkgs.kdePackages.qtvirtualkeyboard ];
   };
 
   # Session switching: steamos-manager writes to /etc/sddm.conf.d/ at runtime.
@@ -118,10 +117,11 @@ in
     extraPythonPackages = p: with p; [ click ];
   };
 
-  # Extra gaming packages
+  # Extra gaming packages + virtual keyboard for SDDM
   environment.systemPackages = with pkgs; [
     steam-rom-manager
     r2modman
+    kdePackages.qtvirtualkeyboard
   ];
 
   # Fonts
