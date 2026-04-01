@@ -90,7 +90,7 @@
 
     # Enable virtual keyboard in Plasma
     configFile."kwinrc"."Wayland"."VirtualKeyboardEnabled" = true;
-    configFile."kwinrc"."Wayland"."InputMethod[$e]" =
+    configFile."kwinrc"."Wayland"."InputMethod" =
       "${pkgs.maliit-keyboard}/share/applications/com.github.maliit.keyboard.desktop";
   };
 
