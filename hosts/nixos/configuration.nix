@@ -185,4 +185,9 @@ in
     (import ../common/system/streamcontroller.nix { inherit pkgs; }).package
     vial-rules
   ];
+
+  # Fix Gigabyte motherboard + NVMe immediate wake from suspend
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="pci", DRIVER=="pcieport", ATTR{power/wakeup}="disabled"
+  '';
 }
