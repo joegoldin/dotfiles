@@ -18,6 +18,7 @@
     # ./hyprwhspr.nix
     ./yepanywhere.nix
     ./desk-phone.nix
+    ./vban-send.nix
     # ./data-drives.nix
   ];
 }
