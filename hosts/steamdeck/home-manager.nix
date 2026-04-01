@@ -91,7 +91,7 @@
     # Enable virtual keyboard in Plasma
     configFile."kwinrc"."Wayland"."VirtualKeyboardEnabled" = true;
     configFile."kwinrc"."Wayland"."InputMethod[$e]" =
-      "/run/current-system/sw/share/applications/com.github.maliit.keyboard.desktop";
+      "${pkgs.maliit-keyboard}/share/applications/com.github.maliit.keyboard.desktop";
   };
 
   # Return to Gaming Mode desktop entry + desktop shortcut icon
