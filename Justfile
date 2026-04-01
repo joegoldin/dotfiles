@@ -29,7 +29,12 @@ flake-update:
 
 [macos]
 build: system-info _check-maintenance
-    @just _timed-build "darwin" "export NIX_CONFIG=\"access-tokens = github.com=\$(gh auth token 2>/dev/null || echo '')\"; nh darwin switch . --accept-flake-config"
+    #!/usr/bin/env bash
+    just _show-build-prediction "darwin"
+    start=$(date +%s)
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    nh darwin switch . --accept-flake-config
+    just _finish-build "darwin" "$start" $?
 
 [linux]
 build: system-info _check-maintenance
@@ -52,33 +57,63 @@ build: system-info _check-maintenance
 
 [private]
 _build-wsl:
-    @echo "🔨  Building for WSL 🪟..."
-    @just _timed-build "joe-wsl" "export NIX_CONFIG=\"access-tokens = github.com=\$(gh auth token 2>/dev/null || echo '')\"; nh os switch . -H joe-wsl --accept-flake-config"
+    #!/usr/bin/env bash
+    echo "🔨  Building for WSL 🪟..."
+    just _show-build-prediction "joe-wsl"
+    start=$(date +%s)
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    nh os switch . -H joe-wsl --accept-flake-config
+    just _finish-build "joe-wsl" "$start" $?
 
 [private]
 _build-bastion:
-    @echo "🔨  Building for Oracle Cloud bastion 🐧..."
-    @just _timed-build "oracle-cloud-bastion" "export NIX_CONFIG=\"access-tokens = github.com=\$(gh auth token 2>/dev/null || echo '')\"; nh os switch . -H oracle-cloud-bastion --accept-flake-config"
+    #!/usr/bin/env bash
+    echo "🔨  Building for Oracle Cloud bastion 🐧..."
+    just _show-build-prediction "oracle-cloud-bastion"
+    start=$(date +%s)
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    nh os switch . -H oracle-cloud-bastion --accept-flake-config
+    just _finish-build "oracle-cloud-bastion" "$start" $?
 
 [private]
 _build-office-pc:
-    @echo "🔨  Building for office PC 🐧..."
-    @just _timed-build "office-pc" "export NIX_CONFIG=\"access-tokens = github.com=\$(gh auth token 2>/dev/null || echo '')\"; nh os switch . -H office-pc --accept-flake-config"
+    #!/usr/bin/env bash
+    echo "🔨  Building for office PC 🐧..."
+    just _show-build-prediction "office-pc"
+    start=$(date +%s)
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    nh os switch . -H office-pc --accept-flake-config
+    just _finish-build "office-pc" "$start" $?
 
 [private]
 _build-racknerd:
-    @echo "🔨  Building for RackNerd VPS 🐧..."
-    @just _timed-build "racknerd-cloud-agent" "export NIX_CONFIG=\"access-tokens = github.com=\$(gh auth token 2>/dev/null || echo '')\"; nh os switch . -H racknerd-cloud-agent --accept-flake-config"
+    #!/usr/bin/env bash
+    echo "🔨  Building for RackNerd VPS 🐧..."
+    just _show-build-prediction "racknerd-cloud-agent"
+    start=$(date +%s)
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    nh os switch . -H racknerd-cloud-agent --accept-flake-config
+    just _finish-build "racknerd-cloud-agent" "$start" $?
 
 [private]
 _build-steamdeck:
-    @echo "🔨  Building for Steam Deck 🎮..."
-    @just _timed-build "joe-steamdeck" "export NIX_CONFIG=\"access-tokens = github.com=\$(gh auth token 2>/dev/null || echo '')\"; nh os switch . -H joe-steamdeck --accept-flake-config"
+    #!/usr/bin/env bash
+    echo "🔨  Building for Steam Deck 🎮..."
+    just _show-build-prediction "joe-steamdeck"
+    start=$(date +%s)
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    nh os switch . -H joe-steamdeck --accept-flake-config
+    just _finish-build "joe-steamdeck" "$start" $?
 
 [private]
 _build-nixos:
-    @echo "🔨  Building for NixOS desktop 🐧..."
-    @just _timed-build "joe-desktop" "export NIX_CONFIG=\"access-tokens = github.com=\$(gh auth token 2>/dev/null || echo '')\"; nh os switch . -H joe-desktop --accept-flake-config"
+    #!/usr/bin/env bash
+    echo "🔨  Building for NixOS desktop 🐧..."
+    just _show-build-prediction "joe-desktop"
+    start=$(date +%s)
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    nh os switch . -H joe-desktop --accept-flake-config
+    just _finish-build "joe-desktop" "$start" $?
 
 # ── macOS-specific ───────────────────────────────────────────────────────
 
@@ -299,24 +334,20 @@ _record-build-time host seconds:
     mv "$file.tmp" "$file"
 
 [private]
-_timed-build host +cmd:
+_finish-build host start_time exit_code:
     #!/usr/bin/env bash
-    just _show-build-prediction "{{ host }}"
-    start=$(date +%s)
-    eval {{ cmd }}
-    rc=$?
-    elapsed=$(( $(date +%s) - start ))
+    elapsed=$(( $(date +%s) - {{ start_time }} ))
     if (( elapsed >= 60 )); then
       fmt=$(printf "%dm%02ds" $((elapsed/60)) $((elapsed%60)))
     else
       fmt="${elapsed}s"
     fi
-    if [[ $rc -eq 0 ]]; then
+    if [[ {{ exit_code }} -eq 0 ]]; then
       just _record-build-time "{{ host }}" "$elapsed"
       echo "✅  Built! ⏱️  ${fmt}"
     else
       echo "❌  Build failed after ⏱️  ${fmt}"
-      exit $rc
+      exit {{ exit_code }}
     fi
 
 # ── History tracking ─────────────────────────────────────────────────
