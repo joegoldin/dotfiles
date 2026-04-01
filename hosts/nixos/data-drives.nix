@@ -17,6 +17,7 @@ let
       device = "/dev/mapper/${drive.luksName}";
       fsType = "ext4";
       options = [
+        "noauto"
         "nofail"
         "x-systemd.automount"
         "x-systemd.device-timeout=10s"
@@ -34,9 +35,8 @@ let
     name = "fix-ownership-${mountToUnit drive.mountPoint}";
     value = {
       description = "Fix ownership of ${drive.mountPoint}";
-      after = [ "${mountToUnit drive.mountPoint}.mount" ];
-      requires = [ "${mountToUnit drive.mountPoint}.mount" ];
       wantedBy = [ "${mountToUnit drive.mountPoint}.mount" ];
+      after = [ "${mountToUnit drive.mountPoint}.mount" ];
       serviceConfig = {
         Type = "oneshot";
         ExecStart = "${pkgs.coreutils}/bin/chown ${username}:users ${drive.mountPoint}";
