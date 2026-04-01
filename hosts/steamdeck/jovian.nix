@@ -54,7 +54,7 @@ in
   # Instead, steamos.conf in the writable conf.d/ handles autologin + session selection.
   systemd.tmpfiles.rules = [
     "d /etc/sddm.conf.d 0755 root root -"
-    "f /etc/sddm.conf.d/steamos.conf 0644 root root - [Autologin]\\nUser=${username}\\nSession=gamescope-wayland\\nRelogin=true"
+    "F /etc/sddm.conf.d/steamos.conf 0644 root root - [Autologin]\\nUser=${username}\\nSession=gamescope-wayland\\nRelogin=true"
   ];
 
   # Disable getty on tty1 for seamless session transitions
