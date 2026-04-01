@@ -19,6 +19,6 @@
     ./yepanywhere.nix
     ./desk-phone.nix
     ./vban-send.nix
-    # ./data-drives.nix
+    ./data-drives.nix
   ];
 }

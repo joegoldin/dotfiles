@@ -23,15 +23,10 @@
         "sd_mod"
       ];
       kernelModules = [ "amdgpu" ];
+      # Only root LUKS device in initrd; data drives unlock post-boot via data-drives.nix
       luks.devices = {
         "luks-bf7e5885-6a8e-447b-bb6d-b682b2991325".device =
           "/dev/disk/by-uuid/bf7e5885-6a8e-447b-bb6d-b682b2991325";
-        "luks-60b66d17-ac9f-4df3-a9fe-d7aeb9a2a966".device =
-          "/dev/disk/by-uuid/60b66d17-ac9f-4df3-a9fe-d7aeb9a2a966";
-        "luks-63ba694c-a286-432d-bef5-954daf856ca5".device =
-          "/dev/disk/by-uuid/63ba694c-a286-432d-bef5-954daf856ca5";
-        "luks-15d8d13e-00ff-4657-93ac-1401f40853e7".device =
-          "/dev/disk/by-uuid/15d8d13e-00ff-4657-93ac-1401f40853e7";
       };
     };
     kernelModules = [ "kvm-intel" ];
@@ -53,20 +48,7 @@
       ];
     };
 
-    "/mnt/data1" = {
-      device = "/dev/mapper/luks-60b66d17-ac9f-4df3-a9fe-d7aeb9a2a966";
-      fsType = "ext4";
-    };
-
-    "/mnt/data2" = {
-      device = "/dev/mapper/luks-63ba694c-a286-432d-bef5-954daf856ca5";
-      fsType = "ext4";
-    };
-
-    "/mnt/data3" = {
-      device = "/dev/mapper/luks-15d8d13e-00ff-4657-93ac-1401f40853e7";
-      fsType = "ext4";
-    };
+    # Data drives managed by data-drives.nix
   };
 
   swapDevices = [
