@@ -91,6 +91,7 @@
 
   environment.systemPackages = with pkgs; [
     agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
+    flatpak
     git
     wget
     maliit-keyboard
