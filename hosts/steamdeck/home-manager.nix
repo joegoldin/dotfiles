@@ -88,6 +88,10 @@
       };
     };
 
+    # Disable KDE Wallet
+    configFile."kwalletrc"."Wallet"."Enabled" = false;
+    configFile."kwalletrc"."Wallet"."First Use" = false;
+
     # Enable virtual keyboard in Plasma
     configFile."kwinrc"."Wayland"."VirtualKeyboardEnabled" = true;
     configFile."kwinrc"."Wayland"."InputMethod" =
