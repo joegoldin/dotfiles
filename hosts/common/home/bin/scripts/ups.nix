@@ -26,7 +26,9 @@
 
     if test (count $argv) -eq 0
       if set -q _flag_raw
-        upsc $ups
+        for var in ups.status battery.charge battery.runtime ups.load ups.realpower ups.power input.voltage
+          echo "$var: "(upsc $ups $var 2>/dev/null)
+        end
         return
       end
 
