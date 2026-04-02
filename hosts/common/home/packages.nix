@@ -31,7 +31,6 @@ let
       # claude-container is added per-host (needs native build, no QEMU)
       clojure
       codex
-      comma
       coreutils
       cowsay
       unstable.devenv
