@@ -13,6 +13,7 @@ in
     lib.optionals pkgs.stdenv.hostPlatform.isx86_64 [
       claude-container
       docker-buildx
+      unstable.ffmpeg
       inotify-tools
       localsend
       mpv
