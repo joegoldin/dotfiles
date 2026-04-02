@@ -41,6 +41,7 @@ in
       localsend
       lotion
       unstable.maven
+      nut
       unstable.obsidian
       unstable.parsec-bin
       pulseaudio # pactl required by pulsemeeter's pmctl script
