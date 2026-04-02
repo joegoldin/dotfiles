@@ -44,6 +44,19 @@ buildNpmPackage rec {
                      '"build": "tsc && vite build"'
   '';
 
+  # Stub out x-win on KDE Wayland — the native Rust crate panics (process abort)
+  # on non-GNOME compositors. x-win is only used to list open windows, not for
+  # heartbeat tracking, so stubbing it out is safe.
+  # See: https://github.com/wakatime/desktop-wakatime/issues/104
+  preBuild = ''
+    cat > node_modules/@miniben90/x-win/index.js <<'STUB'
+    module.exports.openWindowsAsync = async () => [];
+    module.exports.activeWindow = () => ({});
+    module.exports.subscribeActiveWindow = () => {};
+    module.exports.unsubscribeAllActiveWindow = () => {};
+    STUB
+  '';
+
   # vite-plugin-electron outputs to dist-electron/ (main + preload) and dist/ (renderer)
   postInstall = ''
     # Install the built app files
