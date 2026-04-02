@@ -152,6 +152,7 @@ in
     kdePackages.gwenview
     kdePackages.konsole
     kdePackages.spectacle
+    kdePackages.krdc
     kdotool
 
     # Keyboard configurator
