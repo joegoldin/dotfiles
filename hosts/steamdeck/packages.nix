@@ -19,6 +19,7 @@
     nix-output-monitor
     nixfmt
     comma
+    unstable.ffmpeg
     unstable.just
   ];
 }
