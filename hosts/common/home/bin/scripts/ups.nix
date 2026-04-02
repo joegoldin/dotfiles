@@ -25,6 +25,11 @@
     argparse r/raw -- $argv 2>/dev/null; or return 1
 
     if test (count $argv) -eq 0
+      if set -q _flag_raw
+        upsc $ups
+        return
+      end
+
       # Default: pretty-print summary
       set -l charge (upsc $ups battery.charge 2>/dev/null)
       set -l runtime (upsc $ups battery.runtime 2>/dev/null)
