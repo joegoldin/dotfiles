@@ -34,7 +34,7 @@
         except Exception:
             return 0.0
 
-    charge, load, power, voltage = [], [], [], []
+    charge, load, watts, va, voltage = [], [], [], [], []
     times = []
     t0 = time.monotonic()
 
@@ -43,12 +43,13 @@
     while True:
         charge.append(query("battery.charge"))
         load.append(query("ups.load"))
-        power.append(query("ups.realpower"))
+        watts.append(query("ups.realpower"))
+        va.append(query("ups.power"))
         voltage.append(query("input.voltage"))
         times.append(round(time.monotonic() - t0))
 
         if len(times) > maxpts:
-            for lst in (charge, load, power, voltage, times):
+            for lst in (charge, load, watts, va, voltage, times):
                 del lst[0]
 
         plt.clf()
@@ -69,9 +70,9 @@
 
         plt.subplot(2, 1)
         plt.title("Power")
-        plt.ylabel("W")
-        plt.ylim(0, 1000)
-        plt.plot(times, power)
+        plt.ylim(0, 1500)
+        plt.plot(times, watts, label="W")
+        plt.plot(times, va, label="VA")
 
         plt.subplot(2, 2)
         plt.title("Voltage")
