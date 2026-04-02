@@ -6,6 +6,7 @@
 
     Commands:
       (default)    Pretty-print UPS summary
+      charts       Live-plot charge, load, power, voltage
       raw          Show all raw UPS variables
       charge       Battery charge percentage
       runtime      Battery runtime remaining
@@ -68,6 +69,9 @@
     end
 
     switch $argv[1]
+      case charts
+        set -e argv[1]
+        exec ups-charts $argv
       case raw
         upsc $ups
       case charge
