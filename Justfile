@@ -325,8 +325,8 @@ _record-build-time host seconds:
     #!/usr/bin/env bash
     file="{{ build_times_file }}"
     touch "$file"
-    # Keep last 10 entries per host
-    existing=$(grep "^{{ host }}:" "$file" 2>/dev/null | tail -9)
+    # Keep last 5 entries per host
+    existing=$(grep "^{{ host }}:" "$file" 2>/dev/null | tail -4)
     grep -v "^{{ host }}:" "$file" > "$file.tmp" 2>/dev/null || true
     if [[ -n "$existing" ]]; then
       echo "$existing" >> "$file.tmp"
