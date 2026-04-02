@@ -7,7 +7,7 @@
     ../common/system/howdy.nix
     ./configuration.nix
     ./hardware-configuration.nix
-    ./drag-shift.nix
+    ../common/system/drag-shift.nix
     ./double-tap-overview.nix
     ../common/system/app-autostart.nix
     ../common/system/gaming.nix

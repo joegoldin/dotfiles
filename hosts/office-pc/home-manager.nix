@@ -1,5 +1,9 @@
 # hosts/office-pc/home-manager.nix
-{ ... }:
+{
+  pkgs,
+  username,
+  ...
+}:
 {
   imports = [
     ../common/home
@@ -68,6 +72,28 @@
         key = "Meta+B";
         command = "firefox";
       };
+    };
+
+    # krdp server config
+    configFile."krdpserverrc"."General" = {
+      Certificate = "/home/${username}/.local/share/krdpserver/krdp.crt";
+      CertificateKey = "/home/${username}/.local/share/krdpserver/krdp.key";
+    };
+  };
+
+  # Autostart krdp server with the Plasma session
+  systemd.user.services."krdp-server" = {
+    Unit = {
+      Description = "KDE RDP Server";
+      After = [ "graphical-session.target" ];
+    };
+    Service = {
+      ExecStart = "${pkgs.kdePackages.krdp}/bin/krdp-server";
+      Restart = "on-failure";
+      RestartSec = 5;
+    };
+    Install = {
+      WantedBy = [ "graphical-session.target" ];
     };
   };
 }
