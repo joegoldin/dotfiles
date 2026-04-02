@@ -34,7 +34,7 @@
         except Exception:
             return 0.0
 
-    charge, load, watts, va, in_volt, out_volt = [], [], [], [], [], []
+    charge, load, watts, va, in_volt, out_volt, runtime = [], [], [], [], [], [], []
     times = []
     t0 = time.monotonic()
 
@@ -47,38 +47,44 @@
         va.append(query("ups.power"))
         in_volt.append(query("input.voltage"))
         out_volt.append(query("output.voltage"))
+        runtime.append(query("battery.runtime") / 60.0)
         times.append(round(time.monotonic() - t0))
 
         if len(times) > maxpts:
-            for lst in (charge, load, watts, va, in_volt, out_volt, times):
+            for lst in (charge, load, watts, va, in_volt, out_volt, runtime, times):
                 del lst[0]
 
         plt.clf()
-        plt.subplots(1, 3)
+        plt.subplots(2, 2)
         plt.theme("dark")
 
         def fmt(v):
             return str(int(v)) if v == int(v) else f"{v:.1f}"
 
         plt.subplot(1, 1)
-        plt.title("Charge / Load")
+        plt.title(f"Charge: {fmt(charge[-1])}%  Load: {fmt(load[-1])}%")
         plt.ylabel("%")
         plt.ylim(0, 100)
-        plt.plot(times, charge, label=f"Charge: {fmt(charge[-1])}%")
-        plt.plot(times, load, label=f"Load: {fmt(load[-1])}%")
+        plt.plot(times, charge, label="Charge")
+        plt.plot(times, load, label="Load")
 
         plt.subplot(1, 2)
-        plt.title("Power")
+        plt.title(f"Power  W: {fmt(watts[-1])}  VA: {fmt(va[-1])}")
         plt.ylim(0, 1500)
-        plt.plot(times, watts, label=f"W: {fmt(watts[-1])}")
-        plt.plot(times, va, label=f"VA: {fmt(va[-1])}")
+        plt.plot(times, watts, label="W")
+        plt.plot(times, va, label="VA")
 
-        plt.subplot(1, 3)
-        plt.title("Voltage")
+        plt.subplot(2, 1)
+        plt.title(f"Voltage  In: {fmt(in_volt[-1])}V  Out: {fmt(out_volt[-1])}V")
         plt.ylabel("V")
         plt.ylim(100, 140)
-        plt.plot(times, in_volt, label=f"In: {fmt(in_volt[-1])}V")
-        plt.plot(times, out_volt, label=f"Out: {fmt(out_volt[-1])}V")
+        plt.plot(times, in_volt, label="Input")
+        plt.plot(times, out_volt, label="Output")
+
+        plt.subplot(2, 2)
+        plt.title(f"Runtime: {fmt(runtime[-1])} min")
+        plt.ylabel("min")
+        plt.plot(times, runtime)
 
         plt.show()
         time.sleep(interval)
