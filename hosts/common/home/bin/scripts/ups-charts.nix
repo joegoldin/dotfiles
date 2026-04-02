@@ -69,7 +69,10 @@
                 for lst in (charge, load, watts, va, in_volt, out_volt, runtime, elapsed):
                     del lst[0]
 
-        xlabels = [elapsed_label(e) for e in elapsed]
+        # Build tick positions at whole-minute boundaries
+        max_e = elapsed[-1]
+        tick_vals = list(range(0, int(max_e) + 60, 60))
+        tick_labels = [elapsed_label(t) for t in tick_vals]
 
         plt.clf()
         plt.subplots(2, 2)
@@ -78,30 +81,37 @@
         def fmt(v):
             return str(int(v)) if v == int(v) else f"{v:.1f}"
 
+        def setup_x():
+            plt.xticks(tick_vals, tick_labels)
+
         plt.subplot(1, 1)
         plt.title(f"Charge: {fmt(charge[-1])}%  Load: {fmt(load[-1])}%")
         plt.ylabel("%")
         plt.ylim(0, 100)
-        plt.plot(xlabels, charge, label="Charge")
-        plt.plot(xlabels, load, label="Load")
+        plt.plot(elapsed, charge, label="Charge")
+        plt.plot(elapsed, load, label="Load")
+        setup_x()
 
         plt.subplot(1, 2)
         plt.title(f"Power  W: {fmt(watts[-1])}  VA: {fmt(va[-1])}")
         plt.ylim(0, 1500)
-        plt.plot(xlabels, watts, label="W")
-        plt.plot(xlabels, va, label="VA")
+        plt.plot(elapsed, watts, label="W")
+        plt.plot(elapsed, va, label="VA")
+        setup_x()
 
         plt.subplot(2, 1)
         plt.title(f"Voltage  In: {fmt(in_volt[-1])}V  Out: {fmt(out_volt[-1])}V")
         plt.ylabel("V")
         plt.ylim(100, 140)
-        plt.plot(xlabels, in_volt, label="Input")
-        plt.plot(xlabels, out_volt, label="Output")
+        plt.plot(elapsed, in_volt, label="Input")
+        plt.plot(elapsed, out_volt, label="Output")
+        setup_x()
 
         plt.subplot(2, 2)
         plt.title(f"Runtime: {fmt(runtime[-1])} min")
         plt.ylabel("min")
-        plt.plot(xlabels, runtime)
+        plt.plot(elapsed, runtime)
+        setup_x()
 
         plt.show()
         time.sleep(interval)
