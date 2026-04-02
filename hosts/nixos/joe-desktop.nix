@@ -99,6 +99,20 @@ in
     flatpak.enable = true;
   };
 
+  # Unload DisplayLink evdi module before suspend to prevent freeze
+  systemd.services.displaylink-suspend = {
+    description = "Unload evdi before suspend, reload after resume";
+    before = [ "sleep.target" ];
+    wantedBy = [ "sleep.target" ];
+    unitConfig.StopWhenUnneeded = true;
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.kmod}/bin/modprobe -r evdi";
+      ExecStop = "${pkgs.kmod}/bin/modprobe evdi";
+    };
+  };
+
   # Rootless Docker
   virtualisation.docker = {
     enable = true;
