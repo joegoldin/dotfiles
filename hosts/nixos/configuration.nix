@@ -186,8 +186,11 @@ in
     vial-rules
   ];
 
-  # Fix Gigabyte motherboard + NVMe immediate wake from suspend
+  # Fix Gigabyte motherboard immediate wake from suspend
+  # Disable wakeup on: PCIe ports, Intel I226-V NIC, ASMedia USB 3.1 controller
   services.udev.extraRules = ''
     ACTION=="add", SUBSYSTEM=="pci", DRIVER=="pcieport", ATTR{power/wakeup}="disabled"
+    ACTION=="add", SUBSYSTEM=="pci", ATTR{vendor}=="0x8086", ATTR{device}=="0x125c", ATTR{power/wakeup}="disabled"
+    ACTION=="add", SUBSYSTEM=="pci", ATTR{vendor}=="0x1b21", ATTR{device}=="0x2142", ATTR{power/wakeup}="disabled"
   '';
 }
