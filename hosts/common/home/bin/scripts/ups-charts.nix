@@ -69,9 +69,27 @@
                 for lst in (charge, load, watts, va, in_volt, out_volt, runtime, elapsed):
                     del lst[0]
 
-        # Build tick positions at whole-minute boundaries
-        max_e = elapsed[-1]
-        tick_vals = list(range(0, int(max_e) + 60, 60))
+        # Adaptive tick spacing based on time span
+        span = elapsed[-1] - elapsed[0]
+        if span <= 10:
+            step = interval
+        elif span <= 60:
+            step = 5
+        elif span <= 5 * 60:
+            step = 30
+        elif span <= 15 * 60:
+            step = 60
+        elif span <= 60 * 60:
+            step = 5 * 60
+        else:
+            step = 15 * 60
+
+        start = int(elapsed[0] / step) * step
+        tick_vals = []
+        t = start
+        while t <= elapsed[-1] + step:
+            tick_vals.append(t)
+            t += step
         tick_labels = [elapsed_label(t) for t in tick_vals]
 
         plt.clf()
