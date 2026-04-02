@@ -28,7 +28,7 @@
       # Default: pretty-print summary
       set -l charge (upsc $ups battery.charge 2>/dev/null)
       set -l runtime (upsc $ups battery.runtime 2>/dev/null)
-      set -l status (upsc $ups ups.status 2>/dev/null)
+      set -l ups_status (upsc $ups ups.status 2>/dev/null)
       set -l load (upsc $ups ups.load 2>/dev/null)
       set -l watts (upsc $ups ups.realpower 2>/dev/null)
       set -l va (upsc $ups ups.power 2>/dev/null)
@@ -39,18 +39,18 @@
       set -l secs (math --scale=0 "$runtime % 60")
 
       # Format status
-      switch "$status"
+      switch "$ups_status"
         case "OL"
-          set status "Online (AC power)"
+          set ups_status "Online (AC power)"
         case "OB"
-          set status "On Battery"
+          set ups_status "On Battery"
         case "OB LB"
-          set status "On Battery (LOW)"
+          set ups_status "On Battery (LOW)"
         case "OL CHRG"
-          set status "Online (Charging)"
+          set ups_status "Online (Charging)"
       end
 
-      printf "%-12s %s\n" "Status" "$status"
+      printf "%-12s %s\n" "Status" "$ups_status"
       printf "%-12s %s%%\n" "Charge" "$charge"
       printf "%-12s %sm %ss\n" "Runtime" "$mins" "$secs"
       printf "%-12s %s%%\n" "Load" "$load"
