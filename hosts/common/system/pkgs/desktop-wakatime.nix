@@ -16,8 +16,8 @@ buildNpmPackage {
   src = fetchFromGitHub {
     owner = "joegoldin";
     repo = "desktop-wakatime";
-    rev = "ad2c4c1";
-    hash = "sha256-E8xVQL7OsExVWRtmWvycTPjr3WmWhdhrTittCRPWOu0=";
+    rev = "ca0b8f1";
+    hash = "sha256-t0m9WX24DMjzIr0uSOD8N93fyNv2aJt4bpjQS7/zKCo=";
   };
 
   npmDepsHash = "sha256-Kjt3Tu2Ez8kJ5HkonCd36ZpGEzXNGSWIPATf21qIpSs=";
@@ -51,6 +51,9 @@ buildNpmPackage {
     mkdir -p $out/lib/desktop-wakatime
     cp -r dist-electron $out/lib/desktop-wakatime/
     cp -r dist $out/lib/desktop-wakatime/
+
+    # Copy public/ for tray icons (VITE_PUBLIC points here when not packaged)
+    cp -r public $out/lib/desktop-wakatime/
 
     # Copy the renderer HTML entry points
     for f in monitored-apps.html settings.html; do
