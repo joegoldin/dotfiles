@@ -16,8 +16,8 @@ buildNpmPackage {
   src = fetchFromGitHub {
     owner = "joegoldin";
     repo = "desktop-wakatime";
-    rev = "ca0b8f1";
-    hash = "sha256-t0m9WX24DMjzIr0uSOD8N93fyNv2aJt4bpjQS7/zKCo=";
+    rev = "06c7d0e";
+    hash = "sha256-K2EdzT/6/Y3dARksK55iM7mYk0AUXp+sywJQ7hTVCqM=";
   };
 
   npmDepsHash = "sha256-Kjt3Tu2Ez8kJ5HkonCd36ZpGEzXNGSWIPATf21qIpSs=";
