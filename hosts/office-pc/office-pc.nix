@@ -70,18 +70,6 @@ in
 
   };
 
-  # Lock screen immediately after auto-login (security for physical access)
-  systemd.user.services."lock-on-login" = {
-    description = "Lock screen after auto-login";
-    wantedBy = [ "graphical-session.target" ];
-    after = [ "graphical-session.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStartPre = "${pkgs.coreutils}/bin/sleep 3";
-      ExecStart = "${pkgs.systemd}/bin/loginctl lock-session";
-    };
-  };
-
   # Open RDP port for krdp
   networking.firewall.allowedTCPPorts = [ 3389 ];
 

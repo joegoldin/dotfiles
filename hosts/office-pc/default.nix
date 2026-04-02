@@ -10,6 +10,7 @@
     ./configuration.nix
     ./disk-config.nix
     ./hardware-configuration.nix
+    ../common/system/drag-shift.nix
     ./office-pc.nix
   ];
 }
