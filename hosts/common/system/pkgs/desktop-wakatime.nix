@@ -2,6 +2,7 @@
   lib,
   buildNpmPackage,
   fetchFromGitHub,
+  fetchurl,
   electron_37,
   makeWrapper,
   python3,
@@ -9,6 +10,19 @@
   copyDesktopItems,
   makeDesktopItem,
 }:
+let
+  # x-win v3.4.0 with KDE/wlroots Wayland support
+  # The v2.x bundled with desktop-wakatime panics on non-GNOME compositors.
+  # See: https://github.com/wakatime/desktop-wakatime/issues/104
+  xwin-js = fetchurl {
+    url = "https://registry.npmjs.org/@miniben90/x-win/-/x-win-3.4.0.tgz";
+    hash = "sha256-14rx5FqkyzENah1SObR2GrHfzuaI/EagsBtrJJRWcck=";
+  };
+  xwin-native = fetchurl {
+    url = "https://registry.npmjs.org/@miniben90/x-win-linux-x64-gnu/-/x-win-linux-x64-gnu-3.4.0.tgz";
+    hash = "sha256-VS6MCtXTXj0lw+O00LRFyEp2/Pxzwf0uyCMOznT/eZ0=";
+  };
+in
 buildNpmPackage rec {
   pname = "desktop-wakatime";
   version = "3.0.0";
@@ -37,24 +51,28 @@ buildNpmPackage rec {
 
   # Run tsc && vite build, but skip electron-builder
   npmBuildScript = "build";
+  # Adapt source for x-win v3 API change: subscribeActiveWindow callback
+  # changed from (windowInfo) => void to (error, windowInfo) => void
+  postPatch = ''
+    substituteInPlace electron/watchers/watcher.ts \
+      --replace-fail '(windowInfo: WindowInfo) => {' \
+                     '(error: Error | null, windowInfo: WindowInfo | undefined) => {
+        if (error || !windowInfo) return;'
+  '';
+
   postConfigure = ''
     # Override the build script to skip electron-builder
     substituteInPlace package.json \
       --replace-fail '"build": "tsc && vite build && electron-builder"' \
                      '"build": "tsc && vite build"'
-  '';
 
-  # Stub out x-win on KDE Wayland — the native Rust crate panics (process abort)
-  # on non-GNOME compositors. x-win is only used to list open windows, not for
-  # heartbeat tracking, so stubbing it out is safe.
-  # See: https://github.com/wakatime/desktop-wakatime/issues/104
-  preBuild = ''
-    cat > node_modules/@miniben90/x-win/index.js <<'STUB'
-    module.exports.openWindowsAsync = async () => [];
-    module.exports.activeWindow = () => ({});
-    module.exports.subscribeActiveWindow = () => {};
-    module.exports.unsubscribeAllActiveWindow = () => {};
-    STUB
+    # Replace x-win v2 with v3 for build (types + native binary)
+    rm -rf node_modules/@miniben90/x-win
+    rm -rf node_modules/@miniben90/x-win-linux-x64-gnu
+    mkdir -p node_modules/@miniben90/x-win
+    tar xzf ${xwin-js} --strip-components=1 -C node_modules/@miniben90/x-win
+    mkdir -p node_modules/@miniben90/x-win-linux-x64-gnu
+    tar xzf ${xwin-native} --strip-components=1 -C node_modules/@miniben90/x-win-linux-x64-gnu
   '';
 
   # vite-plugin-electron outputs to dist-electron/ (main + preload) and dist/ (renderer)
@@ -72,8 +90,20 @@ buildNpmPackage rec {
     # Copy package.json (electron needs it to find the main entry)
     cp package.json $out/lib/desktop-wakatime/
 
-    # Copy node_modules for native dependencies (@miniben90/x-win, etc.)
+    # Copy node_modules for native dependencies
     cp -r node_modules $out/lib/desktop-wakatime/
+
+    # Replace x-win v2 with v3 in both node_modules locations
+    # v2 panics on KDE/wlroots Wayland, v3 adds proper support
+    # See: https://github.com/wakatime/desktop-wakatime/issues/104
+    for nmdir in $out/lib/desktop-wakatime/node_modules $out/lib/node_modules/desktop-wakatime/node_modules; do
+      rm -rf $nmdir/@miniben90/x-win
+      rm -rf $nmdir/@miniben90/x-win-linux-x64-gnu
+      mkdir -p $nmdir/@miniben90/x-win
+      tar xzf ${xwin-js} --strip-components=1 -C $nmdir/@miniben90/x-win
+      mkdir -p $nmdir/@miniben90/x-win-linux-x64-gnu
+      tar xzf ${xwin-native} --strip-components=1 -C $nmdir/@miniben90/x-win-linux-x64-gnu
+    done
 
     # Create the wrapper script
     makeWrapper ${electron_37}/bin/electron $out/bin/desktop-wakatime \
