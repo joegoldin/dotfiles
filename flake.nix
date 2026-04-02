@@ -862,6 +862,7 @@
           modules = [
             # > Our main darwin configuration <
             ./hosts/darwin
+            nix-index-database.darwinModules.default
             nix-homebrew.darwinModules.nix-homebrew
             # Rosetta-based Linux builder for fast x86_64-linux builds on Apple Silicon
             nix-rosetta-builder.darwinModules.default

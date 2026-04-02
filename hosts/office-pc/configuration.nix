@@ -104,6 +104,7 @@
       polkitPolicyOwners = [ "${username}" ];
     };
     nix-ld.enable = true;
+    nix-index-database.comma.enable = true;
     nh = {
       enable = true;
       flake = "/home/${username}/dotfiles";
