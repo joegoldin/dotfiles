@@ -20,5 +20,6 @@
     ./desk-phone.nix
     ./vban-send.nix
     ./data-drives.nix
+    ./nut.nix
   ];
 }
