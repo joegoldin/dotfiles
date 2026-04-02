@@ -46,7 +46,13 @@ in
   };
 
   services = {
-    displayManager.sddm.enable = true;
+    displayManager = {
+      sddm.enable = true;
+      autoLogin = {
+        enable = true;
+        user = "${username}";
+      };
+    };
     xserver = {
       enable = true;
       videoDrivers = [ "amdgpu" ];
@@ -61,7 +67,23 @@ in
       jack.enable = true;
     };
     pulseaudio.enable = false;
+
   };
+
+  # Lock screen immediately after auto-login (security for physical access)
+  systemd.user.services."lock-on-login" = {
+    description = "Lock screen after auto-login";
+    wantedBy = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStartPre = "${pkgs.coreutils}/bin/sleep 3";
+      ExecStart = "${pkgs.systemd}/bin/loginctl lock-session";
+    };
+  };
+
+  # Open RDP port for krdp
+  networking.firewall.allowedTCPPorts = [ 3389 ];
 
   # Rootless Docker
   virtualisation.docker = {
@@ -98,6 +120,7 @@ in
     kdePackages.gwenview
     kdotool
     kdePackages.konsole
+    kdePackages.krdp
     kdePackages.spectacle
   ];
 
