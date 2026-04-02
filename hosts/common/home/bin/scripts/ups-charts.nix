@@ -12,20 +12,22 @@
       default = "2";
     }
     {
-      name = "--history";
-      short = "-n";
-      arg = "POINTS";
-      desc = "Number of data points to keep";
-      default = "60";
+      name = "--window";
+      short = "-w";
+      arg = "MINS";
+      desc = "Rolling time window in minutes (0=unlimited)";
+      default = "5";
     }
   ];
   body = ''
     import subprocess, time, signal, sys
+    from datetime import datetime
     import plotext as plt
 
     UPS = "cyberpower@localhost"
     interval = int(_args.interval)
-    maxpts = int(_args.history)
+    window_mins = int(_args.window)
+    window_secs = window_mins * 60 if window_mins > 0 else 0
 
     def query(var):
         try:
@@ -35,12 +37,13 @@
             return 0.0
 
     charge, load, watts, va, in_volt, out_volt, runtime = [], [], [], [], [], [], []
-    times = []
-    t0 = time.monotonic()
+    timestamps = []
+    labels = []
 
     signal.signal(signal.SIGINT, lambda *_: sys.exit(0))
 
     while True:
+        now = time.time()
         charge.append(query("battery.charge"))
         load.append(query("ups.load"))
         watts.append(query("ups.realpower"))
@@ -48,11 +51,17 @@
         in_volt.append(query("input.voltage"))
         out_volt.append(query("output.voltage"))
         runtime.append(query("battery.runtime") / 60.0)
-        times.append(round(time.monotonic() - t0))
+        timestamps.append(now)
+        labels.append(datetime.fromtimestamp(now).strftime("%H:%M:%S"))
 
-        if len(times) > maxpts:
-            for lst in (charge, load, watts, va, in_volt, out_volt, runtime, times):
-                del lst[0]
+        # Trim to rolling window
+        if window_secs > 0:
+            cutoff = now - window_secs
+            while timestamps and timestamps[0] < cutoff:
+                for lst in (charge, load, watts, va, in_volt, out_volt, runtime, timestamps, labels):
+                    del lst[0]
+
+        window_label = f"{window_mins}m" if window_mins > 0 else "all"
 
         plt.clf()
         plt.subplots(2, 2)
@@ -65,26 +74,30 @@
         plt.title(f"Charge: {fmt(charge[-1])}%  Load: {fmt(load[-1])}%")
         plt.ylabel("%")
         plt.ylim(0, 100)
-        plt.plot(times, charge, label="Charge")
-        plt.plot(times, load, label="Load")
+        plt.plot(labels, charge, label="Charge")
+        plt.plot(labels, load, label="Load")
+        plt.xlabel(f"window: {window_label}")
 
         plt.subplot(1, 2)
         plt.title(f"Power  W: {fmt(watts[-1])}  VA: {fmt(va[-1])}")
         plt.ylim(0, 1500)
-        plt.plot(times, watts, label="W")
-        plt.plot(times, va, label="VA")
+        plt.plot(labels, watts, label="W")
+        plt.plot(labels, va, label="VA")
+        plt.xlabel(f"window: {window_label}")
 
         plt.subplot(2, 1)
         plt.title(f"Voltage  In: {fmt(in_volt[-1])}V  Out: {fmt(out_volt[-1])}V")
         plt.ylabel("V")
         plt.ylim(100, 140)
-        plt.plot(times, in_volt, label="Input")
-        plt.plot(times, out_volt, label="Output")
+        plt.plot(labels, in_volt, label="Input")
+        plt.plot(labels, out_volt, label="Output")
+        plt.xlabel(f"window: {window_label}")
 
         plt.subplot(2, 2)
         plt.title(f"Runtime: {fmt(runtime[-1])} min")
         plt.ylabel("min")
-        plt.plot(times, runtime)
+        plt.plot(labels, runtime)
+        plt.xlabel(f"window: {window_label}")
 
         plt.show()
         time.sleep(interval)
