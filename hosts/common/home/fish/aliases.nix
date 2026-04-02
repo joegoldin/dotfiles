@@ -52,7 +52,7 @@ in
 
     s = mkIf hasSpecialisationCli "specialisation";
 
-    ls = mkIf hasExa "eza";
+    ls = if hasExa then "eza -lA --group-directories-first -snew --icons=auto --git -h" else "ls -lArth";
     exa = mkIf hasExa "eza";
     lst = mkIf hasExa "eza -lath";
 

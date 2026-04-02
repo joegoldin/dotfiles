@@ -37,6 +37,7 @@ let
       unstable.devenv
       direnv
       dua
+      eza
       elixir_1_18
       (lib.lowPrio erlang_27)
       file
