@@ -84,7 +84,7 @@
         else
           set -l mins (math --scale=0 "$val / 60")
           set -l secs (math --scale=0 "$val % 60")
-          echo "{$mins}m {$secs}s"
+          echo "$mins"m "$secs"s
         end
       case status
         set -l val (upsc $ups ups.status 2>/dev/null)
@@ -116,21 +116,21 @@
         if set -q _flag_raw
           echo $val
         else
-          echo "{$val}W"
+          echo "$val"W
         end
       case va
         set -l val (upsc $ups ups.power 2>/dev/null)
         if set -q _flag_raw
           echo $val
         else
-          echo "{$val}VA"
+          echo "$val"VA
         end
       case voltage
         set -l val (upsc $ups input.voltage 2>/dev/null)
         if set -q _flag_raw
           echo $val
         else
-          echo "{$val}V"
+          echo "$val"V
         end
       case '*'
         # Pass through arbitrary variable names
