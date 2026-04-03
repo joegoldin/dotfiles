@@ -12,6 +12,9 @@
     # ...
     # });
 
+    # Force freerdp to use ffmpeg for H.264 instead of broken openh264
+    freerdp = prev.freerdp.override { openh264 = null; };
+
     howdy = prev.howdy.overrideAttrs (oldAttrs: {
       patches = (oldAttrs.patches or [ ]) ++ [
         (final.fetchpatch {

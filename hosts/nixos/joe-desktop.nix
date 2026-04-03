@@ -152,7 +152,7 @@ in
     kdePackages.gwenview
     kdePackages.konsole
     kdePackages.spectacle
-    kdePackages.krdc
+    freerdp
     kdotool
 
     # Keyboard configurator

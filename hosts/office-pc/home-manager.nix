@@ -78,6 +78,7 @@
     configFile."krdpserverrc"."General" = {
       Certificate = "/home/${username}/.local/share/krdpserver/krdp.crt";
       CertificateKey = "/home/${username}/.local/share/krdpserver/krdp.key";
+      SystemUserEnabled = false;
     };
   };
 
