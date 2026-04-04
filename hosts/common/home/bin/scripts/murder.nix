@@ -2,15 +2,23 @@
   name = "murder";
   desc = "Kill processes by pid, name, or port";
   params = [{ name = "TARGET"; desc = "PID, process name, or :PORT"; }];
+  flags = [
+    {
+      name = "--dry-run";
+      short = "-d";
+      desc = "Show matching processes without killing";
+      bool = true;
+    }
+  ];
   examples = [
     { cmd = "murder 1234"; desc = "Kill process by PID"; }
     { cmd = "murder node"; desc = "Kill processes matching 'node'"; }
     { cmd = "murder :8080"; desc = "Kill process on port 8080"; }
+    { cmd = "murder -d node"; desc = "Show matching processes only"; }
   ];
   python = ''
     import os
     import subprocess
-    import sys
     import time
 
     SIGNALS = [
@@ -19,6 +27,8 @@
         [1, 4],   # SIGHUP, wait 4s
         [9, 0]    # SIGKILL, no wait
     ]
+
+    dry_run = _args.dry_run
 
     def is_int(arg):
         try:
@@ -35,6 +45,8 @@
             return False
 
     def go_ahead():
+        if dry_run:
+            return False
         try:
             response = input().strip().lower()
             return response in ['y', 'yes', 'yas']
@@ -48,10 +60,17 @@
             pass
 
     def murder_pid(pid):
+        ps_result = subprocess.run(
+            ['ps', '-p', str(pid), '-o', 'command='],
+            capture_output=True, text=True
+        )
+        name = ps_result.stdout.strip() or f"pid {pid}"
+        print(f"  {name} (pid {pid})")
+        if dry_run:
+            return
         for signal_code, wait_time in SIGNALS:
             if not running(pid):
                 break
-
             kill_process(pid, signal_code)
             time.sleep(0.5)
             if running(pid):
@@ -81,6 +100,10 @@
                     pid = int(pid_str)
 
                     if pid == os.getpid():
+                        continue
+
+                    if dry_run:
+                        print(f"  {fullname.strip()} (pid {pid})")
                         continue
 
                     print(f"murder {fullname.strip()} (pid {pid})? ", end="", flush=True)
@@ -123,6 +146,10 @@
 
                     fullname = fullname_lines[1]
 
+                    if dry_run:
+                        print(f"  {fullname.strip()} (pid {pid_str})")
+                        continue
+
                     print(f"murder {fullname.strip()} (pid {pid_str})? ", end="", flush=True)
                     if go_ahead():
                         murder_pid(int(pid_str))
@@ -145,15 +172,7 @@
         else:
             murder_names(arg)
 
-    if __name__ == '__main__':
-        if len(sys.argv) < 2:
-            print('usage:')
-            print('murder 123    # kill by pid')
-            print('murder ruby   # kill by process name')
-            print('murder :3000  # kill by port')
-            sys.exit(1)
-
-        for arg in sys.argv[1:]:
-            murder(arg)
+    for arg in [_args.target]:
+        murder(arg)
   '';
 }
