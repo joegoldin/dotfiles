@@ -1,7 +1,6 @@
 {
   name = "yep";
   desc = "YepAnywhere client control";
-  type = "bash";
   autoparse = false;
   params = [
     {
@@ -10,7 +9,7 @@
       required = false;
     }
   ];
-  body = ''
+  bash = ''
     cmd="''${1:-help}"
 
     case "$cmd" in

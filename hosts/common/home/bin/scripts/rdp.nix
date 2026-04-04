@@ -2,8 +2,7 @@
   name = "rdp";
   desc = "Connect to a remote desktop via RDP (disables secondary monitors)";
   usage = "rdp [user@]<hostname>";
-  type = "bash";
-  body = ''
+  bash = ''
     if [[ $# -lt 1 ]]; then
       echo "Usage: rdp [user@]<hostname>"
       exit 1

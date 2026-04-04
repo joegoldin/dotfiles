@@ -1,7 +1,6 @@
 {
   name = "sfx";
   desc = "Play a sound effect";
-  type = "fish";
   params = [
     {
       name = "NAME";
@@ -18,7 +17,7 @@
       default = "1.0";
     }
   ];
-  body = ''
+  fish = ''
     pw-play --volume $_flag_volume "$HOME/dotfiles/assets/sfx/$argv[1].ogg" &
   '';
 }

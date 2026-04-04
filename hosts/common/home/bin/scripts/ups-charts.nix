@@ -1,7 +1,6 @@
 {
   name = "ups-charts";
   desc = "Live-plot UPS charge, load, power, and voltage";
-  type = "python";
   pythonPackages = [ "plotext" ];
   flags = [
     {
@@ -19,7 +18,7 @@
       default = "5";
     }
   ];
-  body = ''
+  python = ''
     import subprocess, time, signal, sys
     import plotext as plt
 

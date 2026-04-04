@@ -14,16 +14,17 @@
       load         Load percentage
       watts        Real power draw (watts)
       va           Apparent power (volt-amps)
-      voltage      Input voltage
-
-    Flags:
-      --raw, -r    Output raw value (no formatting)'';
-  type = "fish";
-  body = ''
+      voltage      Input voltage'';
+  flags = [
+    {
+      name = "--raw";
+      short = "-r";
+      desc = "Output raw value (no formatting)";
+      bool = true;
+    }
+  ];
+  fish = ''
     set -l ups "cyberpower@localhost"
-
-    # Parse --raw flag
-    argparse r/raw -- $argv 2>/dev/null; or return 1
 
     if test (count $argv) -eq 0
       if set -q _flag_raw

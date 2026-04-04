@@ -2,8 +2,7 @@
   name = "running";
   desc = "List running processes, optionally filtered";
   usage = "running [PATTERN]";
-  type = "fish";
-  body = ''
+  fish = ''
     set process_list (ps -eo 'pid command')
     if test (count $argv) -gt 0
         set process_list (string match -r ".*$argv.*" $process_list)

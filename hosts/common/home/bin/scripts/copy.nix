@@ -2,8 +2,7 @@
   name = "copy";
   desc = "Copy stdin to clipboard";
   usage = "echo hi | copy";
-  type = "fish";
-  body = ''
+  fish = ''
     if command -v pbcopy >/dev/null
         exec pbcopy
     else if command -v wl-copy >/dev/null

@@ -2,8 +2,7 @@
   name = "lowered";
   desc = "Convert stdin to lowercase";
   usage = "echo HI | lowered";
-  type = "fish";
-  body = ''
+  fish = ''
     tr '[:upper:]' '[:lower:]'
   '';
 }

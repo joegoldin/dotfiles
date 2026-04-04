@@ -2,8 +2,7 @@
   name = "url";
   desc = "Parse and print parts of a URL";
   usage = "url https://example.com/path?q=1";
-  type = "python-argparse";
-  body = ''
+  python-argparse = ''
     import argparse
     from urllib.parse import urlparse, parse_qsl
 

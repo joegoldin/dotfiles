@@ -2273,17 +2273,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1774679353,
-        "narHash": "sha256-N5L8U18JigqVqxMz1FuwbJVruCCa5lA6hgGeXLg8LI8=",
+        "lastModified": 1775203938,
+        "narHash": "sha256-huln34r9PztWS2OznILgbsIGZD0Y/zJQZXN+6MVV6X4=",
         "owner": "Jovian-Experiments",
         "repo": "Jovian-NixOS",
-        "rev": "8ffb6db9322542ec3cb541a232864084422f7e90",
+        "rev": "24f05f5e3b61dd4f5a4bdcbe5f2ecfa488d4109f",
         "type": "github"
       },
       "original": {
         "owner": "Jovian-Experiments",
         "repo": "Jovian-NixOS",
-        "rev": "8ffb6db9322542ec3cb541a232864084422f7e90",
+        "rev": "24f05f5e3b61dd4f5a4bdcbe5f2ecfa488d4109f",
         "type": "github"
       }
     },
@@ -3654,7 +3654,8 @@
         "plasma-manager": "plasma-manager",
         "systems": "systems_15",
         "tinygrad-nix": "tinygrad-nix",
-        "zed-editor": "zed-editor"
+        "zed-editor": "zed-editor",
+        "zed-nix-ext": "zed-nix-ext"
       }
     },
     "rust-overlay": {
@@ -4117,6 +4118,22 @@
         "owner": "zed-industries",
         "ref": "v0.228.0-pre",
         "repo": "zed",
+        "type": "github"
+      }
+    },
+    "zed-nix-ext": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775277883,
+        "narHash": "sha256-lCg/pHPpyy47HhtsGAAG1sPix1me2VoH86rNlXQlJBg=",
+        "owner": "joegoldin",
+        "repo": "nix",
+        "rev": "55662966302eb4876127d125e7509d780ef6e816",
+        "type": "github"
+      },
+      "original": {
+        "owner": "joegoldin",
+        "repo": "nix",
         "type": "github"
       }
     },

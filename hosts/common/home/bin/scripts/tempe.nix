@@ -2,8 +2,7 @@
   name = "tempe";
   desc = "cd into a new temporary directory";
   usage = "tempe [SUBDIR]";
-  type = "function";
-  body = ''
+  function = ''
     set temp_dir (mktemp -d)
     cd $temp_dir
     chmod -R 0700 .

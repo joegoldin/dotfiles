@@ -26,7 +26,7 @@
     nixos-wsl.url = "github:nix-community/NixOS-WSL/release-25.11";
     # jovian (Steam Deck)
     jovian-nixos = {
-      url = "github:Jovian-Experiments/Jovian-NixOS?rev=8ffb6db9322542ec3cb541a232864084422f7e90";
+      url = "github:Jovian-Experiments/Jovian-NixOS?rev=24f05f5e3b61dd4f5a4bdcbe5f2ecfa488d4109f";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -131,6 +131,11 @@
     ghostty.url = "github:ghostty-org/ghostty?rev=d3bd224081d3c7c5ee54df6815e44f0b5d25357b";
     # Zed editor (built from source via flake)
     zed-editor.url = "github:zed-industries/zed?ref=v0.228.0-pre";
+    # Zed nix extension (fork with language injection for script bodies)
+    zed-nix-ext = {
+      url = "github:joegoldin/nix";
+      flake = false;
+    };
     # KDE configuration
     plasma-manager = {
       url = "github:nix-community/plasma-manager?rev=a4b33606111c9c5dcd10009042bb710307174f51";

@@ -2,8 +2,7 @@
   name = "pasta";
   desc = "Paste clipboard to stdout";
   usage = "pasta";
-  type = "fish";
-  body = ''
+  fish = ''
     if command -v pbpaste >/dev/null
         exec pbpaste
     else if command -v xclip >/dev/null

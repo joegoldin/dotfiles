@@ -157,4 +157,9 @@
       };
     };
   };
+
+  # Overlay our forked Nix extension's injections.scm for language injection
+  # (fish/bash/python syntax highlighting in script body strings)
+  xdg.dataFile."zed/extensions/installed/nix/languages/nix/injections.scm".source =
+    "${inputs.zed-nix-ext}/languages/nix/injections.scm";
 }

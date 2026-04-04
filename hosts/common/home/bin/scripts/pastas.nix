@@ -2,8 +2,7 @@
   name = "pastas";
   desc = "Watch clipboard and print changes";
   usage = "pastas";
-  type = "fish";
-  body = ''
+  fish = ''
     trap 'exit 0' SIGINT
 
     set last_value '''

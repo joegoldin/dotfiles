@@ -2,8 +2,7 @@
   name = "serveit";
   desc = "Start a local HTTP server";
   usage = "serveit [PORT]";
-  type = "fish";
-  body = ''
+  fish = ''
     set port 8000
     if test (count $argv) -eq 1
         set port $argv[1]

@@ -2,8 +2,7 @@
   name = "nato";
   desc = "Spell out words in NATO alphabet";
   usage = "nato WORD...";
-  type = "python";
-  body = ''
+  python = ''
     import sys
 
     DICTIONARY = {

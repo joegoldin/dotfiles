@@ -2,8 +2,7 @@
   name = "murder";
   desc = "Kill processes by pid, name, or port";
   usage = "murder PID|NAME|:PORT";
-  type = "python";
-  body = ''
+  python = ''
     import os
     import subprocess
     import sys

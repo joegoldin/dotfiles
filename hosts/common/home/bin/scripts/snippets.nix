@@ -1,7 +1,6 @@
 {
   name = "snippets";
   desc = "Print a snippet by name";
-  type = "fish";
   params = [
     {
       name = "NAME";
@@ -9,7 +8,7 @@
       completions = "ls $HOME/dotfiles/snippets/ 2>/dev/null";
     }
   ];
-  body = ''
+  fish = ''
     set snippets_dir "$HOME/dotfiles/snippets"
     set path "$snippets_dir/$argv[1]"
 
