@@ -1,5 +1,7 @@
 # VBAN recv module - receives audio from office-pc (Windows) over Tailscale
 {
+  networking.firewall.allowedUDPPorts = [ 6981 ];
+
   services.pipewire.extraConfig.pipewire."91-vban-recv" = {
     "context.modules" = [
       {
