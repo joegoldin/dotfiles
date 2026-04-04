@@ -1,7 +1,7 @@
 {
   name = "getsubs";
   desc = "Extract subtitles from a YouTube video";
-  usage = "getsubs URL";
+  params = [{ name = "URL"; desc = "YouTube URL to extract subtitles from"; }];
   python-argparse = ''
     import argparse
     import os

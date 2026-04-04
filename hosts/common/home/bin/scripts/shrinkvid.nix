@@ -1,7 +1,11 @@
 {
   name = "shrinkvid";
   desc = "Shrink a video with ffmpeg";
-  usage = "shrinkvid INPUT OUTPUT [CRF]";
+  params = [
+    { name = "INPUT"; desc = "Input video file"; }
+    { name = "OUTPUT"; desc = "Output video file"; }
+    { name = "CRF"; desc = "Quality (default: 30, lower = better)"; required = false; }
+  ];
   examples = [
     { cmd = "shrinkvid big.mp4 small.mp4"; desc = "Shrink with default CRF (30)"; }
     { cmd = "shrinkvid big.mp4 small.mp4 23"; desc = "Higher quality (lower CRF)"; }

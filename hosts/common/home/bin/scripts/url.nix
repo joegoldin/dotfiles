@@ -1,7 +1,7 @@
 {
   name = "url";
   desc = "Parse and print parts of a URL";
-  usage = "url https://example.com/path?q=1";
+  params = [{ name = "URL"; desc = "URL to parse"; }];
   examples = [
     { cmd = "url https://example.com/path?q=1"; desc = "Parse URL parts"; }
     { cmd = "echo 'https://x.com' | url"; desc = "Parse from stdin"; }

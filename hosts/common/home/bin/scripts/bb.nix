@@ -1,7 +1,7 @@
 {
   name = "bb";
   desc = "Run a command in the background silently";
-  usage = "bb COMMAND...";
+  params = [{ name = "COMMAND"; desc = "Command to run in background"; }];
   examples = [
     { cmd = "bb firefox"; desc = "Launch firefox in background"; }
     { cmd = "bb make build"; desc = "Run build silently"; }

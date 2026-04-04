@@ -28,6 +28,11 @@
     { cmd = "ai --raw 'list files'"; desc = "Plain text, no markdown"; }
   ];
   fish = ''
+    if test (count $argv) -eq 0; and isatty stdin
+      ai --help
+      return 1
+    end
+
     set -l flags -p
     if set -q _flag_reply
       set -a flags -c
