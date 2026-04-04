@@ -934,6 +934,7 @@ let
         set -l cmd (string split -m1 \t $choice)[1]
         set -l parts (string split ' ' $cmd)
         $parts $remaining
+        exit $status
       end
 
       ${binsLines}
