@@ -2,6 +2,10 @@
   name = "running";
   desc = "List running processes, optionally filtered";
   usage = "running [PATTERN]";
+  examples = [
+    { cmd = "running"; desc = "List all processes"; }
+    { cmd = "running node"; desc = "Filter by name"; }
+  ];
   fish = ''
     set process_list (ps -eo 'pid command')
     if test (count $argv) -gt 0

@@ -1,6 +1,10 @@
 {
   name = "snippets";
   desc = "Print a snippet by name";
+  examples = [
+    { cmd = "snippets gitignore"; desc = "Print gitignore snippet"; }
+    { cmd = "snippets flake > flake.nix"; desc = "Write snippet to file"; }
+  ];
   params = [
     {
       name = "NAME";

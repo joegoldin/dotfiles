@@ -20,6 +20,13 @@
       bool = true;
     }
   ];
+  examples = [
+    { cmd = "ai 'what is 2+2'"; desc = "Ask a question"; }
+    { cmd = "cat file | ai 'summarize'"; desc = "Pipe input as context"; }
+    { cmd = "ai -r 'tell me more'"; desc = "Continue last conversation"; }
+    { cmd = "ai -c 'write a haiku'"; desc = "Copy result to clipboard"; }
+    { cmd = "ai --raw 'list files'"; desc = "Plain text, no markdown"; }
+  ];
   fish = ''
     set -l flags --bare -p
     if set -q _flag_reply

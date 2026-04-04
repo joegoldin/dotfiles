@@ -111,6 +111,10 @@ Each subcommand `.nix` file uses the same format as a top-level script — all f
       required = false;        # die if not provided (default: false)
     }
   ];
+  examples = [
+    { cmd = "deploy staging"; desc = "Deploy to staging"; }
+    { cmd = "deploy -d production"; desc = "Dry-run production deploy"; }
+  ];
   bash = ''
     echo "Deploying $1 from branch $branch"
   '';
@@ -151,6 +155,7 @@ When flags or `runtimeInputs`/`beforeExit` are present, scripts get:
 - **Cleanup** - `beforeExit` code runs on script exit (trap/atexit/fish_exit)
 - **PATH setup** - `runtimeInputs` packages prepended to PATH
 - **Fish completions** - auto-generated for all flags and params
+- **Examples** - shown in `--help` output when `examples` field is defined
 
 Scripts without these features produce the same output as before (backward compatible).
 
@@ -197,11 +202,11 @@ If a script needs access to `pkgs` (for `runtimeInputs`), export a function:
 }
 ```
 
-## Interactive Mode
-
-`bins -i` launches a fuzzy finder (fzf) over all scripts and subcommands. Select one to execute it. Extra arguments are passed through:
+## Interactive Mode and Help
 
 ```sh
+bins                       # list all scripts
 bins -i                    # fuzzy-find and run a script
 bins -i --raw "question"   # select a script, run it with those args
+bins help ai               # show help for a command (runs ai --help)
 ```

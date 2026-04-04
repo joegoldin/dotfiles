@@ -2,6 +2,10 @@
   name = "rdp";
   desc = "Connect to a remote desktop via RDP (disables secondary monitors)";
   usage = "rdp [user@]<hostname>";
+  examples = [
+    { cmd = "rdp 192.168.1.10"; desc = "Connect as current user"; }
+    { cmd = "rdp admin@office-pc"; desc = "Connect as admin"; }
+  ];
   bash = ''
     if [[ $# -lt 1 ]]; then
       echo "Usage: rdp [user@]<hostname>"

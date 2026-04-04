@@ -115,6 +115,7 @@ let
   # ── Param helpers ─────────────────────────────────────────────────
   hasParams = s: s ? params && s.params != [ ];
   hasFlags = s: s ? flags && s.flags != [ ];
+  hasExamples = s: s ? examples && s.examples != [ ];
 
   # Display name for help text (defaults to s.name, can be overridden for subcommands)
   getDisplayName = s: s.displayName or s.name;
@@ -179,6 +180,46 @@ let
           "";
     in
     argLines + flagLines;
+
+  # ── Example helpers ─────────────────────────────────────────────
+  fishExamplesHelp =
+    s:
+    if hasExamples s then
+      let
+        lines = map (e: "    printf '  %-30s %s\\n' '${escSQ e.cmd}' '${escSQ e.desc}'") s.examples;
+      in
+      ''
+          echo ""
+          echo "Examples:"
+        ${builtins.concatStringsSep "\n" lines}''
+    else
+      "";
+
+  bashExamplesHelp =
+    s:
+    if hasExamples s then
+      [
+        "  echo \"\""
+        "  echo \"Examples:\""
+      ]
+      ++ (map (e: "  printf '  %-30s %s\\n' '${escSQ e.cmd}' '${escSQ e.desc}'") s.examples)
+    else
+      [ ];
+
+  pythonExamplesHelp =
+    s:
+    if hasExamples s then
+      let
+        lines = map (
+          e: "        print(\"  %-30s %s\" % (\"${escPyStr e.cmd}\", \"${escPyStr e.desc}\"))"
+        ) s.examples;
+      in
+      ''
+              print()
+              print("Examples:")
+        ${builtins.concatStringsSep "\n" lines}''
+    else
+      "";
 
   # ── Bash preamble generators ──────────────────────────────────────
 
@@ -306,7 +347,8 @@ let
         else
           [ ];
 
-      allHelpLines = paramHelpLines ++ flagHelpLines;
+      examplesHelpLines = bashExamplesHelp s;
+      allHelpLines = paramHelpLines ++ flagHelpLines ++ examplesHelpLines;
     in
     ''
       usage() {
@@ -608,6 +650,7 @@ let
           echo "  -v, --verbose    Show debug output"
           echo "  -h, --help       Show this help"
         ''}
+        ${fishExamplesHelp s}
           exit 0
         end
 
@@ -716,6 +759,7 @@ let
               print()
               print("Usage: ${usage}")
           ${pythonParamHelp}
+          ${pythonExamplesHelp s}
               sys.exit(0)
 
           ${s.body}
@@ -914,10 +958,21 @@ let
       if contains -- --help $argv; or contains -- -h $argv
         echo "bins - List all custom scripts"
         echo ""
-        echo "Usage: bins [-i/--interactive]"
+        echo "Usage: bins [-i/--interactive] [help <command>]"
         echo ""
         echo "  -i, --interactive  Fuzzy-find and execute a script"
+        echo "  help <command>     Show help for a command"
         exit 0
+      end
+
+      if test (count $argv) -ge 2; and test "$argv[1]" = "help"
+        set -l cmd $argv[2]
+        if command -q $cmd
+          exec $cmd --help
+        else
+          echo "Unknown command: $cmd" >&2
+          exit 1
+        end
       end
 
       if contains -- -i $argv; or contains -- --interactive $argv
@@ -997,10 +1052,15 @@ let
         + "\n";
     };
 
+  binsCompletionCmds = builtins.concatStringsSep "\n" (
+    map (s: "complete -c bins -f -n '__fish_seen_subcommand_from help' -a '${s.name}' -d '${escFishDQ s.desc}'") scripts
+  );
   binsCompletion = {
     "fish/completions/bins.fish".text = ''
       complete -c bins -f -l help -s h -d "Show help"
       complete -c bins -f -l interactive -s i -d "Fuzzy-find and execute a script"
+      complete -c bins -f -n '__fish_use_subcommand' -a 'help' -d 'Show help for a command'
+      ${binsCompletionCmds}
     '';
   };
 

@@ -2,6 +2,11 @@
   name = "murder";
   desc = "Kill processes by pid, name, or port";
   usage = "murder PID|NAME|:PORT";
+  examples = [
+    { cmd = "murder 1234"; desc = "Kill process by PID"; }
+    { cmd = "murder node"; desc = "Kill processes matching 'node'"; }
+    { cmd = "murder :8080"; desc = "Kill process on port 8080"; }
+  ];
   python = ''
     import os
     import subprocess

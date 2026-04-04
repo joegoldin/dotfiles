@@ -1,6 +1,13 @@
 {
   name = "ghreview";
   desc = "Wrapper for gh-pr-review with auto-detection and code context";
+  examples = [
+    { cmd = "ghreview"; desc = "View reviews for current PR"; }
+    { cmd = "ghreview --pretty"; desc = "Pretty-print as markdown"; }
+    { cmd = "ghreview --raw"; desc = "Raw JSON output"; }
+    { cmd = "ghreview --no-code"; desc = "Skip source code context"; }
+    { cmd = "ghreview threads list"; desc = "List review threads"; }
+  ];
   flags = [
     {
       name = "--raw";
