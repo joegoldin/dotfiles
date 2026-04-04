@@ -54,6 +54,41 @@ let
     else
       builtins.substring 0 1 (normalizeFlagName f.name);
 
+  # Resolve short flags for all flags in a script, auto-uppercasing on collision.
+  # Returns the flags list with `short` explicitly set on each.
+  resolveShorts =
+    scriptName: flags:
+    let
+      # Reserved shorts from auto-added flags
+      reserved = [ "h" "v" ];
+
+      resolve = acc: remaining:
+        if remaining == [ ] then
+          acc.resolved
+        else
+          let
+            f = builtins.head remaining;
+            rest = builtins.tail remaining;
+            candidate =
+              if f ? short then
+                lib.removePrefix "-" f.short
+              else
+                builtins.substring 0 1 (normalizeFlagName f.name);
+            lower = lib.toLower candidate;
+            upper = lib.toUpper candidate;
+            chosen =
+              if !(builtins.elem candidate acc.taken) then candidate
+              else if candidate == lower && !(builtins.elem upper acc.taken) then upper
+              else if candidate == upper && !(builtins.elem lower acc.taken) then lower
+              else builtins.throw "Script '${scriptName}': short flag collision for '${f.name}' (-${candidate}), both -${lower} and -${upper} are taken";
+          in
+          resolve {
+            taken = acc.taken ++ [ chosen ];
+            resolved = acc.resolved ++ [ (f // { short = "-${chosen}"; }) ];
+          } rest;
+    in
+    resolve { taken = reserved; resolved = []; } flags;
+
   # Is this a bool flag?
   flagIsBool = f: f.bool or false;
 
@@ -88,21 +123,30 @@ let
 
   # ── Script normalization ──────────────────────────────────────────
   # Derive type and body from language-named fields (fish, bash, python, etc.)
+  # Resolve short flag collisions (auto-uppercase on conflict, error if both taken)
   # Falls back to explicit type + body for backwards compatibility
   normalizeScript =
     s:
-    if s ? fish then
-      s // { type = "fish"; body = s.fish; }
-    else if s ? bash then
-      s // { type = "bash"; body = s.bash; }
-    else if s ? python then
-      s // { type = "python"; body = s.python; }
-    else if s ? python-argparse then
-      s // { type = "python-argparse"; body = s.python-argparse; }
-    else if s ? function then
-      s // { type = "function"; body = s.function; }
+    let
+      base =
+        if s ? fish then
+          s // { type = "fish"; body = s.fish; }
+        else if s ? bash then
+          s // { type = "bash"; body = s.bash; }
+        else if s ? python then
+          s // { type = "python"; body = s.python; }
+        else if s ? python-argparse then
+          s // { type = "python-argparse"; body = s.python-argparse; }
+        else if s ? function then
+          s // { type = "function"; body = s.function; }
+        else
+          s;
+      name = base.name or "unknown";
+    in
+    if base ? flags && base.flags != [ ] then
+      base // { flags = resolveShorts name base.flags; }
     else
-      s;
+      base;
 
   # ── Type predicates ────────────────────────────────────────────────
   isFishBin = s: s.type == "fish";
