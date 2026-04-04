@@ -8,6 +8,10 @@
       completions = "ls $HOME/dotfiles/assets/sfx/ 2>/dev/null | string replace -r '\\.ogg$' ''";
     }
   ];
+  examples = [
+    { cmd = "sfx level-up"; desc = "Play level-up sound"; }
+    { cmd = "sfx timer -V 50"; desc = "Play timer at 50% volume"; }
+  ];
   flags = [
     {
       name = "--volume";

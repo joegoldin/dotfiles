@@ -2,6 +2,10 @@
   name = "each";
   desc = "Run each stdin line through a command";
   usage = "echo -e 'a\\nb' | each 'echo {}'";
+  examples = [
+    { cmd = "ls | each 'wc -l {}'"; desc = "Count lines in each file"; }
+    { cmd = "cat urls | each 'curl {}'"; desc = "Fetch each URL"; }
+  ];
   python-argparse = ''
     import argparse
     import re

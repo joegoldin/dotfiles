@@ -2,6 +2,10 @@
   name = "serveit";
   desc = "Start a local HTTP server";
   usage = "serveit [PORT]";
+  examples = [
+    { cmd = "serveit"; desc = "Serve current dir on port 8000"; }
+    { cmd = "serveit 3000"; desc = "Serve on port 3000"; }
+  ];
   fish = ''
     set port 8000
     if test (count $argv) -eq 1

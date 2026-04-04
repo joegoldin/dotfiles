@@ -15,6 +15,12 @@
       watts        Real power draw (watts)
       va           Apparent power (volt-amps)
       voltage      Input voltage'';
+  examples = [
+    { cmd = "ups"; desc = "Pretty-print UPS summary"; }
+    { cmd = "ups charge"; desc = "Battery charge percentage"; }
+    { cmd = "ups charge -r"; desc = "Raw charge value (no unit)"; }
+    { cmd = "ups charts"; desc = "Live-plot UPS metrics"; }
+  ];
   flags = [
     {
       name = "--raw";

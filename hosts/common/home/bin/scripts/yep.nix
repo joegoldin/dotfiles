@@ -2,6 +2,12 @@
   name = "yep";
   desc = "YepAnywhere client control";
   autoparse = false;
+  examples = [
+    { cmd = "yep on"; desc = "Start the service"; }
+    { cmd = "yep off"; desc = "Stop the service"; }
+    { cmd = "yep status"; desc = "Check service status"; }
+    { cmd = "yep logs"; desc = "View service logs"; }
+  ];
   params = [
     {
       name = "command";

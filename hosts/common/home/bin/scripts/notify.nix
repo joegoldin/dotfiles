@@ -2,6 +2,10 @@
   name = "notify";
   desc = "Send a desktop notification";
   usage = "notify [TITLE] [BODY]";
+  examples = [
+    { cmd = "notify 'Build done'"; desc = "Simple notification"; }
+    { cmd = "notify 'Deploy' 'Finished successfully'"; desc = "With body text"; }
+  ];
   python = ''
     import subprocess
     import sys
