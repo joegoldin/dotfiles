@@ -28,7 +28,7 @@
     { cmd = "ai --raw 'list files'"; desc = "Plain text, no markdown"; }
   ];
   fish = ''
-    set -l flags --bare -p
+    set -l flags -p
     if set -q _flag_reply
       set -a flags -c
     end
