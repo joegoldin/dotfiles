@@ -932,7 +932,8 @@ let
         set -l choice (printf '${fzfEntries}\n' | ${pkgs.fzf}/bin/fzf --prompt='bins> ' --delimiter='\t' --with-nth=1.. --tabstop=20)
         or exit 0
         set -l cmd (string split -m1 \t $choice)[1]
-        exec (string split ' ' $cmd) $remaining
+        set -l parts (string split ' ' $cmd)
+        exec $parts $remaining
       end
 
       ${binsLines}
