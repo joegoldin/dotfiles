@@ -1,7 +1,7 @@
 {
   name = "each";
   desc = "Run each stdin line through a command";
-  usage = "echo -e 'a\\nb' | each 'echo {}'";
+  params = [{ name = "COMMAND"; desc = "Command template with {} placeholder"; }];
   examples = [
     { cmd = "ls | each 'wc -l {}'"; desc = "Count lines in each file"; }
     { cmd = "cat urls | each 'curl {}'"; desc = "Fetch each URL"; }

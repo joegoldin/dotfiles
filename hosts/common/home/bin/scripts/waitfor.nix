@@ -1,7 +1,7 @@
 {
   name = "waitfor";
   desc = "Wait for a process to finish";
-  usage = "waitfor PID";
+  params = [{ name = "PID"; desc = "Process ID to wait for"; }];
   fish = ''
     set pid $argv[1]
 

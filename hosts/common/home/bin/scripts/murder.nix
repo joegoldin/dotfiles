@@ -1,7 +1,7 @@
 {
   name = "murder";
   desc = "Kill processes by pid, name, or port";
-  usage = "murder PID|NAME|:PORT";
+  params = [{ name = "TARGET"; desc = "PID, process name, or :PORT"; }];
   examples = [
     { cmd = "murder 1234"; desc = "Kill process by PID"; }
     { cmd = "murder node"; desc = "Kill processes matching 'node'"; }

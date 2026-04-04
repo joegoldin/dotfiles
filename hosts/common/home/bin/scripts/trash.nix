@@ -1,7 +1,7 @@
 {
   name = "trash";
   desc = "Move files to trash";
-  usage = "trash FILE...";
+  params = [{ name = "FILE"; desc = "File(s) to trash"; }];
   fish = ''
     if test (uname) = Darwin
         for arg in $argv

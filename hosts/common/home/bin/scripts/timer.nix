@@ -1,7 +1,7 @@
 {
   name = "timer";
   desc = "Set a timer with notification";
-  usage = "timer DURATION";
+  params = [{ name = "DURATION"; desc = "Time to wait (e.g. 5m, 1h, 30)"; }];
   examples = [
     { cmd = "timer 5m"; desc = "5 minute timer"; }
     { cmd = "timer 1h"; desc = "1 hour timer"; }

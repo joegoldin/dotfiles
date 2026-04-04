@@ -1,7 +1,7 @@
 {
   name = "nato";
   desc = "Spell out words in NATO alphabet";
-  usage = "nato WORD...";
+  params = [{ name = "WORD"; desc = "Word(s) to spell out"; }];
   python = ''
     import sys
 

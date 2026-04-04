@@ -1,7 +1,7 @@
 {
   name = "getsong";
   desc = "Download best audio with yt-dlp";
-  usage = "getsong URL";
+  params = [{ name = "URL"; desc = "YouTube URL to download"; }];
   fish = ''
     exec yt-dlp -f bestaudio -o '%(title)s.%(ext)s' $argv
   '';
