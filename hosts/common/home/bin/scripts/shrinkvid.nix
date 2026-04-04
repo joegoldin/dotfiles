@@ -2,8 +2,7 @@
   name = "shrinkvid";
   desc = "Shrink a video with ffmpeg";
   usage = "shrinkvid INPUT OUTPUT [CRF]";
-  type = "fish";
-  body = ''
+  fish = ''
     ffmpeg -i $argv[1] -c:v libx264 -tag:v avc1 -movflags faststart -crf (test (count $argv) -ge 3; and echo $argv[3]; or echo 30) -preset superfast $argv[2]
   '';
 }

@@ -2,8 +2,7 @@
   name = "notify";
   desc = "Send a desktop notification";
   usage = "notify [TITLE] [BODY]";
-  type = "python";
-  body = ''
+  python = ''
     import subprocess
     import sys
     import json

@@ -2,8 +2,7 @@
   name = "each";
   desc = "Run each stdin line through a command";
   usage = "echo -e 'a\\nb' | each 'echo {}'";
-  type = "python-argparse";
-  body = ''
+  python-argparse = ''
     import argparse
     import re
     import shlex

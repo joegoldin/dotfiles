@@ -2,8 +2,7 @@
   name = "getsubs";
   desc = "Extract subtitles from a YouTube video";
   usage = "getsubs URL";
-  type = "python-argparse";
-  body = ''
+  python-argparse = ''
     import argparse
     import os
     import re

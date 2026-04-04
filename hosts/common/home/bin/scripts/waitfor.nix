@@ -2,8 +2,7 @@
   name = "waitfor";
   desc = "Wait for a process to finish";
   usage = "waitfor PID";
-  type = "fish";
-  body = ''
+  fish = ''
     set pid $argv[1]
 
     if command -v caffeinate >/dev/null

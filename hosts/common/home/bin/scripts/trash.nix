@@ -2,8 +2,7 @@
   name = "trash";
   desc = "Move files to trash";
   usage = "trash FILE...";
-  type = "fish";
-  body = ''
+  fish = ''
     if test (uname) = Darwin
         for arg in $argv
             set file (realpath $arg)

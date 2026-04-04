@@ -1,27 +1,33 @@
 {
   name = "ghreview";
   desc = "Wrapper for gh-pr-review with auto-detection and code context";
-  usage = "ghreview [--pretty] [--no-code] [--raw] [subcommand] [args...]";
-  type = "fish";
-  body = ''
-    set -l raw false
+  flags = [
+    {
+      name = "--raw";
+      short = "-r";
+      desc = "Output raw JSON without formatting";
+      bool = true;
+    }
+    {
+      name = "--no-code";
+      short = "-n";
+      desc = "Skip enriching output with source code context";
+      bool = true;
+    }
+    {
+      name = "--pretty";
+      short = "-p";
+      desc = "Pretty-print as readable markdown";
+      bool = true;
+    }
+  ];
+  fish = ''
     set -l with_code true
-    set -l pretty false
-    set -l pass_args
-
-    # Parse custom flags, pass everything else through
-    for arg in $argv
-      switch $arg
-        case '--raw'
-          set raw true
-        case '--no-code'
-          set with_code false
-        case '--pretty'
-          set pretty true
-        case '*'
-          set -a pass_args $arg
-      end
+    if set -q _flag_no_code
+      set with_code false
     end
+
+    set -l pass_args $argv
 
     # Default to 'review view' if no subcommand given
     if test (count $pass_args) -eq 0
@@ -93,7 +99,7 @@
     end
 
     # Output
-    if $pretty; and test "$output_type" = reviews
+    if set -q _flag_pretty; and test "$output_type" = reviews
       jq -r '
         [.reviews[]? | select((.body and (.body | length > 0)) or (.comments and (.comments | length > 0)))] |
         map(
@@ -118,7 +124,7 @@
           else "" end)
         ) | join("\n\n===\n\n")
       ' $tmpfile
-    else if $pretty; and test "$output_type" = threads
+    else if set -q _flag_pretty; and test "$output_type" = threads
       jq -r '
         map(
           "### `" + .path + ":" + (.line | tostring) + "` — " + .threadId +
@@ -130,7 +136,7 @@
           "\n\nUpdated: " + (.updatedAt | split("T") | .[0])
         ) | join("\n\n---\n\n")
       ' $tmpfile
-    else if $raw
+    else if set -q _flag_raw
       cat $tmpfile
     else
       jq . $tmpfile

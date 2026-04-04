@@ -8,8 +8,9 @@ let
       f:
       let
         raw = import (./scripts + "/${f}");
+        resolved = if builtins.isFunction raw then raw { inherit pkgs; } else raw;
       in
-      if builtins.isFunction raw then raw { inherit pkgs; } else raw
+      normalizeScript resolved
     ) scriptFiles
   );
 
@@ -24,8 +25,9 @@ let
           f:
           let
             raw = import (./scripts + "/${dir}/${f}");
+            resolved = if builtins.isFunction raw then raw { inherit pkgs; } else raw;
           in
-          if builtins.isFunction raw then raw { inherit pkgs; } else raw
+          normalizeScript resolved
         ) subFiles
       );
     in
@@ -83,6 +85,24 @@ let
   escBashDQ = s: builtins.replaceStrings [ "\\" "$" "\"" "`" ] [ "\\\\" "\\$" "\\\"" "\\`" ] s;
   # Escape for Python string literals: \ "
   escPyStr = s: builtins.replaceStrings [ "\\" "\"" ] [ "\\\\" "\\\"" ] s;
+
+  # ── Script normalization ──────────────────────────────────────────
+  # Derive type and body from language-named fields (fish, bash, python, etc.)
+  # Falls back to explicit type + body for backwards compatibility
+  normalizeScript =
+    s:
+    if s ? fish then
+      s // { type = "fish"; body = s.fish; }
+    else if s ? bash then
+      s // { type = "bash"; body = s.bash; }
+    else if s ? python then
+      s // { type = "python"; body = s.python; }
+    else if s ? python-argparse then
+      s // { type = "python-argparse"; body = s.python-argparse; }
+    else if s ? function then
+      s // { type = "function"; body = s.function; }
+    else
+      s;
 
   # ── Type predicates ────────────────────────────────────────────────
   isFishBin = s: s.type == "fish";
@@ -871,6 +891,19 @@ let
   );
   binsLines = flatBinsLines + "\n" + groupBinsLines;
 
+  # ── fzf entries for interactive mode ─────────────────────────────
+  fzfEntries =
+    let
+      flatEntries = map (s: "${s.name}\t${s.desc}") scripts;
+      groupEntries = builtins.concatLists (
+        map (
+          g:
+          map (sub: "${g.parentName} ${sub.name}\t${sub.desc}") g.subs
+        ) builtGroups
+      );
+    in
+    builtins.concatStringsSep "\\n" (flatEntries ++ groupEntries);
+
   binsScript = pkgs.writeTextFile {
     name = "bins";
     executable = true;
@@ -881,8 +914,25 @@ let
       if contains -- --help $argv; or contains -- -h $argv
         echo "bins - List all custom scripts"
         echo ""
-        echo "Usage: bins"
+        echo "Usage: bins [-i/--interactive]"
+        echo ""
+        echo "  -i, --interactive  Fuzzy-find and execute a script"
         exit 0
+      end
+
+      if contains -- -i $argv; or contains -- --interactive $argv
+        # Remove the -i/--interactive flag from argv
+        set -l remaining
+        for arg in $argv
+          if test "$arg" != "-i"; and test "$arg" != "--interactive"
+            set -a remaining $arg
+          end
+        end
+
+        set -l choice (printf '${fzfEntries}\n' | ${pkgs.fzf}/bin/fzf --prompt='bins> ' --delimiter='\t' --with-nth=1.. --tabstop=20)
+        or exit 0
+        set -l cmd (string split -m1 \t $choice)[1]
+        exec (string split ' ' $cmd) $remaining
       end
 
       ${binsLines}
@@ -948,6 +998,7 @@ let
   binsCompletion = {
     "fish/completions/bins.fish".text = ''
       complete -c bins -f -l help -s h -d "Show help"
+      complete -c bins -f -l interactive -s i -d "Fuzzy-find and execute a script"
     '';
   };
 

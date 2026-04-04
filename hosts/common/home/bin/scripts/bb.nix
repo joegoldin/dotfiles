@@ -2,8 +2,7 @@
   name = "bb";
   desc = "Run a command in the background silently";
   usage = "bb COMMAND...";
-  type = "fish";
-  body = ''
+  fish = ''
     if isatty stdout
         exec >/dev/null
     end

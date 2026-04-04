@@ -2,8 +2,7 @@
   name = "uppered";
   desc = "Convert stdin to uppercase";
   usage = "echo hi | uppered";
-  type = "fish";
-  body = ''
+  fish = ''
     tr '[:lower:]' '[:upper:]'
   '';
 }
