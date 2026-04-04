@@ -258,10 +258,7 @@ let
           e: "        print(\"  %-30s %s\" % (\"${escPyStr e.cmd}\", \"${escPyStr e.desc}\"))"
         ) s.examples;
       in
-      ''
-              print()
-              print("Examples:")
-        ${builtins.concatStringsSep "\n" lines}''
+      "        print()\n        print(\"Examples:\")\n" + builtins.concatStringsSep "\n" lines
     else
       "";
 
@@ -647,9 +644,20 @@ let
         ) params
       );
     in
+    let
+      epilogStr =
+        if hasExamples s then
+          let
+            lines = map (e: "  ${escPyStr e.cmd}  ${escPyStr e.desc}") s.examples;
+            epilog = "Examples:\\n" + (builtins.concatStringsSep "\\n" lines);
+          in
+          '', epilog="${epilog}", formatter_class=_argparse.RawDescriptionHelpFormatter''
+        else
+          "";
+    in
     ''
       import argparse as _argparse
-      _parser = _argparse.ArgumentParser(prog="${escPyStr (getDisplayName s)}", description="${escPyStr s.desc}")
+      _parser = _argparse.ArgumentParser(prog="${escPyStr (getDisplayName s)}", description="${escPyStr s.desc}"${epilogStr})
       _parser.add_argument("-v", "--verbose", action="store_true", default=bool(_os.environ.get("POG_VERBOSE", "")), help="show debug output")
       ${flagArgs}
       ${paramArgs}
