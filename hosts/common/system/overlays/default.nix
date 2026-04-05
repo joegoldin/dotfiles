@@ -36,6 +36,13 @@
       };
       overlays = [
         inputs.tinygrad-nix.overlays.default
+        (uFinal: uPrev: {
+          pulsemeeter = uPrev.pulsemeeter.overrideAttrs (oldAttrs: {
+            patches = (oldAttrs.patches or [ ]) ++ [
+              ./patches/pulsemeeter-fix-empty-ports.patch
+            ];
+          });
+        })
       ];
     };
   };
