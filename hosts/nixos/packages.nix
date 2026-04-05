@@ -26,6 +26,7 @@ in
       unstable.darktable
       # unstable.davinci-resolve
       unstable.discord
+      unstable.easyeffects
       unstable.ffmpeg
       # hyprwhspr
       docker-buildx
@@ -47,6 +48,7 @@ in
       pulseaudio # pactl required by pulsemeeter's pmctl script
       unstable.pulsemeeter
       unstable.pulsemixer
+      roomeqwizard
       rclone
       reptyr
       rocmPackages.amdsmi
