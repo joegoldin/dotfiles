@@ -11,6 +11,7 @@
     ../common/home/zed.nix
     ../common/home/default-apps.nix
     ./dolphin.nix
+    ./easyeffects.nix
   ];
 
   # TODO: git signing with 1password

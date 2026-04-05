@@ -26,7 +26,6 @@ in
       unstable.darktable
       # unstable.davinci-resolve
       unstable.discord
-      unstable.easyeffects
       unstable.ffmpeg
       # hyprwhspr
       docker-buildx
