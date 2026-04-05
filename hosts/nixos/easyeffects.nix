@@ -1,5 +1,12 @@
 { pkgs, ... }:
 {
+  # Lock EasyEffects output to the MOTU M2 (headphones only)
+  # Qudelix-5K handles its own EQ for speakers
+  dconf.settings."com/github/wwmm/easyeffects/streamoutputs" = {
+    use-default-output-device = false;
+    output-device = "alsa_output.usb-MOTU_M2_M20000044767-00.HiFi__Line1__sink";
+  };
+
   services.easyeffects = {
     enable = true;
     package = pkgs.unstable.easyeffects;
