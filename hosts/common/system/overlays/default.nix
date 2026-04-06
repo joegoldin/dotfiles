@@ -8,9 +8,13 @@ let
     inputs.tinygrad-nix.overlays.default
     (uFinal: uPrev: {
       pulsemeeter = uPrev.pulsemeeter.overrideAttrs (oldAttrs: {
-        patches = (oldAttrs.patches or [ ]) ++ [
-          ./patches/pulsemeeter-fix-empty-ports.patch
-        ];
+        src = uPrev.fetchFromGitHub {
+          owner = "joegoldin";
+          repo = "pulsemeeter";
+          rev = "b87dd7f220e18f21795e1b718290c986b19c4907";
+          hash = "sha256-B3wbAxL+6Tw83BwwvbGz4I+ZhaZSFpus/qlbxi9w8mw=";
+        };
+        patches = [ ];
       });
     })
   ];
