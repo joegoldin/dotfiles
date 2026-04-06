@@ -325,7 +325,7 @@
       formatter = eachSystem (system: inputs.nixpkgs-unstable.legacyPackages.${system}.nixfmt-tree);
 
       # Your custom packages and modifications, exported as overlays
-      overlays = import ./hosts/common/system/overlays { inherit inputs; };
+      overlays = builtins.removeAttrs (import ./hosts/common/system/overlays { inherit inputs; }) [ "unstableOverlays" ];
 
       checks = eachSystem (system: {
         pre-commit-check = git-hooks.lib.${system}.run {
