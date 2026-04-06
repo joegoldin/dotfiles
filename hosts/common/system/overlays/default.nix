@@ -1,5 +1,20 @@
 # This file defines overlays
 { inputs, ... }:
+let
+  # Common overlays applied to the unstable nixpkgs import.
+  # Host-specific unstable overrides (e.g. for rocmSupport) should include these
+  # to avoid losing package patches.
+  unstableOverlays = [
+    inputs.tinygrad-nix.overlays.default
+    (uFinal: uPrev: {
+      pulsemeeter = uPrev.pulsemeeter.overrideAttrs (oldAttrs: {
+        patches = (oldAttrs.patches or [ ]) ++ [
+          ./patches/pulsemeeter-fix-empty-ports.patch
+        ];
+      });
+    })
+  ];
+in
 {
   # This one brings our custom packages from the 'pkgs' directory
   additions = final: _prev: import ../pkgs final.pkgs;
@@ -34,16 +49,7 @@
         allowUnfree = true;
         android_sdk.accept_license = true;
       };
-      overlays = [
-        inputs.tinygrad-nix.overlays.default
-        (uFinal: uPrev: {
-          pulsemeeter = uPrev.pulsemeeter.overrideAttrs (oldAttrs: {
-            patches = (oldAttrs.patches or [ ]) ++ [
-              ./patches/pulsemeeter-fix-empty-ports.patch
-            ];
-          });
-        })
-      ];
+      overlays = unstableOverlays;
     };
   };
 

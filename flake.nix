@@ -283,6 +283,8 @@
       hostname = "${username}-nix";
       homeDirectory = nixpkgs.lib.mkForce "/home/${username}";
       stateVersion = "24.11";
+      overlaysModule = import ./hosts/common/system/overlays { inherit inputs; };
+      inherit (overlaysModule) unstableOverlays;
       commonOverlays = builtins.attrValues self.overlays;
       keys = import "${dotfiles-secrets}/keys.nix";
       commonSpecialArgs = inputs // {
@@ -486,8 +488,7 @@
                       android_sdk.accept_license = true;
                       rocmSupport = true;
                     };
-                    overlays = [
-                      inputs.tinygrad-nix.overlays.default
+                    overlays = unstableOverlays ++ [
                       (import ./hosts/common/system/overlays/vllm-rocm.nix)
                     ];
                   };
@@ -567,7 +568,7 @@
                       allowUnfree = true;
                       rocmSupport = true;
                     };
-                    overlays = [
+                    overlays = unstableOverlays ++ [
                       (import ./hosts/common/system/overlays/vllm-rocm.nix)
                     ];
                   };
