@@ -83,6 +83,16 @@ let
     exec ${claudeWithPluginsBase}/bin/claude --verbose "$@"
   '';
 
+  # Wrapper that runs claude with a separate CLAUDE_CONFIG_DIR (~/.claude-work)
+  # so a second Anthropic account can be used in parallel. Nix-driven plugins
+  # are baked into the binary via --plugin-dir, so they apply regardless of
+  # CLAUDE_CONFIG_DIR. settings.json is symlinked into the work dir below.
+  claudeWork = pkgs.writeShellScriptBin "claude-work" ''
+    mkdir -p "$HOME/.claude-work"
+    export CLAUDE_CONFIG_DIR="$HOME/.claude-work"
+    exec ${claudeWithPluginsBase}/bin/claude --verbose "$@"
+  '';
+
   # Generate settings.json content
   settingsContent = import ./settings.nix {
     inherit codeNotify;
@@ -93,12 +103,16 @@ in
   # notify-send wrapper handles WSL (wsl-notify-send.exe) vs native (libnotify)
   home.packages = lib.mkIf enabled [
     claudeWithPlugins
+    claudeWork
     codeNotify
     notifySendWrapper
   ];
 
-  # Generate settings.json
+  # Generate settings.json for both the default and the claude-work config dirs
   home.file.".claude/settings.json" = lib.mkIf enabled {
+    text = builtins.toJSON settingsContent;
+  };
+  home.file.".claude-work/settings.json" = lib.mkIf enabled {
     text = builtins.toJSON settingsContent;
   };
 }
