@@ -65,9 +65,7 @@ pkgs: {
       ;
   };
 
-  lotion = pkgs.callPackage ./lotion {
-    electron = pkgs.electron_37;
-  };
+  lotion = pkgs.callPackage ./lotion { };
 
   git-hunk = pkgs.callPackage ./git-hunk.nix { };
 

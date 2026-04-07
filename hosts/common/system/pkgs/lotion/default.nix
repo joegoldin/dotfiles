@@ -2,7 +2,7 @@
   lib,
   buildNpmPackage,
   fetchFromGitHub,
-  electron,
+  electron_38,
   makeWrapper,
   python3,
   pkg-config,
@@ -56,7 +56,7 @@ buildNpmPackage rec {
   '';
 
   postInstall = ''
-    makeWrapper ${electron}/bin/electron $out/bin/lotion \
+    makeWrapper ${electron_38}/bin/electron $out/bin/lotion \
       --add-flags $out/lib/node_modules/lotion/src/main/index.js
 
     install -Dm644 $out/lib/node_modules/lotion/assets/icon.png \
