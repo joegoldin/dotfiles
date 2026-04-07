@@ -21,6 +21,7 @@ in
       goModule.packages.claude-squad
       claude-container
       claude-desktop-fhs
+      bubblewrap
       unstable.cloudflared
       desktop-wakatime
       unstable.darktable
