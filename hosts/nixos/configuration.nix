@@ -54,6 +54,11 @@ in
       enable = true;
       pkiBundle = "/var/lib/sbctl";
     };
+    # Disable deep NVMe power states. The Corsair MP600 PRO LPX (Phison E18)
+    # backing /mnt/data1 was hitting write I/O timeouts when waking from
+    # APST low-power states, causing filesystem stalls. SMART is clean;
+    # this is a known firmware/power-state interaction.
+    kernelParams = [ "nvme_core.default_ps_max_latency_us=0" ];
   };
 
   # Enable aarch64 cross-compilation via QEMU
