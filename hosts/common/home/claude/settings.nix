@@ -7,9 +7,13 @@
 
   cleanupPeriodDays = 14;
 
+  feedbackSurveyRate = 0;
+
   env = {
     DISABLE_AUTOUPDATER = "1";
     CLAUDE_CODE_DISABLE_AUTO_MEMORY = "1";
+    CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY = "1";
+    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = "1";
   };
 
   permissions = {
