@@ -135,6 +135,21 @@ in
 
   security.rtkit.enable = true;
 
+  # Allow KDE's Sleep menu entry to suspend when multiple sessions exist
+  # (SDDM greeter + user session). The physical power button goes through
+  # logind directly and bypasses polkit, which is why it already works.
+  security.polkit.extraConfig = ''
+    polkit.addRule(function(action, subject) {
+      if ((action.id == "org.freedesktop.login1.suspend" ||
+           action.id == "org.freedesktop.login1.suspend-multiple-sessions" ||
+           action.id == "org.freedesktop.login1.hibernate" ||
+           action.id == "org.freedesktop.login1.hibernate-multiple-sessions") &&
+          subject.isInGroup("wheel")) {
+        return polkit.Result.YES;
+      }
+    });
+  '';
+
   # Additional system packages
   environment.systemPackages = with pkgs; [
     # Drivers
