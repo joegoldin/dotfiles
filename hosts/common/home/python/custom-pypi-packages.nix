@@ -598,6 +598,10 @@ let
 
       doCheck = false;
 
+      # modal pins protobuf<7 but nixpkgs ships protobuf 7.x; the wheel works
+      # fine in practice, so relax the runtime dep check.
+      pythonRelaxDeps = [ "protobuf" ];
+
       pythonImportsCheck = [ "modal" ];
 
       meta = with lib; {
