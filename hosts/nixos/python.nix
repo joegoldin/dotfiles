@@ -4,7 +4,8 @@
     ps: with ps; [
       datasets
       scikit-learn
-      tinygradWithRocm
+      # tinygradWithRocm temporarily disabled — upstream test suite hits
+      # "sqlite3.OperationalError: database is locked" under parallel builds.
       torch
       torchvision
       transformers
