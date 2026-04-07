@@ -11,6 +11,9 @@ let
   fonts = import ../common/system/fonts { inherit pkgs lib dotfiles-assets; };
 in
 {
+  # Cap parallel build jobs to 18 to avoid saturating the box during rebuilds.
+  nix.settings.max-jobs = 18;
+
   # TODO: Add litra-autotoggle as a service to systemd
 
   # ssh with 1password
