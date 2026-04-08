@@ -28,6 +28,9 @@
       bool = true;
     }
   ];
+  # Let unknown flags (e.g. --thread-id, --body, --unresolved, --not_outdated)
+  # pass through to the underlying `gh pr-review` subcommand instead of erroring.
+  passthrough = true;
   fish = ''
     set -l with_code true
     if set -q _flag_no_code
