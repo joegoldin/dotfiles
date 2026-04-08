@@ -25,8 +25,10 @@
       kernelModules = [ "amdgpu" ];
       # Only root LUKS device in initrd; data drives unlock post-boot via data-drives.nix
       luks.devices = {
-        "luks-bf7e5885-6a8e-447b-bb6d-b682b2991325".device =
-          "/dev/disk/by-uuid/bf7e5885-6a8e-447b-bb6d-b682b2991325";
+        "luks-bf7e5885-6a8e-447b-bb6d-b682b2991325" = {
+          device = "/dev/disk/by-uuid/bf7e5885-6a8e-447b-bb6d-b682b2991325";
+          allowDiscards = true;
+        };
       };
     };
     kernelModules = [ "kvm-intel" ];

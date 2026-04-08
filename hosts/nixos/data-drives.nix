@@ -9,7 +9,7 @@ let
 
   # Post-boot LUKS unlock via crypttab with keyfile, nofail so boot isn't blocked
   mkCryptTab = drive:
-    "${drive.luksName} /dev/disk/by-uuid/${drive.uuid} /etc/secrets/luks-data.key nofail,x-systemd.device-timeout=10s";
+    "${drive.luksName} /dev/disk/by-uuid/${drive.uuid} /etc/secrets/luks-data.key nofail,x-systemd.device-timeout=10s,discard";
 
   mkFileSystem = drive: {
     name = drive.mountPoint;
