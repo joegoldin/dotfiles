@@ -19,7 +19,7 @@ let
     from evdev import ecodes
 
     TRIGGER_KEYS = {ecodes.KEY_F6, ecodes.BTN_MIDDLE}
-    DOUBLE_TAP_WINDOW = 0.3  # seconds
+    DOUBLE_TAP_WINDOW = 0.15  # seconds
     QDBUS = "${qdbus}"
 
     def find_devices():
