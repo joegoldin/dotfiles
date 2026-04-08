@@ -1463,11 +1463,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1775506206,
-        "narHash": "sha256-JcnCJBXmYBNUH/YJv8p5LdyyOxNgihPkZkhMBB3M05s=",
+        "lastModified": 1775631629,
+        "narHash": "sha256-Xo665z8Y2AnhvUeXh3etT3CVGKPYsRAVlBE14+NVqJY=",
         "owner": "joegoldin",
         "repo": "gemini-nix",
-        "rev": "a442d24dd35ecfa7f4b5e3e0a5e82a05a7743938",
+        "rev": "cdad1c03612be0b1f97e7782a405dc6e7345058a",
         "type": "github"
       },
       "original": {
