@@ -511,7 +511,7 @@ let
   '';
 
   fishArgparse =
-    flags:
+    s: flags:
     let
       specs = map (
         f:
@@ -523,8 +523,10 @@ let
         in
         "'${shPart}${longName}${valPart}'"
       ) flags;
+      passthrough = s.passthrough or false;
+      opts = lib.optionalString passthrough "--ignore-unknown ";
     in
-    "argparse 'h/help' 'v/verbose' ${builtins.concatStringsSep " " specs} -- $argv; or exit 1";
+    "argparse ${opts}'h/help' 'v/verbose' ${builtins.concatStringsSep " " specs} -- $argv; or exit 1";
 
   fishEnvVarDefaults =
     flags:
@@ -706,7 +708,7 @@ let
           exit 0
         end
 
-        ${lib.optionalString (hasFlags s) (fishArgparse flags)}
+        ${lib.optionalString (hasFlags s) (fishArgparse s flags)}
 
         ${lib.optionalString (hasFlags s) (fishEnvVarDefaults flags)}
 
