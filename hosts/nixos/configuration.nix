@@ -180,6 +180,9 @@ in
     enable = true;
   };
 
+  # Periodic TRIM for all SSDs (weekly).
+  services.fstrim.enable = true;
+
   services.tailscale = {
     enable = true;
     package = pkgs.unstable.tailscale;
