@@ -104,23 +104,45 @@ let
                     asyncio.create_task(monitor_mouse(dev, ui, state, tracked))
 
     async def main():
+        import signal
         ui = UInput({ecodes.EV_KEY: [SHIFT_KEY]}, name="drag-shift-injector")
         state = {"left": False, "shift": False}
         tracked = {}
 
-        print("Scanning for mouse devices...")
-        for path in evdev.list_devices():
-            dev = is_mouse(path)
-            if dev:
-                tracked[path] = dev
-                asyncio.create_task(monitor_mouse(dev, ui, state, tracked))
+        stop = asyncio.Event()
+        loop = asyncio.get_running_loop()
+        for sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
+            loop.add_signal_handler(sig, stop.set)
 
-        asyncio.create_task(reconcile(ui, state, tracked))
+        try:
+            print("Scanning for mouse devices...")
+            for path in evdev.list_devices():
+                dev = is_mouse(path)
+                if dev:
+                    tracked[path] = dev
+                    asyncio.create_task(monitor_mouse(dev, ui, state, tracked))
 
-        if not tracked:
-            print("No mouse devices found yet, watching for new ones...")
+            asyncio.create_task(reconcile(ui, state, tracked))
 
-        await watch_devices(ui, state, tracked)
+            if not tracked:
+                print("No mouse devices found yet, watching for new ones...")
+
+            watcher = asyncio.create_task(watch_devices(ui, state, tracked))
+            stopper = asyncio.create_task(stop.wait())
+            await asyncio.wait({watcher, stopper}, return_when=asyncio.FIRST_COMPLETED)
+        finally:
+            # Ensure Shift is released before the uinput device is destroyed,
+            # so a SIGTERM during nixos-rebuild can't leave Shift stuck.
+            try:
+                ui.write(ecodes.EV_KEY, SHIFT_KEY, 0)
+                ui.syn()
+            except Exception:
+                pass
+            try:
+                ui.close()
+            except Exception:
+                pass
+            print("drag-shift shut down cleanly")
 
     asyncio.run(main())
   '';
@@ -136,6 +158,8 @@ in
       ExecStart = "${drag-shift}/bin/drag-shift";
       Restart = "always";
       RestartSec = 2;
+      KillSignal = "SIGTERM";
+      TimeoutStopSec = 5;
     };
   };
 
