@@ -14,6 +14,8 @@ let
   drag-shift = pkgs.writeScriptBin "drag-shift" ''
     #!${python}/bin/python3
     import asyncio
+    import os
+    import sys
     import evdev
     from evdev import UInput, ecodes
     from inotify_simple import INotify, flags
@@ -21,6 +23,11 @@ let
 
     SHIFT_KEY = ecodes.KEY_LEFTSHIFT
     INPUT_DIR = "/dev/input"
+    DEBUG = os.environ.get("DRAG_SHIFT_DEBUG", "0") == "1"
+
+    def dbg(msg):
+        if DEBUG:
+            print(f"[drag-shift] {msg}", flush=True)
 
     def is_mouse(path):
         try:
@@ -49,6 +56,7 @@ let
                 except OSError:
                     pass
             if state["left"] and not physical_left:
+                dbg(f"reconcile: clearing stuck left (state={state})")
                 state["left"] = False
                 if state["shift"]:
                     ui.write(ecodes.EV_KEY, SHIFT_KEY, 0)
@@ -63,18 +71,29 @@ let
                     continue
 
                 if event.code == ecodes.BTN_LEFT:
+                    dbg(f"BTN_LEFT value={event.value} dev={mouse.name} state_before={state}")
                     state["left"] = event.value in (1, 2)
                     if not state["left"] and state["shift"]:
-                        ui.write(ecodes.EV_KEY, SHIFT_KEY, 0)
-                        ui.syn()
-                        state["shift"] = False
+                        # Delay Shift release so KWin sees Shift still held
+                        # at the moment it processes the L-release and
+                        # finalizes the window move (otherwise no snap).
+                        async def release_shift_later():
+                            await asyncio.sleep(0.025)
+                            ui.write(ecodes.EV_KEY, SHIFT_KEY, 0)
+                            ui.syn()
+                            state["shift"] = False
+                            dbg("  -> delayed shift release done")
+                        asyncio.create_task(release_shift_later())
+                    dbg(f"  -> state_after={state}")
 
                 elif event.code == ecodes.BTN_RIGHT:
+                    dbg(f"BTN_RIGHT value={event.value} dev={mouse.name} state_before={state}")
                     pressed = event.value == 1
                     if pressed and state["left"]:
                         state["shift"] = not state["shift"]
                         ui.write(ecodes.EV_KEY, SHIFT_KEY, 1 if state["shift"] else 0)
                         ui.syn()
+                    dbg(f"  -> state_after={state}")
         except OSError:
             print(f"  Disconnected: {mouse.name} ({mouse.path})")
         finally:
