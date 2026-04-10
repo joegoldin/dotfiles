@@ -154,7 +154,12 @@ in
           ];
         };
         transcribe = {
-          default_backend = "deepgram";
+          default_backend = "elevenlabs";
+          elevenlabs = {
+            api_key_file = "/run/agenix/elevenlabs_api_key";
+            model = "scribe_v2";
+            diarize = true;
+          };
           deepgram = {
             api_key_file = "/run/agenix/deepgram_api_key";
             model = "nova-3";
