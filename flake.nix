@@ -536,6 +536,11 @@
                   mode = "0400";
                   owner = specialArgs.username;
                 };
+                age.secrets.elevenlabs_api_key = {
+                  file = "${dotfiles-secrets}/elevenlabs_api_key.age";
+                  mode = "0400";
+                  owner = specialArgs.username;
+                };
                 age.secrets.wakapi_api_key = {
                   file = "${dotfiles-secrets}/wakapi_api_key.age";
                   mode = "0400";
