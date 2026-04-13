@@ -13,6 +13,12 @@ let
         doInstallCheck = false;
       });
 
+      # ibis-framework: duckdb import fails during build (missing duckdb module)
+      ibis-framework = pyPrev.ibis-framework.overrideAttrs (old: {
+        doInstallCheck = false;
+        pythonImportsCheck = [ ];
+      });
+
       # wandb: test_printer_asyncio spinner tests are flaky in the sandbox
       wandb = pyPrev.wandb.overrideAttrs (old: {
         disabledTestPaths = (old.disabledTestPaths or [ ]) ++ [

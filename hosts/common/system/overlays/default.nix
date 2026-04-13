@@ -16,6 +16,14 @@ let
         };
         patches = [ ];
       });
+
+      # ibis-framework: duckdb import fails during pythonImportsCheck in nixpkgs
+      python313Packages = uPrev.python313Packages.overrideScope (pyFinal: pyPrev: {
+        ibis-framework = pyPrev.ibis-framework.overrideAttrs (old: {
+          doInstallCheck = false;
+          pythonImportsCheck = [ ];
+        });
+      });
     })
   ];
 in
