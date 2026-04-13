@@ -2,7 +2,7 @@
   lib,
   buildNpmPackage,
   fetchFromGitHub,
-  electron_38,
+  electron_39,
   makeWrapper,
   python3,
   pkg-config,
@@ -67,7 +67,7 @@ buildNpmPackage {
     cp -r node_modules $out/lib/desktop-wakatime/
 
     # Create the wrapper script
-    makeWrapper ${electron_38}/bin/electron $out/bin/desktop-wakatime \
+    makeWrapper ${electron_39}/bin/electron $out/bin/desktop-wakatime \
       --add-flags $out/lib/desktop-wakatime/dist-electron/main.js
 
     # Install icon
