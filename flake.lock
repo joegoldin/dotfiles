@@ -2652,11 +2652,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1776191659,
-        "narHash": "sha256-hkDxX8YPQGL+HiOF+189/MQtPYy1yclpsWrOx6aBpHc=",
+        "lastModified": 1776195869,
+        "narHash": "sha256-QiIpceK9j0V6yiEm2wF8kdfawCoFztVFb7k24HrYNYA=",
         "owner": "joegoldin",
         "repo": "nix-rosetta-builder",
-        "rev": "3cf7098356c8f7b2e136257f58cdeae5e610e3ab",
+        "rev": "87e63f41e1bc3727da4bf3d16b8293b518b976ce",
         "type": "github"
       },
       "original": {

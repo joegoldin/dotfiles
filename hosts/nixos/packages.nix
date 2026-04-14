@@ -58,6 +58,7 @@ in
       sublime-merge
       unstable.tailscale
       ungoogled-chromium
+      unstable.umu-launcher
       mpv
       nvtopPackages.amd
       unstable.vllm

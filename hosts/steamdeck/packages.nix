@@ -20,5 +20,6 @@
     nixfmt
     unstable.ffmpeg
     unstable.just
+    unstable.umu-launcher
   ];
 }
