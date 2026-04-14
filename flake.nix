@@ -128,9 +128,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Ghostty terminal
-    ghostty.url = "github:ghostty-org/ghostty?rev=557de7c92556ab0eb9725b5693d396a68b242dc3";
+    ghostty.url = "github:ghostty-org/ghostty?rev=01825411ab2720e47e6902e9464e805bc6a062a1";
     # Zed editor (built from source via flake)
-    zed-editor.url = "github:zed-industries/zed?ref=v0.231.2";
+    zed-editor.url = "github:zed-industries/zed?ref=v0.230.2";
     # Zed nix extension (fork with language injection for script bodies)
     zed-nix-ext = {
       url = "github:joegoldin/nix";
@@ -146,7 +146,7 @@
     # ── Claude / LLM tooling ───────────────────────────────────────────────
     # Claude Desktop for Linux
     claude-desktop-debian = {
-      url = "github:aaddrick/claude-desktop-debian?rev=218934d14dd19637520a000bd807cb8db3e074cd";
+      url = "github:aaddrick/claude-desktop-debian?rev=4b1d5bfa124fafa36676949028ff015975cbc81c";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Claude Code configuration library
@@ -155,7 +155,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, gemini-cli)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=01e70ec69c7b46feee62846997727af5b56c8b6c";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=df5704a3d06edd7ba96ed86a922bbce0e5a498df";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
