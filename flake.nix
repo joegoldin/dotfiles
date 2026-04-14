@@ -104,7 +104,7 @@
     };
     # fast x86_64-linux builds on Apple Silicon
     nix-rosetta-builder = {
-      url = "github:cpick/nix-rosetta-builder?rev=50e6070082e0b4fbaf67dd8f346892a1a9ed685c";
+      url = "github:joegoldin/nix-rosetta-builder";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
