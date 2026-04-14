@@ -28,6 +28,7 @@ in
       ungoogled-chromium
       unstable.cloudflared
       unstable.tailscale
+      unstable.umu-launcher
       unstable.vllm
       wl-clipboard
       xclip

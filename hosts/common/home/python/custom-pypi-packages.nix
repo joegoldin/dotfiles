@@ -6,7 +6,7 @@
 }:
 let
   # Define all packages in a recursive attribute set
-  pythonPackages = {
+  pythonPackages = rec {
     fal-client = pythonBase.pkgs.buildPythonPackage {
       pname = "fal-client";
       version = "0.7.0";
@@ -283,6 +283,25 @@ let
     #   };
     # };
 
+    mlx-metal = pythonBase.pkgs.buildPythonPackage {
+      pname = "mlx-metal";
+      version = "0.26.5";
+      format = "wheel";
+
+      src = pkgs.fetchurl {
+        url = "https://files.pythonhosted.org/packages/a6/a0/0e01714f94f3b0efe7f90581c4b27becba9df55d15fd562cbd45f3a6dec3/mlx_metal-0.26.5-py3-none-macosx_15_0_arm64.whl";
+        sha256 = "sha256-9b05TH/27rqvjbbXvU+N7Jby0jLwi6ZBZzq2byLpcns=";
+      };
+
+      doCheck = false;
+
+      meta = with lib; {
+        description = "MLX Metal backend for Apple silicon GPUs.";
+        homepage = "https://github.com/ml-explore/mlx";
+        license = licenses.mit;
+      };
+    };
+
     mlx = pythonBase.pkgs.buildPythonPackage {
       pname = "mlx";
       version = "0.26.5";
@@ -294,12 +313,9 @@ let
       };
 
       # Dependencies
-      propagatedBuildInputs = [ ];
+      propagatedBuildInputs = [ pythonPackages.mlx-metal ];
 
-      # Disable tests - enable if you have specific test dependencies
       doCheck = false;
-
-      # Basic import check
       pythonImportsCheck = [ "mlx" ];
 
       meta = with lib; {

@@ -105,7 +105,6 @@ let
       trippy
       typescript
       unstable.just
-      unstable.umu-launcher
       unzip
       uv
       uxplay

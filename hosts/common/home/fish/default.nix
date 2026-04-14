@@ -22,6 +22,7 @@ let
       tag = version;
       hash = "sha256-Giw5d0X8/1PXK1j428LJjg+Gqadm93C51mLfrYc5J94=";
     };
+    doCheck = false; # tests require /dev/tty unavailable in sandbox
   });
 
   fishAiPython = pkgs.python313Packages.buildPythonApplication {
