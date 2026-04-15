@@ -41,6 +41,11 @@ in
     # ...
     # });
 
+    # direnv: fish integration test gets SIGKILL in the nix sandbox
+    direnv = prev.direnv.overrideAttrs (old: {
+      doCheck = false;
+    });
+
     # Force freerdp to use ffmpeg for H.264 instead of broken openh264
     freerdp = prev.freerdp.override { openh264 = null; };
 
