@@ -295,6 +295,15 @@ let
 
       doCheck = false;
 
+      # mlx-metal shares the mlx/ namespace with the main mlx package.
+      # Remove Python stub files that conflict in buildEnv; the Metal
+      # shaders (.metallib) are the actual payload.
+      postFixup = ''
+        rm -rf $out/lib/python*/site-packages/mlx/__pycache__
+        rm -f $out/lib/python*/site-packages/mlx/__init__.py
+        rm -f $out/lib/python*/site-packages/mlx/utils.py
+      '';
+
       meta = with lib; {
         description = "MLX Metal backend for Apple silicon GPUs.";
         homepage = "https://github.com/ml-explore/mlx";

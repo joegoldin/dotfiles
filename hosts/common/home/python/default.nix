@@ -26,6 +26,11 @@ let
         ];
       });
 
+      # torch-bin: wheel requires fsspec but nixpkgs doesn't include it
+      torch-bin = pyPrev.torch-bin.overridePythonAttrs (old: {
+        dependencies = (old.dependencies or [ ]) ++ [ pyFinal.fsspec ];
+      });
+
     };
   };
 
