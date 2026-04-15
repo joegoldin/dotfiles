@@ -138,7 +138,6 @@
       "barrier"
       "bentobox"
       "blender"
-      "blip"
       "chatgpt"
       "chromedriver"
       "claude"
