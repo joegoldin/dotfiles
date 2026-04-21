@@ -56,6 +56,7 @@ in
       (extension "external-application" "{65b77238-bb05-470a-a445-ec0efe1d66c4}")
       (extension "modern-for-hacker-news" "{b9edf38a-e293-4606-a088-e63cd4e56d2d}")
       (extension "single-file" "{531906d3-e22f-4a6c-a102-8057b88a1a63}")
+      (extension "byob-bring-your-own-binge" "byob@byob.video")
     ];
   # To add additional extensions, find it on addons.mozilla.org, find
   # the short ID in the url (like https://addons.mozilla.org/en-US/firefox/addon/!SHORT_ID!/)
