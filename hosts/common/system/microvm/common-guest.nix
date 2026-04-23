@@ -64,9 +64,10 @@
 
     interfaces = [
       {
-        type = "tap";
+        type = "bridge";
         id = "vm-${meta.name}";
         mac = meta.mac;
+        bridge = "vmbr0";
       }
     ];
 
