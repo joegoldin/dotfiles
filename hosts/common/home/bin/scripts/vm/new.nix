@@ -194,10 +194,10 @@
 
     # Register with microvm.nix. The generated per-VM flake doesn't use
     # self.submodules, so path: works (and avoids needing to git-init the VM dir).
+    # microvm appends #nixosConfigurations.NAME... itself, so pass the bare ref.
     info("registering with microvm.nix")
     subprocess.run(
-        ["sudo", "microvm", "-c", args.name,
-         "-f", f"path:{vm_dir}#{args.name}"],
+        ["sudo", "microvm", "-c", args.name, "-f", f"path:{vm_dir}"],
         check=True,
     )
     ok("registered")
