@@ -1,0 +1,36 @@
+{
+  description = "microVM: hello";
+
+  inputs = {
+    dotfiles.url = "git+file:///home/joe/dotfiles";
+    nixpkgs.follows = "dotfiles/nixpkgs";
+    microvm-nix.follows = "dotfiles/microvm-nix";
+    home-manager.follows = "dotfiles/home-manager";
+  };
+
+  outputs = { self, nixpkgs, microvm-nix, home-manager, dotfiles, ... }: let
+    system = "x86_64-linux";
+    pkgs = import nixpkgs {
+      inherit system;
+      config.allowUnfree = true;
+      overlays = builtins.attrValues dotfiles.overlays;
+    };
+    meta = builtins.fromJSON (builtins.readFile ./meta.json);
+    cliSshPubKey = "ssh-ed25519 AAAATESTCLIKEY cli-test";
+    userSshPubKey = "ssh-ed25519 AAAATESTUSERKEY joe-test";
+  in {
+    nixosConfigurations.hello = nixpkgs.lib.nixosSystem {
+      inherit system pkgs;
+      specialArgs = {
+        inherit meta cliSshPubKey userSshPubKey;
+        fishGuest = dotfiles + "/hosts/common/home/fish-guest.nix";
+      };
+      modules = [
+        microvm-nix.nixosModules.microvm
+        home-manager.nixosModules.home-manager
+        (dotfiles + "/hosts/common/system/microvm/common-guest.nix")
+        ./module.nix
+      ];
+    };
+  };
+}

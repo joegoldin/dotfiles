@@ -21,6 +21,10 @@
   # Tell `./bin` to strip hostOnly scripts for guest use.
   _module.args.vmGuest = true;
 
+  # home-manager requires an explicit stateVersion; username/homeDirectory
+  # are inferred from the NixOS user config (useUserPackages = true).
+  home.stateVersion = "25.11";
+
   programs.fish = {
     enable = true;
 
