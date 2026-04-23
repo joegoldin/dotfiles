@@ -120,9 +120,11 @@
     else:
         die(f"no such profile: {args.profile}")
 
-    # Build meta
+    # Build meta (also derive deterministic IP so we don't depend on DNS for lookup)
     mac_hash = hashlib.sha1(args.name.encode()).hexdigest()
     mac = "02:" + ":".join(mac_hash[i:i + 2] for i in range(0, 10, 2))
+    ip_suffix = (int(mac_hash[10:12], 16) % 240) + 10
+    vm_ip = f"10.100.0.{ip_suffix}"
 
     mounts = [parse_mount(m, os.getcwd()) for m in args.mounts]
 
@@ -147,6 +149,7 @@
         "de": de,
         "hostname": args.name,
         "mac": mac,
+        "ip": vm_ip,
         "created_at": now,
         "ttl_days": ttl_days,
         "last_touched": now,
@@ -199,10 +202,7 @@
         die("microvm -c failed; spec left at " + str(spec_dir) + " for inspection")
     ok("registered")
 
-    # Append to dnsmasq.leases (for host -> VM DNS). Use an arbitrary free
-    # address by MAC hashing: avoid collisions deterministically.
-    ip_suffix = (int(mac_hash[10:12], 16) % 240) + 10
-    vm_ip = f"10.100.0.{ip_suffix}"
+    # Append to dnsmasq.leases for DHCP static assignment + *.vm DNS.
     lease_line = f"{mac},{vm_ip},{args.name},12h"
     subprocess.run(
         ["sudo", "tee", "-a", "/var/lib/microvms/dnsmasq.leases"],

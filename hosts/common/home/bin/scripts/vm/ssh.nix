@@ -7,13 +7,17 @@
   ];
   runtimeInputs = with pkgs; [
     openssh
-    glibc
+    jq
   ];
   bash = ''
     name="''${1:-}"
     [ -z "$name" ] && die "usage: vm ssh <name> [command...]"
     shift || true
-    [ -f "/var/lib/vm-specs/$name/meta.json" ] || die "no such VM: $name"
+    meta="/var/lib/vm-specs/$name/meta.json"
+    [ -f "$meta" ] || die "no such VM: $name"
+
+    ip=$(jq -r .ip "$meta")
+    [ -n "$ip" ] || die "no IP stored in meta.json"
 
     key=/var/lib/microvms/ssh/id_ed25519
     [ -r "$key" ] || die "CLI ssh key not readable ($key). Re-login to pick up vmusers group?"
@@ -23,6 +27,6 @@
       -o StrictHostKeyChecking=accept-new \
       -o UserKnownHostsFile=/dev/null \
       -o LogLevel=ERROR \
-      "joe@$name.vm" "$@"
+      "joe@$ip" "$@"
   '';
 }

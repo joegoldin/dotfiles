@@ -25,10 +25,11 @@
     touched=$(jq -r .last_touched "$meta")
     ttl_days=$(jq -r .ttl_days "$meta")
 
-    state=$(systemctl is-active "microvm@$name" 2>/dev/null || echo "inactive")
+    state=$(systemctl is-active "microvm@$name" 2>/dev/null)
+    [ -z "$state" ] && state="inactive"
     [ "$paused" = "true" ] && state="paused"
-    ip=$(getent hosts "$name.vm" | awk '{print $1}')
-    [ -z "$ip" ] && ip="(not assigned)"
+    ip=$(jq -r .ip "$meta" 2>/dev/null)
+    [ -z "$ip" ] || [ "$ip" = "null" ] && ip="(not assigned)"
 
     bold "VM: $name"
     printf '  %-14s %s\n' "profile" "$profile"

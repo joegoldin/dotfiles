@@ -3,12 +3,12 @@
   name = "ip";
   desc = "Print the IP address of a VM";
   params = [ { name = "NAME"; desc = "VM name"; } ];
-  runtimeInputs = [ pkgs.glibc ];
+  runtimeInputs = [ pkgs.jq ];
   bash = ''
     name="''${1:-}"
     [ -z "$name" ] && die "usage: vm ip <name>"
-    ip=$(getent hosts "$name.vm" | awk '{print $1}')
-    [ -z "$ip" ] && die "no IP assigned to '$name' (is the VM running?)"
-    echo "$ip"
+    meta="/var/lib/vm-specs/$name/meta.json"
+    [ -f "$meta" ] || die "no such VM: $name"
+    jq -r .ip "$meta"
   '';
 }
