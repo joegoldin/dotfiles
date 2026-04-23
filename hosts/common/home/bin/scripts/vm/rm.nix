@@ -26,12 +26,13 @@
       [[ "$reply" =~ ^[yY] ]] || { yellow "cancelled"; exit 0; }
     fi
 
-    if systemctl is-active --quiet "microvm@$name"; then
+    # Stop the service whether it's running, activating, or failed.
+    if systemctl is-active --quiet "microvm@$name" 2>/dev/null \
+      || systemctl is-failed --quiet "microvm@$name" 2>/dev/null; then
       blue "stopping"
-      if [ -n "$force" ]; then
-        systemctl kill --signal=KILL "microvm@$name" || true
-      fi
-      systemctl stop "microvm@$name" || true
+      [ -n "$force" ] && systemctl kill --signal=KILL "microvm@$name" 2>/dev/null || true
+      systemctl stop "microvm@$name" 2>/dev/null || true
+      systemctl reset-failed "microvm@$name" 2>/dev/null || true
     fi
 
     if [ -n "$keep_disk" ]; then
