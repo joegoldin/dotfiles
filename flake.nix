@@ -149,11 +149,6 @@
       url = "github:aaddrick/claude-desktop-debian?rev=2543ee58bcc68a224fca3cdea61f5b705d8ba87d";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # Claude Code configuration library
-    claude-nix = {
-      url = "github:joegoldin/claude-nix?rev=337e48e08076a01c12a00290a318955e5e8bd6d2";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     # LLM agent tools (claude-code, codex, gemini-cli)
     llm-agents.url = "github:numtide/llm-agents.nix?rev=6fd26c9cb50d9549f3791b3d35e4f72f97677103";
     # declarative MCP server configuration
@@ -162,14 +157,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
-    # Claude Code agent skills
+    # Agent skills + re-exported claude-nix, gemini-nix, codex-nix modules
     agent-skills = {
       url = "path:./agent-skills";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    # Gemini CLI configuration library (declarative skills, commands, hooks)
-    gemini-nix = {
-      url = "github:joegoldin/gemini-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

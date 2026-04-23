@@ -19,6 +19,12 @@
     inputs.audiomemo.homeManagerModules.default
     inputs.nix-attic-infra.homeManagerModules.attic-client
 
+    # Agent skills: re-exported home-manager modules for Claude, Gemini, Codex
+    inputs.agent-skills.homeManagerModules.claude
+    inputs.agent-skills.homeManagerModules.gemini
+    inputs.agent-skills.homeManagerModules.codex
+    inputs.agent-skills.homeManagerModules.agent-skills
+
     # You can also split up your configuration and import pieces of it here:
     ./fish
     ./packages.nix
@@ -30,6 +36,7 @@
     ./starship.nix
     ./claude
     ./gemini
+    ./codex
     ./wakatime.nix
     ./bin
   ];
