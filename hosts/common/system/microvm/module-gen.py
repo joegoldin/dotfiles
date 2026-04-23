@@ -37,8 +37,12 @@ def render_module(meta: dict, profile: dict) -> str:
 
     de_block = render_de(de) if gui else ""
     spice_block = render_spice(meta["name"]) if gui else ""
-    autologin = profile.get("services", {}).get("autologin_user")
-    autologin_block = render_autologin(autologin) if (gui and autologin) else ""
+    autologin_user = (
+        meta.get("user")
+        if gui and profile.get("services", {}).get("autologin")
+        else None
+    )
+    autologin_block = render_autologin(autologin_user) if autologin_user else ""
 
     return (
         "{ lib, pkgs, ... }:\n"

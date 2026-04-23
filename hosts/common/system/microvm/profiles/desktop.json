@@ -10,7 +10,7 @@
   "packages": ["firefox-devedition-bin"],
   "services": {
     "openssh": true,
-    "autologin_user": "joe"
+    "autologin": true
   },
   "hypervisor": "qemu"
 }

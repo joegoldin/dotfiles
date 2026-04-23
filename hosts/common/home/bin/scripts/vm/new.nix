@@ -138,6 +138,7 @@
     now = datetime.datetime.now().astimezone().isoformat(timespec="seconds")
     meta = {
         "name": args.name,
+        "user": os.environ["USER"],
         "profile": args.profile,
         "profile_base": profile.get("name", args.profile),
         "gui": gui,

@@ -1,5 +1,6 @@
 {
   "name": "hello",
+  "user": "joe",
   "profile": "minimal",
   "profile_base": "minimal",
   "gui": false,

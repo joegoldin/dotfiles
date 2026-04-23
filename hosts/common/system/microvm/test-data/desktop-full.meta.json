@@ -1,5 +1,6 @@
 {
   "name": "ff",
+  "user": "joe",
   "profile": "desktop",
   "profile_base": "desktop",
   "gui": true,
