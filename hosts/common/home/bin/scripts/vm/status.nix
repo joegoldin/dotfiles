@@ -11,7 +11,7 @@
   bash = ''
     name="''${1:-}"
     [ -z "$name" ] && die "usage: vm status <name>"
-    meta="/var/lib/microvms/$name/meta.json"
+    meta="/var/lib/vm-specs/$name/meta.json"
     [ -f "$meta" ] || die "no such VM: $name"
 
     profile=$(jq -r .profile "$meta")

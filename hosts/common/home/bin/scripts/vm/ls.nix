@@ -11,13 +11,13 @@
     glibc
   ];
   bash = ''
-    STATE=/var/lib/microvms
+    SPECS=/var/lib/vm-specs
     shopt -s nullglob
 
     printf '%-22s %-12s %-10s %-15s %-6s\n' NAME PROFILE STATE IP TTL-DAYS
     printf '%-22s %-12s %-10s %-15s %-6s\n' ---- ------- ----- -- --------
 
-    dirs=("$STATE"/*/meta.json)
+    dirs=("$SPECS"/*/meta.json)
     if (( ''${#dirs[@]} == 0 )); then
       echo "(no VMs — try 'vm new <name>')"
       exit 0

@@ -22,7 +22,8 @@
     from pathlib import Path
 
     STATE = Path("/var/lib/microvms")
-    PROFILES = STATE / "profiles"
+    SPECS = Path("/var/lib/vm-specs")
+    PROFILES = SPECS / "profiles"
     DEFAULT_DOTFILES = Path.home() / "dotfiles"
 
     # ── ANSI helpers ────────────────────────────────────────────────────────
@@ -105,7 +106,8 @@
         die(f"name '{args.name}' collides with a built-in profile name")
 
     vm_dir = STATE / args.name
-    if vm_dir.exists():
+    spec_dir = SPECS / args.name
+    if vm_dir.exists() or spec_dir.exists():
         die(f"VM '{args.name}' already exists")
 
     # Profile resolution
@@ -160,12 +162,12 @@
 
     info(f"creating {BOLD}{args.name}{RST} ({profile['description']})")
 
-    # Stage files in a tmp location then move as root
+    # Stage files in a tmp location first, then move to /var/lib/vm-specs/<name>
+    # as root. /var/lib/vm-specs is vmusers-writable so moves are cheap.
     tmp = Path(f"/tmp/vm-new-{args.name}-{os.getpid()}")
     tmp.mkdir(parents=True, exist_ok=True)
     (tmp / "meta.json").write_text(json.dumps(meta, indent=2) + "\n")
 
-    # Run the generator against the tmp location
     gen_cmd = [
         "vm-module-gen",
         "--meta", str(tmp / "meta.json"),
@@ -178,28 +180,23 @@
         gen_cmd += ["--user-pub", str(user_pub)]
     subprocess.run(gen_cmd, check=True)
 
-    # Move into place (needs root: parent /var/lib/microvms is microvm:vmusers 0775,
-    # but per-VM dirs are created by microvm.nix as microvm:kvm).
-    subprocess.run(["sudo", "mkdir", "-p", str(vm_dir / "disks")], check=True)
-    subprocess.run(
-        ["sudo", "cp", "-t", str(vm_dir),
-         str(tmp / "meta.json"), str(tmp / "module.nix"), str(tmp / "flake.nix")],
-        check=True,
-    )
-    subprocess.run(["sudo", "chown", "-R", "microvm:vmusers", str(vm_dir)], check=True)
-    subprocess.run(["sudo", "chmod", "-R", "g+rw", str(vm_dir)], check=True)
-    subprocess.run(["rm", "-rf", str(tmp)], check=True)
+    # Move to /var/lib/vm-specs/<name>/ (CLI-owned, NOT /var/lib/microvms/ —
+    # microvm.nix manages that itself).
+    subprocess.run(["sudo", "mv", str(tmp), str(spec_dir)], check=True)
+    subprocess.run(["sudo", "chown", "-R", "root:vmusers", str(spec_dir)], check=True)
+    subprocess.run(["sudo", "chmod", "-R", "g+rw", str(spec_dir)], check=True)
+    ok(f"staged spec at {spec_dir}")
 
-    ok(f"staged {vm_dir}")
-
-    # Register with microvm.nix. The generated per-VM flake doesn't use
-    # self.submodules, so path: works (and avoids needing to git-init the VM dir).
-    # microvm appends #nixosConfigurations.NAME... itself, so pass the bare ref.
+    # Register with microvm.nix: it'll build the runner, create /var/lib/microvms/<name>/,
+    # and store the flake ref. microvm -c fails if the target dir already exists.
     info("registering with microvm.nix")
-    subprocess.run(
-        ["sudo", "microvm", "-c", args.name, "-f", f"path:{vm_dir}"],
-        check=True,
-    )
+    try:
+        subprocess.run(
+            ["sudo", "microvm", "-c", args.name, "-f", f"path:{spec_dir}"],
+            check=True,
+        )
+    except subprocess.CalledProcessError:
+        die("microvm -c failed; spec left at " + str(spec_dir) + " for inspection")
     ok("registered")
 
     # Append to dnsmasq.leases (for host -> VM DNS). Use an arbitrary free
