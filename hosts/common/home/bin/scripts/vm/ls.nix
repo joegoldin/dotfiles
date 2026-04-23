@@ -28,10 +28,12 @@
       name=$(basename "$dir")
       profile=$(jq -r .profile "$meta" 2>/dev/null || echo "?")
       paused=$(jq -r .paused "$meta" 2>/dev/null || echo "false")
-      state=$(systemctl is-active "microvm@$name" 2>/dev/null || echo "inactive")
+      # is-active prints state on stdout regardless of exit code; don't chain ||.
+      state=$(systemctl is-active "microvm@$name" 2>/dev/null)
+      [ -z "$state" ] && state="inactive"
       [ "$paused" = "true" ] && state="paused"
-      ip=$(getent hosts "$name.vm" 2>/dev/null | awk '{print $1}')
-      [ -z "$ip" ] && ip="—"
+      ip=$(jq -r .ip "$meta" 2>/dev/null)
+      [ -z "$ip" ] || [ "$ip" = "null" ] && ip="—"
 
       # TTL remaining
       ttl_days=$(jq -r .ttl_days "$meta" 2>/dev/null || echo "—")
