@@ -67,8 +67,8 @@
     sudo cp "$staged/module.nix" "$staged/flake.nix" "/var/lib/microvms/$target/"
     rm -rf "$staged"
 
-    # Register with microvm.nix
-    sudo microvm -c "$target" -f "git+file:///var/lib/microvms/$target#$target"
+    # Register with microvm.nix (path: — the generated flake doesn't use submodules)
+    sudo microvm -c "$target" -f "path:/var/lib/microvms/$target#$target"
 
     # dnsmasq lease
     mac=$(jq -r .mac "/var/lib/microvms/$target/meta.json")
