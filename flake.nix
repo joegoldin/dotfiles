@@ -124,13 +124,13 @@
     # ── Desktop / NixOS applications ───────────────────────────────────────
     # affinity apps
     affinity-nix = {
-      url = "github:mrshmllow/affinity-nix?rev=37642ecbe71c636f9261ab94b7adb8ce6dae0a1c";
+      url = "github:mrshmllow/affinity-nix?rev=1aa96ece7d3c39aee027b126005cf401cfb591f2";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Ghostty terminal
-    ghostty.url = "github:ghostty-org/ghostty?rev=2a3d93f77ba42ebb099bc7d686e65f6978ff4a94";
+    ghostty.url = "github:ghostty-org/ghostty?rev=880a599d66c0678c9d1709097b38beb5c0730175";
     # Zed editor (built from source via flake)
-    zed-editor.url = "github:zed-industries/zed?ref=v0.233.5";
+    zed-editor.url = "github:zed-industries/zed?ref=v0.234.0-pre";
     # Zed nix extension (fork with language injection for script bodies)
     zed-nix-ext = {
       url = "github:joegoldin/nix";
