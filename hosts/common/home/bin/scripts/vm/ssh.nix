@@ -17,6 +17,7 @@
     [ -f "$meta" ] || die "no such VM: $name"
 
     ip=$(jq -r .ip "$meta")
+    user=$(jq -r .user "$meta")
     [ -n "$ip" ] || die "no IP stored in meta.json"
 
     key=/var/lib/microvms/ssh/id_ed25519
@@ -27,6 +28,6 @@
       -o StrictHostKeyChecking=accept-new \
       -o UserKnownHostsFile=/dev/null \
       -o LogLevel=ERROR \
-      "joe@$ip" "$@"
+      "$user@$ip" "$@"
   '';
 }

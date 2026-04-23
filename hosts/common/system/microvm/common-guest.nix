@@ -28,13 +28,13 @@
   time.timeZone = lib.mkDefault "America/Los_Angeles";
 
   # ── Users ─────────────────────────────────────────────────────────────────
-  users.users.joe = {
+  # meta.user is always set by `vm new` (captured from the creator's $USER).
+  users.users.${meta.user} = {
     isNormalUser = true;
     uid = 1000;
     extraGroups = [ "wheel" ];
     shell = pkgs.fish;
-    # Empty password so autologin / console fallback works if needed.
-    initialPassword = "joe";
+    initialPassword = meta.user;
     openssh.authorizedKeys.keys =
       [ cliSshPubKey ] ++ lib.optional (userSshPubKey != null && userSshPubKey != "") userSshPubKey;
   };
@@ -108,14 +108,14 @@
     }) (meta.mounts or [ ])
   );
 
-  # Enable system-level fish so `users.users.joe.shell = pkgs.fish` is valid.
+  # Enable system-level fish so `users.users.<user>.shell = pkgs.fish` is valid.
   programs.fish.enable = true;
 
-  # ── home-manager for joe (fish-guest) ─────────────────────────────────────
+  # ── home-manager for the guest user (fish-guest) ──────────────────────────
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    users.joe = import fishGuest;
+    users.${meta.user} = import fishGuest;
   };
 
   # ── Base packages always present in a guest ───────────────────────────────
