@@ -7,16 +7,26 @@
 let
   enabled = pkgs ? llm-agents;
 
-  # Get the latest claude-code from llm-agents
-  claude-code-latest = pkgs.llm-agents.claude-code;
+  # Get claudeLib via agent-skills re-export
+  claudeLib = inputs.agent-skills.lib.${pkgs.system}.claudeLib;
 
-  # Get claude-nix library with explicitly overridden claude-code
-  claudeLib = import "${inputs.claude-nix}/lib" {
-    pkgs = pkgs.extend (
-      final: prev: {
-        claude-code = claude-code-latest;
-      }
-    );
+  # WakaTime plugin for Claude Code (uses system wakatime-cli)
+  wakatimePlugin = pkgs.callPackage ./wakatime-plugin { };
+
+  # Local skills defined in this repo
+  localSkill =
+    name:
+    claudeLib.mkSkill {
+      inherit name;
+      description = "";
+    } (builtins.readFile ./skills/${name}/SKILL.md);
+
+  localPlugin = claudeLib.mkPlugin {
+    name = "local";
+    description = "Local skills from dotfiles";
+    skills = [
+      (localSkill "git-hunk")
+    ];
   };
 
   # WSL-compatible notify-send wrapper (detects wsl-notify-send.exe at runtime)
@@ -43,76 +53,20 @@ let
       ${pkgs.libnotify}/bin/notify-send "$@"
     fi
   '';
-
-  # Build code-notify package
-  codeNotify = pkgs.callPackage ./code-notify.nix { };
-
-  # WakaTime plugin for Claude Code (uses system wakatime-cli)
-  wakatimePlugin = pkgs.callPackage ./wakatime-plugin { };
-
-  # Get the agent-skills plugin (includes all skills, commands, agents, hooks, MCP, LSP)
-  agentSkillsPlugin = inputs.agent-skills.packages.${pkgs.system}.default;
-
-  # Local skills defined in this repo
-  localSkill =
-    name:
-    claudeLib.mkSkill {
-      inherit name;
-      description = "";
-    } (builtins.readFile ./skills/${name}/SKILL.md);
-
-  localPlugin = claudeLib.mkPlugin {
-    name = "local";
-    description = "Local skills from dotfiles";
-    skills = [
-      (localSkill "git-hunk")
-    ];
-  };
-
-  # Create wrapped claude binary with plugins
-  claudeWithPluginsBase = claudeLib.mkClaude {
-    plugins = [
-      agentSkillsPlugin
-      localPlugin
-      wakatimePlugin
-    ];
-  };
-
-  # Wrap claude to always pass --verbose
-  claudeWithPlugins = pkgs.writeShellScriptBin "claude" ''
-    exec ${claudeWithPluginsBase}/bin/claude --verbose "$@"
-  '';
-
-  # Wrapper that runs claude with a separate CLAUDE_CONFIG_DIR (~/.claude-work)
-  # so a second Anthropic account can be used in parallel. Nix-driven plugins
-  # are baked into the binary via --plugin-dir, so they apply regardless of
-  # CLAUDE_CONFIG_DIR. settings.json is symlinked into the work dir below.
-  claudeWork = pkgs.writeShellScriptBin "claude-work" ''
-    mkdir -p "$HOME/.claude-work"
-    export CLAUDE_CONFIG_DIR="$HOME/.claude-work"
-    exec ${claudeWithPluginsBase}/bin/claude --verbose "$@"
-  '';
-
-  # Generate settings.json content
-  settingsContent = import ./settings.nix {
-    inherit codeNotify;
-  };
 in
 {
-  # Add claude (with plugins) and code-notify to packages
-  # notify-send wrapper handles WSL (wsl-notify-send.exe) vs native (libnotify)
+  # Add extra packages alongside claude (which is installed by the module)
   home.packages = lib.mkIf enabled [
-    claudeWithPlugins
-    claudeWork
-    codeNotify
     notifySendWrapper
   ];
 
-  # Generate settings.json for both the default and the claude-work config dirs
-  home.file.".claude/settings.json" = lib.mkIf enabled {
-    text = builtins.toJSON settingsContent;
-  };
-  home.file.".claude-work/settings.json" = lib.mkIf enabled {
-    text = builtins.toJSON settingsContent;
+  programs.claude-nix = lib.mkIf enabled {
+    enable = true;
+    package = pkgs.llm-agents.claude-code;
+    plugins = [
+      wakatimePlugin
+      localPlugin
+    ];
+    extraSettingsDirs = [ ".claude-work" ];
   };
 }

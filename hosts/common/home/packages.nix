@@ -28,9 +28,9 @@ let
       cachix
       caddy
       # claude-code is provided by ./claude module with plugins
+      # codex is provided by ./codex module with plugins
       # claude-container is added per-host (needs native build, no QEMU)
       clojure
-      codex
       coreutils
       cowsay
       unstable.devenv
