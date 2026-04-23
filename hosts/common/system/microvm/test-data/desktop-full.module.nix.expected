@@ -1,0 +1,25 @@
+{ lib, pkgs, ... }:
+{
+  environment.systemPackages = with pkgs; [
+    firefox-devedition-bin
+    unstable.wireshark
+  ];
+
+  # Desktop environment: KDE Plasma 6
+  services.xserver.enable = true;
+  services.displayManager.sddm.enable = true;
+  services.displayManager.sddm.wayland.enable = true;
+  services.desktopManager.plasma6.enable = true;
+
+  # SPICE graphics (socket consumed by `vm gui`)
+  services.spice-vdagentd.enable = true;
+  microvm.qemu.extraArgs = [
+    "-spice" "unix=on,addr=/var/lib/microvms/ff/spice.sock,disable-ticketing=on"
+    "-device" "virtio-serial-pci"
+    "-chardev" "spicevmc,id=spicechannel0,name=vdagent"
+    "-device" "virtserialport,chardev=spicechannel0,name=com.redhat.spice.0"
+  ];
+
+  # Autologin for SPICE session
+  services.displayManager.autoLogin = { enable = true; user = "joe"; };
+}

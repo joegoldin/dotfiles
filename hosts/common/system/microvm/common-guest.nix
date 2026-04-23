@@ -108,8 +108,15 @@
     }) (meta.mounts or [ ])
   );
 
+  # Enable system-level fish so `users.users.joe.shell = pkgs.fish` is valid.
+  programs.fish.enable = true;
+
   # ── home-manager for joe (fish-guest) ─────────────────────────────────────
-  imports = [ fishGuest ];
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    users.joe = import fishGuest;
+  };
 
   # ── Base packages always present in a guest ───────────────────────────────
   environment.systemPackages = with pkgs; [

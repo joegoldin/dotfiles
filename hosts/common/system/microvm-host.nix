@@ -103,7 +103,7 @@ in
     "d /var/lib/microvms                     0775 microvm vmusers -"
     "d /var/lib/microvms/profiles            0755 root    vmusers -"
     "d /var/lib/microvms/profiles/custom     0775 root    vmusers -"
-    "d /var/lib/microvms/ssh                 0770 root    vmusers -"
+    "d /var/lib/microvms/ssh                 0755 root    vmusers -"
     "f /var/lib/microvms/dnsmasq.leases      0644 root    vmusers -"
     "f /var/lib/microvms/events.log          0664 root    vmusers -"
     "f /var/lib/microvms/state.json          0664 root    vmusers -"
