@@ -1085,7 +1085,7 @@ let
             map (
               f:
               let
-                longName = normalizeFlagName f.name;
+                longName = lib.removePrefix "--" f.name;
                 sh = flagShort f;
                 shortPart = if sh != "" then " -s ${sh}" else "";
                 requiresArg = if !(flagIsBool f) then " -r" else "";
@@ -1132,7 +1132,7 @@ let
       subLines = builtins.concatStringsSep "\n" (
         map (
           sub:
-          "complete -c ${parentName} -f -n '__fish_use_subcommand' -a '${sub.name}' -d '${escFishDQ sub.desc}'"
+          "complete -c ${parentName} -f -n '__fish_use_subcommand' -a '${sub.name}' -d '${escSQ sub.desc}'"
         ) g.subs
       );
       # Complete flags/params for each subcommand
@@ -1147,12 +1147,12 @@ let
                   map (
                     f:
                     let
-                      longName = normalizeFlagName f.name;
+                      longName = lib.removePrefix "--" f.name;
                       sh = flagShort f;
                       shortPart = if sh != "" then " -s ${sh}" else "";
                       requiresArg = if !(flagIsBool f) then " -r" else "";
                     in
-                    "complete -c ${parentName} -f ${cond} -l ${longName}${shortPart}${requiresArg} -d '${escFishDQ (f.desc or "a flag")}'"
+                    "complete -c ${parentName} -f ${cond} -l ${longName}${shortPart}${requiresArg} -d '${escSQ (f.desc or "a flag")}'"
                   ) (sub.flags or [ ])
                 else
                   [ ];
