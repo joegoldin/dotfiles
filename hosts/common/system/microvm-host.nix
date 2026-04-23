@@ -88,10 +88,10 @@ in
       # Don't read /etc/resolv.conf or /etc/hosts (avoid loops with resolved).
       no-resolv = true;
       no-hosts = true;
-      # Upstream DNS for VMs (Cloudflare + Google).
+      # Upstream DNS for VMs (Cloudflare only).
       server = [
         "1.1.1.1"
-        "8.8.8.8"
+        "1.0.0.1"
       ];
     };
   };

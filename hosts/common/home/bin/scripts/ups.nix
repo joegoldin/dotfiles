@@ -1,6 +1,7 @@
 {
   name = "ups";
   desc = "Query UPS status";
+  hostOnly = true;
   usage = ''
     ups [command]
 
