@@ -120,7 +120,7 @@ let
       yepanywhere
       yq-go # yaml processer https://github.com/mikefarah/yq
       yt-dlp
-      zellij
+      unstable.zellij
       zip
       zlib
       zstd
@@ -189,6 +189,7 @@ in
 
     zellij = {
       enable = true;
+      package = unstable.zellij;
       enableFishIntegration = false;
       enableBashIntegration = false;
       enableZshIntegration = false;

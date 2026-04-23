@@ -7,14 +7,7 @@
 
   programs.zed-editor = {
     enable = true;
-    package =
-      inputs.zed-editor.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs
-        (old: {
-          postPatch = (old.postPatch or "") + ''
-            grep -q "impl FeatureFlag for GitGraphFeatureFlag" crates/feature_flags/src/flags.rs
-            sed -i "/impl FeatureFlag for GitGraphFeatureFlag/,/^}/ s/^}/    fn enabled_for_all() -> bool { true }\n}/" crates/feature_flags/src/flags.rs
-          '';
-        });
+    package = inputs.zed-editor.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
     extensions = [
       "csharp"
