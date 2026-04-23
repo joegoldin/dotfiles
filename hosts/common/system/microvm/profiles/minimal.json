@@ -1,0 +1,16 @@
+{
+  "name": "minimal",
+  "description": "Minimal NixOS: openssh, fish, starship, core CLI tools",
+  "base_channel": "stable",
+  "gui": false,
+  "de": null,
+  "ram_mb": 4096,
+  "cpu": 2,
+  "disk_gb": 16,
+  "packages": [],
+  "services": {
+    "openssh": true,
+    "autologin_user": null
+  },
+  "hypervisor": "qemu"
+}
