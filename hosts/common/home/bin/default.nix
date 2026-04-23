@@ -1,9 +1,12 @@
-{ pkgs, ... }:
+{ pkgs, ... }@args:
 let
+  # When imported into a microVM guest (via `_module.args.vmGuest = true;`),
+  # strip scripts marked `hostOnly = true;`.
+  vmGuest = args.vmGuest or false;
   # ── Import all script definitions from ./scripts/ ──────────────────
   scriptDir = builtins.readDir ./scripts;
   scriptFiles = builtins.filter (f: scriptDir.${f} == "regular") (builtins.attrNames scriptDir);
-  scripts = builtins.sort (a: b: a.name < b.name) (
+  allScripts = builtins.sort (a: b: a.name < b.name) (
     map (
       f:
       let
@@ -13,6 +16,8 @@ let
       normalizeScript resolved
     ) scriptFiles
   );
+  scripts =
+    if vmGuest then builtins.filter (s: !(s.hostOnly or false)) allScripts else allScripts;
 
   # ── Import subcommand groups from subdirectories ───────────────────
   subcommandDirs = builtins.filter (f: scriptDir.${f} == "directory") (builtins.attrNames scriptDir);
