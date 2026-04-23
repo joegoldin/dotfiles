@@ -19,9 +19,12 @@
   networking.hostName = meta.name;
   networking.domain = "vm";
 
-  # ── Networking (single DHCP iface on the host's vmbr0 bridge) ─────────────
+  # ── Networking (systemd-networkd + default 99-ethernet-default-dhcp) ─────
+  # microvm.nix runs systemd-networkd in guests; the upstream default picks
+  # up any ethernet device and does DHCP, which is what we want.
   networking.useDHCP = false;
-  networking.interfaces.eth0.useDHCP = true;
+  networking.useNetworkd = true;
+  systemd.network.enable = true;
   # Nameserver is handed out by the host's dnsmasq via DHCP option 6.
   networking.firewall.enable = lib.mkDefault false;
 
