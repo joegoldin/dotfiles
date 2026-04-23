@@ -90,6 +90,11 @@
       url = "github:nix-community/disko?ref=v1.13.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # microVM runtime (for the `vm` CLI)
+    microvm-nix = {
+      url = "github:microvm-nix/microvm.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # secure boot
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v1.0.0";
