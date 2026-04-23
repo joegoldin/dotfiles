@@ -87,10 +87,11 @@
         proto = "virtiofs";
       }) (meta.mounts or [ ]));
 
-    # Persistent root disk managed by the `vm` CLI.
+    # Persistent root disk. microvm creates the qcow2 on first boot at the
+    # service's WorkingDirectory (/var/lib/microvms/<name>/).
     volumes = [
       {
-        image = "disks/root.img";
+        image = "root.img";
         mountPoint = "/";
         size = meta.disk_gb * 1024;
         fsType = "ext4";

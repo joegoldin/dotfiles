@@ -39,10 +39,7 @@
       mkdir -p "$archive"
       ts=$(date +%Y%m%d-%H%M%S)
       src="$state_dir/root.img"
-      if [ ! -f "$src" ]; then
-        src=$(find "$state_dir" -maxdepth 2 -name 'root.img' -type f 2>/dev/null | head -n1)
-      fi
-      if [ -n "$src" ] && [ -f "$src" ]; then
+      if [ -f "$src" ]; then
         blue "archiving disk → $archive/$name-$ts.img"
         sudo cp "$src" "$archive/$name-$ts.img"
         sudo chown "$USER:users" "$archive/$name-$ts.img"
