@@ -192,11 +192,12 @@
 
     ok(f"staged {vm_dir}")
 
-    # Register with microvm.nix
+    # Register with microvm.nix. The generated per-VM flake doesn't use
+    # self.submodules, so path: works (and avoids needing to git-init the VM dir).
     info("registering with microvm.nix")
     subprocess.run(
         ["sudo", "microvm", "-c", args.name,
-         "-f", f"git+file://{vm_dir}#{args.name}"],
+         "-f", f"path:{vm_dir}#{args.name}"],
         check=True,
     )
     ok("registered")
