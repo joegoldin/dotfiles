@@ -14,8 +14,12 @@
   bash = ''
     name="''${1:-}"
     [ -z "$name" ] && die "usage: vm rm <name>"
-    meta="/var/lib/microvms/$name/meta.json"
-    [ -f "$meta" ] || die "no such VM: $name"
+    state_dir="/var/lib/microvms/$name"
+    spec_dir="/var/lib/vm-specs/$name"
+
+    if [ ! -d "$state_dir" ] && [ ! -d "$spec_dir" ]; then
+      die "no such VM: $name"
+    fi
 
     if [ -z "$force" ]; then
       read -r -p "delete VM '$name' and all its state? [y/N] " reply
@@ -26,27 +30,28 @@
       blue "stopping"
       if [ -n "$force" ]; then
         systemctl kill --signal=KILL "microvm@$name" || true
-        systemctl stop "microvm@$name" || true
-      else
-        systemctl stop "microvm@$name"
       fi
+      systemctl stop "microvm@$name" || true
     fi
 
     if [ -n "$keep_disk" ]; then
       archive="$HOME/vm-archives"
       mkdir -p "$archive"
       ts=$(date +%Y%m%d-%H%M%S)
-      src="/var/lib/microvms/$name/disks/root.img"
-      if [ -f "$src" ]; then
+      src="$state_dir/root.img"
+      if [ ! -f "$src" ]; then
+        src=$(find "$state_dir" -maxdepth 2 -name 'root.img' -type f 2>/dev/null | head -n1)
+      fi
+      if [ -n "$src" ] && [ -f "$src" ]; then
         blue "archiving disk → $archive/$name-$ts.img"
         sudo cp "$src" "$archive/$name-$ts.img"
         sudo chown "$USER:users" "$archive/$name-$ts.img"
       fi
     fi
 
-    blue "unregistering"
-    sudo microvm -R "$name" 2>/dev/null || true
-    sudo rm -rf "/var/lib/microvms/$name"
+    blue "cleaning up"
+    sudo rm -rf "$state_dir" "$spec_dir"
+    sudo rm -f "/nix/var/nix/gcroots/microvm/$name" "/nix/var/nix/gcroots/microvm/booted-$name"
 
     # Remove DHCP lease
     lease_file=/var/lib/microvms/dnsmasq.leases

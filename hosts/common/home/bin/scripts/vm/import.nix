@@ -32,51 +32,46 @@
     orig=$(jq -r .name "$meta")
     target=''${new_name:-$orig}
 
-    if [ -d "/var/lib/microvms/$target" ]; then
-      die "VM '$target' already exists (remove first or pass a new name)"
+    if [ -d "/var/lib/vm-specs/$target" ] || [ -d "/var/lib/microvms/$target" ]; then
+      die "VM '$target' already exists"
     fi
 
-    # Re-derive MAC from name if renamed
-    if [ "$target" != "$orig" ]; then
-      mac_hash=$(printf '%s' "$target" | sha1sum | awk '{print $1}')
-      new_mac="02:''${mac_hash:0:2}:''${mac_hash:2:2}:''${mac_hash:4:2}:''${mac_hash:6:2}:''${mac_hash:8:2}"
-      tmp=$(mktemp)
-      jq --arg n "$target" --arg m "$new_mac" '.name=$n | .hostname=$n | .mac=$m' "$meta" > "$tmp"
-      mv "$tmp" "$meta"
-    fi
+    # Re-derive MAC from (possibly new) name
+    mac_hash=$(printf '%s' "$target" | sha1sum | awk '{print $1}')
+    new_mac="02:''${mac_hash:0:2}:''${mac_hash:2:2}:''${mac_hash:4:2}:''${mac_hash:6:2}:''${mac_hash:8:2}"
+    tmp=$(mktemp)
+    jq --arg n "$target" --arg m "$new_mac" '.name=$n | .hostname=$n | .mac=$m' "$meta" > "$tmp"
+    mv "$tmp" "$meta"
 
-    # Install
-    sudo mkdir -p "/var/lib/microvms/$target"
-    sudo cp -r "$staging"/. "/var/lib/microvms/$target/"
-    sudo chown -R microvm:vmusers "/var/lib/microvms/$target"
-    sudo chmod -R g+rw "/var/lib/microvms/$target"
-    rm -rf "$staging"
-
-    # Regenerate module/flake (pub keys and repo root may differ from source host)
-    staged=$(mktemp -d)
-    sudo cp "/var/lib/microvms/$target/meta.json" "$staged/meta.json"
-    sudo chown "$USER:users" "$staged/meta.json"
+    # Regenerate module/flake in staging (pubkeys/repo may differ from source host)
     user_pub="$HOME/.ssh/id_ed25519.pub"
     user_flag=()
     [ -f "$user_pub" ] && user_flag=(--user-pub "$user_pub")
     vm-module-gen \
-      --meta "$staged/meta.json" --out "$staged" \
-      --profiles-dir /var/lib/microvms/profiles \
+      --meta "$meta" --out "$staging" \
+      --profiles-dir /var/lib/vm-specs/profiles \
       --repo-root "''${VM_DOTFILES:-$HOME/dotfiles}" \
       --cli-pub /var/lib/microvms/ssh/id_ed25519.pub "''${user_flag[@]}"
-    sudo cp "$staged/module.nix" "$staged/flake.nix" "/var/lib/microvms/$target/"
-    rm -rf "$staged"
 
-    # Register with microvm.nix (path: — the generated flake doesn't use submodules).
-    # microvm appends #nixosConfigurations.NAME... itself, so pass the bare ref.
-    sudo microvm -c "$target" -f "path:/var/lib/microvms/$target"
+    # Cross-host disk restore is not supported in v1 — drop any bundled disks.
+    if [ -d "$staging/disks" ]; then
+      yellow "note: disk restore across hosts not yet supported — disks dropped"
+      rm -rf "$staging/disks"
+    fi
+
+    # Move into vm-specs (CLI-owned)
+    spec_dir="/var/lib/vm-specs/$target"
+    sudo mv "$staging" "$spec_dir"
+    sudo chown -R root:vmusers "$spec_dir"
+    sudo chmod -R g+rw "$spec_dir"
+
+    # Register with microvm.nix (creates /var/lib/microvms/$target/)
+    sudo microvm -c "$target" -f "path:$spec_dir"
 
     # dnsmasq lease
-    mac=$(jq -r .mac "/var/lib/microvms/$target/meta.json")
-    mac_hash=$(printf '%s' "$target" | sha1sum | awk '{print $1}')
     ip_suffix=$(( 16#''${mac_hash:10:2} % 240 + 10 ))
     vm_ip="10.100.0.$ip_suffix"
-    echo "$mac,$vm_ip,$target,12h" | sudo tee -a /var/lib/microvms/dnsmasq.leases >/dev/null
+    echo "$new_mac,$vm_ip,$target,12h" | sudo tee -a /var/lib/microvms/dnsmasq.leases >/dev/null
     sudo systemctl reload-or-restart dnsmasq
 
     green "imported $target (ip $vm_ip)"

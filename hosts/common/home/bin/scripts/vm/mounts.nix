@@ -7,7 +7,7 @@
   bash = ''
     name="''${1:-}"
     [ -z "$name" ] && die "usage: vm mounts <name>"
-    meta="/var/lib/microvms/$name/meta.json"
+    meta="/var/lib/vm-specs/$name/meta.json"
     [ -f "$meta" ] || die "no such VM: $name"
     count=$(jq -r '.mounts | length' "$meta")
     if [ "$count" -eq 0 ]; then

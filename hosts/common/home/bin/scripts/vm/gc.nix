@@ -9,8 +9,8 @@
   runtimeInputs = [ pkgs.jq ];
   bash = ''
     shopt -s nullglob
-    STATE=/var/lib/microvms
-    metas=("$STATE"/*/meta.json)
+    SPECS=/var/lib/vm-specs
+    metas=("$SPECS"/*/meta.json)
     now_ts=$(date +%s)
 
     expired=()

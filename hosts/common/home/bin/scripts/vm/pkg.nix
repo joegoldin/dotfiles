@@ -12,7 +12,7 @@
     name="''${2:-}"
     shift 2 || true
     [ -z "$verb" ] || [ -z "$name" ] && die "usage: vm pkg <add|rm|ls> <NAME> [pkg...]"
-    meta="/var/lib/microvms/$name/meta.json"
+    meta="/var/lib/vm-specs/$name/meta.json"
     [ -f "$meta" ] || die "no such VM: $name"
 
     regen() {
@@ -24,10 +24,10 @@
       [ -f "$user_pub" ] && user_flag=(--user-pub "$user_pub")
       vm-module-gen \
         --meta "$staged/meta.json" --out "$staged" \
-        --profiles-dir /var/lib/microvms/profiles \
+        --profiles-dir /var/lib/vm-specs/profiles \
         --repo-root "''${VM_DOTFILES:-$HOME/dotfiles}" \
         --cli-pub /var/lib/microvms/ssh/id_ed25519.pub "''${user_flag[@]}"
-      sudo cp "$staged/module.nix" "$staged/flake.nix" "/var/lib/microvms/$name/"
+      sudo cp "$staged/module.nix" "$staged/flake.nix" "/var/lib/vm-specs/$name/"
       rm -rf "$staged"
       sudo microvm -u "$name"
     }

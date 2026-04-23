@@ -97,16 +97,17 @@ in
   };
 
   # ── State directory bootstrap ─────────────────────────────────────────────
+  # /var/lib/microvms/<name>/   owned by microvm.nix (current/booted symlinks, disks)
+  # /var/lib/vm-specs/<name>/   CLI-owned (meta.json, module.nix, flake.nix, flake.lock)
   systemd.tmpfiles.rules = [
-    # Group-writable root dir for CLI-owned per-VM subdirs. The microvm.nix
-    # module also ensures /var/lib/microvms exists; this just tightens perms.
     "d /var/lib/microvms                     0775 microvm vmusers -"
-    "d /var/lib/microvms/profiles            0755 root    vmusers -"
-    "d /var/lib/microvms/profiles/custom     0775 root    vmusers -"
     "d /var/lib/microvms/ssh                 0755 root    vmusers -"
     "f /var/lib/microvms/dnsmasq.leases      0644 root    vmusers -"
     "f /var/lib/microvms/events.log          0664 root    vmusers -"
     "f /var/lib/microvms/state.json          0664 root    vmusers -"
+    "d /var/lib/vm-specs                     0775 root    vmusers -"
+    "d /var/lib/vm-specs/profiles            0755 root    vmusers -"
+    "d /var/lib/vm-specs/profiles/custom     0775 root    vmusers -"
   ];
 
   # ── polkit: vmusers can manage microvm@ systemd units ─────────────────────
@@ -141,11 +142,11 @@ in
   # The built-ins are copied read-only from the repo snapshot at activation;
   # user profiles under custom/ are preserved across switches.
   system.activationScripts.microvmBuiltinProfiles = ''
-    mkdir -p /var/lib/microvms/profiles/custom
-    install -m 0644 ${./microvm/profiles/desktop.json} /var/lib/microvms/profiles/desktop.json
-    install -m 0644 ${./microvm/profiles/minimal.json} /var/lib/microvms/profiles/minimal.json
-    chown -R root:vmusers /var/lib/microvms/profiles
-    chmod 0775 /var/lib/microvms/profiles/custom
+    mkdir -p /var/lib/vm-specs/profiles/custom
+    install -m 0644 ${./microvm/profiles/desktop.json} /var/lib/vm-specs/profiles/desktop.json
+    install -m 0644 ${./microvm/profiles/minimal.json} /var/lib/vm-specs/profiles/minimal.json
+    chown -R root:vmusers /var/lib/vm-specs/profiles
+    chmod 0775 /var/lib/vm-specs/profiles/custom
   '';
 
   # ── Packages needed by the `vm` CLI ───────────────────────────────────────
