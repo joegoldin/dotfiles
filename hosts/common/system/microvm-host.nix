@@ -137,12 +137,33 @@ in
     chmod 0644 /var/lib/microvms/ssh/id_ed25519.pub
   '';
 
+  # ── Built-in profiles shipped from the repo ───────────────────────────────
+  # The built-ins are copied read-only from the repo snapshot at activation;
+  # user profiles under custom/ are preserved across switches.
+  system.activationScripts.microvmBuiltinProfiles = ''
+    mkdir -p /var/lib/microvms/profiles/custom
+    install -m 0644 ${./microvm/profiles/desktop.json} /var/lib/microvms/profiles/desktop.json
+    install -m 0644 ${./microvm/profiles/minimal.json} /var/lib/microvms/profiles/minimal.json
+    chown -R root:vmusers /var/lib/microvms/profiles
+    chmod 0775 /var/lib/microvms/profiles/custom
+  '';
+
   # ── Packages needed by the `vm` CLI ───────────────────────────────────────
   # (The CLI scripts themselves are installed via home-manager; these are their
   # runtime dependencies that live on the host side.)
-  environment.systemPackages = with pkgs; [
-    virt-viewer # `vm gui` opens SPICE via remote-viewer
-    socat # `vm console` attaches to the serial socket
-    zstd # `vm export` bundles with tar+zstd
-  ];
+  environment.systemPackages =
+    let
+      # Wrap module-gen.py so it's on PATH as `vm-module-gen`. The script is
+      # pulled into the system closure directly from the repo checkout.
+      vmModuleGen = pkgs.writeShellScriptBin "vm-module-gen" ''
+        exec ${pkgs.python3}/bin/python3 ${./microvm/module-gen.py} "$@"
+      '';
+    in
+    with pkgs;
+    [
+      vmModuleGen
+      virt-viewer # `vm gui` opens SPICE via remote-viewer
+      socat # `vm console` attaches to the serial socket
+      zstd # `vm export` bundles with tar+zstd
+    ];
 }
