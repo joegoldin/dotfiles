@@ -7,7 +7,7 @@
   "ram_mb": 6144,
   "cpu": 4,
   "disk_gb": 20,
-  "packages": ["firefox-devedition-bin"],
+  "packages": ["firefox-devedition"],
   "services": {
     "openssh": true,
     "autologin": true
