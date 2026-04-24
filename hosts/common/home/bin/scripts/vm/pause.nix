@@ -22,11 +22,12 @@
     sock="/var/lib/microvms/$name/$name.sock"
     [ -S "$sock" ] || die "no QMP socket at $sock (VM may not be fully started)"
 
-    # QMP handshake + stop
+    # QMP handshake + stop. The socket is owned by the `microvm` user with no
+    # group write, so socat needs sudo to actually connect.
     printf '%s\n%s\n' \
       '{"execute":"qmp_capabilities"}' \
       '{"execute":"stop"}' \
-      | socat - "UNIX-CONNECT:$sock" >/dev/null
+      | sudo socat - "UNIX-CONNECT:$sock" >/dev/null
 
     now=$(date -Iseconds)
     tmp=$(mktemp)

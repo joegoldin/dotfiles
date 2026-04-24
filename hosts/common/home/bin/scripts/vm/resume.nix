@@ -26,7 +26,7 @@
     printf '%s\n%s\n' \
       '{"execute":"qmp_capabilities"}' \
       '{"execute":"cont"}' \
-      | socat - "UNIX-CONNECT:$sock" >/dev/null
+      | sudo socat - "UNIX-CONNECT:$sock" >/dev/null
 
     now=$(date -Iseconds)
     tmp=$(mktemp)
