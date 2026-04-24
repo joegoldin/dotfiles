@@ -337,6 +337,8 @@
       # Window decoration buttons
       "kwinrc"."org.kde.kdecoration2"."ButtonsOnLeft" = "MSFB";
       "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "IAX";
+      # Overview effect: hide minimized windows
+      "kwinrc"."Effect-overview"."IgnoreMinimized" = true;
       # Caps -> Ctrl
       "kxkbrc"."Layout"."Options" = "caps:ctrl_modifier";
       "kxkbrc"."Layout"."ResetOldOptions" = true;

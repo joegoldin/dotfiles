@@ -1,0 +1,18 @@
+{
+  "name": "desktop",
+  "description": "KDE Plasma 6 with Firefox Developer Edition and SPICE graphics",
+  "base_channel": "stable",
+  "gui": true,
+  "de": "plasma",
+  "ram_mb": 6144,
+  "cpu": 4,
+  "disk_gb": 20,
+  "sound": true,
+  "resolution": "1920x1080",
+  "packages": ["firefox-devedition"],
+  "services": {
+    "openssh": true,
+    "autologin": true
+  },
+  "hypervisor": "qemu"
+}

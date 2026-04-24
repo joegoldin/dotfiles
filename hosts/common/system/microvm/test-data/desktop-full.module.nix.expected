@@ -1,0 +1,69 @@
+{ lib, pkgs, ... }:
+{
+  imports = [
+    ({ lib, pkgs, ... }: {
+
+  # Desktop environment: KDE Plasma 6
+  services.xserver.enable = true;
+  services.displayManager.sddm.enable = true;
+  services.displayManager.sddm.wayland.enable = true;
+  services.desktopManager.plasma6.enable = true;
+    })
+    ({ lib, pkgs, ... }: {
+
+  # SPICE graphics (socket consumed by `vm gui`)
+  services.spice-vdagentd.enable = true;
+  microvm.optimize.enable = false;
+  # spice-vdagent (user session) handles clipboard + resize.
+  # NixOS doesn't auto-start it; wire it into the graphical session.
+  systemd.user.services.spice-vdagent = {
+    description = "SPICE vdagent (clipboard & resize)";
+    wantedBy = [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.spice-vdagent}/bin/spice-vdagent -x";
+      Restart = "on-failure";
+    };
+  };
+  # `microvm` machine type doesn't do legacy VGA — use virtio-gpu-pci.
+  # usb-tablet gives an absolute pointer so the viewer doesn't
+  # capture the mouse; usb-kbd avoids the PS/2 fallback.
+  microvm.qemu.extraArgs = [
+    "-device" "virtio-gpu-pci,xres=1920,yres=1080"
+    "-device" "qemu-xhci"
+    "-device" "usb-tablet"
+    "-device" "usb-kbd"
+    "-spice" "unix=on,addr=/var/lib/microvms/ff/spice.sock,disable-ticketing=on"
+    "-device" "virtio-serial-pci"
+    "-chardev" "spicevmc,id=spicechannel0,name=vdagent"
+    "-device" "virtserialport,chardev=spicechannel0,name=com.redhat.spice.0"
+  ];
+    })
+    ({ lib, pkgs, ... }: {
+
+  # Sound (SPICE audio redirect)
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+  };
+  microvm.qemu.extraArgs = [
+    "-device" "ich9-intel-hda"
+    "-device" "hda-duplex,audiodev=spice-audio"
+    "-audiodev" "spice,id=spice-audio"
+  ];
+    })
+    ({ lib, pkgs, ... }: {
+
+  # Autologin for SPICE session
+  services.displayManager.autoLogin = { enable = true; user = "joe"; };
+    })
+  ];
+
+  environment.systemPackages = with pkgs; [
+    firefox-devedition
+    unstable.wireshark
+  ];
+}

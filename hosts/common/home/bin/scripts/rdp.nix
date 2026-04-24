@@ -1,6 +1,7 @@
 {
   name = "rdp";
   desc = "Connect to a remote desktop via RDP (disables secondary monitors)";
+  hostOnly = true;
   params = [{ name = "HOST"; desc = "[user@]hostname to connect to"; }];
   examples = [
     { cmd = "rdp 192.168.1.10"; desc = "Connect as current user"; }
