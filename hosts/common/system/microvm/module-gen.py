@@ -88,8 +88,13 @@ def render_spice(name: str) -> str:
         "  services.spice-vdagentd.enable = true;\n"
         "  microvm.optimize.enable = false;\n"
         "  # `microvm` machine type doesn't do legacy VGA — use virtio-gpu-pci.\n"
+        "  # usb-tablet gives an absolute pointer so the viewer doesn't\n"
+        "  # capture the mouse; usb-kbd avoids the PS/2 fallback.\n"
         "  microvm.qemu.extraArgs = [\n"
         '    "-device" "virtio-gpu-pci"\n'
+        '    "-device" "qemu-xhci"\n'
+        '    "-device" "usb-tablet"\n'
+        '    "-device" "usb-kbd"\n'
         f'    "-spice" "unix=on,addr=/var/lib/microvms/{name}/spice.sock,disable-ticketing=on"\n'
         '    "-device" "virtio-serial-pci"\n'
         '    "-chardev" "spicevmc,id=spicechannel0,name=vdagent"\n'

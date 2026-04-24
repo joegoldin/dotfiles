@@ -15,8 +15,13 @@
   services.spice-vdagentd.enable = true;
   microvm.optimize.enable = false;
   # `microvm` machine type doesn't do legacy VGA — use virtio-gpu-pci.
+  # usb-tablet gives an absolute pointer so the viewer doesn't
+  # capture the mouse; usb-kbd avoids the PS/2 fallback.
   microvm.qemu.extraArgs = [
     "-device" "virtio-gpu-pci"
+    "-device" "qemu-xhci"
+    "-device" "usb-tablet"
+    "-device" "usb-kbd"
     "-spice" "unix=on,addr=/var/lib/microvms/ff/spice.sock,disable-ticketing=on"
     "-device" "virtio-serial-pci"
     "-chardev" "spicevmc,id=spicechannel0,name=vdagent"
