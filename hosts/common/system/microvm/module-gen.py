@@ -78,12 +78,13 @@ def render_spice(name: str) -> str:
     # SPICE UNIX socket at /var/lib/microvms/<name>/spice.sock plus vdagent
     # channel for clipboard/resize. `unix` is a boolean flag (not unix=on).
     #
-    # microvm.nix defaults to a stripped qemu-host-cpu-only-for-vm-tests
-    # build that lacks SPICE support — force the full qemu_kvm.
+    # microvm.graphics.enable=true is what tells microvm.nix NOT to strip
+    # qemu via its minimizeQemuClosureSize overlay. Without it the runner
+    # is qemu-host-cpu-only-for-vm-tests which lacks SPICE support.
     return (
         "\n  # SPICE graphics (socket consumed by `vm gui`)\n"
         "  services.spice-vdagentd.enable = true;\n"
-        "  microvm.qemu.package = pkgs.qemu_kvm;\n"
+        "  microvm.graphics.enable = true;\n"
         "  microvm.qemu.extraArgs = [\n"
         f'    "-spice" "unix,addr=/var/lib/microvms/{name}/spice.sock,disable-ticketing=on"\n'
         '    "-device" "virtio-serial-pci"\n'
