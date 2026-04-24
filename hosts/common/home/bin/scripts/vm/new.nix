@@ -96,6 +96,7 @@
     p.add_argument("--ttl", help="Days (e.g. 14d, 2w); default 14d")
     p.add_argument("--de", choices=["plasma", "xfce"], help="Override desktop environment")
     p.add_argument("--gui", action="store_true", help="Force-enable SPICE graphics")
+    p.add_argument("--resolution", "--res", help="Initial display size, e.g. 1920x1080")
     p.add_argument("--sound", dest="sound", action="store_true", default=None,
                    help="Force-enable audio (SPICE redirect to host viewer)")
     p.add_argument("--no-sound", dest="sound", action="store_false",
@@ -153,6 +154,7 @@
         "extra_pkgs": args.pkgs,
         "de": de,
         "sound": profile.get("sound", False) if args.sound is None else args.sound,
+        "resolution": args.resolution or profile.get("resolution", "1920x1080"),
         "hostname": args.name,
         "mac": mac,
         "ip": vm_ip,

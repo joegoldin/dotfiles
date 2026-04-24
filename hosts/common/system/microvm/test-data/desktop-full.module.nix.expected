@@ -29,7 +29,7 @@
   # usb-tablet gives an absolute pointer so the viewer doesn't
   # capture the mouse; usb-kbd avoids the PS/2 fallback.
   microvm.qemu.extraArgs = [
-    "-device" "virtio-gpu-pci"
+    "-device" "virtio-gpu-pci,xres=1920,yres=1080"
     "-device" "qemu-xhci"
     "-device" "usb-tablet"
     "-device" "usb-kbd"

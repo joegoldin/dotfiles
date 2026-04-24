@@ -8,6 +8,7 @@
   "cpu": 4,
   "disk_gb": 20,
   "sound": true,
+  "resolution": "1920x1080",
   "packages": ["firefox-devedition"],
   "services": {
     "openssh": true,

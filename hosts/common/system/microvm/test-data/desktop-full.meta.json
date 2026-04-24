@@ -13,6 +13,8 @@
   ],
   "extra_pkgs": ["unstable.wireshark"],
   "de": "plasma",
+  "resolution": "1920x1080",
+  "sound": true,
   "hostname": "ff",
   "mac": "02:00:00:DE:AD:BE",
   "created_at": "2026-04-23T00:00:00-07:00",
