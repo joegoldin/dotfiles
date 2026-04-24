@@ -29,12 +29,13 @@
     fi
 
     sock="/var/lib/microvms/$name/spice.sock"
-    # Wait up to 10s for the SPICE socket to appear
-    for _ in $(seq 1 20); do
+    # Desktop-profile VMs format a fresh 20G disk on first boot, so give qemu
+    # up to a minute to set up the SPICE server. Subsequent boots are fast.
+    for _ in $(seq 1 120); do
       [ -S "$sock" ] && break
       sleep 0.5
     done
-    [ -S "$sock" ] || die "SPICE socket never appeared at $sock"
+    [ -S "$sock" ] || die "SPICE socket never appeared at $sock (VM may still be booting; try again in a moment)"
 
     blue "opening viewer for $name"
     exec setsid remote-viewer "spice+unix://$sock" --title "vm: $name" >/dev/null 2>&1 &
