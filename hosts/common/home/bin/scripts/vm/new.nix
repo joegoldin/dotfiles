@@ -220,6 +220,18 @@
     if args.start:
         info("starting")
         subprocess.run(["systemctl", "start", f"microvm@{args.name}"], check=True)
+        # systemctl start returns when ExecStart is invoked, not when the
+        # unit is active. Wait until it's active before reporting so `vm gui`
+        # below doesn't race.
+        import time as _time
+        for _ in range(60):
+            r = subprocess.run(
+                ["systemctl", "is-active", f"microvm@{args.name}"],
+                capture_output=True, text=True,
+            )
+            if r.stdout.strip() == "active":
+                break
+            _time.sleep(0.5)
         ok(f"running — ssh {args.name}.vm or `vm ssh {args.name}`")
         if gui:
             info("opening SPICE viewer")
