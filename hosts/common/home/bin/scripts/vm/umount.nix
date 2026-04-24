@@ -22,7 +22,7 @@
 
     tmp=$(mktemp)
     jq --arg p "$path" '.mounts |= map(select(.dst != $p and .src != $p))' "$meta" > "$tmp"
-    sudo cp "$tmp" "$meta"
+    cp "$tmp" "$meta"
     rm -f "$tmp"
 
     blue "regenerating module"

@@ -45,7 +45,7 @@
     tmp=$(mktemp)
     jq --arg src "$src" --arg dst "$dst" --arg tag "$tag" --argjson ro "$ro" \
       '.mounts += [{"src":$src,"dst":$dst,"tag":$tag,"ro":$ro}]' "$meta" > "$tmp"
-    sudo cp "$tmp" "$meta"
+    cp "$tmp" "$meta"
     rm -f "$tmp"
 
     blue "regenerating module"
