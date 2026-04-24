@@ -20,8 +20,8 @@
       exit 0
     fi
 
-    sock=$(find "/var/lib/microvms/$name" -name 'qmp*.sock' -type s 2>/dev/null | head -n1)
-    [ -z "$sock" ] && die "no QMP socket found"
+    sock="/var/lib/microvms/$name/$name.sock"
+    [ -S "$sock" ] || die "no QMP socket at $sock"
 
     printf '%s\n%s\n' \
       '{"execute":"qmp_capabilities"}' \

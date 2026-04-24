@@ -18,9 +18,9 @@
       die "$name is not running"
     fi
 
-    # microvm.nix puts the QMP socket under the VM's state dir
-    sock=$(find "/var/lib/microvms/$name" -name 'qmp*.sock' -type s 2>/dev/null | head -n1)
-    [ -z "$sock" ] && die "no QMP socket found (VM may not be fully started)"
+    # microvm.nix puts the QMP socket at /var/lib/microvms/<name>/<name>.sock
+    sock="/var/lib/microvms/$name/$name.sock"
+    [ -S "$sock" ] || die "no QMP socket at $sock (VM may not be fully started)"
 
     # QMP handshake + stop
     printf '%s\n%s\n' \
