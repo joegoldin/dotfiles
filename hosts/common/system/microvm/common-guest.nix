@@ -29,6 +29,12 @@
   };
   # Nameserver is handed out by the host's dnsmasq via DHCP option 6.
   networking.firewall.enable = lib.mkDefault false;
+  # Static alias for the host bridge gateway so guests can use 'host' or
+  # 'host.vm' instead of memorizing 10.100.0.1.
+  networking.hosts."10.100.0.1" = [
+    "host"
+    "host.vm"
+  ];
 
   time.timeZone = lib.mkDefault "America/Los_Angeles";
 
