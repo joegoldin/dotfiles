@@ -123,7 +123,26 @@
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    users.${meta.user} = import fishGuest;
+    users.${meta.user} =
+      { ... }:
+      {
+        imports = [ fishGuest ];
+        # When the VM is GUI and has at least one mount, put a Mounts shortcut
+        # on the desktop so the user can discover host-shared dirs.
+        home.file = lib.mkIf (meta.gui && (meta.mounts or [ ]) != [ ]) {
+          "Desktop/Mounts.desktop" = {
+            text = ''
+              [Desktop Entry]
+              Type=Link
+              Name=Mounts
+              Comment=Host-shared directories (virtiofs)
+              URL=file:///mnt
+              Icon=folder-cloud
+            '';
+            executable = true;
+          };
+        };
+      };
   };
 
   # ── Base packages always present in a guest ───────────────────────────────
