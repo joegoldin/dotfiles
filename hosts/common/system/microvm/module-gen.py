@@ -37,6 +37,8 @@ def render_module(meta: dict, profile: dict) -> str:
 
     de_block = render_de(de) if gui else ""
     spice_block = render_spice(meta["name"]) if gui else ""
+    sound = bool(meta.get("sound") or profile.get("sound"))
+    sound_block = render_sound() if sound else ""
     autologin_user = (
         meta.get("user")
         if gui and profile.get("services", {}).get("autologin")
@@ -44,13 +46,20 @@ def render_module(meta: dict, profile: dict) -> str:
     )
     autologin_block = render_autologin(autologin_user) if autologin_user else ""
 
+    # Wrap each feature block in its own anonymous module so that
+    # microvm.qemu.extraArgs (list type) merges instead of colliding.
+    feature_modules = "".join(
+        f"    ({{ lib, pkgs, ... }}: {{\n{block}    }})\n"
+        for block in (de_block, spice_block, sound_block, autologin_block)
+        if block
+    )
+
     return (
         "{ lib, pkgs, ... }:\n"
         "{\n"
+        f"  imports = [\n{feature_modules}  ];\n"
+        "\n"
         f'  environment.systemPackages = with pkgs; [\n{pkgs_lines}  ];\n'
-        f"{de_block}"
-        f"{spice_block}"
-        f"{autologin_block}"
         "}\n"
     )
 
@@ -107,6 +116,27 @@ def render_autologin(user: str) -> str:
     return (
         "\n  # Autologin for SPICE session\n"
         f'  services.displayManager.autoLogin = {{ enable = true; user = "{user}"; }};\n'
+    )
+
+
+def render_sound() -> str:
+    # ich9-intel-hda + hda-duplex + spice audiodev routes guest audio through
+    # the SPICE client, so sound plays on the host that ran `vm gui`.
+    # pipewire in the guest gives pulseaudio + alsa compat for apps.
+    return (
+        "\n  # Sound (SPICE audio redirect)\n"
+        "  security.rtkit.enable = true;\n"
+        "  services.pipewire = {\n"
+        "    enable = true;\n"
+        "    alsa.enable = true;\n"
+        "    alsa.support32Bit = true;\n"
+        "    pulse.enable = true;\n"
+        "  };\n"
+        "  microvm.qemu.extraArgs = [\n"
+        '    "-device" "ich9-intel-hda"\n'
+        '    "-device" "hda-duplex,audiodev=spice-audio"\n'
+        '    "-audiodev" "spice,id=spice-audio"\n'
+        "  ];\n"
     )
 
 

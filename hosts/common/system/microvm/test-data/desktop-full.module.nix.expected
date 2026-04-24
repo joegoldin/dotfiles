@@ -1,15 +1,15 @@
 { lib, pkgs, ... }:
 {
-  environment.systemPackages = with pkgs; [
-    firefox-devedition
-    unstable.wireshark
-  ];
+  imports = [
+    ({ lib, pkgs, ... }: {
 
   # Desktop environment: KDE Plasma 6
   services.xserver.enable = true;
   services.displayManager.sddm.enable = true;
   services.displayManager.sddm.wayland.enable = true;
   services.desktopManager.plasma6.enable = true;
+    })
+    ({ lib, pkgs, ... }: {
 
   # SPICE graphics (socket consumed by `vm gui`)
   services.spice-vdagentd.enable = true;
@@ -27,7 +27,32 @@
     "-chardev" "spicevmc,id=spicechannel0,name=vdagent"
     "-device" "virtserialport,chardev=spicechannel0,name=com.redhat.spice.0"
   ];
+    })
+    ({ lib, pkgs, ... }: {
+
+  # Sound (SPICE audio redirect)
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+  };
+  microvm.qemu.extraArgs = [
+    "-device" "ich9-intel-hda"
+    "-device" "hda-duplex,audiodev=spice-audio"
+    "-audiodev" "spice,id=spice-audio"
+  ];
+    })
+    ({ lib, pkgs, ... }: {
 
   # Autologin for SPICE session
   services.displayManager.autoLogin = { enable = true; user = "joe"; };
+    })
+  ];
+
+  environment.systemPackages = with pkgs; [
+    firefox-devedition
+    unstable.wireshark
+  ];
 }
