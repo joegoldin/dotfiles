@@ -54,17 +54,18 @@
     [ -f "$user_pub" ] && user_flag=(--user-pub "$user_pub")
 
     staged=$(mktemp -d)
-    sudo cp "$meta" "$staged/meta.json"
-    sudo chown "$USER:users" "$staged/meta.json"
+    cp "$meta" "$staged/meta.json"
     vm-module-gen \
       --meta "$staged/meta.json" --out "$staged" \
       --profiles-dir /var/lib/vm-specs/profiles \
       --repo-root "''${VM_DOTFILES:-$HOME/dotfiles}" \
       --cli-pub /var/lib/microvms/ssh/id_ed25519.pub "''${user_flag[@]}"
-    sudo cp "$staged/module.nix" "$staged/flake.nix" "/var/lib/vm-specs/$name/"
+    cp "$staged/module.nix" "$staged/flake.nix" "/var/lib/vm-specs/$name/"
     rm -rf "$staged"
 
     sudo microvm -u "$name"
+    sudo chown -R root:vmusers "/var/lib/vm-specs/$name"
+    sudo chmod -R g+rw "/var/lib/vm-specs/$name"
 
     if systemctl is-active --quiet "microvm@$name"; then
       if [ -n "$now" ]; then

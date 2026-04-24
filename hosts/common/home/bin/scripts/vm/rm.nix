@@ -42,23 +42,24 @@
       src="$state_dir/root.img"
       if [ -f "$src" ]; then
         blue "archiving disk → $archive/$name-$ts.img"
-        sudo cp "$src" "$archive/$name-$ts.img"
-        sudo chown "$USER:users" "$archive/$name-$ts.img"
+        cp "$src" "$archive/$name-$ts.img"
       fi
     fi
 
     blue "cleaning up"
-    sudo rm -rf "$state_dir" "$spec_dir"
-    sudo rm -f "/nix/var/nix/gcroots/microvm/$name" "/nix/var/nix/gcroots/microvm/booted-$name"
+    # vmusers has write on the parent dirs, so rmdir/unlink don't need sudo.
+    rm -rf "$state_dir" "$spec_dir"
+    # gcroots dir is root-owned; needs sudo.
+    sudo rm -f "/nix/var/nix/gcroots/microvm/$name" "/nix/var/nix/gcroots/microvm/booted-$name" 2>/dev/null || true
 
-    # Remove DHCP lease
+    # Remove DHCP lease (file is vmusers-writable)
     lease_file=/var/lib/microvms/dnsmasq.leases
     if grep -q ",$name," "$lease_file" 2>/dev/null; then
       tmp=$(mktemp)
       grep -v ",$name," "$lease_file" > "$tmp" || true
-      sudo cp "$tmp" "$lease_file"
+      cp "$tmp" "$lease_file"
       rm -f "$tmp"
-      sudo systemctl reload-or-restart dnsmasq
+      systemctl reload-or-restart dnsmasq
     fi
 
     green "deleted $name"

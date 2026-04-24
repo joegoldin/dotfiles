@@ -55,10 +55,11 @@
         builtin="/var/lib/vm-specs/profiles/$name.json"
         [ -f "$builtin" ] && die "'$name' is a built-in name"
         [ -f "$custom" ] && die "custom profile '$name' already exists"
-        # Seed from minimal as a starting point
-        sudo cp /var/lib/vm-specs/profiles/minimal.json "$custom"
-        sudo chown "$USER:vmusers" "$custom"
-        sudo chmod 0664 "$custom"
+        # Seed from minimal as a starting point.
+        # Parent dir /var/lib/vm-specs/profiles/custom is 0775 root:vmusers,
+        # so vmusers can create files here without sudo.
+        cp /var/lib/vm-specs/profiles/minimal.json "$custom"
+        chmod 0664 "$custom"
         tmp=$(mktemp)
         jq --arg n "$name" '.name = $n | .description = "Custom profile: " + $n' "$custom" > "$tmp"
         cp "$tmp" "$custom"
@@ -72,7 +73,7 @@
         builtin="/var/lib/vm-specs/profiles/$name.json"
         [ -f "$builtin" ] && die "cannot remove built-in '$name'"
         [ -f "$custom" ] || die "no such custom profile: $name"
-        sudo rm "$custom"
+        rm "$custom"
         green "removed $name"
         ;;
       *)

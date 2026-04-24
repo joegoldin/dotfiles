@@ -68,11 +68,11 @@
     # Register with microvm.nix (creates /var/lib/microvms/$target/)
     sudo microvm -c "$target" -f "path:$spec_dir"
 
-    # dnsmasq lease
+    # dnsmasq lease (file is vmusers-writable; reload goes via polkit)
     ip_suffix=$(( 16#''${mac_hash:10:2} % 240 + 10 ))
     vm_ip="10.100.0.$ip_suffix"
-    echo "$new_mac,$vm_ip,$target,12h" | sudo tee -a /var/lib/microvms/dnsmasq.leases >/dev/null
-    sudo systemctl reload-or-restart dnsmasq
+    echo "$new_mac,$vm_ip,$target,12h" >> /var/lib/microvms/dnsmasq.leases
+    systemctl reload-or-restart dnsmasq
 
     green "imported $target (ip $vm_ip)"
   '';
