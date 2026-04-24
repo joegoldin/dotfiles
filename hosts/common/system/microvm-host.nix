@@ -59,6 +59,15 @@ in
   # Trust the VM bridge fully — VMs can reach any host port, and vice versa
   # (the spec calls for bidirectional open access on the host-only bridge).
   networking.firewall.trustedInterfaces = [ "vmbr0" ];
+
+  # Don't run bridged (L2) traffic through iptables/arptables — otherwise
+  # the host's FORWARD chain drops VM packets before they reach the bridge
+  # destination. We rely on a trusted bridge for host<->VM comms.
+  boot.kernel.sysctl = {
+    "net.bridge.bridge-nf-call-iptables" = 0;
+    "net.bridge.bridge-nf-call-ip6tables" = 0;
+    "net.bridge.bridge-nf-call-arptables" = 0;
+  };
   # Allow DHCP request responses on the bridge (dnsmasq).
   networking.firewall.interfaces.vmbr0 = {
     allowedUDPPorts = [
