@@ -41,7 +41,7 @@
         tmp=$(mktemp)
         jq --argjson new "$(printf '%s\n' "$@" | jq -R . | jq -s .)" \
           '.extra_pkgs = (.extra_pkgs + $new | unique)' "$meta" > "$tmp"
-        sudo cp "$tmp" "$meta"; rm -f "$tmp"
+        cp "$tmp" "$meta"; rm -f "$tmp"
         blue "regenerating module"
         regen
         systemctl is-active --quiet "microvm@$name" && yellow "added — restart with: vm restart $name"
@@ -52,7 +52,7 @@
         tmp=$(mktemp)
         jq --argjson rem "$(printf '%s\n' "$@" | jq -R . | jq -s .)" \
           '.extra_pkgs |= map(select(. as $p | $rem | index($p) | not))' "$meta" > "$tmp"
-        sudo cp "$tmp" "$meta"; rm -f "$tmp"
+        cp "$tmp" "$meta"; rm -f "$tmp"
         blue "regenerating module"
         regen
         systemctl is-active --quiet "microvm@$name" && yellow "removed — restart with: vm restart $name"

@@ -31,7 +31,7 @@
     now=$(date -Iseconds)
     tmp=$(mktemp)
     jq --arg t "$now" '.last_touched = $t | .paused = false' "$meta" > "$tmp"
-    sudo cp "$tmp" "$meta"
+    cp "$tmp" "$meta"
     rm -f "$tmp"
 
     green "stopped"
