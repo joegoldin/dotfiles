@@ -36,7 +36,7 @@ def render_module(meta: dict, profile: dict) -> str:
     gui = bool(meta.get("gui") or profile.get("gui"))
 
     de_block = render_de(de) if gui else ""
-    spice_block = render_spice(meta["name"]) if gui else ""
+    spice_block = render_spice(meta["name"], meta.get("resolution") or "1920x1080") if gui else ""
     sound = bool(meta.get("sound") or profile.get("sound"))
     sound_block = render_sound() if sound else ""
     autologin_user = (
@@ -83,7 +83,12 @@ def render_de(de: str | None) -> str:
     return ""
 
 
-def render_spice(name: str) -> str:
+def render_spice(name: str, resolution: str = "1920x1080") -> str:
+    try:
+        xres, yres = resolution.lower().split("x", 1)
+        int(xres); int(yres)
+    except Exception:
+        xres, yres = "1920", "1080"
     # SPICE UNIX socket at /var/lib/microvms/<name>/spice.sock plus vdagent
     # channel for clipboard/resize.
     #
@@ -111,7 +116,7 @@ def render_spice(name: str) -> str:
         "  # usb-tablet gives an absolute pointer so the viewer doesn't\n"
         "  # capture the mouse; usb-kbd avoids the PS/2 fallback.\n"
         "  microvm.qemu.extraArgs = [\n"
-        '    "-device" "virtio-gpu-pci"\n'
+        f'    "-device" "virtio-gpu-pci,xres={xres},yres={yres}"\n'
         '    "-device" "qemu-xhci"\n'
         '    "-device" "usb-tablet"\n'
         '    "-device" "usb-kbd"\n'
