@@ -23,6 +23,22 @@
       local spec="/var/lib/vm-specs/$name"
       [ -d "$spec" ] || die "no such VM: $name"
 
+      # Regenerate module.nix / flake.nix from the current module-gen.py so
+      # recent changes to common-guest / render_spice / etc. reach the runner.
+      blue "regenerating module for $name"
+      staged=$(mktemp -d)
+      cp "$spec/meta.json" "$staged/meta.json"
+      user_pub="$HOME/.ssh/id_ed25519.pub"
+      user_flag=()
+      [ -f "$user_pub" ] && user_flag=(--user-pub "$user_pub")
+      vm-module-gen \
+        --meta "$staged/meta.json" --out "$staged" \
+        --profiles-dir /var/lib/vm-specs/profiles \
+        --repo-root "''${VM_DOTFILES:-$HOME/dotfiles}" \
+        --cli-pub /var/lib/microvms/ssh/id_ed25519.pub "''${user_flag[@]}"
+      cp "$staged/module.nix" "$staged/flake.nix" "$spec/"
+      rm -rf "$staged"
+
       if [ -z "$no_lock" ]; then
         blue "updating flake inputs for $name"
         # flake.lock is vmusers-writable after `vm new` sets perms.
