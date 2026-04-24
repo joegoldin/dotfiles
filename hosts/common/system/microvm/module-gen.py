@@ -76,17 +76,20 @@ def render_de(de: str | None) -> str:
 
 def render_spice(name: str) -> str:
     # SPICE UNIX socket at /var/lib/microvms/<name>/spice.sock plus vdagent
-    # channel for clipboard/resize. `unix` is a boolean flag (not unix=on).
+    # channel for clipboard/resize.
     #
-    # microvm.graphics.enable=true is what tells microvm.nix NOT to strip
-    # qemu via its minimizeQemuClosureSize overlay. Without it the runner
-    # is qemu-host-cpu-only-for-vm-tests which lacks SPICE support.
+    # microvm.nix's optimize.enable=true rewrites qemu into a stripped
+    # test-only variant that lacks SPICE. graphics.enable=true keeps the
+    # full qemu but also adds -display gtk,gl=on (no good for SPICE).
+    # optimize.enable=false is the sweet spot: full qemu, no GTK display.
+    # We supply our own SPICE display via -spice + virtio-vga.
     return (
         "\n  # SPICE graphics (socket consumed by `vm gui`)\n"
         "  services.spice-vdagentd.enable = true;\n"
-        "  microvm.graphics.enable = true;\n"
+        "  microvm.optimize.enable = false;\n"
         "  microvm.qemu.extraArgs = [\n"
-        f'    "-spice" "unix,addr=/var/lib/microvms/{name}/spice.sock,disable-ticketing=on"\n'
+        '    "-vga" "qxl"\n'
+        f'    "-spice" "unix=on,addr=/var/lib/microvms/{name}/spice.sock,disable-ticketing=on"\n'
         '    "-device" "virtio-serial-pci"\n'
         '    "-chardev" "spicevmc,id=spicechannel0,name=vdagent"\n'
         '    "-device" "virtserialport,chardev=spicechannel0,name=com.redhat.spice.0"\n'

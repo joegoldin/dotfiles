@@ -13,9 +13,10 @@
 
   # SPICE graphics (socket consumed by `vm gui`)
   services.spice-vdagentd.enable = true;
-  microvm.graphics.enable = true;
+  microvm.optimize.enable = false;
   microvm.qemu.extraArgs = [
-    "-spice" "unix,addr=/var/lib/microvms/ff/spice.sock,disable-ticketing=on"
+    "-vga" "qxl"
+    "-spice" "unix=on,addr=/var/lib/microvms/ff/spice.sock,disable-ticketing=on"
     "-device" "virtio-serial-pci"
     "-chardev" "spicevmc,id=spicechannel0,name=vdagent"
     "-device" "virtserialport,chardev=spicechannel0,name=com.redhat.spice.0"
