@@ -201,17 +201,20 @@
         )
     except subprocess.CalledProcessError:
         die("microvm -c failed; spec left at " + str(spec_dir) + " for inspection")
+    # microvm -c (and its flake evaluation) may have created flake.lock as root:root.
+    # Make it group-writable so later vm mount/pkg/update don't need sudo.
+    subprocess.run(
+        ["sudo", "chown", "-R", "root:vmusers", str(spec_dir)], check=True
+    )
+    subprocess.run(["sudo", "chmod", "-R", "g+rw", str(spec_dir)], check=True)
     ok("registered")
 
     # Append to dnsmasq.leases for DHCP static assignment + *.vm DNS.
-    lease_line = f"{mac},{vm_ip},{args.name},12h"
-    subprocess.run(
-        ["sudo", "tee", "-a", "/var/lib/microvms/dnsmasq.leases"],
-        input=lease_line.encode() + b"\n",
-        check=True,
-        stdout=subprocess.DEVNULL,
-    )
-    subprocess.run(["sudo", "systemctl", "reload-or-restart", "dnsmasq"], check=True)
+    # dnsmasq.leases is vmusers-writable; dnsmasq reload goes via polkit.
+    lease_line = f"{mac},{vm_ip},{args.name},12h\n"
+    with open("/var/lib/microvms/dnsmasq.leases", "a") as f:
+        f.write(lease_line)
+    subprocess.run(["systemctl", "reload-or-restart", "dnsmasq"], check=True)
     ok(f"lease {vm_ip} ({mac})")
 
     if args.start:

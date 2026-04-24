@@ -25,11 +25,15 @@
 
       if [ -z "$no_lock" ]; then
         blue "updating flake inputs for $name"
-        sudo nix flake update --flake "$spec"
+        # flake.lock is vmusers-writable after `vm new` sets perms.
+        nix flake update --flake "$spec"
       fi
 
       blue "rebuilding runner for $name"
       sudo microvm -u "$name"
+      # microvm -u may rewrite flake.lock as root; normalize perms.
+      sudo chown -R root:vmusers "$spec"
+      sudo chmod -R g+rw "$spec"
 
       if [ -n "$restart" ] && systemctl is-active --quiet "microvm@$name"; then
         blue "restarting $name"

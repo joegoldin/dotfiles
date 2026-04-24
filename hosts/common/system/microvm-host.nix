@@ -127,11 +127,23 @@ in
   # ── polkit: vmusers can manage microvm@ systemd units ─────────────────────
   security.polkit.extraConfig = ''
     polkit.addRule(function(action, subject) {
-      if (action.id == "org.freedesktop.systemd1.manage-units" &&
-          subject.isInGroup("vmusers")) {
+      if (!subject.isInGroup("vmusers")) return;
+
+      // Systemd manage-units (start / stop / restart / kill / reset-failed)
+      // limited to microvm@ and microvm-* template instances.
+      if (action.id == "org.freedesktop.systemd1.manage-units") {
         var unit = action.lookup("unit");
         if (unit && (unit.indexOf("microvm@") == 0 ||
                      unit.indexOf("microvm-") == 0)) {
+          return polkit.Result.YES;
+        }
+      }
+
+      // dnsmasq reload so `vm new`/`vm rm` can re-read dnsmasq.leases
+      // without a password prompt.
+      if (action.id == "org.freedesktop.systemd1.manage-units") {
+        var unit = action.lookup("unit");
+        if (unit == "dnsmasq.service") {
           return polkit.Result.YES;
         }
       }

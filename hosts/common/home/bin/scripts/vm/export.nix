@@ -28,14 +28,14 @@
     # Stage into a temp dir so tar sees both roots at once.
     staging=$(mktemp -d)
     trap 'rm -rf "$staging"' EXIT
-    sudo cp -r "$spec"/. "$staging/"
+    cp -r "$spec"/. "$staging/"
     if [ -z "$no_disk" ]; then
       if compgen -G "$state/*.img" >/dev/null 2>&1; then
         mkdir -p "$staging/disks"
-        sudo cp "$state"/*.img "$staging/disks/" 2>/dev/null || true
+        # Disk images are microvm-owned; user in kvm group can read.
+        cp "$state"/*.img "$staging/disks/" 2>/dev/null || true
       fi
     fi
-    sudo chown -R "$USER:users" "$staging"
 
     if [ -n "$output" ]; then
       tar -C "$staging" -cf - . | zstd -T0 -19 -o "$output"
