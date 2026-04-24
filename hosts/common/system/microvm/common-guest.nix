@@ -19,14 +19,34 @@
   networking.hostName = meta.name;
   networking.domain = "vm";
 
-  # ── Networking (systemd-networkd + default 99-ethernet-default-dhcp) ─────
-  # microvm.nix runs systemd-networkd in guests; the upstream default picks
-  # up any ethernet device and does DHCP, which is what we want.
+  # ── Networking (systemd-networkd, explicit DHCP on any ethernet) ─────────
   networking.useDHCP = false;
   networking.useNetworkd = true;
   systemd.network.enable = true;
+  systemd.network.networks."10-vm-eth" = {
+    matchConfig.Type = "ether";
+    networkConfig.DHCP = "yes";
+  };
   # Nameserver is handed out by the host's dnsmasq via DHCP option 6.
   networking.firewall.enable = lib.mkDefault false;
+
+  # Dump network state to the serial console a few seconds after boot so
+  # we can diagnose (stdin isn't wired, but journalctl -u microvm@<name>
+  # captures serial stdout).
+  systemd.services.vm-net-debug = {
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" ];
+    serviceConfig.Type = "oneshot";
+    serviceConfig.StandardOutput = "journal+console";
+    serviceConfig.StandardError = "journal+console";
+    script = ''
+      echo "=== vm-net-debug ==="
+      ${pkgs.iproute2}/bin/ip -brief link
+      ${pkgs.iproute2}/bin/ip -brief -4 addr
+      ${pkgs.systemd}/bin/networkctl status
+      echo "=== /vm-net-debug ==="
+    '';
+  };
 
   time.timeZone = lib.mkDefault "America/Los_Angeles";
 
@@ -64,6 +84,7 @@
     # Use a writable overlay so runtime installs (nix-env, nix-shell) don't
     # require a rebuild.
     writableStoreOverlay = "/nix/.rw-store";
+
 
     interfaces = [
       {
