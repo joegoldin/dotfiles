@@ -9,6 +9,7 @@
 # - Activation: generates a CLI-owned SSH keypair used by `vm ssh`
 {
   config,
+  lib,
   pkgs,
   inputs,
   username,
@@ -25,6 +26,12 @@ in
 
   # ── microvm.nix host module ───────────────────────────────────────────────
   microvm.host.enable = true;
+
+  # microvm.nix's virtiofsd template runs with PrivateTmp=yes by default,
+  # which gives each virtiofsd its own private /tmp — so mounting host:/tmp
+  # into a guest would share an empty private dir, not the real one. Drop
+  # PrivateTmp so `vm mount foo /tmp` actually works.
+  systemd.services."microvm-virtiofsd@".serviceConfig.PrivateTmp = lib.mkForce false;
 
   # ── Group for CLI users ───────────────────────────────────────────────────
   # `vmusers` is the general "can manage VMs" group; `kvm` is needed to talk
