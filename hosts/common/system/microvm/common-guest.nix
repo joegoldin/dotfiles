@@ -30,24 +30,6 @@
   # Nameserver is handed out by the host's dnsmasq via DHCP option 6.
   networking.firewall.enable = lib.mkDefault false;
 
-  # Dump network state to the serial console a few seconds after boot so
-  # we can diagnose (stdin isn't wired, but journalctl -u microvm@<name>
-  # captures serial stdout).
-  systemd.services.vm-net-debug = {
-    wantedBy = [ "multi-user.target" ];
-    after = [ "network.target" ];
-    serviceConfig.Type = "oneshot";
-    serviceConfig.StandardOutput = "journal+console";
-    serviceConfig.StandardError = "journal+console";
-    script = ''
-      echo "=== vm-net-debug ==="
-      ${pkgs.iproute2}/bin/ip -brief link
-      ${pkgs.iproute2}/bin/ip -brief -4 addr
-      ${pkgs.systemd}/bin/networkctl status
-      echo "=== /vm-net-debug ==="
-    '';
-  };
-
   time.timeZone = lib.mkDefault "America/Los_Angeles";
 
   # ── Users ─────────────────────────────────────────────────────────────────
