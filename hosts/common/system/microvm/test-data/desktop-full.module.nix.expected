@@ -14,8 +14,9 @@
   # SPICE graphics (socket consumed by `vm gui`)
   services.spice-vdagentd.enable = true;
   microvm.optimize.enable = false;
+  # `microvm` machine type doesn't do legacy VGA — use virtio-gpu-pci.
   microvm.qemu.extraArgs = [
-    "-vga" "qxl"
+    "-device" "virtio-gpu-pci"
     "-spice" "unix=on,addr=/var/lib/microvms/ff/spice.sock,disable-ticketing=on"
     "-device" "virtio-serial-pci"
     "-chardev" "spicevmc,id=spicechannel0,name=vdagent"
