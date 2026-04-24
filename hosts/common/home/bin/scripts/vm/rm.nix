@@ -26,14 +26,26 @@
       [[ "$reply" =~ ^[yY] ]] || { yellow "cancelled"; exit 0; }
     fi
 
-    # Stop the service whether it's running, activating, or failed.
-    if systemctl is-active --quiet "microvm@$name" 2>/dev/null \
-      || systemctl is-failed --quiet "microvm@$name" 2>/dev/null; then
-      blue "stopping"
-      [ -n "$force" ] && systemctl kill --signal=KILL "microvm@$name" 2>/dev/null || true
-      systemctl stop "microvm@$name" 2>/dev/null || true
-      systemctl reset-failed "microvm@$name" 2>/dev/null || true
-    fi
+    # Stop and reset all microvm-related template instances for this VM
+    # (microvm@, microvm-virtiofsd@, microvm-tap-interfaces@,
+    # microvm-pci-devices@, microvm-set-booted@, microvm-macvtap-interfaces@,
+    # install-microvm-<name>). Leaving any of these in failed state breaks
+    # the next nixos-rebuild activation.
+    blue "stopping related systemd units"
+    related=(
+      "microvm@$name"
+      "microvm-virtiofsd@$name"
+      "microvm-tap-interfaces@$name"
+      "microvm-pci-devices@$name"
+      "microvm-set-booted@$name"
+      "microvm-macvtap-interfaces@$name"
+      "install-microvm-$name"
+    )
+    for unit in "''${related[@]}"; do
+      [ -n "$force" ] && systemctl kill --signal=KILL "$unit" 2>/dev/null || true
+      systemctl stop "$unit" 2>/dev/null || true
+      systemctl reset-failed "$unit" 2>/dev/null || true
+    done
 
     if [ -n "$keep_disk" ]; then
       archive="$HOME/vm-archives"
