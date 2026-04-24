@@ -76,12 +76,12 @@ def render_de(de: str | None) -> str:
 
 def render_spice(name: str) -> str:
     # SPICE UNIX socket at /var/lib/microvms/<name>/spice.sock plus vdagent
-    # channel for clipboard/resize.
+    # channel for clipboard/resize. `unix` is a boolean flag (not unix=on).
     return (
         "\n  # SPICE graphics (socket consumed by `vm gui`)\n"
         "  services.spice-vdagentd.enable = true;\n"
         "  microvm.qemu.extraArgs = [\n"
-        f'    "-spice" "unix=on,addr=/var/lib/microvms/{name}/spice.sock,disable-ticketing=on"\n'
+        f'    "-spice" "unix,addr=/var/lib/microvms/{name}/spice.sock,disable-ticketing=on"\n'
         '    "-device" "virtio-serial-pci"\n'
         '    "-chardev" "spicevmc,id=spicechannel0,name=vdagent"\n'
         '    "-device" "virtserialport,chardev=spicechannel0,name=com.redhat.spice.0"\n'
