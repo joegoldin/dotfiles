@@ -25,7 +25,7 @@
     touched=$(jq -r .last_touched "$meta")
     ttl_days=$(jq -r .ttl_days "$meta")
 
-    state=$(systemctl is-active "microvm@$name" 2>/dev/null)
+    state=$(systemctl is-active "microvm@$name" 2>/dev/null || true)
     [ -z "$state" ] && state="inactive"
     [ "$paused" = "true" ] && state="paused"
     ip=$(jq -r .ip "$meta" 2>/dev/null)
