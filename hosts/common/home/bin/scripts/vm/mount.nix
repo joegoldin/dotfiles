@@ -42,6 +42,13 @@
     fi
     tag=$(echo "$dst" | sed 's|^/||;s|/|-|g;s|[^a-z0-9-]|-|g' | cut -c1-30)
 
+    # Guard against duplicate tag/dst — microvm.nix rejects duplicate share
+    # tags at eval time (hard to recover from once meta.json is corrupt).
+    if jq -e --arg dst "$dst" --arg tag "$tag" \
+      '.mounts | any(.dst == $dst or .tag == $tag)' "$meta" >/dev/null; then
+      die "a mount with dst=$dst (tag=$tag) already exists on '$name' — use 'vm umount' first"
+    fi
+
     tmp=$(mktemp)
     jq --arg src "$src" --arg dst "$dst" --arg tag "$tag" --argjson ro "$ro" \
       '.mounts += [{"src":$src,"dst":$dst,"tag":$tag,"ro":$ro}]' "$meta" > "$tmp"
