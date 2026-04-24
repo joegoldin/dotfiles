@@ -87,8 +87,9 @@ def render_spice(name: str) -> str:
         "\n  # SPICE graphics (socket consumed by `vm gui`)\n"
         "  services.spice-vdagentd.enable = true;\n"
         "  microvm.optimize.enable = false;\n"
+        "  # `microvm` machine type doesn't do legacy VGA — use virtio-gpu-pci.\n"
         "  microvm.qemu.extraArgs = [\n"
-        '    "-vga" "qxl"\n'
+        '    "-device" "virtio-gpu-pci"\n'
         f'    "-spice" "unix=on,addr=/var/lib/microvms/{name}/spice.sock,disable-ticketing=on"\n'
         '    "-device" "virtio-serial-pci"\n'
         '    "-chardev" "spicevmc,id=spicechannel0,name=vdagent"\n'
