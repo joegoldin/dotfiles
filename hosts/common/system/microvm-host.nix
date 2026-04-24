@@ -27,8 +27,13 @@ in
   microvm.host.enable = true;
 
   # ── Group for CLI users ───────────────────────────────────────────────────
+  # `vmusers` is the general "can manage VMs" group; `kvm` is needed to talk
+  # to qemu's QMP socket (pause/resume/query).
   users.groups.vmusers = { };
-  users.users.${username}.extraGroups = [ "vmusers" ];
+  users.users.${username}.extraGroups = [
+    "vmusers"
+    "kvm"
+  ];
 
   # ── Bridge ────────────────────────────────────────────────────────────────
   # Scripted-networking bridge (plays fine alongside NetworkManager when NM is
