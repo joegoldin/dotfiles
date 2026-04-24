@@ -1,6 +1,7 @@
 {
   name = "ups-charts";
   desc = "Live-plot UPS charge, load, power, and voltage";
+  hostOnly = true;
   pythonPackages = [ "plotext" ];
   flags = [
     {

@@ -1,9 +1,12 @@
-{ pkgs, ... }:
+{ pkgs, ... }@args:
 let
+  # When imported into a microVM guest (via `_module.args.vmGuest = true;`),
+  # strip scripts marked `hostOnly = true;`.
+  vmGuest = args.vmGuest or false;
   # ── Import all script definitions from ./scripts/ ──────────────────
   scriptDir = builtins.readDir ./scripts;
   scriptFiles = builtins.filter (f: scriptDir.${f} == "regular") (builtins.attrNames scriptDir);
-  scripts = builtins.sort (a: b: a.name < b.name) (
+  allScripts = builtins.sort (a: b: a.name < b.name) (
     map (
       f:
       let
@@ -13,6 +16,8 @@ let
       normalizeScript resolved
     ) scriptFiles
   );
+  scripts =
+    if vmGuest then builtins.filter (s: !(s.hostOnly or false)) allScripts else allScripts;
 
   # ── Import subcommand groups from subdirectories ───────────────────
   subcommandDirs = builtins.filter (f: scriptDir.${f} == "directory") (builtins.attrNames scriptDir);
@@ -1080,7 +1085,7 @@ let
             map (
               f:
               let
-                longName = normalizeFlagName f.name;
+                longName = lib.removePrefix "--" f.name;
                 sh = flagShort f;
                 shortPart = if sh != "" then " -s ${sh}" else "";
                 requiresArg = if !(flagIsBool f) then " -r" else "";
@@ -1127,7 +1132,7 @@ let
       subLines = builtins.concatStringsSep "\n" (
         map (
           sub:
-          "complete -c ${parentName} -f -n '__fish_use_subcommand' -a '${sub.name}' -d '${escFishDQ sub.desc}'"
+          "complete -c ${parentName} -f -n '__fish_use_subcommand' -a '${sub.name}' -d '${escSQ sub.desc}'"
         ) g.subs
       );
       # Complete flags/params for each subcommand
@@ -1142,12 +1147,12 @@ let
                   map (
                     f:
                     let
-                      longName = normalizeFlagName f.name;
+                      longName = lib.removePrefix "--" f.name;
                       sh = flagShort f;
                       shortPart = if sh != "" then " -s ${sh}" else "";
                       requiresArg = if !(flagIsBool f) then " -r" else "";
                     in
-                    "complete -c ${parentName} -f ${cond} -l ${longName}${shortPart}${requiresArg} -d '${escFishDQ (f.desc or "a flag")}'"
+                    "complete -c ${parentName} -f ${cond} -l ${longName}${shortPart}${requiresArg} -d '${escSQ (f.desc or "a flag")}'"
                   ) (sub.flags or [ ])
                 else
                   [ ];

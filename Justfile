@@ -294,6 +294,16 @@ sync-submodules:
     '
     # Second pass: pull remote updates
     git submodule update --init --recursive --remote
+    # Third pass: re-resolve transitive flake deps from path: submodules
+    # (e.g. agent-skills pins codex-nix/claude-nix/gemini-nix which the
+    #  outer dotfiles lock caches independently)
+    echo "🔒  Re-locking transitive flake deps from submodules..."
+    git submodule foreach --quiet 'echo "$name"' | while read -r sub; do
+      for dep in $(nix flake metadata --json "path:./$sub" 2>/dev/null \
+                    | jq -r '.locks.nodes.root.inputs // {} | keys[]' 2>/dev/null); do
+        nix flake lock --update-input "$sub/$dep" 2>/dev/null || true
+      done
+    done
     just _record-history sync-submodules
     echo "✅  Submodules synced!"
 

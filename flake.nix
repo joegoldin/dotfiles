@@ -26,7 +26,7 @@
     nixos-wsl.url = "github:nix-community/NixOS-WSL/release-25.11";
     # jovian (Steam Deck)
     jovian-nixos = {
-      url = "github:Jovian-Experiments/Jovian-NixOS?rev=67d55e61fe5e4d88d3fb90c0888cfced04a0589d";
+      url = "github:Jovian-Experiments/Jovian-NixOS?rev=4c8ccc482a3665fb4a3b2cadbbe7772fb7cc2629";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -90,6 +90,11 @@
       url = "github:nix-community/disko?ref=v1.13.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # microVM runtime (for the `vm` CLI)
+    microvm-nix = {
+      url = "github:microvm-nix/microvm.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # secure boot
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v1.0.0";
@@ -99,7 +104,7 @@
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.7.0";
     # pre-built nix-index database
     nix-index-database = {
-      url = "github:nix-community/nix-index-database?rev=bedba5989b04614fc598af9633033b95a937933f";
+      url = "github:nix-community/nix-index-database?rev=c43246d4e9e506178b69baed075d797ec2d873e2";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # fast x86_64-linux builds on Apple Silicon
@@ -111,7 +116,7 @@
     # ── Development tools ──────────────────────────────────────────────────
     devenv.url = "github:cachix/devenv?ref=v2.0.6";
     nixpkgs-python.url = "github:cachix/nixpkgs-python?rev=8b6d4103312761d4144b7bf9aebcc2f394b7e325";
-    git-hooks.url = "github:cachix/git-hooks.nix?rev=580633fa3fe5fc0379905986543fd7495481913d";
+    git-hooks.url = "github:cachix/git-hooks.nix?rev=3cfd774b0a530725a077e17354fbdb87ea1c4aad";
 
     # ── ML / GPU compute ────────────────────────────────────────────────────
     # tinygrad with ROCm/CUDA support
@@ -128,9 +133,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Ghostty terminal
-    ghostty.url = "github:ghostty-org/ghostty?rev=01825411ab2720e47e6902e9464e805bc6a062a1";
+    ghostty.url = "github:ghostty-org/ghostty?rev=880a599d66c0678c9d1709097b38beb5c0730175";
     # Zed editor (built from source via flake)
-    zed-editor.url = "github:zed-industries/zed?ref=v0.230.2";
+    zed-editor.url = "github:zed-industries/zed?ref=v0.234.0-pre";
     # Zed nix extension (fork with language injection for script bodies)
     zed-nix-ext = {
       url = "github:joegoldin/nix";
@@ -146,37 +151,27 @@
     # ── Claude / LLM tooling ───────────────────────────────────────────────
     # Claude Desktop for Linux
     claude-desktop-debian = {
-      url = "github:aaddrick/claude-desktop-debian?rev=4b1d5bfa124fafa36676949028ff015975cbc81c";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    # Claude Code configuration library
-    claude-nix = {
-      url = "github:joegoldin/claude-nix?rev=337e48e08076a01c12a00290a318955e5e8bd6d2";
+      url = "github:aaddrick/claude-desktop-debian?rev=2543ee58bcc68a224fca3cdea61f5b705d8ba87d";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, gemini-cli)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=df5704a3d06edd7ba96ed86a922bbce0e5a498df";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=6fd26c9cb50d9549f3791b3d35e4f72f97677103";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
-    # Claude Code agent skills
+    # Agent skills + re-exported claude-nix, gemini-nix, codex-nix modules
     agent-skills = {
       url = "path:./agent-skills";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    # Gemini CLI configuration library (declarative skills, commands, hooks)
-    gemini-nix = {
-      url = "github:joegoldin/gemini-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # ── Homebrew (macOS) ───────────────────────────────────────────────────
     nix-homebrew.url = "github:zhaofengli/nix-homebrew?rev=a7760a3a83f7609f742861afb5732210fdc437ed";
     brew-nix = {
-      url = "github:BatteredBunny/brew-nix?rev=6fcb48f460c97ba65a9ce94f8c841b36f53122fc";
+      url = "github:BatteredBunny/brew-nix?rev=0457cb099ee50ce2587060acfaccf7362542e93a";
       inputs.brew-api.follows = "brew-api";
     };
     brew-api = {
