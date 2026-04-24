@@ -96,6 +96,17 @@ def render_spice(name: str) -> str:
         "\n  # SPICE graphics (socket consumed by `vm gui`)\n"
         "  services.spice-vdagentd.enable = true;\n"
         "  microvm.optimize.enable = false;\n"
+        "  # spice-vdagent (user session) handles clipboard + resize.\n"
+        "  # NixOS doesn't auto-start it; wire it into the graphical session.\n"
+        "  systemd.user.services.spice-vdagent = {\n"
+        '    description = "SPICE vdagent (clipboard & resize)";\n'
+        '    wantedBy = [ "graphical-session.target" ];\n'
+        '    partOf = [ "graphical-session.target" ];\n'
+        "    serviceConfig = {\n"
+        '      ExecStart = "${pkgs.spice-vdagent}/bin/spice-vdagent -x";\n'
+        '      Restart = "on-failure";\n'
+        "    };\n"
+        "  };\n"
         "  # `microvm` machine type doesn't do legacy VGA — use virtio-gpu-pci.\n"
         "  # usb-tablet gives an absolute pointer so the viewer doesn't\n"
         "  # capture the mouse; usb-kbd avoids the PS/2 fallback.\n"
