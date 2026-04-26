@@ -59,6 +59,7 @@ in
       unstable.tailscale
       ungoogled-chromium
       unstable.umu-launcher
+      unstable.unityhub
       mpv
       nvtopPackages.amd
       unstable.vllm
