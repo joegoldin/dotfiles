@@ -37,6 +37,7 @@
     ./claude
     ./gemini
     ./codex
+    ./notify.nix
     ./wakatime.nix
     ./bin
   ];
