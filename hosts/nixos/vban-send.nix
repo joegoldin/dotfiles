@@ -11,6 +11,7 @@ in
     "context.modules" = [
       {
         name = "libpipewire-module-vban-send";
+        flags = [ "nofail" ];
         args = {
           "local.ifname" = "tailscale0";
           "destination.ip" = domains.officePcTailscale;
