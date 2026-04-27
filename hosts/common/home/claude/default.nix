@@ -67,6 +67,6 @@ in
       wakatimePlugin
       localPlugin
     ];
-    extraSettingsDirs = [ ".claude-work" ];
+    extraAccounts = [ "work" ];
   };
 }
