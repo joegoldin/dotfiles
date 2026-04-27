@@ -6,6 +6,7 @@
     "context.modules" = [
       {
         name = "libpipewire-module-vban-recv";
+        flags = [ "nofail" ];
         args = {
           "local.ifname" = "tailscale0";
           "source.port" = 6981;
