@@ -59,7 +59,9 @@ in
       unstable.tailscale
       ungoogled-chromium
       unstable.umu-launcher
-      unstable.unityhub
+      (unstable.unityhub.override {
+        extraPkgs = ps: [ ps.sqlite ];
+      })
       mpv
       nvtopPackages.amd
       unstable.vllm
