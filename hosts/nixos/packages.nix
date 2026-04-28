@@ -61,7 +61,10 @@ in
       ungoogled-chromium
       unstable.umu-launcher
       (unstable.unityhub.override {
-        extraPkgs = ps: [ ps.sqlite ];
+        extraPkgs = ps: [
+          ps.sqlite
+          blip-caption
+        ];
       })
       mpv
       nvtopPackages.amd
