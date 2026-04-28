@@ -14,7 +14,11 @@ let
   hasLazydocker = hasPackage "lazydocker";
 in
 {
-  shellAliases = { };
+  shellAliases = {
+    ls =
+      if hasExa then "eza -lA --group-directories-first -snew --icons=auto --git -h" else "ls -lArth";
+    l = "command ls";
+  };
 
   shellAbbrs = {
     # Clear screen and scrollback
@@ -52,7 +56,6 @@ in
 
     s = mkIf hasSpecialisationCli "specialisation";
 
-    ls = if hasExa then "eza -lA --group-directories-first -snew --icons=auto --git -h" else "ls -lArth";
     exa = mkIf hasExa "eza";
     lst = mkIf hasExa "eza -lath";
 
