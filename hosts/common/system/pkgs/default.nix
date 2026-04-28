@@ -1,22 +1,47 @@
 # Custom packages, that can be defined similarly to ones from nixpkgs
 # You can build them using 'nix build .#example'
 pkgs: {
-  google-chrome-stable = pkgs.writeShellScriptBin "google-chrome" ''
-    exec -a $0 ${pkgs.google-chrome}/bin/google-chrome-stable $@
-  '';
-
   aws-cli = pkgs.writeShellScriptBin "aws" ''
     unset PYTHONPATH
     exec ${pkgs.unstable.awscli2}/bin/aws "$@"
   '';
 
-  shopt-script = pkgs.writeShellScriptBin "shopt" ''
-    args="";
-    for item in "$@"; do
-      args="$args $item";
-    done
-    shopt $args;
+  blip-caption = pkgs.callPackage ./blip-caption.nix { };
+
+  desktop-wakatime = pkgs.callPackage ./desktop-wakatime.nix { };
+
+  git-hunk = pkgs.callPackage ./git-hunk.nix { };
+
+  google-chrome-stable = pkgs.writeShellScriptBin "google-chrome" ''
+    exec -a $0 ${pkgs.google-chrome}/bin/google-chrome-stable $@
   '';
+
+  helm-with-plugins = pkgs.wrapHelm pkgs.kubernetes-helm {
+    plugins = with pkgs.kubernetes-helmPlugins; [
+      helm-secrets
+      helm-diff
+      helm-s3
+      helm-git
+      helm-unittest
+    ];
+  };
+
+  helmfile-with-plugins = pkgs.helmfile-wrapped.override {
+    inherit
+      (pkgs.wrapHelm pkgs.kubernetes-helm {
+        plugins = with pkgs.kubernetes-helmPlugins; [
+          helm-secrets
+          helm-diff
+          helm-s3
+          helm-git
+          helm-unittest
+        ];
+      })
+      pluginsDir
+      ;
+  };
+
+  hyprwhspr = pkgs.callPackage ./hyprwhspr { };
 
   iterm2-terminal-integration = pkgs.stdenv.mkDerivation rec {
     pname = "iterm2-terminal-integration";
@@ -41,41 +66,19 @@ pkgs: {
     '';
   };
 
-  helm-with-plugins = pkgs.wrapHelm pkgs.kubernetes-helm {
-    plugins = with pkgs.kubernetes-helmPlugins; [
-      helm-secrets
-      helm-diff
-      helm-s3
-      helm-git
-      helm-unittest
-    ];
-  };
-  helmfile-with-plugins = pkgs.helmfile-wrapped.override {
-    inherit
-      (pkgs.wrapHelm pkgs.kubernetes-helm {
-        plugins = with pkgs.kubernetes-helmPlugins; [
-          helm-secrets
-          helm-diff
-          helm-s3
-          helm-git
-          helm-unittest
-        ];
-      })
-      pluginsDir
-      ;
-  };
-
   lotion = pkgs.callPackage ./lotion { };
 
-  git-hunk = pkgs.callPackage ./git-hunk.nix { };
+  mkWindowsApp = pkgs.callPackage ./mkwindowsapp { };
+
+  shopt-script = pkgs.writeShellScriptBin "shopt" ''
+    args="";
+    for item in "$@"; do
+      args="$args $item";
+    done
+    shopt $args;
+  '';
 
   yepanywhere = pkgs.callPackage ./yepanywhere { };
   yepanywhere-relay = pkgs.callPackage ./yepanywhere-relay { };
   yepanywhere-remote = pkgs.callPackage ./yepanywhere-remote { };
-
-  desktop-wakatime = pkgs.callPackage ./desktop-wakatime.nix { };
-
-  hyprwhspr = pkgs.callPackage ./hyprwhspr { };
-
-  mkWindowsApp = pkgs.callPackage ./mkwindowsapp { };
 }
