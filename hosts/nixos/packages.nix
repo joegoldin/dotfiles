@@ -21,6 +21,7 @@ in
       goModule.packages.claude-squad
       claude-container
       claude-desktop-fhs
+      blip-caption
       bubblewrap
       unstable.cloudflared
       desktop-wakatime
