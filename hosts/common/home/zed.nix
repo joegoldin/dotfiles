@@ -12,7 +12,7 @@ in
   home.sessionVariables = {
     EDITOR = "zeditor --wait";
     VISUAL = "zeditor --wait";
-    DOTNET_ROOT = "${dotnet}";
+    DOTNET_ROOT = "${dotnet}/share/dotnet";
   };
 
   programs.zed-editor = {
@@ -167,7 +167,7 @@ in
         roslyn = {
           binary = {
             env = {
-              DOTNET_ROOT = "${dotnet}";
+              DOTNET_ROOT = "${dotnet}/share/dotnet";
             };
           };
         };
