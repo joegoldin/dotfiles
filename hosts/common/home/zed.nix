@@ -72,6 +72,15 @@ in
         };
       }
       {
+        context = "Terminal";
+        bindings = {
+          "shift-enter" = [
+            "terminal::SendText"
+            (builtins.fromJSON ''"\u001b\r"'')
+          ];
+        };
+      }
+      {
         bindings = {
           "ctrl-shift-`" = "terminal_panel::ToggleFocus";
           "cmd-q" = null;
@@ -98,6 +107,10 @@ in
 
       terminal = {
         font_family = "TX02 Nerd Font Mono";
+        show_count_badge = false;
+        toolbar = {
+          breadcrumbs = false;
+        };
       };
 
       theme = {
@@ -117,6 +130,41 @@ in
       show_edit_predictions = true;
       confirm_quit = true;
       ensure_final_newline_on_save = true;
+      colorize_brackets = true;
+      cli_default_open_behavior = "existing_window";
+
+      calls = {
+        mute_on_join = true;
+      };
+
+      which_key = {
+        enabled = true;
+      };
+
+      sticky_scroll = {
+        enabled = true;
+      };
+
+      git = {
+        inline_blame = {
+          show_commit_summary = false;
+        };
+      };
+
+      project_panel = {
+        bold_folder_labels = true;
+        diagnostic_badges = true;
+        dock = "left";
+        git_status_indicator = true;
+      };
+
+      outline_panel = {
+        dock = "left";
+      };
+
+      collaboration_panel = {
+        dock = "left";
+      };
 
       edit_predictions = {
         sweep = {
@@ -127,6 +175,9 @@ in
       };
 
       agent = {
+        dock = "right";
+        enable_feedback = false;
+        show_turn_stats = true;
         tool_permissions = {
           default = "allow";
         };
@@ -149,7 +200,11 @@ in
       diff_view_style = "split";
 
       git_panel = {
-        tree_view = false;
+        collapse_untracked_diff = false;
+        dock = "left";
+        file_icons = false;
+        show_count_badge = true;
+        tree_view = true;
       };
 
       agent_servers = {
