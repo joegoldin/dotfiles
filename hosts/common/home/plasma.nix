@@ -339,6 +339,9 @@
       "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "IAX";
       # Overview effect: hide minimized windows
       "kwinrc"."Effect-overview"."IgnoreMinimized" = true;
+      # Alt+Tab task switcher: only current screen, exclude minimized
+      "kwinrc"."TabBox"."MultiScreenMode" = 1;
+      "kwinrc"."TabBox"."MinimizedMode" = 1;
       # Caps -> Ctrl
       "kxkbrc"."Layout"."Options" = "caps:ctrl_modifier";
       "kxkbrc"."Layout"."ResetOldOptions" = true;
