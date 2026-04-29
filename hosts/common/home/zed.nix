@@ -1,8 +1,18 @@
 { pkgs, inputs, ... }:
+let
+  # Zed's csharp extension ships a Roslyn LSP binary built against .NET 10.
+  # On NixOS there is no /usr/share/dotnet for the apphost to discover, so we
+  # provide a Nix-built dotnet runtime and point DOTNET_ROOT at it. dotnet-sdk_10
+  # only landed in nixpkgs-unstable, so use the unstable overlay.
+  dotnet = pkgs.unstable.dotnet-sdk_10;
+in
 {
+  home.packages = [ dotnet ];
+
   home.sessionVariables = {
     EDITOR = "zeditor --wait";
     VISUAL = "zeditor --wait";
+    DOTNET_ROOT = "${dotnet}";
   };
 
   programs.zed-editor = {
@@ -146,6 +156,20 @@
         claude-acp = {
           type = "registry";
           default_mode = "plan";
+        };
+      };
+
+      # Roslyn LSP (from the csharp extension) needs DOTNET_ROOT to find the
+      # .NET runtime — NixOS doesn't ship /usr/share/dotnet. Set it explicitly
+      # at the LSP level so Zed launched from a desktop file (no shell env)
+      # still finds it.
+      lsp = {
+        roslyn = {
+          binary = {
+            env = {
+              DOTNET_ROOT = "${dotnet}";
+            };
+          };
         };
       };
     };
