@@ -171,7 +171,12 @@ in
     kdePackages.konsole
     kdePackages.spectacle
     freerdp
-    kdotool
+    # 25.11 ships kdotool 0.2.2-pre which has an off-by-one IPC bug
+    # against KDE Plasma 6.5+: loadScript returns N but the actual
+    # D-Bus object path is /Scripting/Script(N-1), so windowactivate
+    # fails with "No such object path '/Scripting/Script1'". Fixed in
+    # 0.2.3 which is in unstable.
+    unstable.kdotool
 
     # Keyboard configurator
     vial
