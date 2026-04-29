@@ -6,6 +6,8 @@
     ../common/system/attic-post-build-hook.nix
     ../common/system/howdy.nix
     ../common/system/microvm-host.nix
+    ../common/system/oomd.nix
+    ../common/system/earlyoom.nix
     ./configuration.nix
     ./hardware-configuration.nix
     ../common/system/drag-shift.nix
