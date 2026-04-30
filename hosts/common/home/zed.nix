@@ -207,10 +207,33 @@ in
         tree_view = true;
       };
 
+      # External ACP agents — point them at our Nix-managed wrappers from
+      # pkgs.llm-agents so Zed launches the same binaries (with our skills,
+      # plugins, MCPs, etc.) that we use from the terminal.
+      #
+      # claude-acp: the adapter spawns Claude Code as a subprocess, so
+      #   CLAUDE_CODE_EXECUTABLE redirects it to our wrapped claude.
+      # gemini: the "gemini" registry agent IS @google/gemini-cli invoked with
+      #   --acp, so we override it with a custom entry pointing at our wrapped
+      #   gemini binary.
+      # codex-acp: statically links the codex Rust crates, so its bundled
+      #   codex cannot be overridden at runtime — we just register it here.
       agent_servers = {
         claude-acp = {
           type = "registry";
           default_mode = "plan";
+          env = {
+            CLAUDE_CODE_EXECUTABLE = "${pkgs.llm-agents.claude-code}/bin/claude";
+          };
+        };
+        codex-acp = {
+          type = "registry";
+        };
+        gemini = {
+          type = "custom";
+          command = "${pkgs.llm-agents.gemini-cli}/bin/gemini";
+          args = [ "--acp" ];
+          env = { };
         };
       };
 
