@@ -66,5 +66,7 @@ in
     lzd = mkIf hasLazydocker "lazydocker";
 
     uxplay = "uxplay -p";
+
+    vban-restart = "systemctl --user restart pipewire pipewire-pulse wireplumber";
   };
 }
