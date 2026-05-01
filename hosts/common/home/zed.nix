@@ -157,7 +157,7 @@ in
       };
 
       project_panel = {
-        bold_folder_labels = true;
+        bold_folder_labels = false;
         diagnostic_badges = true;
         dock = "left";
         git_status_indicator = true;
