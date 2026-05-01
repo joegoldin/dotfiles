@@ -1,4 +1,9 @@
-{ pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 let
   # Zed's csharp extension ships a Roslyn LSP binary built against .NET 10.
   # On NixOS there is no /usr/share/dotnet for the apphost to discover, so we
@@ -207,15 +212,19 @@ in
         tree_view = true;
       };
 
-      # External ACP agents — point them at our Nix-managed wrappers from
-      # pkgs.llm-agents so Zed launches the same binaries (with our skills,
-      # plugins, MCPs, etc.) that we use from the terminal.
+      # External ACP agents — point them at our Nix-managed wrappers so Zed
+      # launches the same binaries (with our skills, slash commands, plugins,
+      # MCPs, etc.) that we use from the terminal.
       #
       # claude-acp: the adapter spawns Claude Code as a subprocess, so
-      #   CLAUDE_CODE_EXECUTABLE redirects it to our wrapped claude.
+      #   CLAUDE_CODE_EXECUTABLE redirects it to the home-manager-managed
+      #   claude wrapper. That wrapper bakes in `--plugin-dir` flags for our
+      #   agent-skills plugin (skills + commands + agents); pointing at the
+      #   bare pkgs.llm-agents.claude-code binary instead would skip them.
       # gemini: the "gemini" registry agent IS @google/gemini-cli invoked with
       #   --acp, so we override it with a custom entry pointing at our wrapped
-      #   gemini binary.
+      #   gemini binary. (gemini-nix doesn't add wrapper args — it manages
+      #   ~/.gemini/ directly — so the bare binary is fine.)
       # codex-acp: statically links the codex Rust crates, so its bundled
       #   codex cannot be overridden at runtime — we just register it here.
       agent_servers = {
@@ -223,7 +232,7 @@ in
           type = "registry";
           default_mode = "plan";
           env = {
-            CLAUDE_CODE_EXECUTABLE = "${pkgs.llm-agents.claude-code}/bin/claude";
+            CLAUDE_CODE_EXECUTABLE = "${config.home.profileDirectory}/bin/claude";
           };
         };
         codex-acp = {
