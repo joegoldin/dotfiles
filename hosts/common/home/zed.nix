@@ -221,6 +221,12 @@ in
       #   claude wrapper. That wrapper bakes in `--plugin-dir` flags for our
       #   agent-skills plugin (skills + commands + agents); pointing at the
       #   bare pkgs.llm-agents.claude-code binary instead would skip them.
+      # claude-acp-work: same adapter (@agentclientprotocol/claude-agent-acp,
+      #   the npm package Zed's registry uses), but as a `custom` entry so
+      #   we get a second picker entry pointing at the claude-work wrapper
+      #   (which sets CLAUDE_CONFIG_DIR=~/.claude-work for the work account).
+      #   Custom-type instead of a second registry key because alternate
+      #   registry keys silently fall back to defaults.
       # gemini: the "gemini" registry agent IS @google/gemini-cli invoked with
       #   --acp, so we override it with a custom entry pointing at our wrapped
       #   gemini binary. (gemini-nix doesn't add wrapper args — it manages
@@ -233,6 +239,15 @@ in
           default_mode = "plan";
           env = {
             CLAUDE_CODE_EXECUTABLE = "${config.home.profileDirectory}/bin/claude";
+          };
+        };
+        claude-acp-work = {
+          type = "custom";
+          default_mode = "plan";
+          command = "${pkgs.llm-agents.claude-code-acp}/bin/claude-agent-acp";
+          args = [ ];
+          env = {
+            CLAUDE_CODE_EXECUTABLE = "${config.home.profileDirectory}/bin/claude-work";
           };
         };
         codex-acp = {
