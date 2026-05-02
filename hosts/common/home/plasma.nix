@@ -324,6 +324,11 @@
       # Behavior
       "kdeglobals"."KDE"."SingleClick" = false;
       "krunnerrc"."General"."historyBehavior" = "ImmediateCompletion";
+      # Disable KRunner plugins that freeze kickoff search:
+      # baloosearch returns DBus NotSupported (indexing disabled above),
+      # bookmarks does sync I/O on a 100MB+ Firefox SQLite cache on the UI thread.
+      "krunnerrc"."Plugins"."baloosearchEnabled" = false;
+      "krunnerrc"."Plugins"."bookmarksEnabled" = false;
       "kscreenlockerrc"."Daemon"."Timeout" = 10;
       "kwalletrc"."Wallet"."First Use" = false;
       "kwalletrc"."Wallet"."Prompt on Open" = false;
