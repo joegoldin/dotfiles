@@ -48,6 +48,8 @@ build: system-info _check-maintenance
       just _build-office-pc; \
     elif [ "{{ arch() }}" = "x86_64" ] && [ "$(hostname)" = "racknerd-cloud-agent" ]; then \
       just _build-racknerd; \
+    elif [ "{{ arch() }}" = "x86_64" ] && [ "$(hostname)" = "cloud-proxy" ]; then \
+      just _build-cloud-proxy; \
     elif [ "{{ arch() }}" = "x86_64" ]; then \
       just _build-nixos; \
     else \
@@ -94,6 +96,16 @@ _build-racknerd:
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
     nh os switch . -H racknerd-cloud-agent --accept-flake-config
     just _finish-build "racknerd-cloud-agent" "$start" $?
+
+[private]
+_build-cloud-proxy:
+    #!/usr/bin/env bash
+    echo "🔨  Building for cloud-proxy VPS 🐧..."
+    just _show-build-prediction "cloud-proxy"
+    start=$(date +%s)
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    nh os switch . -H cloud-proxy --accept-flake-config
+    just _finish-build "cloud-proxy" "$start" $?
 
 [private]
 _build-steamdeck:
@@ -199,6 +211,24 @@ deploy-racknerd IP:
     @echo "🚀  Deploying Nix config to RackNerd VPS..."
     , nixos-anywhere --flake .#racknerd-cloud-agent --build-on local joe@{{ IP }}
     @echo "✅  Deployed to RackNerd VPS!"
+
+[unix]
+deploy-cloud-proxy IP USER="ubuntu":
+    @echo "🚀  Deploying Nix config to cloud-proxy VPS..."
+    , nixos-anywhere --flake .#cloud-proxy --build-on local {{ USER }}@{{ IP }}
+    @echo "✅  Deployed to cloud-proxy VPS!"
+
+[unix]
+build-to-cloud-proxy:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "🔨  Rebuilding NixOS on cloud-proxy VPS (build locally, deploy remote)..."
+    DOMAINS="import ./secrets/domains.nix"
+    SSH_DOMAIN=$(nix eval --impure --expr "($DOMAINS).cloudProxySshDomain" --raw)
+    SSH_USER=$(nix eval --impure --expr "($DOMAINS).sshUser" --raw)
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    nixos-rebuild switch --flake .#cloud-proxy --target-host "$SSH_USER@$SSH_DOMAIN" --build-host localhost --sudo --accept-flake-config --log-format internal-json -v |& nom --json
+    echo "✅  Rebuilt cloud-proxy VPS!"
 
 [unix]
 build-to-racknerd:

@@ -432,6 +432,31 @@
           ];
         };
 
+        cloud-proxy = nixpkgs.lib.nixosSystem {
+          specialArgs = commonSpecialArgs // {
+            hostname = "cloud-proxy";
+          };
+          modules = [
+            disko.nixosModules.disko
+            nix-index-database.nixosModules.default
+            # > Our main nixos configuration <
+            ./hosts/cloud-proxy
+            home-manager.nixosModules.home-manager
+            (
+              { specialArgs, ... }:
+              {
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  extraSpecialArgs = specialArgs;
+                  backupFileExtension = "backup";
+                  users.${specialArgs.username} = import ./hosts/cloud-proxy/home-manager.nix;
+                };
+              }
+            )
+          ];
+        };
+
         racknerd-cloud-agent = nixpkgs.lib.nixosSystem {
           specialArgs = commonSpecialArgs // {
             hostname = "racknerd-cloud-agent";
