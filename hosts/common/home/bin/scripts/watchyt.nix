@@ -1,4 +1,7 @@
 { pkgs }:
+# Customized port of https://github.com/bradautomates/claude-video (MIT).
+# Drops the brew installer and bundled Whisper client in favor of audiomemo
+# and home-manager-provided binaries.
 {
   name = "watchyt";
   desc = "Download a video, extract frames, pull a timestamped transcript";
