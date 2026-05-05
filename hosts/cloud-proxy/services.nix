@@ -46,11 +46,28 @@ in
       findtime = 600;
       bantime = 3600;
     };
+    jails.jellyseerr-auth.settings = {
+      enabled = true;
+      filter = "jellyseerr-auth";
+      backend = "auto";
+      logpath = "/var/log/caddy/jellyseerr-access.log";
+      maxretry = 10;
+      findtime = 600;
+      bantime = 3600;
+    };
   };
 
   environment.etc."fail2ban/filter.d/jellyfin-auth.conf".text = ''
     [Definition]
     failregex = ^.*"client_ip":"<HOST>".*"uri":"/Users/AuthenticateByName".*"status":401.*$
+    ignoreregex =
+  '';
+
+  # Jellyseerr auth endpoints: /api/v1/auth/local (username+pw),
+  # /api/v1/auth/plex, /api/v1/auth/jellyfin. 401/403 indicates failure.
+  environment.etc."fail2ban/filter.d/jellyseerr-auth.conf".text = ''
+    [Definition]
+    failregex = ^.*"client_ip":"<HOST>".*"uri":"/api/v1/auth/(local|plex|jellyfin)".*"status":(401|403).*$
     ignoreregex =
   '';
 }
