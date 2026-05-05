@@ -20,6 +20,10 @@
     useRoutingFeatures = "client";
   };
 
+  # Tailscale MagicDNS (*.ts.net) requires systemd-resolved so tailscaled can
+  # inject 100.100.100.100 as the resolver for the ts.net domain.
+  services.resolved.enable = true;
+
   networking.firewall = {
     enable = true;
     allowedTCPPorts = [
