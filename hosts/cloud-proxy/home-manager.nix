@@ -32,6 +32,7 @@
       gnupg
       gnused
       gnutar
+      grc
       httpie
       jq
       nix-output-monitor
