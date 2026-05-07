@@ -10,6 +10,28 @@ let
   # provide a Nix-built dotnet runtime and point DOTNET_ROOT at it. dotnet-sdk_10
   # only landed in nixpkgs-unstable, so use the unstable overlay.
   dotnet = pkgs.unstable.dotnet-sdk_10;
+
+  # Out-of-tree patches fetched from upstream PRs and applied on top of the
+  # zed flake input. Each patch only touches workspace crate sources (not
+  # deps), so cargoArtifacts stays cache-valid and only the final build
+  # rebuilds. Pin to the commit hash (not the PR URL) so force-pushes can't
+  # silently change the contents — the hash check would also catch it.
+  zedPatches = [
+    # https://github.com/zed-industries/zed/pull/54727 — let users rename
+    # ACP threads locally even when the connection doesn't support
+    # set_title (e.g. resume-only agents).
+    (pkgs.fetchpatch {
+      name = "zed-pr-54727-acp-title-editable.patch";
+      url = "https://github.com/zed-industries/zed/commit/c4a633d52fd4b65e64219ef58971d409c271ca84.patch";
+      hash = "sha256-/oD/mRa193EGlIZ5sp1rExlxzguM0aiQDpwEj72UgVA=";
+    })
+  ];
+
+  zedPackage =
+    inputs.zed-editor.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs
+      (old: {
+        patches = (old.patches or [ ]) ++ zedPatches;
+      });
 in
 {
   home.packages = [ dotnet ];
@@ -22,7 +44,7 @@ in
 
   programs.zed-editor = {
     enable = true;
-    package = inputs.zed-editor.packages.${pkgs.stdenv.hostPlatform.system}.default;
+    package = zedPackage;
 
     extensions = [
       "csharp"
