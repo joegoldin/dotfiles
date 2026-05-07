@@ -254,7 +254,9 @@ in
       #   gemini binary. (gemini-nix doesn't add wrapper args — it manages
       #   ~/.gemini/ directly — so the bare binary is fine.)
       # codex-acp: statically links the codex Rust crates, so its bundled
-      #   codex cannot be overridden at runtime — we just register it here.
+      #   codex cannot be overridden at runtime. Zed's registry ships a generic
+      #   Linux binary that fails on NixOS (libcap.so.2 not found), so point at
+      #   the Nix-built codex-acp from llm-agents instead.
       agent_servers = {
         claude-acp = {
           type = "registry";
@@ -273,7 +275,10 @@ in
           };
         };
         codex-acp = {
-          type = "registry";
+          type = "custom";
+          command = "${pkgs.llm-agents.codex-acp}/bin/codex-acp";
+          args = [ ];
+          env = { };
         };
         gemini = {
           type = "custom";
