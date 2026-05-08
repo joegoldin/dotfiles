@@ -26,7 +26,7 @@
     nixos-wsl.url = "github:nix-community/NixOS-WSL/release-25.11";
     # jovian (Steam Deck)
     jovian-nixos = {
-      url = "github:Jovian-Experiments/Jovian-NixOS?rev=ca0970551a092fd69fdbb31ef3ea2dfe15f96349";
+      url = "github:Jovian-Experiments/Jovian-NixOS?rev=3251531a37b09db4b03f48fbf1bc9348ea9ac045";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -129,13 +129,13 @@
     # ── Desktop / NixOS applications ───────────────────────────────────────
     # affinity apps
     affinity-nix = {
-      url = "github:mrshmllow/affinity-nix?rev=fa753e9de7674a792f88f459f410adfaafae5e2d";
+      url = "github:mrshmllow/affinity-nix?rev=112fd1611bba38a618cec49d2db4136b4bc6bfa0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Ghostty terminal
-    ghostty.url = "github:ghostty-org/ghostty?rev=f9a9d33b3a40a95ba01cfbc0f89586567932a22b";
+    ghostty.url = "github:ghostty-org/ghostty?rev=063ac3ecc5adae6360ae2044dc54e7a68c64f3a1";
     # Zed editor (built from source via flake)
-    zed-editor.url = "github:zed-industries/zed?ref=v1.1.4-pre";
+    zed-editor.url = "github:zed-industries/zed?ref=v1.2.1-pre";
     # Zed nix extension (fork with language injection for script bodies)
     zed-nix-ext = {
       url = "github:joegoldin/nix";
@@ -151,11 +151,11 @@
     # ── Claude / LLM tooling ───────────────────────────────────────────────
     # Claude Desktop for Linux
     claude-desktop-debian = {
-      url = "github:aaddrick/claude-desktop-debian?rev=8882f0fe260b03d7b557b5b1cc2b9a5b0e34a4b6";
+      url = "github:aaddrick/claude-desktop-debian?rev=0d67646d21ee28438afeb5c983192582825ad7f2";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, gemini-cli)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=1d66aaf75078e4ebb36b67232a1502c354f962b4";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=a3e22af56365d4734d2caf34e108d18443828548";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
