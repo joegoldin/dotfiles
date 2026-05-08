@@ -18,11 +18,19 @@ let
       });
 
       # ibis-framework: duckdb import fails during pythonImportsCheck in nixpkgs
-      python313Packages = uPrev.python313Packages.overrideScope (pyFinal: pyPrev: {
-        ibis-framework = pyPrev.ibis-framework.overrideAttrs (old: {
-          doInstallCheck = false;
-          pythonImportsCheck = [ ];
-        });
+      python313Packages = uPrev.python313Packages.overrideScope (
+        pyFinal: pyPrev: {
+          ibis-framework = pyPrev.ibis-framework.overrideAttrs (old: {
+            doInstallCheck = false;
+            pythonImportsCheck = [ ];
+          });
+        }
+      );
+
+      # openldap: test017-syncreplication-refresh is timing-flaky in the sandbox
+      # (esp. on i686 multilib pulled in by unstable.lutris)
+      openldap = uPrev.openldap.overrideAttrs (old: {
+        doCheck = false;
       });
     })
   ];
