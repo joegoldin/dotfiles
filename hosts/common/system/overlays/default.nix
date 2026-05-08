@@ -60,6 +60,13 @@ in
       doCheck = false;
     });
 
+    # xdg-desktop-portal: integration/inhibit::test_monitor and integration/usb
+    # flake in the sandbox (dbus signal timing + missing USB devices) despite
+    # XDP_TEST_IN_CI=1 already filtering known flakes upstream.
+    xdg-desktop-portal = prev.xdg-desktop-portal.overrideAttrs (old: {
+      doCheck = false;
+    });
+
     # Force freerdp to use ffmpeg for H.264 instead of broken openh264
     freerdp = prev.freerdp.override { openh264 = null; };
 
