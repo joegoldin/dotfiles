@@ -11,9 +11,12 @@ let
   fonts = import ../common/system/fonts { inherit pkgs lib dotfiles-assets; };
 in
 {
-  # Cap nix builds: 12 parallel jobs, 1 thread per job, 32 GiB RAM ceiling on
-  # the nix-daemon cgroup so builds can't saturate the box.
-  nix.settings.max-jobs = 12;
+  # Cap nix builds: 16 parallel jobs, 1 thread per job. Memory is throttled at
+  # 32 GiB (MemoryHigh, soft) with a 42 GiB hard ceiling (MemoryMax) on the
+  # nix-daemon cgroup — High slows builds down via reclaim pressure rather
+  # than OOM-killing them, while Max keeps a single runaway link step from
+  # taking down the whole 64 GiB box.
+  nix.settings.max-jobs = 16;
   nix.settings.cores = lib.mkForce 1;
 
   # TODO: Add litra-autotoggle as a service to systemd
@@ -33,7 +36,10 @@ in
   systemd = {
     services = {
       dlm.wantedBy = [ "multi-user.target" ];
-      nix-daemon.serviceConfig.MemoryMax = "32G";
+      nix-daemon.serviceConfig = {
+        MemoryHigh = "32G";
+        MemoryMax = "42G";
+      };
     };
 
     # "Most software has the HIP libraries hard-coded. You can work around it on NixOS by using:"
