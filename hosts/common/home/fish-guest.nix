@@ -15,6 +15,26 @@
   config,
   ...
 }:
+let
+  # Upstream nix.fish appends ~/.nix-defexpr/channels to $NIX_PATH unconditionally,
+  # which produces a warning on every nix invocation when channels are disabled.
+  # Guard the append with `test -e` so it only fires when the path actually exists.
+  nixFishSrc = pkgs.runCommand "nix.fish-src" { } ''
+    cp -r ${
+      pkgs.fetchFromGitHub {
+        owner = "kidonng";
+        repo = "nix.fish";
+        rev = "ad57d970841ae4a24521b5b1a68121cf385ba71e";
+        sha256 = "13x3bfif906nszf4mgsqxfshnjcn6qm4qw1gv7nw89wi4cdp9i8q";
+      }
+    } $out
+    chmod -R +w $out
+    substituteInPlace $out/conf.d/nix.fish \
+      --replace-fail \
+        'contains $channels $NIX_PATH || set --global --export --append NIX_PATH $channels' \
+        'test -e $channels; and not contains $channels $NIX_PATH; and set --global --export --append NIX_PATH $channels'
+  '';
+in
 {
   imports = [ ./bin ];
 
@@ -50,12 +70,7 @@
       }
       {
         name = "nix.fish";
-        src = pkgs.fetchFromGitHub {
-          owner = "kidonng";
-          repo = "nix.fish";
-          rev = "ad57d970841ae4a24521b5b1a68121cf385ba71e";
-          sha256 = "13x3bfif906nszf4mgsqxfshnjcn6qm4qw1gv7nw89wi4cdp9i8q";
-        };
+        src = nixFishSrc;
       }
     ];
 
