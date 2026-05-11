@@ -930,6 +930,12 @@
                 age.secrets.attic-netrc = {
                   file = "${dotfiles-secrets}/attic-netrc.age";
                   mode = "0400";
+                  owner = specialArgs.username;
+                };
+                age.secrets.attic-token = {
+                  file = "${dotfiles-secrets}/attic.token.age";
+                  mode = "0400";
+                  owner = specialArgs.username;
                 };
                 age.secrets.wakapi_api_key = {
                   file = "${dotfiles-secrets}/wakapi_api_key.age";
