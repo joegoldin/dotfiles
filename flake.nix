@@ -575,6 +575,11 @@
                   file = "${dotfiles-secrets}/attic-netrc.age";
                   mode = "0400";
                 };
+                age.secrets.atuin_key = {
+                  file = "${dotfiles-secrets}/atuin_key.age";
+                  mode = "0400";
+                  owner = specialArgs.username;
+                };
               }
             )
             inputs.desk-phone.nixosModules.default
@@ -919,8 +924,9 @@
             )
             agenix.darwinModules.default
             (
-              { ... }:
+              { specialArgs, ... }:
               {
+                age.identityPaths = [ "/var/lib/agenix/identity" ];
                 age.secrets.attic-netrc = {
                   file = "${dotfiles-secrets}/attic-netrc.age";
                   mode = "0400";
@@ -928,6 +934,11 @@
                 age.secrets.wakapi_api_key = {
                   file = "${dotfiles-secrets}/wakapi_api_key.age";
                   mode = "0400";
+                };
+                age.secrets.atuin_key = {
+                  file = "${dotfiles-secrets}/atuin_key.age";
+                  mode = "0400";
+                  owner = specialArgs.username;
                 };
               }
             )
