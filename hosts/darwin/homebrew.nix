@@ -141,7 +141,6 @@
       "chatgpt"
       "chromedriver"
       "claude"
-      "codex-app"
       "crossover"
       "cryptomator"
       "daisydisk"
