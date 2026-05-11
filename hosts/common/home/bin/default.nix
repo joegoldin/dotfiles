@@ -16,11 +16,14 @@ let
       normalizeScript resolved
     ) scriptFiles
   );
-  scripts =
-    if vmGuest then builtins.filter (s: !(s.hostOnly or false)) allScripts else allScripts;
+  scripts = if vmGuest then builtins.filter (s: !(s.hostOnly or false)) allScripts else allScripts;
 
   # ── Import subcommand groups from subdirectories ───────────────────
-  subcommandDirs = builtins.filter (f: scriptDir.${f} == "directory") (builtins.attrNames scriptDir);
+  # Directories whose scripts only work on Linux (e.g. vm/* needs systemd).
+  linuxOnlyDirs = [ "vm" ];
+  subcommandDirs = builtins.filter (
+    f: scriptDir.${f} == "directory" && !(pkgs.stdenv.isDarwin && builtins.elem f linuxOnlyDirs)
+  ) (builtins.attrNames scriptDir);
   subcommandGroups = map (
     dir:
     let
@@ -65,9 +68,13 @@ let
     scriptName: flags:
     let
       # Reserved shorts from auto-added flags
-      reserved = [ "h" "v" ];
+      reserved = [
+        "h"
+        "v"
+      ];
 
-      resolve = acc: remaining:
+      resolve =
+        acc: remaining:
         if remaining == [ ] then
           acc.resolved
         else
@@ -82,17 +89,24 @@ let
             lower = lib.toLower candidate;
             upper = lib.toUpper candidate;
             chosen =
-              if !(builtins.elem candidate acc.taken) then candidate
-              else if candidate == lower && !(builtins.elem upper acc.taken) then upper
-              else if candidate == upper && !(builtins.elem lower acc.taken) then lower
-              else builtins.throw "Script '${scriptName}': short flag collision for '${f.name}' (-${candidate}), both -${lower} and -${upper} are taken";
+              if !(builtins.elem candidate acc.taken) then
+                candidate
+              else if candidate == lower && !(builtins.elem upper acc.taken) then
+                upper
+              else if candidate == upper && !(builtins.elem lower acc.taken) then
+                lower
+              else
+                builtins.throw "Script '${scriptName}': short flag collision for '${f.name}' (-${candidate}), both -${lower} and -${upper} are taken";
           in
           resolve {
             taken = acc.taken ++ [ chosen ];
             resolved = acc.resolved ++ [ (f // { short = "-${chosen}"; }) ];
           } rest;
     in
-    resolve { taken = reserved; resolved = []; } flags;
+    resolve {
+      taken = reserved;
+      resolved = [ ];
+    } flags;
 
   # Is this a bool flag?
   flagIsBool = f: f.bool or false;
@@ -135,15 +149,35 @@ let
     let
       base =
         if s ? fish then
-          s // { type = "fish"; body = s.fish; }
+          s
+          // {
+            type = "fish";
+            body = s.fish;
+          }
         else if s ? bash then
-          s // { type = "bash"; body = s.bash; }
+          s
+          // {
+            type = "bash";
+            body = s.bash;
+          }
         else if s ? python then
-          s // { type = "python"; body = s.python; }
+          s
+          // {
+            type = "python";
+            body = s.python;
+          }
         else if s ? python-argparse then
-          s // { type = "python-argparse"; body = s.python-argparse; }
+          s
+          // {
+            type = "python-argparse";
+            body = s.python-argparse;
+          }
         else if s ? function then
-          s // { type = "function"; body = s.function; }
+          s
+          // {
+            type = "function";
+            body = s.function;
+          }
         else
           s;
       name = base.name or "unknown";
@@ -192,7 +226,10 @@ let
         paramStr
       ];
     in
-    if hasParams s || hasFlags s then "${dn} ${builtins.concatStringsSep " " parts}" else s.usage or "${dn} [args...]";
+    if hasParams s || hasFlags s then
+      "${dn} ${builtins.concatStringsSep " " parts}"
+    else
+      s.usage or "${dn} [args...]";
 
   hasRequiredParams = s: hasParams s && builtins.any (p: p.required or true) s.params;
 
@@ -921,10 +958,14 @@ let
       # Build each subcommand as a standalone script with name "<parent>--<sub>"
       # Set displayName so help text shows "parent sub" instead of "parent--sub"
       subDerivations = map (
-        sub: mkBin (sub // {
-          name = "${parentName}--${sub.name}";
-          displayName = "${parentName} ${sub.name}";
-        })
+        sub:
+        mkBin (
+          sub
+          // {
+            name = "${parentName}--${sub.name}";
+            displayName = "${parentName} ${sub.name}";
+          }
+        )
       ) (builtins.filter isBin subs);
 
       # Build help lines for subcommands
@@ -985,10 +1026,11 @@ let
     builtins.concatLists (
       map (
         g:
-        [ "  echo ''" "  printf '  %-18s %s\\n' '${escSQ g.parentName}' 'subcommands:'" ]
-        ++ (map (
-          sub: "  printf '    %-16s %s\\n' '${escSQ sub.name}' '${escSQ sub.desc}'"
-        ) g.subs)
+        [
+          "  echo ''"
+          "  printf '  %-18s %s\\n' '${escSQ g.parentName}' 'subcommands:'"
+        ]
+        ++ (map (sub: "  printf '    %-16s %s\\n' '${escSQ sub.name}' '${escSQ sub.desc}'") g.subs)
       ) builtGroups
     )
   );
@@ -999,10 +1041,7 @@ let
     let
       flatEntries = map (s: "${s.name}\t${s.desc}") scripts;
       groupEntries = builtins.concatLists (
-        map (
-          g:
-          map (sub: "${g.parentName} ${sub.name}\t${sub.desc}") g.subs
-        ) builtGroups
+        map (g: map (sub: "${g.parentName} ${sub.name}\t${sub.desc}") g.subs) builtGroups
       );
     in
     builtins.concatStringsSep "\\n" (flatEntries ++ groupEntries);
@@ -1112,7 +1151,10 @@ let
     };
 
   binsCompletionCmds = builtins.concatStringsSep "\n" (
-    map (s: "complete -c bins -f -n '__fish_seen_subcommand_from help' -a '${s.name}' -d '${escFishDQ s.desc}'") scripts
+    map (
+      s:
+      "complete -c bins -f -n '__fish_seen_subcommand_from help' -a '${s.name}' -d '${escFishDQ s.desc}'"
+    ) scripts
   );
   binsCompletion = {
     "fish/completions/bins.fish".text = ''

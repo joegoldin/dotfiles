@@ -15,7 +15,6 @@ in
       torch-bin
       torchvision-bin
       transformers
-      wandb
       customPackages.mlx
     ];
 }
