@@ -18,6 +18,17 @@
       /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
     '';
 
+    # Strip the macOS quarantine attribute from the chromedriver binary installed
+    # by the homebrew cask, so Gatekeeper does not block execution.
+    activationScripts.chromedriverUnquarantine.text = ''
+      for d in /opt/homebrew/Caskroom/chromedriver /usr/local/Caskroom/chromedriver; do
+        if [ -d "$d" ]; then
+          /usr/bin/find "$d" -name chromedriver -type f \
+            -exec /usr/bin/xattr -d com.apple.quarantine {} \; 2>/dev/null || true
+        fi
+      done
+    '';
+
     primaryUser = username;
 
     defaults = {
