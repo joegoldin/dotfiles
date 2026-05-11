@@ -1,10 +1,16 @@
 {
   config,
+  lib,
   pkgs,
   inputs,
   ...
 }:
 let
+  # On Darwin, Zed comes from Homebrew (cask "zed"). We only manage settings,
+  # keymaps, and the extension list there. Nix-built Zed + Roslyn dotnet
+  # plumbing only run on Linux.
+  isLinux = pkgs.stdenv.isLinux;
+
   # Zed's csharp extension ships a Roslyn LSP binary built against .NET 10.
   # On NixOS there is no /usr/share/dotnet for the apphost to discover, so we
   # provide a Nix-built dotnet runtime and point DOTNET_ROOT at it. dotnet-sdk_10
@@ -34,17 +40,21 @@ let
       });
 in
 {
-  home.packages = [ dotnet ];
+  home.packages = lib.optionals isLinux [ dotnet ];
 
   home.sessionVariables = {
-    EDITOR = "zeditor --wait";
-    VISUAL = "zeditor --wait";
+    EDITOR = if isLinux then "zeditor --wait" else "zed --wait";
+    VISUAL = if isLinux then "zeditor --wait" else "zed --wait";
+  }
+  // lib.optionalAttrs isLinux {
     DOTNET_ROOT = "${dotnet}/share/dotnet";
   };
 
   programs.zed-editor = {
     enable = true;
-    package = zedPackage;
+    # null on Darwin → home-manager skips installing Zed but still manages
+    # settings/keymaps/extensions for the Homebrew install.
+    package = if isLinux then zedPackage else null;
 
     extensions = [
       "csharp"
@@ -288,6 +298,8 @@ in
         };
       };
 
+    }
+    // lib.optionalAttrs isLinux {
       # Roslyn LSP (from the csharp extension) needs DOTNET_ROOT to find the
       # .NET runtime — NixOS doesn't ship /usr/share/dotnet. Set it explicitly
       # at the LSP level so Zed launched from a desktop file (no shell env)
@@ -305,7 +317,11 @@ in
   };
 
   # Overlay our forked Nix extension's injections.scm for language injection
-  # (fish/bash/python syntax highlighting in script body strings)
-  xdg.dataFile."zed/extensions/installed/nix/languages/nix/injections.scm".source =
-    "${inputs.zed-nix-ext}/languages/nix/injections.scm";
+  # (fish/bash/python syntax highlighting in script body strings). Mac Zed
+  # stores extensions under ~/Library/Application Support/Zed/, not XDG, so
+  # this overlay is Linux-only.
+  xdg.dataFile = lib.optionalAttrs isLinux {
+    "zed/extensions/installed/nix/languages/nix/injections.scm".source =
+      "${inputs.zed-nix-ext}/languages/nix/injections.scm";
+  };
 }
