@@ -84,7 +84,7 @@ let
       openring
       p7zip
       pinentry-curses
-      pipenv
+      (lib.lowPrio pipenv)
       unstable.playwright-driver
       unstable.playwright-driver.browsers
       popeye
