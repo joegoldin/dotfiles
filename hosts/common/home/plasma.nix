@@ -2,6 +2,15 @@
 # Shared KDE Plasma 6 configuration for desktop machines
 { username, ... }:
 {
+  # Force Electron/Chromium apps onto native Wayland so they obey the
+  # kwinrc Wayland.EnablePrimarySelection=false setting below instead of
+  # running through XWayland (which has its own PRIMARY selection that
+  # middle-click pastes from).
+  xdg.configFile."environment.d/10-ozone-wayland.conf".text = ''
+    NIXOS_OZONE_WL=1
+    ELECTRON_OZONE_PLATFORM_HINT=auto
+  '';
+
   # ssh with 1password
   programs.ssh = {
     enable = true;
