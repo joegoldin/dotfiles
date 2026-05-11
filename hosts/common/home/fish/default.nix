@@ -92,4 +92,20 @@ in
       rm -rf "$INSTALL_DIR"
     fi
   '';
+
+  # Symlink atuin's encryption key from agenix so it stays in sync across hosts.
+  # Skips on hosts that don't manage atuin_key via agenix.
+  home.activation.linkAtuinKey = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    AGENIX_KEY=/run/agenix/atuin_key
+    TARGET="$HOME/.local/share/atuin/key"
+    if [ -e "$AGENIX_KEY" ]; then
+      mkdir -p "$(dirname "$TARGET")"
+      if [ -e "$TARGET" ] && [ ! -L "$TARGET" ]; then
+        backup="$TARGET.pre-agenix-$(date +%s)"
+        echo "Backing up existing atuin key to $backup"
+        mv "$TARGET" "$backup"
+      fi
+      ln -sfn "$AGENIX_KEY" "$TARGET"
+    fi
+  '';
 }
