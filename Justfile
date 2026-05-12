@@ -303,27 +303,44 @@ sync-submodules:
     set -euo pipefail
     echo "🔄  Syncing submodules..."
     git submodule sync --recursive
-    # First pass: push local commits and check for problems
+    # Ensure submodules are initialized (clones any new ones)
+    git submodule update --init --recursive
+    # First pass: fetch, validate state, push local-ahead commits on main
     git submodule foreach --recursive '
       git fetch origin 2>/dev/null || { echo "❌  $name: failed to fetch — aborting"; exit 1; }
-      local_ahead="$(git log --oneline @{u}..HEAD 2>/dev/null || true)"
-      remote_ahead="$(git log --oneline HEAD..@{u} 2>/dev/null || true)"
       dirty="$(git status --porcelain 2>/dev/null || true)"
       if [ -n "$dirty" ]; then
         echo "❌  $name: has uncommitted changes — aborting"
         exit 1
       fi
-      if [ -n "$local_ahead" ] && [ -n "$remote_ahead" ]; then
-        echo "❌  $name: local and remote have diverged — aborting (resolve manually)"
+      current_branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo HEAD)"
+      if [ "$current_branch" != "main" ] && [ "$current_branch" != "HEAD" ]; then
+        echo "❌  $name: on branch '\''$current_branch'\'' (expected main or detached) — aborting"
         exit 1
       fi
-      if [ -n "$local_ahead" ]; then
-        echo "  ⬆️  Pushing $name..."
-        git push || { echo "❌  $name: push failed — aborting"; exit 1; }
+      if [ "$current_branch" = "main" ]; then
+        local_ahead="$(git log --oneline origin/main..HEAD 2>/dev/null || true)"
+        remote_ahead="$(git log --oneline HEAD..origin/main 2>/dev/null || true)"
+        if [ -n "$local_ahead" ] && [ -n "$remote_ahead" ]; then
+          echo "❌  $name: main has diverged from origin/main — aborting (resolve manually)"
+          exit 1
+        fi
+        if [ -n "$local_ahead" ]; then
+          echo "  ⬆️  Pushing $name..."
+          git push origin main || { echo "❌  $name: push failed — aborting"; exit 1; }
+        fi
       fi
     '
-    # Second pass: pull remote updates
-    git submodule update --init --recursive --remote
+    # Second pass: check out main at latest origin/main for every submodule
+    git submodule foreach --recursive '
+      echo "  ⬇️  $name → origin/main"
+      if git show-ref --verify --quiet refs/heads/main; then
+        git checkout main >/dev/null 2>&1
+        git merge --ff-only origin/main
+      else
+        git checkout -B main origin/main
+      fi
+    '
     # Third pass: re-resolve transitive flake deps from path: submodules
     # (e.g. agent-skills pins codex-nix/claude-nix/gemini-nix which the
     #  outer dotfiles lock caches independently)
