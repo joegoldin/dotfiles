@@ -26,7 +26,7 @@
     nixos-wsl.url = "github:nix-community/NixOS-WSL/release-25.11";
     # jovian (Steam Deck)
     jovian-nixos = {
-      url = "github:Jovian-Experiments/Jovian-NixOS?rev=3251531a37b09db4b03f48fbf1bc9348ea9ac045";
+      url = "github:Jovian-Experiments/Jovian-NixOS?rev=6d7bfd32efacd9a06c36df65f47c875395547977";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -104,7 +104,7 @@
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.7.0";
     # pre-built nix-index database
     nix-index-database = {
-      url = "github:nix-community/nix-index-database?rev=2dea2b920e7127b3afa8506713f23536651de312";
+      url = "github:nix-community/nix-index-database?rev=01466c414c7357ae2ce32be4a272a7c69e94ab5f";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # fast x86_64-linux builds on Apple Silicon
@@ -116,7 +116,7 @@
     # ── Development tools ──────────────────────────────────────────────────
     devenv.url = "github:cachix/devenv?ref=v2.0.6";
     nixpkgs-python.url = "github:cachix/nixpkgs-python?rev=0e0fd8c0fb36b707d0f90c38b13265d366db8798";
-    git-hooks.url = "github:cachix/git-hooks.nix?rev=3cfd774b0a530725a077e17354fbdb87ea1c4aad";
+    git-hooks.url = "github:cachix/git-hooks.nix?rev=61ab0e80d9c7ab14c256b5b453d8b3fb0189ba0a";
 
     # ── ML / GPU compute ────────────────────────────────────────────────────
     # tinygrad with ROCm/CUDA support
@@ -129,13 +129,13 @@
     # ── Desktop / NixOS applications ───────────────────────────────────────
     # affinity apps
     affinity-nix = {
-      url = "github:mrshmllow/affinity-nix?rev=112fd1611bba38a618cec49d2db4136b4bc6bfa0";
+      url = "github:mrshmllow/affinity-nix?rev=f76f97513153a753718aa1423e84b4cb8ea4c185";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Ghostty terminal
-    ghostty.url = "github:ghostty-org/ghostty?rev=063ac3ecc5adae6360ae2044dc54e7a68c64f3a1";
+    ghostty.url = "github:ghostty-org/ghostty?rev=b0f8276658fbcc75318d2125d40146074a3fc505";
     # Zed editor (built from source via flake)
-    zed-editor.url = "github:zed-industries/zed?ref=v1.2.1-pre";
+    zed-editor.url = "github:zed-industries/zed?ref=v1.2.2-pre";
     # Zed nix extension (fork with language injection for script bodies)
     zed-nix-ext = {
       url = "github:joegoldin/nix";
@@ -151,11 +151,11 @@
     # ── Claude / LLM tooling ───────────────────────────────────────────────
     # Claude Desktop for Linux
     claude-desktop-debian = {
-      url = "github:aaddrick/claude-desktop-debian?rev=0d67646d21ee28438afeb5c983192582825ad7f2";
+      url = "github:aaddrick/claude-desktop-debian?rev=fa8f3441c0ea1146f2abbdbf5d39222ef5102a9e";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, gemini-cli)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=a3e22af56365d4734d2caf34e108d18443828548";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=140f3839f0cb215d8429af8e5cce6f4b0cd84269";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
@@ -169,9 +169,9 @@
     };
 
     # ── Homebrew (macOS) ───────────────────────────────────────────────────
-    nix-homebrew.url = "github:zhaofengli/nix-homebrew?rev=aeb2069920742d0d6570089e8b3b8620050bacf2";
+    nix-homebrew.url = "github:zhaofengli/nix-homebrew?rev=7d0038b5bb60568ec41f5f4ef5067cd221ca7c0d";
     brew-nix = {
-      url = "github:BatteredBunny/brew-nix?rev=0457cb099ee50ce2587060acfaccf7362542e93a";
+      url = "github:BatteredBunny/brew-nix?rev=7cae52ef844b23c85a04d08e6033b30510459dc0";
       inputs.brew-api.follows = "brew-api";
     };
     brew-api = {

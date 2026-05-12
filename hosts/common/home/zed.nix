@@ -278,7 +278,7 @@ in
         claude-acp-work = {
           type = "custom";
           default_mode = "plan";
-          command = "${pkgs.llm-agents.claude-code-acp}/bin/claude-agent-acp";
+          command = "${pkgs.llm-agents.claude-agent-acp}/bin/claude-agent-acp";
           args = [ ];
           env = {
             CLAUDE_CODE_EXECUTABLE = "${config.home.profileDirectory}/bin/claude-work";
