@@ -325,7 +325,9 @@
       formatter = eachSystem (system: inputs.nixpkgs-unstable.legacyPackages.${system}.nixfmt-tree);
 
       # Your custom packages and modifications, exported as overlays
-      overlays = builtins.removeAttrs (import ./hosts/common/system/overlays { inherit inputs; }) [ "unstableOverlays" ];
+      overlays = builtins.removeAttrs (import ./hosts/common/system/overlays { inherit inputs; }) [
+        "unstableOverlays"
+      ];
 
       checks = eachSystem (system: {
         pre-commit-check = git-hooks.lib.${system}.run {
@@ -956,6 +958,26 @@
               # onDemand: VM starts only when needed and powers off when idle
               nix-rosetta-builder.enable = true;
               nix-rosetta-builder.onDemand = true;
+              # Debug instrumentation so we can diagnose why sshd in the NixOS
+              # guest stops starting after some time:
+              #   - console=hvc0 routes kernel/systemd output to the virtio
+              #     console that lima captures in serialv.log (default config
+              #     only sets console=tty0, leaving boot output invisible).
+              #   - Autologin + passwordless sudo on the serial getty so we
+              #     can poke at the live VM via lima's serial console next
+              #     time sshd fails.
+              nix-rosetta-builder.potentiallyInsecureExtraNixosModule = {
+                boot.kernelParams = [
+                  "console=hvc0,115200"
+                  "console=tty0"
+                ];
+                services.getty.autologinUser = "builder";
+                security.sudo = {
+                  enable = true;
+                  wheelNeedsPassword = false;
+                };
+                users.users.builder.extraGroups = [ "wheel" ];
+              };
             }
           ];
         };
