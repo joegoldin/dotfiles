@@ -966,6 +966,9 @@
               #   - Autologin + passwordless sudo on the serial getty so we
               #     can poke at the live VM via lima's serial console next
               #     time sshd fails.
+              # mkForce overrides package.nix's `security.sudo.enable = debugInsecurely`
+              # (false by default), which would otherwise conflict. The option is
+              # types.attrs upstream so it must be a plain attrs (not a function).
               nix-rosetta-builder.potentiallyInsecureExtraNixosModule = {
                 boot.kernelParams = [
                   "console=hvc0,115200"
@@ -973,8 +976,8 @@
                 ];
                 services.getty.autologinUser = "builder";
                 security.sudo = {
-                  enable = true;
-                  wheelNeedsPassword = false;
+                  enable = nixpkgs.lib.mkForce true;
+                  wheelNeedsPassword = nixpkgs.lib.mkForce false;
                 };
                 users.users.builder.extraGroups = [ "wheel" ];
               };
