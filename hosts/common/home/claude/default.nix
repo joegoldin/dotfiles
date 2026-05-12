@@ -14,5 +14,6 @@ in
     package = pkgs.llm-agents.claude-code;
     plugins = [ wakatimePlugin ];
     extraAccounts = [ "work" ];
+    settings.skillListingBudgetFraction = 0.04;
   };
 }
