@@ -20,7 +20,7 @@ let
       # audiomemo is managed by programs.audiomemo
       aria2 # A lightweight multi-protocol & multi-source command-line download utility
       attic-client
-      unstable.asciinema_3
+      unstable.asciinema
       aws-cli
       bc
       bfg-repo-cleaner
