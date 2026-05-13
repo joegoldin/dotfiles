@@ -139,19 +139,11 @@ in
   config.programs = {
     audiomemo = {
       enable = true;
+      # Host-specific device settings live in hosts/darwin/packages.nix and
+      # hosts/nixos/packages.nix; home-manager deep-merges them with these.
       settings = {
         onboard_version = 1;
-        record.device = "mic";
-        devices = {
-          mic = "alsa_input.usb-MOTU_M2_M20000044767-00.HiFi__Mic1__source";
-          speakers = "alsa_output.usb-MOTU_M2_M20000044767-00.HiFi__Line1__sink.monitor";
-        };
-        device_groups = {
-          combo = [
-            "mic"
-            "speakers"
-          ];
-        };
+        record.output_dir = "~/Recordings";
         transcribe = {
           default_backend = "elevenlabs";
           elevenlabs = {
