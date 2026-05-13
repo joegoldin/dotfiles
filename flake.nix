@@ -948,6 +948,16 @@
                   mode = "0400";
                   owner = specialArgs.username;
                 };
+                age.secrets.deepgram_api_key = {
+                  file = "${dotfiles-secrets}/deepgram_api_key.age";
+                  mode = "0400";
+                  owner = specialArgs.username;
+                };
+                age.secrets.elevenlabs_api_key = {
+                  file = "${dotfiles-secrets}/elevenlabs_api_key.age";
+                  mode = "0400";
+                  owner = specialArgs.username;
+                };
               }
             )
             {
