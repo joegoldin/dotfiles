@@ -67,6 +67,16 @@ in
       doCheck = false;
     });
 
+    # pipenv 2025.0.4 ships its sphinx docs/ (with conf.py) and benchmarks/
+    # trees into site-packages, colliding with other Python envs in
+    # home-manager-path's buildEnv merge.
+    pipenv = prev.pipenv.overrideAttrs (old: {
+      postFixup = (old.postFixup or "") + ''
+        rm -rf "$out"/lib/python*/site-packages/docs
+        rm -rf "$out"/lib/python*/site-packages/benchmarks
+      '';
+    });
+
     # Force freerdp to use ffmpeg for H.264 instead of broken openh264
     freerdp = prev.freerdp.override { openh264 = null; };
 
