@@ -40,7 +40,6 @@ let
       pkgs
       lib
       pythonBase
-      unstable
       ;
   };
 
@@ -62,6 +61,14 @@ let
       flake8
       flask
       isort
+      llm
+      llm-anthropic
+      llm-cmd
+      llm-deepseek
+      llm-gemini
+      llm-grok
+      llm-ollama
+      llm-perplexity
       lxml
       msgpack
       numpy
@@ -101,15 +108,6 @@ let
       # Custom packages from PyPI
       customPackages.deepgram-sdk
       customPackages.fal-client
-      # customPackages.llm
-      # customPackages.llm-anthropic
-      # customPackages.llm-cmd
-      # customPackages.llm-cmd-comp
-      # customPackages.llm-deepseek
-      # customPackages.llm-gemini
-      # customPackages.llm-grok
-      # customPackages.llm-ollama
-      # customPackages.llm-perplexity
       customPackages.lmstudio
       customPackages.modal
       customPackages.scrapy-playwright
