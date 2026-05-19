@@ -67,7 +67,6 @@ let
       llm-deepseek
       llm-gemini
       llm-grok
-      llm-ollama
       llm-perplexity
       lxml
       msgpack
