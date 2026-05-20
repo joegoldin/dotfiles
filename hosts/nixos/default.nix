@@ -12,7 +12,7 @@
     ./configuration.nix
     ./hardware-configuration.nix
     ../common/system/drag-shift.nix
-    ./double-tap-overview.nix
+    ./overview-hotkey.nix
     ../common/system/app-autostart.nix
     ../common/system/gaming.nix
     ./joe-desktop.nix
