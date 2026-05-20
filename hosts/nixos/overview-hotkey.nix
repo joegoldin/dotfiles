@@ -1,5 +1,5 @@
-# Double-tap F6 or double-click middle mouse to trigger KDE Overview (mission control).
-# Monitors keyboard/mouse input via evdev; fires Overview on two presses within 300ms.
+# Press mouse forward + back within a short window to trigger KDE Overview.
+# Passive evdev monitor; apps still receive the button events normally.
 {
   pkgs,
   username,
@@ -9,17 +9,18 @@ let
   python = pkgs.python3.withPackages (ps: [ ps.evdev ]);
   qdbus = "${pkgs.kdePackages.qttools}/bin/qdbus";
 
-  double-tap-overview = pkgs.writeScriptBin "double-tap-overview" ''
+  overview-hotkey = pkgs.writeScriptBin "overview-hotkey" ''
     #!${python}/bin/python3
     import asyncio
-    import os
     import subprocess
     import time
     import evdev
     from evdev import ecodes
 
-    TRIGGER_KEYS = {ecodes.KEY_F6, ecodes.BTN_MIDDLE}
-    DOUBLE_TAP_WINDOW = 0.25  # seconds
+    CHORD_WINDOW = 0.10  # seconds
+    BACK_BUTTON = ecodes.BTN_SIDE
+    FORWARD_BUTTON = ecodes.BTN_EXTRA
+    CHORD_BUTTONS = {BACK_BUTTON, FORWARD_BUTTON}
     QDBUS = "${qdbus}"
 
     def find_devices():
@@ -28,8 +29,8 @@ let
             dev = evdev.InputDevice(path)
             caps = dev.capabilities(verbose=False)
             if ecodes.EV_KEY in caps:
-                keys = caps[ecodes.EV_KEY]
-                if TRIGGER_KEYS & set(keys):
+                keys = set(caps[ecodes.EV_KEY])
+                if BACK_BUTTON in keys and FORWARD_BUTTON in keys:
                     devices.append(dev)
         return devices
 
@@ -49,29 +50,31 @@ let
     async def monitor_device(dev, state):
         try:
             async for event in dev.async_read_loop():
-                if event.type != ecodes.EV_KEY or event.code not in TRIGGER_KEYS:
+                if event.type != ecodes.EV_KEY or event.code not in CHORD_BUTTONS:
                     continue
-                # Only act on key-down (value 1), ignore repeat (2) and release (0)
+                # Only act on key-down (value 1); ignore repeat (2) and release (0)
                 if event.value != 1:
                     continue
                 now = time.monotonic()
-                if now - state["last_press"] <= DOUBLE_TAP_WINDOW:
+                other = FORWARD_BUTTON if event.code == BACK_BUTTON else BACK_BUTTON
+                if now - state[other] <= CHORD_WINDOW:
                     trigger_overview()
-                    state["last_press"] = 0  # reset so triple-tap doesn't re-fire
+                    state[BACK_BUTTON] = 0
+                    state[FORWARD_BUTTON] = 0
                 else:
-                    state["last_press"] = now
+                    state[event.code] = now
         except OSError:
             pass
 
     async def main():
         devices = find_devices()
         if not devices:
-            print("No devices with F6 or middle mouse button found")
+            print("No devices with mouse forward+back buttons found")
             return
 
-        state = {"last_press": 0}
+        state = {BACK_BUTTON: 0, FORWARD_BUTTON: 0}
 
-        print(f"Monitoring {len(devices)} device(s) for double-tap F6 / middle-click:")
+        print(f"Monitoring {len(devices)} device(s) for forward+back chord:")
         for dev in devices:
             print(f"  {dev.name} ({dev.path})")
 
@@ -82,15 +85,15 @@ let
   '';
 in
 {
-  systemd.services."double-tap-overview" = {
-    description = "Double-tap F6 or middle-click to trigger KDE Overview";
+  systemd.services."overview-hotkey" = {
+    description = "Mouse forward+back chord to trigger KDE Overview";
     wantedBy = [ "multi-user.target" ];
     after = [ "systemd-udevd.service" ];
     serviceConfig = {
       Type = "simple";
       User = username;
       Environment = "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus";
-      ExecStart = "${double-tap-overview}/bin/double-tap-overview";
+      ExecStart = "${overview-hotkey}/bin/overview-hotkey";
       Restart = "on-failure";
       RestartSec = 5;
     };
