@@ -239,7 +239,7 @@ build-to-racknerd:
     SSH_DOMAIN=$(nix eval --impure --expr "($DOMAINS).racknerdSshDomain" --raw)
     SSH_USER=$(nix eval --impure --expr "($DOMAINS).sshUser" --raw)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nixos-rebuild switch --flake .#racknerd-cloud-agent --target-host "$SSH_USER@$SSH_DOMAIN" --build-host localhost --sudo --accept-flake-config --log-format internal-json -v |& nom --json
+    nixos-rebuild switch --flake .#racknerd-cloud-agent --target-host "$SSH_USER@$SSH_DOMAIN" --build-host localhost --sudo --accept-flake-config --fallback --log-format internal-json -v |& nom --json
     echo "✅  Rebuilt RackNerd VPS!"
 
 [unix]
