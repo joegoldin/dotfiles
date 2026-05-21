@@ -118,6 +118,9 @@ in
   # claude-container (claude-code wrapper in docker container with sandboxing)
   claude-container-packages = inputs.claude-container.overlays.default;
 
+  # affinity-nix (Affinity Photo/Designer/Publisher via wine)
+  affinity-packages = inputs.affinity-nix.overlays.default;
+
   # MCP server packages for declarative MCP configuration
   # The upstream overlay only exports github-mcp-server; we also need mcp-language-server
   # Inlined upstream overlay to avoid deprecated pkgs.system access in mcps.overlays.default
