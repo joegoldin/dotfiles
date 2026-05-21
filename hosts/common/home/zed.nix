@@ -239,10 +239,6 @@ in
       #   (which sets CLAUDE_CONFIG_DIR=~/.claude-work for the work account).
       #   Custom-type instead of a second registry key because alternate
       #   registry keys silently fall back to defaults.
-      # gemini: the "gemini" registry agent IS @google/gemini-cli invoked with
-      #   --acp, so we override it with a custom entry pointing at our wrapped
-      #   gemini binary. (gemini-nix doesn't add wrapper args — it manages
-      #   ~/.gemini/ directly — so the bare binary is fine.)
       # codex-acp: statically links the codex Rust crates, so its bundled
       #   codex cannot be overridden at runtime. Zed's registry ships a generic
       #   Linux binary that fails on NixOS (libcap.so.2 not found), so point at
@@ -268,12 +264,6 @@ in
           type = "custom";
           command = "${pkgs.llm-agents.codex-acp}/bin/codex-acp";
           args = [ ];
-          env = { };
-        };
-        gemini = {
-          type = "custom";
-          command = "${pkgs.llm-agents.gemini-cli}/bin/gemini";
-          args = [ "--acp" ];
           env = { };
         };
       };
