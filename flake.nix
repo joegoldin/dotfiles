@@ -154,15 +154,15 @@
       url = "github:aaddrick/claude-desktop-debian?rev=b676519c58d907bfcd5b41b9a5c1436a4c895cd7";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # LLM agent tools (claude-code, codex, gemini-cli)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=3d13276b288556bd2604447f87c3077793aa5f7e";
+    # LLM agent tools (claude-code, codex, antigravity)
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=66a4006b59c40563fd296df6478c4137c8625ae3";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
-    # Agent skills + re-exported claude-nix, gemini-nix, codex-nix modules
+    # Agent skills + re-exported claude-nix, antigravity-cli-nix, codex-nix modules
     agent-skills = {
       url = "path:./agent-skills";
       inputs.nixpkgs.follows = "nixpkgs";

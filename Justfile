@@ -342,7 +342,7 @@ sync-submodules:
       fi
     '
     # Third pass: re-resolve transitive flake deps from path: submodules
-    # (e.g. agent-skills pins codex-nix/claude-nix/gemini-nix which the
+    # (e.g. agent-skills pins codex-nix/claude-nix/antigravity-cli-nix which the
     #  outer dotfiles lock caches independently)
     echo "🔒  Re-locking transitive flake deps from submodules..."
     git submodule foreach --quiet 'echo "$name"' | while read -r sub; do
