@@ -70,6 +70,8 @@ pkgs: {
 
   mkWindowsApp = pkgs.callPackage ./mkwindowsapp { };
 
+  rmux = pkgs.callPackage ./rmux.nix { };
+
   shopt-script = pkgs.writeShellScriptBin "shopt" ''
     args="";
     for item in "$@"; do
