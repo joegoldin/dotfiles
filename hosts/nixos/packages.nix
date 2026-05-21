@@ -1,7 +1,6 @@
 {
   pkgs,
   lib,
-  affinity-nix,
   ...
 }:
 let
@@ -14,7 +13,7 @@ in
   home.packages =
     with pkgs;
     lib.optionals pkgs.stdenv.hostPlatform.isx86_64 [
-      affinity-nix.packages.x86_64-linux.v3
+      affinity-v3
       unstable.calcurse
       cameractrls-gtk3
       chromedriver
