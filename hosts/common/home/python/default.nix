@@ -6,33 +6,13 @@
   ...
 }:
 let
-  pythonBase = unstable.python3.override {
-    packageOverrides = pyFinal: pyPrev: {
-      # plotly: tests fail with pytest 9.x due to deprecated py.path.local API
-      plotly = pyPrev.plotly.overrideAttrs (old: {
-        doInstallCheck = false;
-      });
-
-      # ibis-framework: duckdb import fails during build (missing duckdb module)
-      ibis-framework = pyPrev.ibis-framework.overrideAttrs (old: {
-        doInstallCheck = false;
-        pythonImportsCheck = [ ];
-      });
-
-      # wandb: test_printer_asyncio spinner tests are flaky in the sandbox
-      wandb = pyPrev.wandb.overrideAttrs (old: {
-        disabledTestPaths = (old.disabledTestPaths or [ ]) ++ [
-          "tests/unit_tests/test_lib/test_printer_asyncio.py"
-        ];
-      });
-
-      # torch-bin: wheel requires fsspec but nixpkgs doesn't include it
-      torch-bin = pyPrev.torch-bin.overridePythonAttrs (old: {
-        dependencies = (old.dependencies or [ ]) ++ [ pyFinal.fsspec ];
-      });
-
-    };
-  };
+  # Use unstable.python3 directly — do NOT override packageOverrides here.
+  # That pattern re-derives the entire python3 package set identity and
+  # cascades a rebuild across every consumer in the closure (and forfeits
+  # cache.nixos.org / attic substitutes). Leaf overrides needed by the env
+  # are applied inside `pythonBase.withPackages` below, scoped to this env
+  # only — they don't leak into `unstable.python3Packages` at large.
+  pythonBase = unstable.python3;
 
   # Import custom package definitions
   customPackages = import ./custom-pypi-packages.nix {
@@ -98,11 +78,34 @@ let
       ]
     );
 
-  # Final Python environment with all packages
+  # Final Python environment.
+  #
+  # Leaf overrides are applied here, inside `withPackages`, instead of via
+  # `python3.override { packageOverrides = ... }` at the top of this file —
+  # that would change the identity of the whole python3 package set and
+  # cascade a rebuild across every transitive consumer. By patching only the
+  # specific packages this env consumes (wandb, torch-bin) and threading the
+  # patched set into `extraPackages`, the rest of `pythonBase.pkgs` stays at
+  # its upstream hashes and substitutes cleanly.
   pythonWithPackages = pythonBase.withPackages (
     ps:
+    let
+      psPatched = ps // {
+        # wandb: test_printer_asyncio spinner tests are flaky in the sandbox
+        wandb = ps.wandb.overrideAttrs (old: {
+          disabledTestPaths = (old.disabledTestPaths or [ ]) ++ [
+            "tests/unit_tests/test_lib/test_printer_asyncio.py"
+          ];
+        });
+
+        # torch-bin: wheel requires fsspec but nixpkgs doesn't include it
+        torch-bin = ps.torch-bin.overridePythonAttrs (old: {
+          dependencies = (old.dependencies or [ ]) ++ [ ps.fsspec ];
+        });
+      };
+    in
     nixPythonPackages
-    ++ (extraPackages pythonBase.pkgs)
+    ++ (extraPackages psPatched)
     ++ [
       # Custom packages from PyPI
       customPackages.deepgram-sdk

@@ -67,7 +67,7 @@ in
       })
       mpv
       nvtopPackages.amd
-      unstable.vllm
+      unstable.vllm-rocm
       wl-clipboard
       xclip
       unstable.zoom-us

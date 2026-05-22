@@ -1,8 +1,20 @@
 # vLLM ROCm build fixes overlay
-# Patches vllm and xgrammar to build with ROCm support in the Nix sandbox
+#
+# Exposes a top-level `vllm-rocm` Python application (alongside upstream
+# `vllm`). We deliberately do NOT override `python3` or `python3Packages` —
+# overriding the package set re-derives its identity, which cascades a rebuild
+# across every python package in the closure (torch, transformers, datasets,
+# everything that consumes `python3Packages`). Patching vllm and xgrammar as
+# isolated leaves keeps `unstable.python3Packages.*` at upstream hashes so
+# attic / cache.nixos.org substitutes keep hitting.
+#
+# rocmSupport for torch etc. continues to come from
+# `nixpkgs.config.rocmSupport = true` in flake.nix — that is independent of
+# this overlay.
 final: prev:
 let
   inherit (final) lib;
+  py = prev.python3Packages;
 
   tritonKernelsSrc = final.fetchFromGitHub {
     owner = "triton-lang";
@@ -21,19 +33,23 @@ let
       hipcub
     ];
   };
-in
-{
-  python3 = prev.python3.override {
-    packageOverrides = pyFinal: pyPrev: {
-      # xgrammar: test_structural_tag_converter needs HuggingFace network access
-      xgrammar = pyPrev.xgrammar.overrideAttrs (old: {
-        disabledTestPaths = (old.disabledTestPaths or [ ]) ++ [
-          "tests/python/test_structural_tag_converter.py"
-        ];
-      });
 
-      # vllm: set ROCM_PATH, add ROCm build deps, thrust includes, and pre-fetch triton kernels
-      vllm = pyPrev.vllm.overrideAttrs (old: {
+  # xgrammar: test_structural_tag_converter needs HuggingFace network access.
+  # Isolated override — not added to python3Packages, so the upstream xgrammar
+  # still exists at its cached hash for anything else that might consume it.
+  xgrammar' = py.xgrammar.overrideAttrs (old: {
+    disabledTestPaths = (old.disabledTestPaths or [ ]) ++ [
+      "tests/python/test_structural_tag_converter.py"
+    ];
+  });
+
+  # vllm: pin our patched xgrammar as input, add ROCm build deps, thrust
+  # includes, and pre-fetched triton kernels.
+  vllm' =
+    (py.vllm.override {
+      xgrammar = xgrammar';
+    }).overrideAttrs
+      (old: {
         buildInputs =
           (old.buildInputs or [ ])
           ++ (with final.rocmPackages; [
@@ -60,9 +76,7 @@ in
         # tensorizer, runai-model-streamer, conch-triton-kernels not in nixpkgs
         dontCheckRuntimeDeps = true;
       });
-    };
-  };
-  python3Packages = final.python3.pkgs;
-
-  vllm = with final.python3Packages; toPythonApplication vllm;
+in
+{
+  vllm-rocm = py.toPythonApplication vllm';
 }
