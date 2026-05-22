@@ -70,6 +70,10 @@ pkgs: {
 
   mkWindowsApp = pkgs.callPackage ./mkwindowsapp { };
 
+  plasma-applet-claude-usage = pkgs.callPackage ./plasma-applet-claude-usage.nix { };
+  plasma-applet-netspeed = pkgs.callPackage ./plasma-applet-netspeed.nix { };
+  plasma-applet-resources-monitor = pkgs.callPackage ./plasma-applet-resources-monitor.nix { };
+
   rmux = pkgs.callPackage ./rmux.nix { };
 
   shopt-script = pkgs.writeShellScriptBin "shopt" ''

@@ -1,7 +1,20 @@
 # hosts/common/home/plasma.nix
 # Shared KDE Plasma 6 configuration for desktop machines
-{ username, ... }:
 {
+  username,
+  pkgs,
+  ...
+}:
+{
+  # Third-party plasmoids. plasmashell picks these up from XDG_DATA_DIRS
+  # (home-manager adds the user profile), so they show up in the
+  # "Add Widgets" picker without any imperative kpackagetool6 install.
+  home.packages = [
+    pkgs.plasma-applet-claude-usage
+    pkgs.plasma-applet-netspeed
+    pkgs.plasma-applet-resources-monitor
+  ];
+
   # Force Electron/Chromium apps onto native Wayland so they obey the
   # kwinrc Wayland.EnablePrimarySelection=false setting below instead of
   # running through XWayland (which has its own PRIMARY selection that
