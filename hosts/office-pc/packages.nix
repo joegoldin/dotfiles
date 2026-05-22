@@ -29,7 +29,7 @@ in
       unstable.cloudflared
       unstable.tailscale
       unstable.umu-launcher
-      unstable.vllm
+      unstable.vllm-rocm
       wl-clipboard
       xclip
     ];
