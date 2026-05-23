@@ -19,9 +19,9 @@
     inputs.audiomemo.homeManagerModules.default
     inputs.nix-attic-infra.homeManagerModules.attic-client
 
-    # Agent skills: re-exported home-manager modules for Claude, Gemini, Codex
+    # Agent skills: re-exported home-manager modules for Claude, Antigravity, Codex
     inputs.agent-skills.homeManagerModules.claude
-    inputs.agent-skills.homeManagerModules.gemini
+    inputs.agent-skills.homeManagerModules.antigravity
     inputs.agent-skills.homeManagerModules.codex
     inputs.agent-skills.homeManagerModules.agent-skills
 
@@ -35,7 +35,7 @@
     ./gpg.nix
     ./starship.nix
     ./claude
-    ./gemini
+    ./antigravity
     ./codex
     ./notify.nix
     ./wakatime.nix
