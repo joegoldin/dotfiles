@@ -965,17 +965,15 @@
               # nix.linux-builder.enable = true;
 
               # Rosetta-based builder: faster x86_64-linux builds using Rosetta 2
-              # onDemand: VM starts only when needed and powers off when idle
+              # onDemand: VM starts only when needed and powers off when idle.
+              # Backed by the lima 2.x-compatible socat+nc wrapper in
+              # joegoldin/nix-rosetta-builder commit 7612c88.
               nix-rosetta-builder.enable = true;
               nix-rosetta-builder.onDemand = true;
-              # Debug instrumentation so we can diagnose why sshd in the NixOS
-              # guest stops starting after some time:
-              #   - console=hvc0 routes kernel/systemd output to the virtio
-              #     console that lima captures in serialv.log (default config
-              #     only sets console=tty0, leaving boot output invisible).
-              #   - Autologin + passwordless sudo on the serial getty so we
-              #     can poke at the live VM via lima's serial console next
-              #     time sshd fails.
+              # Debug instrumentation kept on after the lima 2.x tag fix so the
+              # next failure, if any, leaves kernel/systemd boot output in
+              # /private/var/lib/rosetta-builder/.lima/rosetta-builder-vm/serialv.log
+              # and a usable shell at the serial console.
               # mkForce overrides package.nix's `security.sudo.enable = debugInsecurely`
               # (false by default), which would otherwise conflict. The option is
               # types.attrs upstream so it must be a plain attrs (not a function).
