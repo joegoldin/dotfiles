@@ -13,6 +13,7 @@
 {
   imports = [
     ../common/system/attic.nix
+    ../common/system/numtide-cache.nix
     ./system.nix
     ./apps.nix
     ./homebrew.nix

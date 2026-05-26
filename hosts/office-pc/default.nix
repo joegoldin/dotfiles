@@ -3,6 +3,7 @@
 {
   imports = [
     ../common/system/attic.nix
+    ../common/system/numtide-cache.nix
     ../common/system/attic-post-build-hook.nix
     ../common/system/app-autostart.nix
     ../common/system/gaming.nix

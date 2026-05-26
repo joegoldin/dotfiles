@@ -3,6 +3,7 @@
 {
   imports = [
     ../common/system/attic.nix
+    ../common/system/numtide-cache.nix
     ./configuration.nix
     ./disk-config.nix
     ./hardware-configuration.nix
