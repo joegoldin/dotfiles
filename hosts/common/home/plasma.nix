@@ -3,6 +3,7 @@
 {
   username,
   pkgs,
+  lib,
   ...
 }:
 {
@@ -22,6 +23,18 @@
   xdg.configFile."environment.d/10-ozone-wayland.conf".text = ''
     NIXOS_OZONE_WL=1
     ELECTRON_OZONE_PLATFORM_HINT=auto
+  '';
+
+  # GTK middle-click paste (gtk-enable-primary-paste) defaults to true and is
+  # read from ~/.config/gtk-{3,4}.0/settings.ini, which kde-gtk-config owns.
+  # Append the key if missing rather than taking ownership of the file, so
+  # KDE can still update theme/font/cursor entries through systemsettings.
+  home.activation.gtkDisablePrimaryPaste = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    for f in "$HOME/.config/gtk-3.0/settings.ini" "$HOME/.config/gtk-4.0/settings.ini"; do
+      if [ -f "$f" ] && ! grep -q "^gtk-enable-primary-paste" "$f"; then
+        sed -i 's/^\[Settings\]$/[Settings]\ngtk-enable-primary-paste=false/' "$f"
+      fi
+    done
   '';
 
   # ssh with 1password

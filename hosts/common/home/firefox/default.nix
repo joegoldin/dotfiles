@@ -326,6 +326,10 @@ in
         # Required for userChrome.css to load
         "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
 
+        # Disable middle-click paste from PRIMARY selection. Firefox has its
+        # own pref independent of GTK's gtk-enable-primary-paste.
+        "middlemouse.paste" = false;
+
         # Startup with previous session
         "browser.startup.page" = 3;
 
