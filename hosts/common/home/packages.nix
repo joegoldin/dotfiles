@@ -93,7 +93,6 @@ let
       pv
       pythonModule.packages
       ripgrep # recursively searches directories for a regex pattern
-      rmux
       # rustup
       socat # replacement of openbsd-netcat
       spritesModule.packages.sprite
