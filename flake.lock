@@ -495,11 +495,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777311415,
-        "narHash": "sha256-PY2qH0zILOz9Ne4DrKG0xZbkQ1S63wNy+QlscjuznaM=",
+        "lastModified": 1779820514,
+        "narHash": "sha256-oMUSUn7CyeVezBF+Ka0pm5Hw4y/oF6qWBtRhdPRQzfY=",
         "owner": "joegoldin",
         "repo": "claude-nix",
-        "rev": "14f5d6992038420c8140e4ee4953fa852fffe8dc",
+        "rev": "a13e8139ee7768433294fc475cfc766b2a99809f",
         "type": "github"
       },
       "original": {
@@ -2761,11 +2761,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779574913,
-        "narHash": "sha256-IHd4ocQAPtFmbQsGEZ3SC08LEQJ4V3W809U07qqUufU=",
+        "lastModified": 1779821956,
+        "narHash": "sha256-erjInjoE/aFSJz3H1lBHiE4vrw8HBvrmboYlK70E+uM=",
         "owner": "joegoldin",
         "repo": "nix-rosetta-builder",
-        "rev": "3cbe9f8c69b1a0415f19467ff02643da67053763",
+        "rev": "6a3290535ef66516e9c27ab016b1c5398c67c200",
         "type": "github"
       },
       "original": {
