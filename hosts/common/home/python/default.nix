@@ -84,9 +84,14 @@ let
   # `python3.override { packageOverrides = ... }` at the top of this file —
   # that would change the identity of the whole python3 package set and
   # cascade a rebuild across every transitive consumer. By patching only the
-  # specific packages this env consumes (wandb, torch-bin) and threading the
-  # patched set into `extraPackages`, the rest of `pythonBase.pkgs` stays at
-  # its upstream hashes and substitutes cleanly.
+  # specific packages this env consumes (wandb) and threading the patched set
+  # into `extraPackages`, the rest of `pythonBase.pkgs` stays at its upstream
+  # hashes and substitutes cleanly.
+  #
+  # Only patch leaves that nothing else in the env depends on transitively —
+  # otherwise the patched derivation and the unpatched one (pulled in via
+  # another package's propagatedBuildInputs) both land in buildEnv and collide
+  # on overlapping output paths.
   pythonWithPackages = pythonBase.withPackages (
     ps:
     let
@@ -96,11 +101,6 @@ let
           disabledTestPaths = (old.disabledTestPaths or [ ]) ++ [
             "tests/unit_tests/test_lib/test_printer_asyncio.py"
           ];
-        });
-
-        # torch-bin: wheel requires fsspec but nixpkgs doesn't include it
-        torch-bin = ps.torch-bin.overridePythonAttrs (old: {
-          dependencies = (old.dependencies or [ ]) ++ [ ps.fsspec ];
         });
       };
     in

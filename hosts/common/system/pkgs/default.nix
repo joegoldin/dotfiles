@@ -74,8 +74,6 @@ pkgs: {
   plasma-applet-netspeed = pkgs.callPackage ./plasma-applet-netspeed.nix { };
   plasma-applet-resources-monitor = pkgs.callPackage ./plasma-applet-resources-monitor.nix { };
 
-  rmux = pkgs.callPackage ./rmux.nix { };
-
   shopt-script = pkgs.writeShellScriptBin "shopt" ''
     args="";
     for item in "$@"; do
