@@ -262,12 +262,26 @@ build-to-bastion local="":
 
 [unix]
 update-pins dry_run='':
-    @echo "🔄  Updating pinned flake inputs..."
-    @export GH_TOKEN="$(gh auth token 2>/dev/null || echo '')"; \
-     {{ if dry_run == "--dry-run" { "DRY_RUN=true" } else { "" } }} scripts/update-flake-pins.sh
-    @{{ if dry_run == "--dry-run" { "true" } else { "just _record-history update-pins" } }}
-    @echo "✅  Pins updated!"
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "🔄  Updating pinned flake inputs..."
+    export GH_TOKEN="$(gh auth token 2>/dev/null || echo '')"
+    if [ "{{ dry_run }}" = "--dry-run" ]; then
+      DRY_RUN=true scripts/update-flake-pins.sh
+      echo "✅  Pins updated (dry-run)!"
+      exit 0
+    fi
+    scripts/update-flake-pins.sh
     just flake-update
+    # Record the run and commit refreshed flake.lock to the parent dotfiles
+    # repo so the machine has a clean history of what's installed.
+    git add flake.lock 2>/dev/null || true
+    if ! git diff --cached --quiet; then
+      git commit -q -m "chore: update-pins — refresh flake inputs"
+      echo "  ✓ committed flake.lock"
+    fi
+    just _record-history update-pins
+    echo "✅  Pins updated!"
 
 [unix]
 setup-python-packages packages='':
@@ -351,12 +365,26 @@ sync-submodules:
         nix flake lock --update-input "$sub/$dep" 2>/dev/null || true
       done
     done
+    # Fourth pass: stage and commit the parent dotfiles repo's updated
+    # submodule pointers + flake.lock (so this machine's recorded HEAD
+    # matches the freshly-synced submodule and flake state).
+    echo "📌  Recording new submodule + flake state in parent repo..."
+    parent_changes=""
+    for path in flake.lock $(git config --file .gitmodules --get-regexp path 2>/dev/null | awk '{print $2}'); do
+      git add -- "$path" 2>/dev/null || true
+    done
+    if ! git diff --cached --quiet; then
+      git commit -q -m "chore: sync-submodules — refresh submodule pointers + flake.lock"
+      echo "  ✓ committed parent pointer updates"
+    else
+      echo "  • parent already up to date"
+    fi
     just _record-history sync-submodules
     echo "✅  Submodules synced!"
 
 # ── Build timing ─────────────────────────────────────────────────────
 
-build_times_file := ".build-times"
+build_times_file := "secrets/.build-times"
 
 [private]
 _show-build-prediction host:
@@ -380,7 +408,9 @@ _show-build-prediction host:
 [private]
 _record-build-time host seconds:
     #!/usr/bin/env bash
+    set -euo pipefail
     file="{{ build_times_file }}"
+    mkdir -p "$(dirname "$file")"
     touch "$file"
     # Keep last 5 entries per host
     existing=$(grep "^{{ host }}:" "$file" 2>/dev/null | tail -4)
@@ -390,6 +420,7 @@ _record-build-time host seconds:
     fi
     echo "{{ host }}:{{ seconds }}" >> "$file.tmp"
     mv "$file.tmp" "$file"
+    just _commit-to-secrets "$file" "chore: record {{ host }} build time ({{ seconds }}s)"
 
 [private]
 _finish-build host start_time exit_code:
@@ -410,15 +441,36 @@ _finish-build host start_time exit_code:
 
 # ── History tracking ─────────────────────────────────────────────────
 
-history_file := ".history"
+history_file := "secrets/.history"
 stale_days := "7"
 
 [private]
 _record-history task:
+    @mkdir -p secrets
     @touch {{ history_file }}
     @grep -v "^{{ task }}:" {{ history_file }} > {{ history_file }}.tmp 2>/dev/null || true
     @echo "{{ task }}:$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> {{ history_file }}.tmp
     @mv {{ history_file }}.tmp {{ history_file }}
+    @just _commit-to-secrets {{ history_file }} "chore: record {{ task }} run"
+
+# Commits a single file inside the secrets submodule. Pulls --rebase first
+# to absorb any concurrent changes from other machines, then pushes. Silent
+# no-op if the file has no actual changes.
+[private]
+_commit-to-secrets file msg:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    relfile=$(echo "{{ file }}" | sed 's|^secrets/||')
+    cd secrets
+    git pull --rebase --autostash origin main >/dev/null 2>&1 || true
+    git add -- "$relfile"
+    if git diff --cached --quiet; then
+      exit 0
+    fi
+    git commit -q -m "{{ msg }}"
+    git push origin main >/dev/null 2>&1 \
+      && echo "  ↑ secrets pushed ({{ msg }})" \
+      || echo "  ⚠ secrets push deferred (will retry next run)"
 
 [private]
 _check-maintenance:
