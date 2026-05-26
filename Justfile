@@ -412,8 +412,9 @@ _record-build-time host seconds:
     file="{{ build_times_file }}"
     mkdir -p "$(dirname "$file")"
     touch "$file"
-    # Keep last 5 entries per host
-    existing=$(grep "^{{ host }}:" "$file" 2>/dev/null | tail -4)
+    # Keep last 5 entries per host. grep+tail returns 1 when there's no
+    # prior entry (first build for this host), so swallow the exit code.
+    existing=$(grep "^{{ host }}:" "$file" 2>/dev/null | tail -4 || true)
     grep -v "^{{ host }}:" "$file" > "$file.tmp" 2>/dev/null || true
     if [[ -n "$existing" ]]; then
       echo "$existing" >> "$file.tmp"
