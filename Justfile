@@ -275,10 +275,10 @@ update-pins dry_run='':
     just flake-update
     # Record the run and commit refreshed flake.lock to the parent dotfiles
     # repo so the machine has a clean history of what's installed.
-    git add flake.lock 2>/dev/null || true
+    git add flake.nix flake.lock 2>/dev/null || true
     if ! git diff --cached --quiet; then
       git commit -q -m "chore: update-pins — refresh flake inputs"
-      echo "  ✓ committed flake.lock"
+      echo "  ✓ committed flake.nix + flake.lock"
     fi
     just _record-history update-pins
     echo "✅  Pins updated!"
