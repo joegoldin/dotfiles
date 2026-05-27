@@ -38,9 +38,7 @@ build: system-info _check-maintenance
 
 [linux]
 build: system-info _check-maintenance
-    @if uname -r | grep -q "WSL"; then \
-      just _build-wsl; \
-    elif [ "{{ arch() }}" = "aarch64" ]; then \
+    @if [ "{{ arch() }}" = "aarch64" ]; then \
       just _build-bastion; \
     elif [ "{{ arch() }}" = "x86_64" ] && [ "$(hostname)" = "joe-steamdeck" ]; then \
       just _build-steamdeck; \
@@ -56,16 +54,6 @@ build: system-info _check-maintenance
       echo "❌  Error: Unsupported architecture: {{ arch() }}"; \
       exit 1; \
     fi
-
-[private]
-_build-wsl:
-    #!/usr/bin/env bash
-    echo "🔨  Building for WSL 🪟..."
-    just _show-build-prediction "joe-wsl"
-    start=$(date +%s)
-    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nh os switch . -H joe-wsl --accept-flake-config
-    just _finish-build "joe-wsl" "$start" $?
 
 [private]
 _build-bastion:

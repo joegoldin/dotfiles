@@ -5,25 +5,23 @@
     self.submodules = true;
 
     # ── Nixpkgs ─────────────────────────────────────────────────────────────
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
     # You can access packages and modules from different nixpkgs revs
     # at the same time. Here's an working example:
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     # Also see the 'unstable-packages' overlay at 'overlays/default.nix'.
-    nixpkgs-darwin.url = "github:nixos/nixpkgs/nixpkgs-25.11-darwin";
+    nixpkgs-darwin.url = "github:nixos/nixpkgs/nixpkgs-26.05-darwin";
 
     # ── Core framework ─────────────────────────────────────────────────────
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.11";
+      url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # darwin
     nix-darwin = {
-      url = "github:nix-darwin/nix-darwin/nix-darwin-25.11";
+      url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # wsl
-    nixos-wsl.url = "github:nix-community/NixOS-WSL/release-25.11";
     # jovian (Steam Deck)
     jovian-nixos = {
       url = "github:Jovian-Experiments/Jovian-NixOS?rev=976bb49bfc30f716c1e94cef55845e915631a4c6";
@@ -259,7 +257,6 @@
       self,
       nixpkgs,
       home-manager,
-      nixos-wsl,
       nix-darwin,
       systems,
       git-hooks,
@@ -353,43 +350,7 @@
       });
 
       # NixOS configuration entrypoint
-      # Available through 'nixos-rebuild --flake .#joe-wsl'
       nixosConfigurations = {
-        joe-wsl = nixpkgs.lib.nixosSystem {
-          specialArgs = commonSpecialArgs // {
-            hostname = "joe-wsl";
-          };
-          modules = [
-            nixos-wsl.nixosModules.default
-            nix-index-database.nixosModules.default
-            # > Our main nixos configuration <
-            ./hosts/wsl
-            home-manager.nixosModules.home-manager
-            (
-              { specialArgs, ... }:
-              {
-                home-manager = {
-                  useGlobalPkgs = true;
-                  useUserPackages = true;
-                  extraSpecialArgs = specialArgs;
-                  backupFileExtension = "backup"; # enable moving existing files
-                  users.${specialArgs.username} = import ./hosts/wsl/home-manager.nix;
-                };
-              }
-            )
-            agenix.nixosModules.default
-            (
-              { ... }:
-              {
-                age.secrets.attic-netrc = {
-                  file = "${dotfiles-secrets}/attic-netrc.age";
-                  mode = "0400";
-                };
-              }
-            )
-          ];
-        };
-
         oracle-cloud-bastion = nixpkgs.lib.nixosSystem {
           specialArgs = commonSpecialArgs // {
             hostname = "bastion";
