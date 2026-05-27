@@ -1,6 +1,7 @@
 { pkgs, ... }:
 {
   home.packages = with pkgs; [
+    claude-container
     shopt-script
     iterm2-terminal-integration
   ];
