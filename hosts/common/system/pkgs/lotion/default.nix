@@ -2,7 +2,7 @@
   lib,
   buildNpmPackage,
   fetchFromGitHub,
-  electron_39,
+  electron_41,
   makeWrapper,
   python3,
   pkg-config,
@@ -13,16 +13,16 @@
 }:
 buildNpmPackage rec {
   pname = "lotion";
-  version = "1.5.0";
+  version = "1.6.0";
 
   src = fetchFromGitHub {
     owner = "puneetsl";
     repo = "lotion";
     tag = "v${version}";
-    hash = "sha256-oOpcIIdKT303a9qOZ50To67XEQ/4olWFJr1Sy3rv2kg=";
+    hash = "sha256-gjJmpWmxFoY801HEkROjET6cjdz8roUbSiOQrlBWDFs=";
   };
 
-  npmDepsHash = "sha256-sZSsKLKGDRB1uCJrLUE23j6Qi+B13YP6OP2j0ZE6+V8=";
+  npmDepsHash = "sha256-CN4RIEDJsM/xWSABFnOtyH/qW0MLSzaV39F/bN44Ics=";
 
   nativeBuildInputs = [
     makeWrapper
@@ -33,10 +33,6 @@ buildNpmPackage rec {
 
   buildInputs = [
     alsa-lib
-  ];
-
-  patches = [
-    ./fixes.patch
   ];
 
   makeCacheWritable = true;
@@ -56,7 +52,7 @@ buildNpmPackage rec {
   '';
 
   postInstall = ''
-    makeWrapper ${electron_39}/bin/electron $out/bin/lotion \
+    makeWrapper ${electron_41}/bin/electron $out/bin/lotion \
       --add-flags $out/lib/node_modules/lotion/src/main/index.js
 
     install -Dm644 $out/lib/node_modules/lotion/assets/icon.png \
