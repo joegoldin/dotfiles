@@ -21,7 +21,6 @@
     ./mounts.nix
     ./uxplay.nix
     # ./hyprwhspr.nix
-    ./yepanywhere.nix
     ./desk-phone.nix
     ./vban-send.nix
     ./vban-recv.nix
