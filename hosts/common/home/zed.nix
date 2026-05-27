@@ -189,6 +189,7 @@ in
         };
         provider = "zed";
         mode = "eager";
+        allow_data_collection = false;
       };
 
       agent = {
