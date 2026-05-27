@@ -9,6 +9,5 @@
     ./hardware-configuration.nix
     ./oracle-cloud.nix
     ./pelican.nix
-    ./yepanywhere.nix
   ];
 }

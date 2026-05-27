@@ -116,7 +116,6 @@ let
       xdg-utils
       xz
       unstable.yarn-berry_3
-      yepanywhere
       yq-go # yaml processer https://github.com/mikefarah/yq
       yt-dlp
       unstable.zellij

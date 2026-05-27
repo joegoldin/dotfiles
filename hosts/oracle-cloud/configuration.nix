@@ -119,4 +119,14 @@
       PasswordAuthentication = false;
     };
   };
+
+  # Brute-force protection for the public bastion (default sshd jail).
+  services.fail2ban = {
+    enable = true;
+    bantime = "1h";
+    bantime-increment = {
+      enable = true;
+      maxtime = "24h";
+    };
+  };
 }
