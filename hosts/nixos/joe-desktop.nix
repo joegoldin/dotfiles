@@ -11,13 +11,13 @@ let
   fonts = import ../common/system/fonts { inherit pkgs lib dotfiles-assets; };
 in
 {
-  # Cap nix builds: 16 parallel jobs, 1 thread per job. Memory is throttled at
-  # 32 GiB (MemoryHigh, soft) with a 42 GiB hard ceiling (MemoryMax) on the
-  # nix-daemon cgroup — High slows builds down via reclaim pressure rather
-  # than OOM-killing them, while Max keeps a single runaway link step from
-  # taking down the whole 64 GiB box.
-  nix.settings.max-jobs = 16;
-  nix.settings.cores = lib.mkForce 1;
+  # Cap nix builds: 3 parallel jobs × 6 threads each = 18 max threads. Memory
+  # is throttled at 32 GiB (MemoryHigh, soft) with a 42 GiB hard ceiling
+  # (MemoryMax) on the nix-daemon cgroup — High slows builds down via reclaim
+  # pressure rather than OOM-killing them, while Max keeps a single runaway
+  # link step from taking down the whole 64 GiB box.
+  nix.settings.max-jobs = 3;
+  nix.settings.cores = 6;
 
   # TODO: Add litra-autotoggle as a service to systemd
 

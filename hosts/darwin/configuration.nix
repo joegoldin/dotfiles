@@ -50,6 +50,9 @@
         nix-path = config.nix.nixPath;
         trusted-users = [ "${username}" ];
         auto-optimise-store = false;
+        # 2 parallel jobs × 6 threads each = 12 max threads.
+        max-jobs = 2;
+        cores = 6;
 
         # Enable building for x86_64-darwin on aarch64-darwin
         extra-platforms = [
