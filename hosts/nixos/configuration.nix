@@ -87,7 +87,9 @@ in
         trusted-users = [ "${username}" ];
         auto-optimise-store = false;
         builders-use-substitutes = true;
-        cores = 20;
+        # Default: 2 jobs × 4 threads = 8 max threads. Per-host overrides allowed.
+        max-jobs = lib.mkDefault 2;
+        cores = lib.mkDefault 4;
       };
 
       gc = {
