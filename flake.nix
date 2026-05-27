@@ -149,7 +149,7 @@
     # ── Claude / LLM tooling ───────────────────────────────────────────────
     # Claude Desktop for Linux
     claude-desktop-debian = {
-      url = "github:aaddrick/claude-desktop-debian?rev=4451694930f7505446532a9395990c6af85830b8";
+      url = "github:aaddrick/claude-desktop-debian?rev=4409f3f0d4bc3ef3247adac2013a3a54be7cfa97";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, antigravity)
