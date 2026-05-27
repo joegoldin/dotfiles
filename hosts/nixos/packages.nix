@@ -23,7 +23,6 @@ in
       blip-caption
       bubblewrap
       unstable.cloudflared
-      desktop-wakatime
       unstable.darktable
       # unstable.davinci-resolve
       unstable.discord

@@ -38,7 +38,6 @@
     ./antigravity
     ./codex
     ./notify.nix
-    ./wakatime.nix
     ./bin
   ];
 

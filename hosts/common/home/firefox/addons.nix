@@ -47,7 +47,6 @@ in
       (extension "web-clipper-obsidian" "clipper@obsidian.md")
 
       (extension "tab-session-manager" "Tab-Session-Manager@sienori")
-      (extension "wakatimes" "addons@wakatime.com")
       (extension "augmented-steam" "{1be309c5-3e4f-4b99-927d-bb500eb4fa88}")
       (extension "soundfixer" "soundfixer@unrelenting.technology")
       (extension "improve-crunchyroll" "{2b6c25c8-0c7e-4692-957f-c4ae6af0c34b}")

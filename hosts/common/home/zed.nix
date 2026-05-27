@@ -67,7 +67,6 @@ in
       "terraform"
       "toml"
       "xml"
-      "wakatime"
       "zig"
     ];
 
