@@ -410,6 +410,7 @@ _record-build-time host seconds:
     echo "{{ host }}:{{ seconds }}" >> "$file.tmp"
     mv "$file.tmp" "$file"
     just _commit-to-secrets "$file" "chore: record {{ host }} build time ({{ seconds }}s)"
+    just _sync-secrets-pointer
 
 [private]
 _finish-build host start_time exit_code:
@@ -441,6 +442,7 @@ _record-history task:
     @echo "{{ task }}:$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> {{ history_file }}.tmp
     @mv {{ history_file }}.tmp {{ history_file }}
     @just _commit-to-secrets {{ history_file }} "chore: record {{ task }} run"
+    @just _sync-secrets-pointer
 
 # Commits a single file inside the secrets submodule. Pulls --rebase first
 # to absorb any concurrent changes from other machines, then pushes. Silent
@@ -460,6 +462,25 @@ _commit-to-secrets file msg:
     git push origin main >/dev/null 2>&1 \
       && echo "  ↑ secrets pushed ({{ msg }})" \
       || echo "  ⚠ secrets push deferred (will retry next run)"
+
+# Re-points the parent repo's `secrets` gitlink to the submodule HEAD that
+# _commit-to-secrets just advanced+pushed, and re-locks the dotfiles-secrets
+# flake input. Without this a build (or update-pins / sync-submodules) leaves
+# the submodule one commit ahead of the recorded pointer — an untracked, dirty
+# tree. Commit-only (push the parent when you like); no-op when already in sync.
+[private]
+_sync-secrets-pointer:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    git add secrets
+    nix --extra-experimental-features 'nix-command flakes' flake update dotfiles-secrets \
+      --option access-tokens "github.com=$(gh auth token 2>/dev/null || echo '')" >/dev/null 2>&1 || true
+    git add flake.lock
+    if git diff --cached --quiet; then
+      exit 0
+    fi
+    git commit -q -m "chore: track secrets submodule (pointer + flake.lock)"
+    echo "  ✓ parent secrets pointer committed"
 
 [private]
 _check-maintenance:
