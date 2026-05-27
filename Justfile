@@ -28,91 +28,98 @@ flake-update:
 # ── Build ────────────────────────────────────────────────────────────────
 
 [macos]
-build: system-info _check-maintenance
+build *args="": system-info _check-maintenance
     #!/usr/bin/env bash
     just _show-build-prediction "darwin"
     start=$(date +%s)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nh darwin switch . --accept-flake-config
+    [ -n "{{args}}" ] && echo "📦  Extra nh args: {{args}}"
+    nh darwin switch . --accept-flake-config {{args}}
     just _finish-build "darwin" "$start" $?
 
 [linux]
-build: system-info _check-maintenance
+build *args="": system-info _check-maintenance
     @if [ "{{ arch() }}" = "aarch64" ]; then \
-      just _build-bastion; \
+      just _build-bastion {{args}}; \
     elif [ "{{ arch() }}" = "x86_64" ] && [ "$(hostname)" = "joe-steamdeck" ]; then \
-      just _build-steamdeck; \
+      just _build-steamdeck {{args}}; \
     elif [ "{{ arch() }}" = "x86_64" ] && [ "$(hostname)" = "office-pc" ]; then \
-      just _build-office-pc; \
+      just _build-office-pc {{args}}; \
     elif [ "{{ arch() }}" = "x86_64" ] && [ "$(hostname)" = "racknerd-cloud-agent" ]; then \
-      just _build-racknerd; \
+      just _build-racknerd {{args}}; \
     elif [ "{{ arch() }}" = "x86_64" ] && [ "$(hostname)" = "cloud-proxy" ]; then \
-      just _build-cloud-proxy; \
+      just _build-cloud-proxy {{args}}; \
     elif [ "{{ arch() }}" = "x86_64" ]; then \
-      just _build-nixos; \
+      just _build-nixos {{args}}; \
     else \
       echo "❌  Error: Unsupported architecture: {{ arch() }}"; \
       exit 1; \
     fi
 
 [private]
-_build-bastion:
+_build-bastion *args="":
     #!/usr/bin/env bash
     echo "🔨  Building for Oracle Cloud bastion 🐧..."
     just _show-build-prediction "oracle-cloud-bastion"
     start=$(date +%s)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nh os switch . -H oracle-cloud-bastion --accept-flake-config
+    [ -n "{{args}}" ] && echo "📦  Extra nh args: {{args}}"
+    nh os switch . -H oracle-cloud-bastion --accept-flake-config {{args}}
     just _finish-build "oracle-cloud-bastion" "$start" $?
 
 [private]
-_build-office-pc:
+_build-office-pc *args="":
     #!/usr/bin/env bash
     echo "🔨  Building for office PC 🐧..."
     just _show-build-prediction "office-pc"
     start=$(date +%s)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nh os switch . -H office-pc --accept-flake-config
+    [ -n "{{args}}" ] && echo "📦  Extra nh args: {{args}}"
+    nh os switch . -H office-pc --accept-flake-config {{args}}
     just _finish-build "office-pc" "$start" $?
 
 [private]
-_build-racknerd:
+_build-racknerd *args="":
     #!/usr/bin/env bash
     echo "🔨  Building for RackNerd VPS 🐧..."
     just _show-build-prediction "racknerd-cloud-agent"
     start=$(date +%s)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nh os switch . -H racknerd-cloud-agent --accept-flake-config
+    [ -n "{{args}}" ] && echo "📦  Extra nh args: {{args}}"
+    nh os switch . -H racknerd-cloud-agent --accept-flake-config {{args}}
     just _finish-build "racknerd-cloud-agent" "$start" $?
 
 [private]
-_build-cloud-proxy:
+_build-cloud-proxy *args="":
     #!/usr/bin/env bash
     echo "🔨  Building for cloud-proxy VPS 🐧..."
     just _show-build-prediction "cloud-proxy"
     start=$(date +%s)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nh os switch . -H cloud-proxy --accept-flake-config
+    [ -n "{{args}}" ] && echo "📦  Extra nh args: {{args}}"
+    nh os switch . -H cloud-proxy --accept-flake-config {{args}}
     just _finish-build "cloud-proxy" "$start" $?
 
 [private]
-_build-steamdeck:
+_build-steamdeck *args="":
     #!/usr/bin/env bash
     echo "🔨  Building for Steam Deck 🎮..."
     just _show-build-prediction "joe-steamdeck"
     start=$(date +%s)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nh os switch . -H joe-steamdeck --accept-flake-config
+    [ -n "{{args}}" ] && echo "📦  Extra nh args: {{args}}"
+    nh os switch . -H joe-steamdeck --accept-flake-config {{args}}
     just _finish-build "joe-steamdeck" "$start" $?
 
 [private]
-_build-nixos:
+_build-nixos *args="":
     #!/usr/bin/env bash
     echo "🔨  Building for NixOS desktop 🐧..."
     just _show-build-prediction "joe-desktop"
     start=$(date +%s)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nh os switch . -H joe-desktop --accept-flake-config
+    [ -n "{{args}}" ] && echo "📦  Extra nh args: {{args}}"
+    nh os switch . -H joe-desktop --accept-flake-config {{args}}
     just _finish-build "joe-desktop" "$start" $?
 
 # ── macOS-specific ───────────────────────────────────────────────────────
