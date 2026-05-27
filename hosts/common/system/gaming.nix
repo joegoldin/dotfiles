@@ -26,7 +26,7 @@
     })
     adwaita-icon-theme
     unstable.cockatrice
-    wowup-cf
+    # wowup-cf  # disabled: upstream download fails with TLS handshake error
   ];
 
   users.users."${username}".extraGroups = [ "gamemode" ];
