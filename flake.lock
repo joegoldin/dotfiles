@@ -490,11 +490,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779839843,
-        "narHash": "sha256-di8r6yxVpc80nPYQ6/6tScnrVLBZhSpSAKb1GYryjhQ=",
+        "lastModified": 1779913807,
+        "narHash": "sha256-y1zeWkhuKW8I7W2d0Pft1tZswgb7VoNSIbmc+KHjysM=",
         "owner": "joegoldin",
         "repo": "claude-container",
-        "rev": "e732d7aacf1afcbc748ec7e0cb634af79f4c3e88",
+        "rev": "3e2aea44b30bc1b84a721a7c0aba2f5e279e3db4",
         "type": "github"
       },
       "original": {
