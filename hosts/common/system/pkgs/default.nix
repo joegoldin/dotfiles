@@ -8,8 +8,6 @@ pkgs: {
 
   blip-caption = pkgs.callPackage ./blip-caption.nix { };
 
-  desktop-wakatime = pkgs.callPackage ./desktop-wakatime.nix { };
-
   git-hunk = pkgs.callPackage ./git-hunk.nix { };
 
   google-chrome-stable = pkgs.writeShellScriptBin "google-chrome" ''
