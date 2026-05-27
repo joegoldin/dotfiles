@@ -24,6 +24,9 @@ buildNpmPackage rec {
 
   npmDepsHash = "sha256-CN4RIEDJsM/xWSABFnOtyH/qW0MLSzaV39F/bN44Ics=";
 
+  npmInstallFlags = [ "--omit=dev" ];
+  npmFlags = [ "--omit=dev" ];
+
   nativeBuildInputs = [
     makeWrapper
     python3
