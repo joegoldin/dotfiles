@@ -12,6 +12,7 @@
     ../common/home/plasma.nix
     ../common/home/zed.nix
     ../common/home/ghostty.nix
+    ../common/home/mouse-actions.nix
     ./packages.nix
     ./python.nix
   ];
