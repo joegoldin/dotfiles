@@ -17,14 +17,13 @@ in
 appimageTools.wrapType2 {
   inherit pname version src;
 
-  # Install the bundled .desktop entry + icon. Tauri's AppImage points Exec
-  # at the AppRun inside the squashfs, so rewrite it to the wrapped binary.
+  # The AppImage already sets Exec=mouse-actions-gui in its bundled .desktop
+  # file, which lines up with the wrapper's binary name — just copy it through
+  # along with the hicolor icon theme so KDE/Plasma can find it.
   extraInstallCommands = ''
-    install -Dm644 ${appimageContents}/mouse-actions-gui.desktop \
+    install -Dm644 ${appimageContents}/usr/share/applications/mouse-actions-gui.desktop \
       $out/share/applications/mouse-actions-gui.desktop
-    substituteInPlace $out/share/applications/mouse-actions-gui.desktop \
-      --replace-fail 'Exec=AppRun' 'Exec=${pname}'
-    cp -r ${appimageContents}/usr/share/icons $out/share/icons || true
+    cp -r ${appimageContents}/usr/share/icons $out/share/icons
   '';
 
   meta = {
