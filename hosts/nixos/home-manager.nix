@@ -10,7 +10,7 @@
     ../common/home/ghostty.nix
     ../common/home/zed.nix
     ../common/home/default-apps.nix
-    ../common/home/mouse-actions.nix
+    ../common/home/mouse-actions
     ./dolphin.nix
   ];
 
