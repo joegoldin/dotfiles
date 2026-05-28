@@ -11,6 +11,7 @@ in
   programs.firefox = {
     enable = true;
     package = pkgs.unstable.firefox;
+    configPath = ".mozilla/firefox";
     # Refer to https://mozilla.github.io/policy-templates or `about:policies#documentation` in firefox
     policies = {
       AppAutoUpdate = false; # Disable automatic application update
