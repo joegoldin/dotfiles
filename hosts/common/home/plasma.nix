@@ -11,7 +11,6 @@
   # (home-manager adds the user profile), so they show up in the
   # "Add Widgets" picker without any imperative kpackagetool6 install.
   home.packages = [
-    pkgs.plasma-applet-claude-usage
     pkgs.plasma-applet-netspeed
     pkgs.plasma-applet-resources-monitor
   ];

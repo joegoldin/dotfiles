@@ -11,7 +11,7 @@ let
   # QDBusConnectionManager's destructor during exit handlers — the shortcut
   # still fires, but the non-zero exit makes mouse-actions report failure.
   configJson = builtins.replaceStrings [ "@DBUS_SEND@" ] [ "${pkgs.dbus}/bin/dbus-send" ] (
-    builtins.readFile ./mouse-actions.json
+    builtins.readFile ./config.json
   );
 
   configFile = pkgs.writeText "mouse-actions.json" configJson;

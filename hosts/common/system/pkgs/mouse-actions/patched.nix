@@ -7,6 +7,6 @@
 mouse-actions.overrideAttrs (old: {
   pname = "mouse-actions-drag-shift";
   cargoPatches = (old.cargoPatches or [ ]) ++ [
-    ./mouse-actions-drag-shift.patch
+    ./drag-shift.patch
   ];
 })
