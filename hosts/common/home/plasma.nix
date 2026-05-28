@@ -56,6 +56,84 @@
       clickItemTo = "select";
     };
 
+    # Captured live layout (thickness 38, centered, bottom). Order matches
+    # AppletOrder in plasma-org.kde.plasma.desktop-appletsrc.
+    panels = [
+      {
+        location = "bottom";
+        height = 38;
+        alignment = "center";
+        floating = false;
+        widgets = [
+          "org.kde.plasma.kicker"
+          {
+            name = "org.kde.plasma.icontasks";
+            config.General.launchers = lib.concatStringsSep "," [
+              "preferred://filemanager"
+              "applications:firefox.desktop"
+              "applications:com.mitchellh.ghostty.desktop"
+              "applications:dev.zed.Zed-Nightly.desktop"
+              "applications:parsecd.desktop"
+              "applications:discord.desktop"
+              "applications:steam.desktop"
+              "applications:Zoom.desktop"
+              "applications:claude-desktop.desktop"
+              "applications:obsidian.desktop"
+              "applications:slack.desktop"
+            ];
+          }
+          "org.kde.plasma.marginsseparator"
+          "org.kde.netspeedWidget"
+          "org.kde.plasma.systemmonitor.cpucore"
+          "org.kde.plasma.systemmonitor.memory"
+          "org.kde.plasma.marginsseparator"
+          {
+            name = "org.kde.plasma.systemtray";
+            config.General = {
+              extraItems = lib.concatStringsSep "," [
+                "org.kde.plasma.cameraindicator"
+                "org.kde.plasma.manage-inputmethod"
+                "org.kde.plasma.clipboard"
+                "org.kde.plasma.bluetooth"
+                "org.kde.plasma.keyboardlayout"
+                "org.kde.plasma.devicenotifier"
+                "org.kde.plasma.mediacontroller"
+                "org.kde.plasma.notifications"
+                "org.kde.kscreen"
+                "org.kde.plasma.brightness"
+                "org.kde.plasma.networkmanagement"
+                "org.kde.plasma.battery"
+                "org.kde.plasma.volume"
+                "org.kde.plasma.printmanager"
+                "org.kde.plasma.keyboardindicator"
+                "org.kde.plasma.weather"
+              ];
+              knownItems = lib.concatStringsSep "," [
+                "org.kde.plasma.cameraindicator"
+                "org.kde.plasma.manage-inputmethod"
+                "org.kde.plasma.clipboard"
+                "org.kde.plasma.bluetooth"
+                "org.kde.plasma.keyboardlayout"
+                "org.kde.plasma.devicenotifier"
+                "org.kde.plasma.mediacontroller"
+                "org.kde.plasma.notifications"
+                "org.kde.kscreen"
+                "org.kde.plasma.brightness"
+                "org.kde.plasma.networkmanagement"
+                "org.kde.plasma.battery"
+                "org.kde.plasma.volume"
+                "org.kde.plasma.printmanager"
+                "org.kde.plasma.keyboardindicator"
+                "org.kde.plasma.weather"
+              ];
+            };
+          }
+          "org.kde.plasma.digitalclock"
+          "org.kde.plasma.minimizeall"
+        ];
+      }
+    ];
+
     shortcuts = {
       "KDE Keyboard Layout Switcher"."Switch to Last-Used Keyboard Layout" = "Meta+Alt+L";
       "KDE Keyboard Layout Switcher"."Switch to Next Keyboard Layout" = "Meta+Alt+K";
