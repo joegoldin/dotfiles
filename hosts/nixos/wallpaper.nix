@@ -30,7 +30,7 @@ in
     script = ''
       ${pythonEnv}/bin/python3 ${scriptPath} ${lib.concatStringsSep " " wallpaperDirs}
     '';
-    path = [ pkgs.xorg.xrandr ];
+    path = [ pkgs.xrandr ];
     serviceConfig = {
       Type = "oneshot";
     };

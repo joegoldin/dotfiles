@@ -65,7 +65,7 @@ in
     xserver = {
       enable = true;
       displayManager.sessionCommands = ''
-        ${lib.getBin pkgs.xorg.xrandr}/bin/xrandr --setprovideroutputsource 2 0
+        ${lib.getBin pkgs.xrandr}/bin/xrandr --setprovideroutputsource 2 0
       '';
       videoDrivers = [
         "amdgpu"
