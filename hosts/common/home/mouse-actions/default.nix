@@ -198,10 +198,10 @@ in
 {
   home.packages = with pkgs; [
     mouse-actions
-    # nixpkgs' mouse-actions-gui is marked broken because Tauri v1 needs
-    # webkit2gtk-4.0, which was removed from nixpkgs. Use upstream's AppImage
-    # (which bundles webkit2gtk-4.0) until upstream migrates to Tauri v2.
-    mouse-actions-gui-appimage
+    # Fork built from source with Tauri v2 — knows about modifier_remaps and
+    # chord_bindings. Symlinks `mouse-actions-gui` so the tray's
+    # shutil.which() and the CLI's `show-gui` subcommand find it.
+    mouse-actions-gui-fork
     xdotool
     mouseActionsTray
   ];
