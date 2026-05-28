@@ -7,7 +7,10 @@
 }:
 let
   python = pkgs.python3.withPackages (ps: [ ps.evdev ]);
-  qdbus = "${pkgs.kdePackages.qttools}/bin/qdbus";
+  # qdbus from qttools 6.11 SEGVs in QDBusConnectionManager's destructor during
+  # exit handlers (the shortcut still fires, but the non-zero exit dirties the
+  # journal). dbus-send is clean.
+  dbus-send = "${pkgs.dbus}/bin/dbus-send";
 
   overview-hotkey = pkgs.writeScriptBin "overview-hotkey" ''
     #!${python}/bin/python3
@@ -21,7 +24,7 @@ let
     BACK_BUTTON = ecodes.BTN_SIDE
     FORWARD_BUTTON = ecodes.BTN_EXTRA
     CHORD_BUTTONS = {BACK_BUTTON, FORWARD_BUTTON}
-    QDBUS = "${qdbus}"
+    DBUS_SEND = "${dbus-send}"
 
     def find_devices():
         devices = []
@@ -37,11 +40,12 @@ let
     def trigger_overview():
         subprocess.Popen(
             [
-                QDBUS,
-                "org.kde.kglobalaccel",
+                DBUS_SEND,
+                "--type=method_call",
+                "--dest=org.kde.kglobalaccel",
                 "/component/kwin",
                 "org.kde.kglobalaccel.Component.invokeShortcut",
-                "Overview",
+                "string:Overview",
             ],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
