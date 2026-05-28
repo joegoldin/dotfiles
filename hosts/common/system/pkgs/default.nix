@@ -70,6 +70,8 @@ pkgs: {
 
   mouse-actions-gui-appimage = pkgs.callPackage ./mouse-actions/gui-appimage.nix { };
 
+  mouse-actions-gui-fork = pkgs.callPackage ./mouse-actions/gui-fork.nix { };
+
   mouse-actions-patched = pkgs.callPackage ./mouse-actions/patched.nix { };
 
   plasma-applet-netspeed = pkgs.callPackage ./plasma-applets/netspeed.nix { };
