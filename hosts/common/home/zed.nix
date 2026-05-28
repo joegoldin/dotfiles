@@ -188,7 +188,7 @@ in
         };
         provider = "zed";
         mode = "eager";
-        allow_data_collection = false;
+        allow_data_collection = "no";
       };
 
       agent = {
