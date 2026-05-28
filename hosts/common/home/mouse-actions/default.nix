@@ -35,6 +35,31 @@ let
         cmd_str = "${pkgs.xdotool}/bin/xdotool key ctrl+x";
       }
     ];
+
+    # Drag-shift: while Left button is held, Right click toggles ShiftLeft
+    # so KWin sees Shift+drag → axis-snap during window moves.
+    modifier_remaps = [
+      {
+        comment = "drag-shift: Left+Right toggles ShiftLeft for KWin axis-snap";
+        while_held = { kind = "Mouse"; code = "Left"; };
+        trigger = { kind = "Mouse"; code = "Right"; };
+        emit = { kind = "Key"; code = "ShiftLeft"; };
+        mode = "Toggle";
+        release_delay_ms = 25;
+      }
+    ];
+
+    # Forward + Back mouse buttons within 100 ms → KDE Overview.
+    # passthrough=true so browser back/forward navigation still works.
+    chord_bindings = [
+      {
+        comment = "BTN_SIDE + BTN_EXTRA → Overview";
+        buttons = [ "Side" "Extra" ];
+        window_ms = 100;
+        cmd_str = "${pkgs.dbus}/bin/dbus-send --type=method_call --dest=org.kde.kglobalaccel /component/kwin org.kde.kglobalaccel.Component.invokeShortcut string:Overview";
+        passthrough = true;
+      }
+    ];
   };
 
   configFile = (pkgs.formats.json { }).generate "mouse-actions.json" mouseActionsConfig;
@@ -58,6 +83,7 @@ let
         ];
       }
       ''
+        import shutil
         import subprocess
         import sys
         from PySide6.QtWidgets import QApplication, QSystemTrayIcon, QMenu
@@ -65,6 +91,7 @@ let
         from PySide6.QtCore import QTimer, Qt
 
         SERVICE = "mouse-actions.service"
+        GUI_BIN = "mouse-actions-gui"
 
         def is_active() -> bool:
             r = subprocess.run(
@@ -120,6 +147,9 @@ let
             tray = QSystemTrayIcon()
             menu = QMenu()
             toggle_action = menu.addAction("Toggle")
+            gui_action = None
+            if shutil.which(GUI_BIN):
+                gui_action = menu.addAction("Open mouse-actions-gui")
             menu.addSeparator()
             quit_action = menu.addAction("Quit tray")
             tray.setContextMenu(menu)
@@ -139,8 +169,18 @@ let
                 if reason == QSystemTrayIcon.Trigger:
                     toggle()
 
+            def open_gui():
+                subprocess.Popen(
+                    [GUI_BIN],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    start_new_session=True,
+                )
+
             tray.activated.connect(on_activate)
             toggle_action.triggered.connect(toggle)
+            if gui_action is not None:
+                gui_action.triggered.connect(open_gui)
             quit_action.triggered.connect(app.quit)
 
             refresh()
