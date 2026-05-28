@@ -5,15 +5,12 @@
 #   - sudo / polkit prompts → howdy face auth attempted, falls back to password
 #   - Lock screen / SDDM login / console login → password only (howdy not in PAM stack)
 #
-# Note: howdy is only in nixpkgs-unstable, so we use pkgs.unstable.howdy.
-{
-  config,
-  pkgs,
-  ...
-}:
+# Implementation: NixOS 26.05 ships a built-in `services.howdy` module that
+# also wires up PAM. We enable it for the package + config.ini, but disable
+# the system-wide PAM default and opt in per-service so only sudo + polkit-1
+# get howdy. Howdy itself is only in nixpkgs-unstable, hence pkgs.unstable.
+{ pkgs, ... }:
 let
-  howdy = pkgs.unstable.howdy;
-
   # Udev rules: stable symlinks for both cameras on the Lenovo Performance Camera.
   # The device exposes two USB interfaces: 00 = color (RGB), 02 = IR.
   # Both have index==0 and the same vendor/product, so bInterfaceNumber is required
@@ -27,56 +24,35 @@ let
     '';
     destination = "/etc/udev/rules.d/99-howdy-camera.rules";
   };
-
-  # Generate howdy config.ini
-  howdyConfig = pkgs.writeText "howdy-config.ini" ''
-    [core]
-    detection_notice = true
-    no_confirmation = true
-    abort_if_ssh = true
-    abort_if_lid_closed = true
-
-    [video]
-    certainty = 3.5
-    timeout = 4
-    device_path = /dev/howdy-camera-ir
-    recording_plugin = v4l2
-
-    [snapshots]
-    save_failed = false
-    save_successful = false
-
-    [rubberstamps]
-    enabled = false
-
-    [debug]
-    end_report = false
-  '';
-
-  # Only services that run while the machine is already unlocked
-  howdyServices = [
-    "sudo"
-    "polkit-1"
-  ];
-
-  mkHowdyService = name: {
-    inherit name;
-    value = {
-      rules.auth = {
-        howdy = {
-          order = config.security.pam.services.${name}.rules.auth.unix.order - 20;
-          control = "sufficient";
-          modulePath = "${howdy}/lib/security/pam_howdy.so";
-        };
-      };
-    };
-  };
 in
 {
-  # Install howdy and its config
-  environment.systemPackages = [ howdy ];
+  services.howdy = {
+    enable = true;
+    package = pkgs.unstable.howdy;
+    control = "sufficient";
+    settings = {
+      core = {
+        detection_notice = true;
+        no_confirmation = true;
+        abort_if_ssh = true;
+        abort_if_lid_closed = true;
+      };
+      video = {
+        certainty = 3.5;
+        timeout = 4;
+        device_path = "/dev/howdy-camera-ir";
+        recording_plugin = "v4l2";
+      };
+      snapshots = {
+        save_failed = false;
+        save_successful = false;
+      };
+      rubberstamps.enabled = false;
+      debug.end_report = false;
+    };
+  };
 
-  # Persistent camera symlink
+  # Persistent camera symlinks
   services.udev.packages = [ howdy-camera-rules ];
 
   # polkit-127 runs polkit-agent-helper in a sandboxed unit that blocks camera access.
@@ -86,10 +62,8 @@ in
     PrivateDevices = "no";
   };
 
-  environment.etc."howdy/config.ini" = {
-    source = howdyConfig;
-  };
-
-  # PAM: add howdy only to unlocked-session services
-  security.pam.services = builtins.listToAttrs (map mkHowdyService howdyServices);
+  # Don't put howdy into every PAM stack by default; opt in per-service below.
+  security.pam.howdy.enable = false;
+  security.pam.services.sudo.howdy.enable = true;
+  security.pam.services."polkit-1".howdy.enable = true;
 }
