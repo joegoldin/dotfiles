@@ -41,14 +41,11 @@
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
-    matchBlocks = {
+    settings = {
       "*" = {
-        identityAgent = "\"/home/${username}/.1password/agent.sock\"";
+        IdentityAgent = "\"/home/${username}/.1password/agent.sock\"";
       };
     };
-    extraConfig = ''
-      IdentityAgent "/home/${username}/.1password/agent.sock"
-    '';
   };
 
   programs.plasma = {
