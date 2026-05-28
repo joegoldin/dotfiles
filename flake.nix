@@ -370,7 +370,7 @@
                   useGlobalPkgs = true;
                   useUserPackages = true;
                   extraSpecialArgs = specialArgs;
-                  backupFileExtension = "backup"; # enable moving existing files
+                  backupCommand = ''mv "$1" "$1.backup-$(date +%Y%m%d-%H%M%S)"''; # timestamped so reruns never collide
                   users.${specialArgs.username} = import ./hosts/oracle-cloud/home-manager.nix;
                 };
               }
@@ -412,7 +412,7 @@
                   useGlobalPkgs = true;
                   useUserPackages = true;
                   extraSpecialArgs = specialArgs;
-                  backupFileExtension = "backup";
+                  backupCommand = ''mv "$1" "$1.backup-$(date +%Y%m%d-%H%M%S)"'';
                   users.${specialArgs.username} = import ./hosts/cloud-proxy/home-manager.nix;
                 };
               }
@@ -438,7 +438,7 @@
                   useGlobalPkgs = true;
                   useUserPackages = true;
                   extraSpecialArgs = specialArgs;
-                  backupFileExtension = "backup"; # enable moving existing files
+                  backupCommand = ''mv "$1" "$1.backup-$(date +%Y%m%d-%H%M%S)"''; # timestamped so reruns never collide
                   users.${specialArgs.username} = import ./hosts/racknerd-cloud/home-manager.nix;
                 };
               }
@@ -494,7 +494,7 @@
                   useGlobalPkgs = true;
                   useUserPackages = true;
                   extraSpecialArgs = specialArgs;
-                  backupFileExtension = "backup"; # enable moving existing files
+                  backupCommand = ''mv "$1" "$1.backup-$(date +%Y%m%d-%H%M%S)"''; # timestamped so reruns never collide
                   sharedModules = [
                     plasma-manager.homeModules.plasma-manager
                     nix-flatpak.homeManagerModules.nix-flatpak
@@ -589,7 +589,7 @@
                   useGlobalPkgs = true;
                   useUserPackages = true;
                   extraSpecialArgs = specialArgs;
-                  backupFileExtension = "backup";
+                  backupCommand = ''mv "$1" "$1.backup-$(date +%Y%m%d-%H%M%S)"'';
                   sharedModules = [
                     plasma-manager.homeModules.plasma-manager
                   ];
@@ -649,7 +649,7 @@
                   useGlobalPkgs = true;
                   useUserPackages = true;
                   extraSpecialArgs = specialArgs;
-                  backupFileExtension = "backup";
+                  backupCommand = ''mv "$1" "$1.backup-$(date +%Y%m%d-%H%M%S)"'';
                   sharedModules = [
                     plasma-manager.homeModules.plasma-manager
                     inputs.nix-attic-infra.homeManagerModules.attic-client
@@ -888,7 +888,7 @@
                   useGlobalPkgs = true;
                   useUserPackages = true;
                   extraSpecialArgs = specialArgs;
-                  backupFileExtension = "backup"; # enable moving existing files
+                  backupCommand = ''mv "$1" "$1.backup-$(date +%Y%m%d-%H%M%S)"''; # timestamped so reruns never collide
                   users.joe.imports = [
                     ./hosts/darwin/home-manager.nix
                   ];
