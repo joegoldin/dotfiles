@@ -94,5 +94,35 @@ in
     enable = true;
     packages = [ "com.bambulab.BambuStudio" ];
     update.onActivation = true;
+    overrides."com.bambulab.BambuStudio".Environment.GTK_THEME = "Adwaita:dark";
   };
+
+  # KDE doesn't push gtk-font-name into Flatpak sandboxes (XDG_CONFIG_HOME is
+  # redirected to ~/.var/app/<id>/config), so GTK menus render as tofu. Pin
+  # the font explicitly — Noto Sans ships in the freedesktop runtime.
+  home.file.".var/app/com.bambulab.BambuStudio/config/gtk-3.0/settings.ini".text = ''
+    [Settings]
+    gtk-font-name=Noto Sans 10
+    gtk-theme-name=Adwaita
+    gtk-application-prefer-dark-theme=true
+  '';
+
+  # Bambu Studio ships HarmonyOS Sans SC under /app/share/BambuStudio/fonts/
+  # but fontconfig inside the Flatpak doesn't scan that dir, so the menu
+  # font resolves to a fallback that can't render the glyphs (tofu). Point
+  # fontconfig at the bundled font dir.
+  home.file.".var/app/com.bambulab.BambuStudio/config/fontconfig/fonts.conf".text = ''
+    <?xml version="1.0"?>
+    <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+    <fontconfig>
+      <dir>/app/share/BambuStudio/fonts</dir>
+    </fontconfig>
+  '';
+
+  # The Flatpak's fontconfig cache is built before our fonts.conf is in
+  # place (and again whenever nix-flatpak updates Bambu), leaving it stale
+  # and menus tofu. Drop the cache so Bambu rebuilds it on next launch.
+  home.activation.bambuStudioFontCache = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    rm -rf "$HOME/.var/app/com.bambulab.BambuStudio/cache/fontconfig"
+  '';
 }
