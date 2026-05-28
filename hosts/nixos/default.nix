@@ -5,7 +5,6 @@
     ../common/system/attic.nix
     ../common/system/numtide-cache.nix
     ../common/system/attic-post-build-hook.nix
-    ../common/system/nixbuild.nix
     ../common/system/howdy.nix
     ../common/system/microvm-host.nix
     ../common/system/oomd.nix
