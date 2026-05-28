@@ -20,11 +20,11 @@ rustPlatform.buildRustPackage (finalAttrs: {
   src = fetchFromGitHub {
     owner = "joegoldin";
     repo = "mouse-actions";
-    rev = "3346b7122001494dc5d5b99edc5d5e73a0029032";
-    hash = "sha256-HSxwt0D27U/RUVe7duyrJWPq4h4/5V1BiSrwQ3JTTFQ=";
+    rev = "103f2b2";
+    hash = "sha256-UDwna4LcauNUTVZqzjdvmLiAO7F4xz4JcasjlTw/ols=";
   };
 
-  cargoHash = "sha256-bGHVjIMGIS0XULjv9ZiMlzFKi3ZSeuR/eySFxM2NIDA=";
+  cargoHash = "sha256-bClutTRxGMQg2r5p9RXAh27lqbPMB8cKHNElvZ5u1K4=";
 
   doInstallCheck = true;
 
