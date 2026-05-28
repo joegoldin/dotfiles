@@ -5,95 +5,109 @@
   ...
 }:
 let
-  qdbus = "${pkgs.kdePackages.qttools}/bin/qdbus";
+  # Live config persisted from ~/.config/mouse-actions.json. Single delta vs.
+  # what mouse-actions-gui writes to disk: the Overview shortcut is invoked
+  # via dbus-send instead of qdbus. qdbus from qttools 6.11 SEGVs in
+  # QDBusConnectionManager's destructor during exit handlers — the shortcut
+  # still fires, but the non-zero exit makes mouse-actions report failure.
+  configJson = builtins.replaceStrings [ "@DBUS_SEND@" ] [ "${pkgs.dbus}/bin/dbus-send" ] (
+    builtins.readFile ./mouse-actions.json
+  );
 
-  mouseActionsConfig = {
-    shape_button = "Right";
-    bindings = [
-      # Draw Z shape → launch zeditor (text editor)
-      {
-        event = {
-          button = "Right";
-          edges = [ ];
-          modifiers = [ ];
-          event_type = "Click";
-          shape = [
-            0.0 0.0 0.0 0.0 0.0 0.0 (-0.05) (-0.05) (-0.06) (-0.04) (-0.03) (-0.02) (-0.02) (-0.02) (-0.03) (-0.03)
-            (-0.05) (-0.05) (-0.06) (-0.06) (-0.08) (-0.08) (-0.1) (-0.1) (-0.14) (-0.14) (-0.25) (-0.25) (-0.58) (-0.58) (-1.51)
-            (-1.51) (-2.12) (-2.12) (-2.48) (-2.48) (-2.54) (-2.54) (-2.59) (-2.59) (-2.62) (-2.62) (-2.64) (-2.64) (-2.63) (-2.63)
-            (-2.62) (-2.62) (-2.61) (-2.61) (-2.59) (-2.59) (-2.59) (-2.55) (-2.55) (-2.51) (-2.47) (-2.47) (-2.35) (-2.35) (-2.18)
-            (-2.18) (-2.18) (-1.65) (-1.65) (-0.81) (-0.81) (-0.46) (-0.46) (-0.3) (-0.2) (-0.2) (-0.2) (-0.15) (-0.11) (-0.08)
-            (-0.07) (-0.07) (-0.07)
-          ];
-        };
-        cmd = [ "zeditor" ];
-      }
+  configFile = pkgs.writeText "mouse-actions.json" configJson;
 
-      # Draw T shape → launch the terminal (ghostty)
-      {
-        event = {
-          button = "Right";
-          edges = [ ];
-          modifiers = [ ];
-          event_type = "Click";
-          shape = [
-            (-0.46) (-0.11) (-0.11) (-0.22) (-0.09) (-0.05) (-0.04) (-0.04) 0.04 0.04 0.05 0.05 0.11 0.11 0.12 0.12
-            0.13 0.13 0.14 0.14 0.16 0.16 0.17 0.17 0.18 0.18 0.16 0.16 0.15 0.15 0.14 0.15 0.15 0.15
-            0.13 0.13 0.11 0.11 (-0.08) (-0.08) (-0.08) (-0.75) (-0.75) (-1.64) (-1.64) (-2.09) (-2.09) (-2.2) (-2.2) (-2.21)
-            (-2.21) (-2.21) (-2.11) (-2.11) (-2.05) (-2.05) (-1.96) (-1.96) (-1.84) (-1.8) (-1.73) (-1.73) (-1.71) (-1.68) (-1.67)
-            (-1.66) (-1.65) (-1.65) (-1.65) (-1.65) (-1.65) (-1.65)
-          ];
-        };
-        cmd = [ "ghostty" ];
-      }
+  mouseActionsGui = "${pkgs.mouse-actions-gui-appimage}/bin/mouse-actions-gui";
 
-      # Draw V shape → KDE Plasma Overview
+  # KDE tray toggle: click to start/stop mouse-actions.service, icon shows state.
+  # Qt's QSystemTrayIcon bridges to KStatusNotifierItem on Plasma 6.
+  mouseActionsTray =
+    pkgs.writers.writePython3Bin "mouse-actions-tray"
       {
-        event = {
-          button = "Right";
-          edges = [ ];
-          modifiers = [ ];
-          event_type = "Click";
-          shape = [
-            (-1.57) (-1.57) (-1.57) (-1.23) (-1.23) (-1.15) (-1.15) (-1.11) (-1.11) (-1.02) (-1.02) (-1.0) (-1.0) (-0.99) (-0.99)
-            (-0.96) (-0.96) (-0.98) (-0.98) (-0.95) (-0.95) (-0.92) (-0.92) (-0.88) (-0.81) (-0.77) (-0.77) (-0.65) (-0.65) (-0.48)
-            (-0.48) (-0.1) (-0.1) 0.22 0.22 0.49 0.49 0.7 0.7 0.74 0.74 0.83 0.83 0.85 0.85 0.82 0.82
-          ];
-        };
-        cmd = [
-          qdbus
-          "org.kde.kglobalaccel"
-          "/component/kwin"
-          "org.kde.kglobalaccel.Component.invokeShortcut"
-          "Overview"
+        libraries = [ pkgs.python3Packages.pyside6 ];
+        flakeIgnore = [
+          "E501"
+          "E402"
+          "W503"
         ];
       }
+      ''
+        import subprocess
+        import sys
+        from PySide6.QtWidgets import QApplication, QSystemTrayIcon, QMenu
+        from PySide6.QtGui import QIcon, QPixmap, QPainter, QColor, QPen
+        from PySide6.QtCore import QTimer, Qt
 
-      # Draw ∝ (alpha) shape → Ctrl+X key (cut)
-      {
-        event = {
-          button = "Right";
-          edges = [ ];
-          modifiers = [ ];
-          event_type = "Click";
-          shape = [
-            (-1.57) (-1.57) (-1.69) (-1.69) (-1.76) (-1.76) (-1.92) (-1.92) (-1.99) (-1.99) (-2.05) (-2.05) (-2.12) (-2.12) (-2.16)
-            (-2.16) (-2.2) (-2.2) (-2.25) (-2.25) (-2.3) (-2.3) (-2.37) (-2.37) (-2.45) (-2.45) (-2.53) (-2.53) (-2.62) (-2.62)
-            (-2.71) (-2.78) (-2.84) (-2.84) (-2.92) (-2.92) (-2.98) (-2.98) (-3.04) (-3.04) (-3.13) (-3.13) 3.06 3.06 2.94
-            2.94 2.8 2.8 2.67 2.67 2.53 2.53 2.24 2.24 1.89 1.89 1.44 1.44 0.95 0.58 0.58 0.31 0.31
-            0.18 0.18 0.01 0.01 (-0.09) (-0.09) (-0.23) (-0.23) (-0.23) (-0.31) (-0.31) (-0.39) (-0.39) (-0.46) (-0.46)
-            (-0.55) (-0.55) (-0.61) (-0.61) (-0.61) (-0.66) (-0.66) (-0.69) (-0.69) (-0.7) (-0.7) (-0.71) (-0.71) (-0.72) (-0.72)
-            (-0.72) (-0.72) (-0.72) (-0.74) (-0.74)
-          ];
-        };
-        cmd = [ "xdotool" "key" "ctrl+x" ];
-      }
-    ];
-  };
+        SERVICE = "mouse-actions.service"
 
-  mouseActionsConfigFile = pkgs.writeText "mouse-actions.json" (
-    builtins.toJSON mouseActionsConfig
-  );
+        def is_active() -> bool:
+            r = subprocess.run(
+                ["systemctl", "--user", "is-active", SERVICE],
+                capture_output=True, text=True,
+            )
+            return r.stdout.strip() == "active"
+
+        def make_icon(active: bool) -> QIcon:
+            size = 64
+            px = QPixmap(size, size)
+            px.fill(Qt.transparent)
+            p = QPainter(px)
+            p.setRenderHint(QPainter.Antialiasing, True)
+            fill = QColor("#3daee9") if active else QColor("#555555")
+            p.setBrush(fill)
+            p.setPen(QPen(fill.darker(150), 3))
+            p.drawEllipse(8, 8, size - 16, size - 16)
+            p.setPen(QPen(QColor("white"), 4))
+            p.setBrush(Qt.NoBrush)
+            if active:
+                p.drawLine(22, 32, 30, 42)
+                p.drawLine(30, 42, 46, 22)
+            else:
+                p.drawLine(22, 22, 42, 42)
+                p.drawLine(42, 22, 22, 42)
+            p.end()
+            return QIcon(px)
+
+        def main():
+            app = QApplication(sys.argv)
+            app.setQuitOnLastWindowClosed(False)
+
+            tray = QSystemTrayIcon()
+            menu = QMenu()
+            toggle_action = menu.addAction("Toggle")
+            menu.addSeparator()
+            quit_action = menu.addAction("Quit tray")
+            tray.setContextMenu(menu)
+
+            def refresh():
+                active = is_active()
+                tray.setIcon(make_icon(active))
+                tray.setToolTip(f"mouse-actions: {'on' if active else 'off'}")
+                toggle_action.setText("Disable" if active else "Enable")
+
+            def toggle():
+                action = "stop" if is_active() else "start"
+                subprocess.run(["systemctl", "--user", action, SERVICE], check=False)
+                QTimer.singleShot(400, refresh)
+
+            def on_activate(reason):
+                if reason == QSystemTrayIcon.Trigger:
+                    toggle()
+
+            tray.activated.connect(on_activate)
+            toggle_action.triggered.connect(toggle)
+            quit_action.triggered.connect(app.quit)
+
+            refresh()
+            timer = QTimer()
+            timer.timeout.connect(refresh)
+            timer.start(5000)
+
+            tray.show()
+            sys.exit(app.exec())
+
+        if __name__ == "__main__":
+            main()
+      '';
 in
 {
   home.packages = with pkgs; [
@@ -103,14 +117,44 @@ in
     # (which bundles webkit2gtk-4.0) until upstream migrates to Tauri v2.
     mouse-actions-gui-appimage
     xdotool
+    mouseActionsTray
   ];
 
-  # Copy the config into place instead of symlinking so the GUI can still
-  # edit it between rebuilds. Each switch overwrites on-disk edits with the
-  # in-tree config — the in-tree nix attrset is the source of truth.
+  # Copy the config into place. Each switch overwrites on-disk edits with the
+  # in-tree config — the in-tree JSON is the source of truth. Re-sync by
+  # copying ~/.config/mouse-actions.json back to this directory when you've
+  # made edits in the GUI you want to keep.
   home.activation.mouseActionsConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     mkdir -p ${config.xdg.configHome}
     rm -f ${config.xdg.configHome}/mouse-actions.json
-    install -m644 ${mouseActionsConfigFile} ${config.xdg.configHome}/mouse-actions.json
+    install -m644 ${configFile} ${config.xdg.configHome}/mouse-actions.json
   '';
+
+  systemd.user.services.mouse-actions = {
+    Unit = {
+      Description = "mouse-actions gesture daemon";
+      PartOf = [ "graphical-session.target" ];
+      After = [ "graphical-session.target" ];
+    };
+    Service = {
+      ExecStart = "${mouseActionsGui} start";
+      Restart = "on-failure";
+      RestartSec = 3;
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
+
+  systemd.user.services.mouse-actions-tray = {
+    Unit = {
+      Description = "mouse-actions tray toggle";
+      PartOf = [ "graphical-session.target" ];
+      After = [ "graphical-session.target" ];
+    };
+    Service = {
+      ExecStart = "${mouseActionsTray}/bin/mouse-actions-tray";
+      Restart = "on-failure";
+      RestartSec = 3;
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
 }
