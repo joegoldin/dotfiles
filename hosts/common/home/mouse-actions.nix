@@ -16,7 +16,9 @@ let
 
   configFile = pkgs.writeText "mouse-actions.json" configJson;
 
-  mouseActionsGui = "${pkgs.mouse-actions-gui-appimage}/bin/mouse-actions-gui";
+  # Daemon = patched CLI (owns the grabbed mouse, drag-shift logic baked in).
+  # GUI AppImage stays installed via home.packages for config editing only.
+  mouseActionsDaemon = "${pkgs.mouse-actions-patched}/bin/mouse-actions";
 
   # KDE tray toggle: click to start/stop mouse-actions.service, icon shows state.
   # Qt's QSystemTrayIcon bridges to KStatusNotifierItem on Plasma 6.
@@ -27,6 +29,8 @@ let
         flakeIgnore = [
           "E501"
           "E402"
+          "E302"
+          "E305"
           "W503"
         ];
       }
@@ -137,7 +141,7 @@ in
       After = [ "graphical-session.target" ];
     };
     Service = {
-      ExecStart = "${mouseActionsGui} start";
+      ExecStart = "${mouseActionsDaemon} start";
       Restart = "on-failure";
       RestartSec = 3;
     };
