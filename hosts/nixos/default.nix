@@ -11,8 +11,6 @@
     ../common/system/earlyoom.nix
     ./configuration.nix
     ./hardware-configuration.nix
-    ../common/system/drag-shift.nix
-    ./overview-hotkey.nix
     ../common/system/app-autostart.nix
     ../common/system/gaming.nix
     ./joe-desktop.nix

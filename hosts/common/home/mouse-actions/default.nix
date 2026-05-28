@@ -79,18 +79,37 @@ let
             px.fill(Qt.transparent)
             p = QPainter(px)
             p.setRenderHint(QPainter.Antialiasing, True)
-            fill = QColor("#3daee9") if active else QColor("#555555")
-            p.setBrush(fill)
-            p.setPen(QPen(fill.darker(150), 3))
-            p.drawEllipse(8, 8, size - 16, size - 16)
-            p.setPen(QPen(QColor("white"), 4))
+
+            base = QIcon.fromTheme("input-mouse")
+            if base.isNull():
+                base = QIcon.fromTheme("preferences-desktop-mouse")
+            if not base.isNull():
+                base.paint(p, 0, 0, size, size)
+            else:
+                # fallback: draw a tiny mouse silhouette
+                body = QColor("#cccccc")
+                p.setBrush(body)
+                p.setPen(QPen(body.darker(150), 2))
+                p.drawRoundedRect(16, 8, 32, 44, 16, 18)
+                p.drawLine(32, 8, 32, 28)
+
+            # status badge bottom-right (check = on, X = off)
+            badge_d = 30
+            pad = 2
+            bx = size - badge_d - pad
+            by = size - badge_d - pad
+            badge_fill = QColor("#27ae60") if active else QColor("#c0392b")
+            p.setBrush(badge_fill)
+            p.setPen(QPen(badge_fill.darker(160), 2))
+            p.drawEllipse(bx, by, badge_d, badge_d)
+            p.setPen(QPen(QColor("white"), 3, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
             p.setBrush(Qt.NoBrush)
             if active:
-                p.drawLine(22, 32, 30, 42)
-                p.drawLine(30, 42, 46, 22)
+                p.drawLine(bx + 7, by + 16, bx + 13, by + 22)
+                p.drawLine(bx + 13, by + 22, bx + 23, by + 9)
             else:
-                p.drawLine(22, 22, 42, 42)
-                p.drawLine(42, 22, 22, 42)
+                p.drawLine(bx + 9, by + 9, bx + 21, by + 21)
+                p.drawLine(bx + 21, by + 9, bx + 9, by + 21)
             p.end()
             return QIcon(px)
 
