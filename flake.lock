@@ -511,17 +511,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1780019098,
-        "narHash": "sha256-4BahS0YIIQG3/Y6r2QEiX4/MQhNbrdLBDr+Qv7bvhvA=",
-        "owner": "aaddrick",
+        "lastModified": 1780061168,
+        "narHash": "sha256-yzsjfkIP1kKDnehrGAkLQ/SkZbvBiHpfDDAsDIHyY58=",
+        "owner": "DhanushSantosh",
         "repo": "claude-desktop-debian",
-        "rev": "2ae2172a6007f70e5499b65900db1b7b9a493e42",
+        "rev": "8667552c3cc3991a9691ee44eeeaabc5b809bbc5",
         "type": "github"
       },
       "original": {
-        "owner": "aaddrick",
+        "owner": "DhanushSantosh",
         "repo": "claude-desktop-debian",
-        "rev": "2ae2172a6007f70e5499b65900db1b7b9a493e42",
+        "rev": "8667552c3cc3991a9691ee44eeeaabc5b809bbc5",
         "type": "github"
       }
     },
