@@ -466,6 +466,7 @@
           };
           modules = [
             # ROCm support only on desktop (has AMD GPU)
+            # temporarily disabled — rocmSupport + vllm-rocm = 15h build
             {
               nixpkgs.overlays = [
                 (final: prev: {
@@ -474,11 +475,12 @@
                     config = {
                       allowUnfree = true;
                       android_sdk.accept_license = true;
-                      rocmSupport = true;
+                      # rocmSupport = true;
                     };
-                    overlays = unstableOverlays ++ [
-                      (import ./hosts/common/system/overlays/vllm-rocm.nix)
-                    ];
+                    overlays = unstableOverlays;
+                    # overlays = unstableOverlays ++ [
+                    #   (import ./hosts/common/system/overlays/vllm-rocm.nix)
+                    # ];
                   };
                 })
               ];

@@ -66,7 +66,7 @@ in
       })
       mpv
       nvtopPackages.amd
-      unstable.vllm-rocm
+      # unstable.vllm-rocm # temporarily disabled — 15h build
       wl-clipboard
       xclip
       unstable.zoom-us
