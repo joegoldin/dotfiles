@@ -267,7 +267,6 @@ update-pins dry_run='':
       exit 0
     fi
     scripts/update-flake-pins.sh
-    just flake-update
     # Record the run and commit refreshed flake.lock to the parent dotfiles
     # repo so the machine has a clean history of what's installed.
     git add flake.nix flake.lock 2>/dev/null || true
