@@ -69,7 +69,20 @@ in
       # unstable.vllm-rocm # temporarily disabled — 15h build
       wl-clipboard
       xclip
-      unstable.zoom-us
+      # Wrap zoom so its forked `zopen` browser-launcher helper inherits a sane
+      # env. On Wayland, `zopen` aborts (SIGABRT in Qt) during the Google/SSO
+      # OAuth browser hand-off; forcing XWayland (QT_QPA_PLATFORM=xcb) and giving
+      # it an explicit BROWSER fixes the sign-in crash. See nixpkgs #69352/#75903.
+      (unstable.symlinkJoin {
+        name = "zoom-us-wrapped";
+        paths = [ unstable.zoom-us ];
+        nativeBuildInputs = [ unstable.makeWrapper ];
+        postBuild = ''
+          wrapProgram $out/bin/zoom \
+            --set QT_QPA_PLATFORM xcb \
+            --set BROWSER firefox
+        '';
+      })
     ]
     ++ appImagePackages;
 
