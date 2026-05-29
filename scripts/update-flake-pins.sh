@@ -295,8 +295,8 @@ echo "  - Found ${#UNPINNED_INPUTS[@]} unpinned inputs"
 
 if [[ "$DRY_RUN" != "true" ]]; then
   echo
-  log_info "Running nix flake update (refreshes all inputs, including unpinned and branch-pinned like nixpkgs-unstable)..."
-  nix flake update 2>&1 | grep -E "^(updating|Updated)" || true
+  log_info "Running just flake-update (refreshes all inputs, including unpinned and branch-pinned like nixpkgs-unstable)..."
+  just flake-update
 fi
 
 if [[ "$DRY_RUN" == "true" ]]; then
