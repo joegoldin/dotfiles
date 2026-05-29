@@ -199,11 +199,18 @@ in
           default = "allow";
         };
         default_model = {
-          model = "claude-sonnet-4-6-thinking-latest";
-          provider = "anthropic";
+          model = "claude-opus-4-7";
+          provider = "zed.dev";
         };
         inline_assistant_model = {
-          model = "claude-sonnet-4-6";
+          model = "claude-opus-4-7";
+          provider = "zed.dev";
+        };
+        # Workaround for https://github.com/zed-industries/zed/issues/49222 —
+        # commit_message_model fallback to default_model was unreliable, so set
+        # it explicitly.
+        commit_message_model = {
+          model = "claude-opus-4-7";
           provider = "zed.dev";
         };
         model_parameters = [ ];
