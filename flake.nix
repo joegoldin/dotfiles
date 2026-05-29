@@ -147,9 +147,15 @@
     };
 
     # ── Claude / LLM tooling ───────────────────────────────────────────────
-    # Claude Desktop for Linux
+    # Claude Desktop for Linux.
+    # TEMP: pinned to DhanushSantosh's fork PR #666 head, which retargets
+    # the .asar trusted-folder guard injection to the `async
+    # addTrustedFolder(...) {` body. The old aaddrick rev (2ae2172a) failed
+    # to build Claude Desktop 1.9659.2 with "addTrustedFolder anchor not
+    # found". Revert to `aaddrick/claude-desktop-debian` main once
+    # https://github.com/aaddrick/claude-desktop-debian/pull/666 merges.
     claude-desktop-debian = {
-      url = "github:aaddrick/claude-desktop-debian?rev=2ae2172a6007f70e5499b65900db1b7b9a493e42";
+      url = "github:DhanushSantosh/claude-desktop-debian/8667552c3cc3991a9691ee44eeeaabc5b809bbc5";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, antigravity)
