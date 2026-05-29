@@ -39,14 +39,18 @@ let
     ];
 
     # Forward + Back mouse buttons within 100 ms → KDE Overview.
-    # passthrough=true so browser back/forward navigation still works.
+    # passthrough=false swallows both buttons so the browser doesn't see
+    # back/forward when you fire the chord. mouse-actions defers the first
+    # press for window_ms; if the second arrives in time the chord fires
+    # and the deferred press is dropped, otherwise a uinput re-injection
+    # turns it back into a solo click (~100 ms perceived latency).
     chord_bindings = [
       {
         comment = "BTN_SIDE + BTN_EXTRA → Overview";
         buttons = [ "Side" "Extra" ];
         window_ms = 100;
         cmd_str = "${pkgs.dbus}/bin/dbus-send --type=method_call --dest=org.kde.kglobalaccel /component/kwin org.kde.kglobalaccel.Component.invokeShortcut string:Overview";
-        passthrough = true;
+        passthrough = false;
       }
     ];
   };
