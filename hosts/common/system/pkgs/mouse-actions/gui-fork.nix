@@ -30,8 +30,8 @@ rustPlatform.buildRustPackage rec {
   src = fetchFromGitHub {
     owner = "joegoldin";
     repo = "mouse-actions";
-    rev = "0af4b36";
-    hash = "sha256-auO3a1Z/StG1rQdqeS18Bmabu+0acrWsgyYLze13We8=";
+    rev = "b3bdbb9";
+    hash = "sha256-NLwwQtZbj6NixqhZm6qX3ZVRe9Wvwas9HfAzDxPqyJk=";
   };
 
   npmRoot = "config-editor";
