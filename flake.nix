@@ -24,7 +24,7 @@
     };
     # jovian (Steam Deck)
     jovian-nixos = {
-      url = "github:Jovian-Experiments/Jovian-NixOS?rev=aee8bab39b309b038c14f216538e6141f28808c6";
+      url = "github:Jovian-Experiments/Jovian-NixOS?rev=8f97d1dee8c0971b01cd6b17ccf913e8bb70f5d5";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -102,7 +102,7 @@
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.7.0";
     # pre-built nix-index database
     nix-index-database = {
-      url = "github:nix-community/nix-index-database?rev=8fba98c80b48fa013820e0163c5096922fea4ddd";
+      url = "github:nix-community/nix-index-database?rev=97df9dc0b7c924344b793a15c1e8e4522ebb854e";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # fast x86_64-linux builds on Apple Silicon
@@ -127,11 +127,11 @@
     # ── Desktop / NixOS applications ───────────────────────────────────────
     # affinity apps
     affinity-nix = {
-      url = "github:mrshmllow/affinity-nix?rev=328f8f66e375c64255dc3cb3453271aab4d4c273";
+      url = "github:mrshmllow/affinity-nix?rev=84994addd36ea35740d2cf2f9de58ed73319aad4";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Ghostty terminal
-    ghostty.url = "github:ghostty-org/ghostty?rev=90175950d5004382abd3b0b9528e7be81b0b52ec";
+    ghostty.url = "github:ghostty-org/ghostty?rev=16f2fdc90c2ca59ed870c7b3355a337b1fd650b2";
     # Zed editor (built from source via flake)
     zed-editor.url = "github:zed-industries/zed?ref=v1.5.3-pre";
     # Zed nix extension (fork with language injection for script bodies)
@@ -159,7 +159,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, antigravity)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=0fb42103f93cd5c1152254856d7eccb3e91c8bf6";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=1e7adcb42b365dbc2cd4161a8fefb16600fb6ec4";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
