@@ -117,10 +117,11 @@ in
   # dm-crypt mapper stays at SYSTEMD_READY=0, so the generated .swap unit waits
   # 90s for its .device dep and fails. Re-trigger udev probing after mkswap.
   # https://github.com/NixOS/nixpkgs/issues/524389
-  systemd.services."mkswap-dev-disk-byx2dpartuuid-0a44e123x2d0bfax2d48c5x2d80c0x2d7215f00162b1".serviceConfig.ExecStartPost = [
-    "${pkgs.systemd}/bin/udevadm trigger --action=change /dev/mapper/dev-disk-byx2dpartuuid-0a44e123x2d0bfax2d48c5x2d80c0x2d7215f00162b1"
-    "${pkgs.systemd}/bin/udevadm settle"
-  ];
+  systemd.services."mkswap-dev-disk-byx2dpartuuid-0a44e123x2d0bfax2d48c5x2d80c0x2d7215f00162b1".serviceConfig.ExecStartPost =
+    [
+      "${pkgs.systemd}/bin/udevadm trigger --action=change /dev/mapper/dev-disk-byx2dpartuuid-0a44e123x2d0bfax2d48c5x2d80c0x2d7215f00162b1"
+      "${pkgs.systemd}/bin/udevadm settle"
+    ];
 
   # Unload DisplayLink evdi module before suspend to prevent freeze
   systemd.services.displaylink-suspend = {
@@ -151,6 +152,13 @@ in
   xdg.portal = {
     enable = true;
     extraPortals = [ pkgs.kdePackages.xdg-desktop-portal-kde ];
+  };
+
+  # Run AppImages directly, registering a binfmt handler so they execute
+  # without an explicit interpreter invocation.
+  programs.appimage = {
+    enable = true;
+    binfmt = true;
   };
 
   security.rtkit.enable = true;
