@@ -131,7 +131,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Ghostty terminal
-    ghostty.url = "github:ghostty-org/ghostty?rev=16f2fdc90c2ca59ed870c7b3355a337b1fd650b2";
+    ghostty.url = "github:ghostty-org/ghostty?rev=0f7cd84b880b203c98683e520e84b9db0c5938d8";
     # Zed editor (built from source via flake)
     zed-editor.url = "github:zed-industries/zed?ref=v1.5.3-pre";
     # Zed nix extension (fork with language injection for script bodies)
@@ -159,7 +159,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, antigravity)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=1e7adcb42b365dbc2cd4161a8fefb16600fb6ec4";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=0e4618ed6c946427e3d036925f98211220834892";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
@@ -175,7 +175,7 @@
     # ── Homebrew (macOS) ───────────────────────────────────────────────────
     nix-homebrew.url = "github:zhaofengli/nix-homebrew?rev=b3a87b4793205cc111f3c61e25e018ffac3b8039";
     brew-nix = {
-      url = "github:BatteredBunny/brew-nix?rev=3018198a797eafa188d81aef2ddc0b2e17b8c3f8";
+      url = "github:BatteredBunny/brew-nix?rev=d40695006e0313d131c668d926d92c0fcd737e2a";
       inputs.brew-api.follows = "brew-api";
     };
     brew-api = {
