@@ -4,12 +4,12 @@
   ...
 }:
 let
-  enabled = (pkgs ? llm-agents) && (pkgs.llm-agents ? antigravity);
+  enabled = (pkgs ? llm-agents) && (pkgs.llm-agents ? antigravity-cli);
 in
 {
   programs.antigravity-cli-nix = lib.mkIf enabled {
     enable = true;
-    package = pkgs.llm-agents.antigravity;
+    package = pkgs.llm-agents.antigravity-cli;
     settings = {
       general.enableNotifications = true;
       skills.enabled = true;
