@@ -131,7 +131,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Ghostty terminal
-    ghostty.url = "github:ghostty-org/ghostty?rev=0f7cd84b880b203c98683e520e84b9db0c5938d8";
+    ghostty.url = "github:ghostty-org/ghostty?rev=5758e149319d244cbf2d21d1ae8d1376adaf1f91";
     # Zed editor (built from source via flake)
     zed-editor.url = "github:zed-industries/zed?ref=v1.5.3-pre";
     # Zed nix extension (fork with language injection for script bodies)
@@ -159,7 +159,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, antigravity)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=0e4618ed6c946427e3d036925f98211220834892";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=0030e3c712f6914dd8e5d59f31afebacbeec5a19";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
