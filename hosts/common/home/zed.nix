@@ -1,5 +1,4 @@
 {
-  config,
   lib,
   pkgs,
   inputs,
@@ -93,6 +92,10 @@ in
           "shift-enter" = [
             "terminal::SendText"
             (builtins.fromJSON ''"\u001b\r"'')
+          ];
+          "ctrl-s" = [
+            "terminal::SendKeystroke"
+            "ctrl+s"
           ];
         };
       }
@@ -192,6 +195,7 @@ in
       };
 
       agent = {
+        notify_when_agent_waiting = "primary_screen";
         dock = "right";
         enable_feedback = false;
         show_turn_stats = true;
@@ -229,50 +233,6 @@ in
         file_icons = false;
         show_count_badge = true;
         tree_view = true;
-      };
-
-      # External ACP agents — point them at our Nix-managed wrappers so Zed
-      # launches the same binaries (with our skills, slash commands, plugins,
-      # MCPs, etc.) that we use from the terminal.
-      #
-      # claude-acp: the adapter spawns Claude Code as a subprocess, so
-      #   CLAUDE_CODE_EXECUTABLE redirects it to the home-manager-managed
-      #   claude wrapper. That wrapper bakes in `--plugin-dir` flags for our
-      #   agent-skills plugin (skills + commands + agents); pointing at the
-      #   bare pkgs.llm-agents.claude-code binary instead would skip them.
-      # claude-acp-work: same adapter (@agentclientprotocol/claude-agent-acp,
-      #   the npm package Zed's registry uses), but as a `custom` entry so
-      #   we get a second picker entry pointing at the claude-work wrapper
-      #   (which sets CLAUDE_CONFIG_DIR=~/.claude-work for the work account).
-      #   Custom-type instead of a second registry key because alternate
-      #   registry keys silently fall back to defaults.
-      # codex-acp: statically links the codex Rust crates, so its bundled
-      #   codex cannot be overridden at runtime. Zed's registry ships a generic
-      #   Linux binary that fails on NixOS (libcap.so.2 not found), so point at
-      #   the Nix-built codex-acp from llm-agents instead.
-      agent_servers = {
-        claude-acp = {
-          type = "registry";
-          default_mode = "plan";
-          env = {
-            CLAUDE_CODE_EXECUTABLE = "${config.home.profileDirectory}/bin/claude";
-          };
-        };
-        claude-acp-work = {
-          type = "custom";
-          default_mode = "plan";
-          command = "${pkgs.llm-agents.claude-agent-acp}/bin/claude-agent-acp";
-          args = [ ];
-          env = {
-            CLAUDE_CODE_EXECUTABLE = "${config.home.profileDirectory}/bin/claude-work";
-          };
-        };
-        codex-acp = {
-          type = "custom";
-          command = "${pkgs.llm-agents.codex-acp}/bin/codex-acp";
-          args = [ ];
-          env = { };
-        };
       };
 
     }
