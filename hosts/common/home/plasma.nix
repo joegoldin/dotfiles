@@ -462,6 +462,33 @@
       # Locale
       "plasma-localerc"."Formats"."LANG" = "en_US.UTF-8";
       "plasmarc"."Theme"."name" = "breeze-dark";
+      # Default terminal -> Ghostty. KIO's KTerminalLauncherJob reads these
+      # from kdeglobals [General]; this makes Dolphin's built-in "Open
+      # Terminal Here" (Alt+Shift+F4) launch Ghostty instead of Konsole.
+      "kdeglobals"."General"."TerminalApplication" = "ghostty";
+      "kdeglobals"."General"."TerminalService" = "com.mitchellh.ghostty.desktop";
+      # Hide the Konsole "Run In Konsole" service menu (from the konsole
+      # package's konsolerun.desktop); replaced by run-in-ghostty below.
+      "kservicemenurc"."Show"."konsolerun" = false;
     };
   };
+
+  # "Run In Ghostty" context-menu entry for executable files, mirroring the
+  # konsole package's konsolerun.desktop (which we hide above). The Ghostty
+  # package already ships an "Open Ghostty Here" menu for directories;
+  # this covers the application/x-executable case. --wait-after-command keeps
+  # the window open after the program exits (Konsole's --hold equivalent).
+  xdg.dataFile."kio/servicemenus/run-in-ghostty.desktop".text = ''
+    [Desktop Entry]
+    Type=Service
+    ServiceTypes=KonqPopupMenu/Plugin
+    MimeType=application/x-executable;
+    Actions=RunInGhostty
+    X-KDE-AuthorizeAction=shell_access
+
+    [Desktop Action RunInGhostty]
+    Name=Run In Ghostty
+    Icon=com.mitchellh.ghostty
+    Exec=ghostty --wait-after-command=true -e %f
+  '';
 }
