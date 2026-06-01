@@ -534,11 +534,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1780074747,
-        "narHash": "sha256-XUVjnSIzgXtrme6L3fNGuHgUOXVjsafNZKE9ZWvNkZ8=",
+        "lastModified": 1780279778,
+        "narHash": "sha256-8y0yKFeD4GV9r3R/WIUgmN8HjdjwYg7vivNMyZbJBfg=",
         "owner": "joegoldin",
         "repo": "claude-nix",
-        "rev": "90a87074be1ad5cacbdc5a468e45625ad8b9aee4",
+        "rev": "785e28cbca59ddb1620f27e4eab7bb8350cde8a0",
         "type": "github"
       },
       "original": {
