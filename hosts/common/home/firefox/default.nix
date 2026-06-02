@@ -11,9 +11,16 @@ in
 {
   programs.firefox = {
     enable = true;
-    # Zen Browser (Firefox fork). home-manager re-wraps this with the policies
-    # below via wrapFirefox's `extraPolicies` override (see mkFirefoxModule.nix).
-    package = inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default;
+    # Zen Browser (Firefox fork). We wrap the *unwrapped* package with nixpkgs'
+    # own wrapFirefox so that home-manager's `package.override { extraPolicies }`
+    # (mkFirefoxModule.nix) actually threads our policies into policies.json.
+    # The flake's pre-wrapped `default` is NOT overridable for extraPolicies
+    # (override is a no-op there), which silently drops all policies — including
+    # the force-installed extensions and search engines.
+    package =
+      pkgs.wrapFirefox
+        inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.zen-browser-unwrapped
+        { };
     # Zen's real profile root is ~/.zen (application.ini: Profile=zen), not
     # ~/.mozilla/firefox. profiles.Default therefore lands in ~/.zen/Default/.
     configPath = ".zen";
