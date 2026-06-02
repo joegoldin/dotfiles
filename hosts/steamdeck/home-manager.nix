@@ -56,7 +56,7 @@
               behavior.grouping.clickAction = "showTooltips";
               launchers = [
                 "preferred://filemanager"
-                "applications:firefox.desktop"
+                "applications:zen.desktop"
                 "applications:steam.desktop"
               ];
             };
@@ -82,9 +82,9 @@
 
     hotkeys.commands = {
       "launch-browser" = {
-        name = "Launch Firefox";
+        name = "Launch Zen";
         key = "Meta+B";
-        command = "firefox";
+        command = "zen";
       };
     };
 

@@ -37,7 +37,7 @@
               launchers = [
                 "preferred://filemanager"
                 "applications:com.mitchellh.ghostty.desktop"
-                "applications:firefox.desktop"
+                "applications:zen.desktop"
                 "applications:discord.desktop"
                 "applications:steam.desktop"
               ];
@@ -69,9 +69,9 @@
         command = "ghostty";
       };
       "launch-browser" = {
-        name = "Launch Firefox";
+        name = "Launch Zen";
         key = "Meta+B";
-        command = "firefox";
+        command = "zen";
       };
     };
 
