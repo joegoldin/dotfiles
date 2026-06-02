@@ -30,7 +30,7 @@
     };
     # jovian (Steam Deck)
     jovian-nixos = {
-      url = "github:Jovian-Experiments/Jovian-NixOS?rev=8f97d1dee8c0971b01cd6b17ccf913e8bb70f5d5";
+      url = "github:Jovian-Experiments/Jovian-NixOS?rev=181c21d94c3a8c6f2198fa240e4012f0674628f7";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -137,7 +137,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Ghostty terminal
-    ghostty.url = "github:ghostty-org/ghostty?rev=5758e149319d244cbf2d21d1ae8d1376adaf1f91";
+    ghostty.url = "github:ghostty-org/ghostty?rev=6246c288ae1087c8d67f75432a59da004b30bf25";
     # Zed editor (built from source via flake)
     zed-editor.url = "github:zed-industries/zed?ref=v1.5.3-pre";
     # Zed nix extension (fork with language injection for script bodies)
@@ -165,7 +165,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, antigravity)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=0030e3c712f6914dd8e5d59f31afebacbeec5a19";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=2f2a2d3e3422a7ad6a105c115db2a08a630a03c4";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
