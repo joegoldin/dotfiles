@@ -2783,26 +2783,6 @@
         "type": "github"
       }
     },
-    "nix-rosetta-builder": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1779821956,
-        "narHash": "sha256-erjInjoE/aFSJz3H1lBHiE4vrw8HBvrmboYlK70E+uM=",
-        "owner": "joegoldin",
-        "repo": "nix-rosetta-builder",
-        "rev": "6a3290535ef66516e9c27ab016b1c5398c67c200",
-        "type": "github"
-      },
-      "original": {
-        "owner": "joegoldin",
-        "repo": "nix-rosetta-builder",
-        "type": "github"
-      }
-    },
     "nix-test-runner": {
       "flake": false,
       "locked": {
@@ -3778,7 +3758,6 @@
         "nix-flatpak": "nix-flatpak",
         "nix-homebrew": "nix-homebrew",
         "nix-index-database": "nix-index-database",
-        "nix-rosetta-builder": "nix-rosetta-builder",
         "nixpkgs": "nixpkgs_17",
         "nixpkgs-darwin": "nixpkgs-darwin",
         "nixpkgs-python": "nixpkgs-python",
@@ -3787,6 +3766,7 @@
         "plasma-manager": "plasma-manager",
         "systems": "systems_15",
         "tinygrad-nix": "tinygrad-nix",
+        "virby": "virby",
         "zed-editor": "zed-editor",
         "zed-nix-ext": "zed-nix-ext"
       }
@@ -4263,6 +4243,26 @@
       "original": {
         "owner": "pyproject-nix",
         "repo": "uv2nix",
+        "type": "github"
+      }
+    },
+    "virby": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1776406961,
+        "narHash": "sha256-tEC8oqQ5qpZJJa2amUgVd/J706R6fmP3QjawOZaBRcA=",
+        "owner": "quinneden",
+        "repo": "virby-nix-darwin",
+        "rev": "6ad5c37179391ccddaabe8fe64750cb0fc4b5670",
+        "type": "github"
+      },
+      "original": {
+        "owner": "quinneden",
+        "repo": "virby-nix-darwin",
         "type": "github"
       }
     },
