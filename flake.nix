@@ -105,9 +105,9 @@
       url = "github:nix-community/nix-index-database?rev=97df9dc0b7c924344b793a15c1e8e4522ebb854e";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # fast x86_64-linux builds on Apple Silicon
-    nix-rosetta-builder = {
-      url = "github:joegoldin/nix-rosetta-builder";
+    # vfkit-based linux builder for nix-darwin (replaces the rosetta-builder)
+    virby = {
+      url = "github:quinneden/virby-nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -274,7 +274,7 @@
       dotfiles-assets,
       dotfiles-secrets,
       pelican,
-      nix-rosetta-builder,
+      virby,
       nix-flatpak,
       nix-index-database,
       ...
@@ -886,8 +886,8 @@
             ./hosts/darwin
             nix-index-database.darwinModules.default
             nix-homebrew.darwinModules.nix-homebrew
-            # Rosetta-based Linux builder for fast x86_64-linux builds on Apple Silicon
-            nix-rosetta-builder.darwinModules.default
+            # vfkit-based Linux builder (enabled below, currently kept off for bootstrap)
+            virby.darwinModules.default
             home-manager.darwinModules.home-manager
             (
               { specialArgs, ... }:
@@ -945,33 +945,17 @@
               }
             )
             {
-              # Standard linux-builder (used for initial bootstrap, now replaced by rosetta-builder)
-              # nix.linux-builder.enable = true;
-
-              # Rosetta-based builder: faster x86_64-linux builds using Rosetta 2
-              # onDemand: VM starts only when needed and powers off when idle.
-              # Backed by the lima 2.x-compatible socat+nc wrapper in
-              # joegoldin/nix-rosetta-builder commit 7612c88.
-              nix-rosetta-builder.enable = true;
-              nix-rosetta-builder.onDemand = true;
-              # Debug instrumentation kept on after the lima 2.x tag fix so the
-              # next failure, if any, leaves kernel/systemd boot output in
-              # /private/var/lib/rosetta-builder/.lima/rosetta-builder-vm/serialv.log
-              # and a usable shell at the serial console.
-              # mkForce overrides package.nix's `security.sudo.enable = debugInsecurely`
-              # (false by default), which would otherwise conflict. The option is
-              # types.attrs upstream so it must be a plain attrs (not a function).
-              nix-rosetta-builder.potentiallyInsecureExtraNixosModule = {
-                boot.kernelParams = [
-                  "console=hvc0,115200"
-                  "console=tty0"
-                ];
-                services.getty.autologinUser = "builder";
-                security.sudo = {
-                  enable = nixpkgs.lib.mkForce true;
-                  wheelNeedsPassword = nixpkgs.lib.mkForce false;
-                };
-                users.users.builder.extraGroups = [ "wheel" ];
+              # vfkit-based Linux builder. The stock nix.linux-builder is kept off;
+              # it was only used to bootstrap this rebuild (it builds virby's VM
+              # image, then virby takes over as the aarch64-/x86_64-linux builder).
+              nix.linux-builder.enable = false;
+              services.virby = {
+                enable = true;
+                # Start the VM on demand and power it down after idle (parity with
+                # the old rosetta-builder onDemand setup).
+                onDemand.enable = true;
+                # Build x86_64-linux via Rosetta translation (aarch64-darwin only).
+                rosetta = true;
               };
             }
           ];
