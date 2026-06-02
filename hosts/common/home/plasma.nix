@@ -70,7 +70,7 @@
             name = "org.kde.plasma.icontasks";
             config.General.launchers = lib.concatStringsSep "," [
               "preferred://filemanager"
-              "applications:firefox.desktop"
+              "applications:zen.desktop"
               "applications:com.mitchellh.ghostty.desktop"
               "applications:dev.zed.Zed-Nightly.desktop"
               "applications:parsecd.desktop"

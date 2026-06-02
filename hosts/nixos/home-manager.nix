@@ -54,7 +54,7 @@
               behavior.grouping.clickAction = "showTooltips";
               launchers = [
                 "preferred://filemanager"
-                "applications:firefox.desktop"
+                "applications:zen.desktop"
                 "applications:com.mitchellh.ghostty.desktop"
                 "applications:dev.zed.Zed-Nightly.desktop"
                 "applications:parsecd.desktop"
@@ -99,9 +99,9 @@
         command = "ghostty";
       };
       "launch-browser" = {
-        name = "Launch Firefox";
+        name = "Launch Zen";
         key = "Meta+B";
-        command = "firefox";
+        command = "zen";
       };
     };
 
@@ -209,7 +209,7 @@
         ''{"layoutDirection":"horizontal","tiles":x5b{"layoutDirection":"floating","tiles":x5b{"height":0.8965277777777776,"width":0.7894531249999752,"x":0.07148437499999993,"y":0.050000000000000155},{"height":0.7597222222222202,"width":0.36015624999999607,"x":0.6312500000000021,"y":0.029861111111111085},{"height":0.8805555555555554,"width":0.45234375000000104,"x":0.016406250000003054,"y":0.020833333333333603}x5d,"width":0.9999999999999984}x5d}'';
       "plasmanotifyrc"."Applications/com.mitchellh.ghostty"."Seen" = true;
       "plasmanotifyrc"."Applications/discord"."Seen" = true;
-      "plasmanotifyrc"."Applications/firefox"."Seen" = true;
+      "plasmanotifyrc"."Applications/zen"."Seen" = true;
       "plasmanotifyrc"."Applications/slack"."Seen" = true;
       "plasmaparc"."General"."RaiseMaximumVolume" = true;
       "spectaclerc"."ImageSave"."translatedScreenshotsFolder" = "Screenshots";

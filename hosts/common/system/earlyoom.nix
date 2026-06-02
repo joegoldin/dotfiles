@@ -30,7 +30,7 @@ _: {
     extraArgs = [
       # Prefer killing the usual memory pigs first.
       "--prefer"
-      "(^|/)(nix|nix-daemon|cargo|rustc|node|electron|chromium|firefox|Unity|java)$"
+      "(^|/)(nix|nix-daemon|cargo|rustc|node|electron|chromium|zen|zen-bin|Unity|java)$"
       # Never reap the things that keep the session alive.
       "--avoid"
       "(^|/)(systemd|dbus|kwin_wayland|plasmashell|plasma-session|sddm|sshd|init|kthreadd|Xwayland)$"

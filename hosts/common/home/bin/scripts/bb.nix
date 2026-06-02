@@ -1,10 +1,21 @@
 {
   name = "bb";
   desc = "Run a command in the background silently";
-  params = [{ name = "COMMAND"; desc = "Command to run in background"; }];
+  params = [
+    {
+      name = "COMMAND";
+      desc = "Command to run in background";
+    }
+  ];
   examples = [
-    { cmd = "bb firefox"; desc = "Launch firefox in background"; }
-    { cmd = "bb make build"; desc = "Run build silently"; }
+    {
+      cmd = "bb zen";
+      desc = "Launch zen in background";
+    }
+    {
+      cmd = "bb make build";
+      desc = "Run build silently";
+    }
   ];
   fish = ''
     if isatty stdout

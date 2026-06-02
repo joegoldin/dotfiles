@@ -80,7 +80,7 @@ in
         postBuild = ''
           wrapProgram $out/bin/zoom \
             --set QT_QPA_PLATFORM xcb \
-            --set BROWSER firefox
+            --set BROWSER zen
         '';
       })
     ]

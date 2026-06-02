@@ -39,7 +39,6 @@ in
       (extension "w2g" "{6ea0a676-b3ef-48aa-b23d-24c8876945fb}")
       (extension "mal-sync" "{c84d89d9-a826-4015-957b-affebd9eb603}")
       (extension "return-youtube-dislikes" "{762f9885-5a13-4abd-9c77-433dcd38b8fd}")
-      (extension "sidebery" "{3c078156-979c-498b-8990-85f7987dd929}")
       (extension "tampermonkey" "firefox@tampermonkey.net")
       (extension "privacy-badger17" "jid1-MnnxcxisBPnSXQ@jetpack")
       (extension "old-reddit-redirect" "{9063c2e9-e07c-4c2c-9646-cfe7ca8d0498}")

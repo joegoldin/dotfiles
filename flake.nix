@@ -12,6 +12,12 @@
     # Also see the 'unstable-packages' overlay at 'overlays/default.nix'.
     nixpkgs-darwin.url = "github:nixos/nixpkgs/nixpkgs-26.05-darwin";
 
+    # Zen Browser (Firefox fork) — packages only, consumed via programs.firefox.
+    zen-browser = {
+      url = "github:youwen5/zen-browser-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # ── Core framework ─────────────────────────────────────────────────────
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";

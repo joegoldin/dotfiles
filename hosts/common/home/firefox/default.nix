@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  inputs,
   ...
 }:
 let
@@ -10,8 +11,12 @@ in
 {
   programs.firefox = {
     enable = true;
-    package = pkgs.unstable.firefox;
-    configPath = ".mozilla/firefox";
+    # Zen Browser (Firefox fork). home-manager re-wraps this with the policies
+    # below via wrapFirefox's `extraPolicies` override (see mkFirefoxModule.nix).
+    package = inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default;
+    # Zen's real profile root is ~/.zen (application.ini: Profile=zen), not
+    # ~/.mozilla/firefox. profiles.Default therefore lands in ~/.zen/Default/.
+    configPath = ".zen";
     # Refer to https://mozilla.github.io/policy-templates or `about:policies#documentation` in firefox
     policies = {
       AppAutoUpdate = false; # Disable automatic application update
@@ -216,116 +221,10 @@ in
     };
 
     profiles.Default = {
-      userChrome = ''
-        /**
-         * Dynamic Horizontal Tabs Toolbar (with animations)
-         * sidebar.verticalTabs: false (with native horizontal tabs)
-         */
-        #main-window #TabsToolbar > .toolbar-items {
-          overflow: hidden;
-          transition: height 0.3s 0.3s !important;
-        }
-        /* Default state: Set initial height to enable animation */
-        #main-window #TabsToolbar > .toolbar-items { height: 3em !important; }
-        #main-window[uidensity="touch"] #TabsToolbar > .toolbar-items { height: 3.35em !important; }
-        #main-window[uidensity="compact"] #TabsToolbar > .toolbar-items { height: 2.7em !important; }
-        /* Hidden state: Hide native tabs strip */
-        #main-window[titlepreface*="sidebery"] #TabsToolbar > .toolbar-items { height: 0 !important; }
-        /* Hidden state: Fix z-index of active pinned tabs */
-        #main-window[titlepreface*="sidebery"] #tabbrowser-tabs { z-index: 0 !important; }
-        /* Hidden state: Hide window buttons in tabs-toolbar */
-        #main-window[titlepreface*="sidebery"] #TabsToolbar .titlebar-spacer,
-        #main-window[titlepreface*="sidebery"] #TabsToolbar .titlebar-buttonbox-container {
-          display: none !important;
-        }
-        /* Hidden state: Hide native tabs when only one tab is open */
-        #main-window #TabsToolbar:has(.tabbrowser-tab:only-of-type) > .toolbar-items { height: 0 !important; }
-        #main-window #TabsToolbar:has(.tabbrowser-tab:only-of-type) #tabbrowser-tabs { z-index: 0 !important; }
-        #main-window #TabsToolbar:has(.tabbrowser-tab:only-of-type) .titlebar-spacer,
-        #main-window #TabsToolbar:has(.tabbrowser-tab:only-of-type) .titlebar-buttonbox-container {
-          display: none !important;
-        }
-        /* [Optional] Uncomment block below to show window buttons in nav-bar (maybe, I didn't test it on non-linux-i3wm env) */
-        /* #main-window[titlepreface*="sidebery"] #nav-bar > .titlebar-buttonbox-container,
-        #main-window[titlepreface*="sidebery"] #nav-bar > .titlebar-buttonbox-container > .titlebar-buttonbox {
-          display: flex !important;
-        } */
-        /* [Optional] Uncomment one of the line below if you need space near window buttons */
-        /* #main-window[titlepreface*="sidebery"] #nav-bar > .titlebar-spacer[type="pre-tabs"] { display: flex !important; } */
-        /* #main-window[titlepreface*="sidebery"] #nav-bar > .titlebar-spacer[type="post-tabs"] { display: flex !important; } */
-
-        /* Page action buttons: show dots, reveal on hover */
-        #page-action-buttons::after {
-          content: "•••";
-          position: absolute;
-          top: 0.7em;
-          font-size: 0.7em;
-          opacity: 0.5;
-          right: 8px;
-          transition: all 50ms ease-in-out;
-        }
-
-        #page-action-buttons:hover::after {
-          display: none !important;
-          width: 0px !important;
-          margin-left: 0px !important;
-          transition: all 50ms ease-in-out;
-        }
-
-        /* URL bar font size */
-        #urlbar, #searchbar {
-          font-size: 13px !important;
-          margin-top: 1px !important;
-        }
-
-        /* Nav bar + bookmarks bar: use darker menubar/frame background */
-        #nav-bar,
-        #PersonalToolbar {
-          background-color: var(--lwt-accent-color) !important;
-          color: var(--lwt-text-color) !important;
-        }
-        #nav-bar toolbarbutton image,
-        #nav-bar .toolbarbutton-icon,
-        #PersonalToolbar toolbarbutton image,
-        #PersonalToolbar .toolbarbutton-icon {
-          fill: var(--lwt-text-color) !important;
-          color: var(--lwt-text-color) !important;
-        }
-
-        /**
-         * Dynamic Sideberry Sidebar (with animations)
-         * Animates sidebar in/out on toggle and hides when only one tab is open.
-         */
-        /* Base: Enable width transition on sidebar */
-        #sidebar-box {
-          overflow: hidden !important;
-          min-width: 0 !important;
-          transition: width 0.3s 0.3s ease !important;
-        }
-        /* Animate sidebar close: override hidden to use width collapse instead of display:none */
-        #sidebar-box[hidden] {
-          display: -moz-box !important;
-          width: 0 !important;
-        }
-        /* Hide sidebar when only one tab is open */
-        #main-window[titlepreface*="sidebery"]:has(.tabbrowser-tab:only-of-type) #sidebar-box {
-          width: 0 !important;
-        }
-        /* Hide splitter when sidebar is collapsed */
-        #sidebar-box[hidden] + #sidebar-splitter,
-        #main-window[titlepreface*="sidebery"]:has(.tabbrowser-tab:only-of-type) #sidebar-splitter {
-          display: none !important;
-        }
-
-        /* Hide native sidebar header (panel switcher above Sidebery) */
-        #sidebar-header {
-          display: none !important;
-        }
-      '';
-
       settings = {
-        # Required for userChrome.css to load
-        "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+        # Auto-enable force-installed extensions in a fresh profile, so the
+        # declarative add-ons activate without manual approval after migration.
+        "extensions.autoDisableScopes" = 0;
 
         # Disable middle-click paste from PRIMARY selection. Firefox has its
         # own pref independent of GTK's gtk-enable-primary-paste.

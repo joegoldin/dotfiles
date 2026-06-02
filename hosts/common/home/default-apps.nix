@@ -4,7 +4,7 @@
     enable = true;
     defaultApplications =
       let
-        browser = "firefox.desktop";
+        browser = "zen.desktop";
         editor = "dev.zed.Zed-Nightly.desktop";
         fileManager = "org.kde.dolphin.desktop";
         imageViewer = "org.kde.gwenview.desktop";

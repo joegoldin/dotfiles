@@ -8,6 +8,7 @@
     ../common/system/app-autostart.nix
     ../common/system/gaming.nix
     ../common/system/howdy.nix
+    ../common/system/1password-browsers.nix
     ./configuration.nix
     ./disk-config.nix
     ./hardware-configuration.nix

@@ -9,6 +9,7 @@
     ../common/system/microvm-host.nix
     ../common/system/oomd.nix
     ../common/system/earlyoom.nix
+    ../common/system/1password-browsers.nix
     ./configuration.nix
     ./hardware-configuration.nix
     ../common/system/app-autostart.nix
