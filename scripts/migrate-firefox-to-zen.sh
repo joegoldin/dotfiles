@@ -17,19 +17,27 @@ if pgrep -x zen >/dev/null 2>&1 || pgrep -x .zen-wrapped >/dev/null 2>&1 || pgre
   die "Zen is running. Close it completely first."
 fi
 
-# 2. Locate the source Firefox profile (Default from profiles.ini, else newest).
+# 2. Locate the source Firefox profile.
+#    Optional override: ./migrate-firefox-to-zen.sh /path/to/firefox/profile
+#    Otherwise pick the profile dir whose places.sqlite is newest. This is robust
+#    to home-manager profiles named "Default" (no profiles.ini, no *.default*
+#    suffix) as well as standard Firefox "*.default-release" profiles, and it
+#    naturally skips empty/stale profiles (e.g. unused *.dev-edition-default).
 [ -d "$FF_ROOT" ] || die "No Firefox profile root at $FF_ROOT"
-SRC=""
-if [ -f "$FF_ROOT/profiles.ini" ]; then
-  # Prefer the [Install...] Default=, else fall back to newest *.default* dir.
-  rel="$(awk -F= '/^\[Install/{i=1} i&&/^Default=/{print $2; exit}' "$FF_ROOT/profiles.ini")"
-  [ -n "${rel:-}" ] && [ -d "$FF_ROOT/$rel" ] && SRC="$FF_ROOT/$rel"
+if [ "${1:-}" != "" ]; then
+  SRC="$1"
+  [ -d "$SRC" ] || die "Given profile path does not exist: $SRC"
+  [ -e "$SRC/places.sqlite" ] || die "Given path has no places.sqlite (not a profile?): $SRC"
+else
+  SRC=""; best_mtime=0
+  while IFS= read -r -d '' places; do
+    dir="$(dirname "$places")"
+    mtime="$(stat -c %Y "$places" 2>/dev/null || echo 0)"
+    if [ "$mtime" -ge "$best_mtime" ]; then best_mtime="$mtime"; SRC="$dir"; fi
+  done < <(find "$FF_ROOT" -mindepth 2 -maxdepth 2 -name places.sqlite -print0 2>/dev/null)
 fi
-if [ -z "$SRC" ]; then
-  SRC="$(find "$FF_ROOT" -maxdepth 1 -type d -name '*.default*' -printf '%T@ %p\n' \
-        | sort -rn | head -1 | cut -d' ' -f2-)"
-fi
-[ -n "$SRC" ] && [ -d "$SRC" ] || die "Could not find a Firefox source profile under $FF_ROOT"
+[ -n "$SRC" ] && [ -d "$SRC" ] \
+  || die "Could not find a Firefox profile with data (places.sqlite) under $FF_ROOT"
 
 # 3. Zen profile dir must exist (created by home-manager activation / first run).
 [ -d "$ZEN_PROFILE" ] || die "Zen profile $ZEN_PROFILE not found. Rebuild and launch Zen once, then re-run."
