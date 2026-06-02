@@ -279,6 +279,12 @@ in
         "browser.theme.toolbar-theme" = 0; # Dark toolbar
         "ui.key.menuAccessKeyFocuses" = false; # Disable Alt key focusing menu bar
 
+        # Zen-specific UI settings (enforced declaratively).
+        "zen.view.use-single-toolbar" = false; # Separate toolbar layout
+        "zen.view.compact.enable-at-startup" = false; # Don't start in compact mode
+        "zen.pinned-tab-manager.restore-pinned-tabs-to-pinned-url" = true; # Pinned tabs reopen at pinned URL
+        "zen.site-data-panel.show-callout" = false; # Suppress site-data panel callout
+
         "media.videocontrols.picture-in-picture.enabled" = true;
         "media.videocontrols.picture-in-picture.enable-when-switching-tabs.enabled" = true;
         "media.videocontrols.picture-in-picture.video-toggle.first-seen-secs" = 1746510487;
