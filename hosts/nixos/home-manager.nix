@@ -1,9 +1,4 @@
-{
-  username,
-  lib,
-  ...
-}:
-{
+_: {
   imports = [
     ../common/home
     ../common/home/plasma.nix
@@ -16,6 +11,7 @@
     ../common/home/default-apps.nix
     ../common/home/mouse-actions
     ./dolphin.nix
+    ./plasma-panels.nix
   ];
 
   # TODO: git signing with 1password
@@ -39,97 +35,6 @@
   # };
 
   programs.plasma = {
-    # Panel configuration (desktop-specific launchers)
-    panels = [
-      {
-        location = "bottom";
-        height = 38;
-        alignment = "center";
-        floating = false;
-        widgets = [
-          "org.kde.plasma.kicker"
-          {
-            name = "org.kde.plasma.icontasks";
-            # Left-clicking a grouped icon shows small window previews instead of
-            # cycling through windows (groupedTaskVisualization: 0=cycle, 1=previews).
-            config.General.groupedTaskVisualization = 1;
-            config.General.launchers = lib.concatStringsSep "," [
-              "preferred://filemanager"
-              "applications:zen.desktop"
-              "applications:com.mitchellh.ghostty.desktop"
-              "applications:dev.zed.Zed-Nightly.desktop"
-              "applications:parsecd.desktop"
-              "applications:discord.desktop"
-              "applications:steam.desktop"
-              "applications:Zoom.desktop"
-              "applications:claude-desktop.desktop"
-              "applications:obsidian.desktop"
-              "applications:slack.desktop"
-            ];
-          }
-          "org.kde.plasma.marginsseparator"
-          "org.kde.netspeedWidget"
-          "org.kde.plasma.systemmonitor.cpucore"
-          "org.kde.plasma.systemmonitor.memory"
-          "org.kde.plasma.marginsseparator"
-          {
-            name = "org.kde.plasma.systemtray";
-            config.General = {
-              extraItems = lib.concatStringsSep "," [
-                "org.kde.plasma.cameraindicator"
-                "org.kde.plasma.manage-inputmethod"
-                "org.kde.plasma.clipboard"
-                "org.kde.plasma.bluetooth"
-                "org.kde.plasma.keyboardlayout"
-                "org.kde.plasma.devicenotifier"
-                "org.kde.plasma.mediacontroller"
-                "org.kde.plasma.notifications"
-                "org.kde.kscreen"
-                "org.kde.plasma.brightness"
-                "org.kde.plasma.networkmanagement"
-                "org.kde.plasma.battery"
-                "org.kde.plasma.volume"
-                "org.kde.plasma.printmanager"
-                "org.kde.plasma.keyboardindicator"
-                "org.kde.plasma.weather"
-              ];
-              knownItems = lib.concatStringsSep "," [
-                "org.kde.plasma.cameraindicator"
-                "org.kde.plasma.manage-inputmethod"
-                "org.kde.plasma.clipboard"
-                "org.kde.plasma.bluetooth"
-                "org.kde.plasma.keyboardlayout"
-                "org.kde.plasma.devicenotifier"
-                "org.kde.plasma.mediacontroller"
-                "org.kde.plasma.notifications"
-                "org.kde.kscreen"
-                "org.kde.plasma.brightness"
-                "org.kde.plasma.networkmanagement"
-                "org.kde.plasma.battery"
-                "org.kde.plasma.volume"
-                "org.kde.plasma.printmanager"
-                "org.kde.plasma.keyboardindicator"
-                "org.kde.plasma.weather"
-              ];
-            };
-          }
-          {
-            digitalClock = {
-              date.format = {
-                custom = "ddd MMM d";
-              };
-              time.showSeconds = "always";
-              font = {
-                family = "Noto Sans";
-                weight = 400;
-              };
-            };
-          }
-          "org.kde.plasma.minimizeall"
-        ];
-      }
-    ];
-
     # Desktop-specific shortcuts (activity UUIDs)
     shortcuts = {
       "ActivityManager"."switch-to-activity-8a44913d-258b-4faf-b84c-6815d74e5cf1" = [ ];

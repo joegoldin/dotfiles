@@ -373,8 +373,8 @@
       # Window decoration buttons
       "kwinrc"."org.kde.kdecoration2"."ButtonsOnLeft" = "MSFB";
       "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "IAX";
-      # Overview effect: hide minimized windows
-      "kwinrc"."Effect-overview"."IgnoreMinimized" = true;
+      # Overview effect: include minimized windows in the grid
+      "kwinrc"."Effect-overview"."IgnoreMinimized" = false;
       # Alt+Tab task switcher: only current screen, exclude minimized
       "kwinrc"."TabBox"."MultiScreenMode" = 1;
       "kwinrc"."TabBox"."MinimizedMode" = 1;
