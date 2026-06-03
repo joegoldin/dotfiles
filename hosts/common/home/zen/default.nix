@@ -9,6 +9,36 @@
 let
   addons = import ./addons.nix { inherit lib; };
 
+  # Zen ships as a prebuilt binary (the flake repackages upstream's release, it
+  # doesn't compile from source), so our gh-13027 fix can't be applied as a
+  # normal source `patches` entry — the affected module lives inside
+  # browser/omni.ja. Unpack that archive, patch the module, and repack it.
+  # Patch source: https://github.com/joegoldin/zen-browser-desktop/pull/1
+  # (vendored at head 51096d2 — re-vendor patches/ if the PR changes).
+  zenUnwrapped = inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.zen-browser-unwrapped;
+  zenPatchedUnwrapped = zenUnwrapped.overrideAttrs (old: {
+    postFixup = (old.postFixup or "") + ''
+      omnija=$(echo "$out"/lib/zen-*/browser/omni.ja)
+      tmp=$(mktemp -d)
+      # unzip exits non-zero on Firefox's "preloaded" omni.ja layout ("extra
+      # bytes at beginning") but still extracts every entry, so tolerate the
+      # exit code and instead assert the module we need actually came out.
+      ${pkgs.unzip}/bin/unzip -q -o "$omnija" -d "$tmp" || true
+      test -f "$tmp/modules/zen/ZenWindowSync.sys.mjs"
+      before=$(find "$tmp" -type f | wc -l)
+      ${pkgs.patch}/bin/patch -l --fuzz=3 --no-backup-if-mismatch \
+        "$tmp/modules/zen/ZenWindowSync.sys.mjs" \
+        < ${./patches/gh-13027-recover-blank-synced-tabs.patch}
+      chmod -R u+w "$(dirname "$omnija")"
+      rm -f "$omnija"
+      # -D omits directory entries so this count matches the file count above.
+      ( cd "$tmp" && ${pkgs.zip}/bin/zip -qr9XD "$omnija" . )
+      after=$(${pkgs.unzip}/bin/zipinfo -1 "$omnija" | wc -l)
+      test "$after" -eq "$before"
+      rm -rf "$tmp"
+    '';
+  });
+
   # Private container routing (Work container + Containerise site rules) lives in
   # the secrets submodule so the work domains stay out of the public dotfiles.
   containerCfg = import "${dotfiles-secrets}/zen-containers.nix";
@@ -53,10 +83,7 @@ in
     # The flake's pre-wrapped `default` is NOT overridable for extraPolicies
     # (override is a no-op there), which silently drops all policies — including
     # the force-installed extensions and search engines.
-    package =
-      pkgs.wrapFirefox
-        inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.zen-browser-unwrapped
-        { };
+    package = pkgs.wrapFirefox zenPatchedUnwrapped { };
     # Zen's real profile root is ~/.zen (application.ini: Profile=zen), not
     # ~/.mozilla/firefox. profiles.Default therefore lands in ~/.zen/Default/.
     configPath = ".zen";
