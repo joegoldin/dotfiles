@@ -380,7 +380,10 @@ sync-submodules:
 
 # ── Build timing ─────────────────────────────────────────────────────
 
-build_times_file := "secrets/.build-times"
+# Per-machine build durations, kept local (gitignored). Predictions are
+# per-host and read straight from this file, so there's nothing to sync to
+# the secrets submodule — no commit, no push, no conflict markers.
+build_times_file := ".build-times"
 
 [private]
 _show-build-prediction host:
@@ -417,8 +420,6 @@ _record-build-time host seconds:
     fi
     echo "{{ host }}:{{ seconds }}" >> "$file.tmp"
     mv "$file.tmp" "$file"
-    just _commit-to-secrets "$file" "chore: record {{ host }} build time ({{ seconds }}s)"
-    just _sync-secrets-pointer
 
 [private]
 _finish-build host start_time exit_code:
@@ -460,11 +461,11 @@ _commit-to-secrets file msg:
       && echo "  ↑ secrets pushed ({{ msg }})" \
       || echo "  ⚠ secrets push deferred (will retry next run)"
 
-# Re-points the parent repo's `secrets` gitlink to the submodule HEAD that
-# _commit-to-secrets just advanced+pushed, and re-locks the dotfiles-secrets
-# flake input. Without this a build (or update-pins / sync-submodules) leaves
-# the submodule one commit ahead of the recorded pointer — an untracked, dirty
-# tree. Commit-only (push the parent when you like); no-op when already in sync.
+# Manual helper: after you commit inside the `secrets` submodule, this re-points
+# the parent repo's `secrets` gitlink to the submodule HEAD and re-locks the
+# dotfiles-secrets flake input — otherwise the submodule sits one commit ahead of
+# the recorded pointer (an untracked, dirty tree). Commit-only (push the parent
+# when you like); no-op when already in sync.
 [private]
 _sync-secrets-pointer:
     #!/usr/bin/env bash
