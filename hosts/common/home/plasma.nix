@@ -375,6 +375,9 @@
       "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "IAX";
       # Overview effect: include minimized windows in the grid
       "kwinrc"."Effect-overview"."IgnoreMinimized" = false;
+      # New windows open on the screen under the cursor, so launching an app
+      # from a given monitor's taskbar opens it on that monitor.
+      "kwinrc"."Windows"."ActiveMouseScreen" = true;
       # Alt+Tab task switcher: only current screen, exclude minimized
       "kwinrc"."TabBox"."MultiScreenMode" = 1;
       "kwinrc"."TabBox"."MinimizedMode" = 1;
@@ -392,6 +395,10 @@
       # Hide the Konsole "Run In Konsole" service menu (from the konsole
       # package's konsolerun.desktop); replaced by run-in-ghostty below.
       "kservicemenurc"."Show"."konsolerun" = false;
+      # Hide Ghostty's own "Open Ghostty Here" directory service menu: it is
+      # now redundant with the built-in "Open Terminal Here" (Alt+Shift+F4),
+      # which the TerminalService setting above already points at Ghostty.
+      "kservicemenurc"."Show"."com.mitchellh.ghostty" = false;
     };
   };
 
