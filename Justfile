@@ -267,14 +267,14 @@ update-pins dry_run='':
       exit 0
     fi
     scripts/update-flake-pins.sh
-    # Record the run and commit refreshed flake.lock to the parent dotfiles
-    # repo so the machine has a clean history of what's installed.
+    # Commit the refreshed flake.lock so this machine persists what's pinned.
+    # (The maintenance reminder reads freshness straight from flake.lock's
+    # lastModified, not from this commit — so there's no history file to sync.)
     git add flake.nix flake.lock 2>/dev/null || true
     if ! git diff --cached --quiet; then
       git commit -q -m "chore: update-pins — refresh flake inputs"
       echo "  ✓ committed flake.nix + flake.lock"
     fi
-    just _record-history update-pins
     echo "✅  Pins updated!"
 
 [unix]
@@ -367,13 +367,15 @@ sync-submodules:
     for path in flake.lock $(git config --file .gitmodules --get-regexp path 2>/dev/null | awk '{print $2}'); do
       git add -- "$path" 2>/dev/null || true
     done
+    # This commit advances the submodule gitlinks; the maintenance reminder
+    # reads the date of the last commit touching a (non-secrets) gitlink as
+    # "last sync" — so there's no history file to sync.
     if ! git diff --cached --quiet; then
       git commit -q -m "chore: sync-submodules — refresh submodule pointers + flake.lock"
       echo "  ✓ committed parent pointer updates"
     else
       echo "  • parent already up to date"
     fi
-    just _record-history sync-submodules
     echo "✅  Submodules synced!"
 
 # ── Build timing ─────────────────────────────────────────────────────
@@ -435,20 +437,9 @@ _finish-build host start_time exit_code:
       exit {{ exit_code }}
     fi
 
-# ── History tracking ─────────────────────────────────────────────────
+# ── Maintenance reminders ────────────────────────────────────────────
 
-history_file := "secrets/.history"
 stale_days := "7"
-
-[private]
-_record-history task:
-    @mkdir -p secrets
-    @touch {{ history_file }}
-    @grep -v "^{{ task }}:" {{ history_file }} > {{ history_file }}.tmp 2>/dev/null || true
-    @echo "{{ task }}:$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> {{ history_file }}.tmp
-    @mv {{ history_file }}.tmp {{ history_file }}
-    @just _commit-to-secrets {{ history_file }} "chore: record {{ task }} run"
-    @just _sync-secrets-pointer
 
 # Commits a single file inside the secrets submodule. Pulls --rebase first
 # to absorb any concurrent changes from other machines, then pushes. Silent
@@ -491,26 +482,28 @@ _sync-secrets-pointer:
 [private]
 _check-maintenance:
     #!/usr/bin/env bash
-    history_file="{{ history_file }}"
     stale_seconds=$(( {{ stale_days }} * 86400 ))
     now=$(date +%s)
+    # Derive each task's freshness from the artifact it maintains rather than a
+    # synced history file:
+    #   • update-pins keeps flake.lock fresh → newest input's lastModified.
+    #     path: inputs (secrets/agent-skills/...) carry no lastModified, so the
+    #     per-build secrets re-lock can't skew this — only real upstream inputs.
+    #   • sync-submodules advances the submodule gitlinks → date of the last
+    #     parent commit touching a non-secrets gitlink (secrets is excluded
+    #     because build-time tracking advances it on every build).
+    # Both answer "how fresh is the artifact, from any source" — what the
+    # reminder actually cares about — and need nothing pushed to .secrets.
     check_task() {
-      local task=$1 label=$2 cmd=$3
-      local last=""
-      if [[ -f "$history_file" ]]; then
-        last=$(grep "^${task}:" "$history_file" 2>/dev/null | cut -d: -f2- || true)
-      fi
-      if [[ -z "$last" ]]; then
+      local label=$1 cmd=$2 last_ts=$3
+      if [[ -z "$last_ts" ]]; then
         echo -e "\033[0;33m[WARN]\033[0m $label has never been run — consider: just $cmd"
-      else
-        local last_ts
-        last_ts=$(date -d "$last" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%SZ" "$last" +%s 2>/dev/null || echo 0)
-        local age=$(( now - last_ts ))
-        if (( age > stale_seconds )); then
-          local days_ago=$(( age / 86400 ))
-          echo -e "\033[0;33m[WARN]\033[0m $label last run ${days_ago}d ago — consider: just $cmd"
-        fi
+      elif (( now - last_ts > stale_seconds )); then
+        echo -e "\033[0;33m[WARN]\033[0m $label last refreshed $(( (now - last_ts) / 86400 ))d ago — consider: just $cmd"
       fi
     }
-    check_task "update-pins" "Pin updates" "update-pins"
-    check_task "sync-submodules" "Submodule sync" "sync-submodules"
+    pins_ts=$(jq -r '[.nodes[].locked.lastModified // empty] | max // empty' flake.lock 2>/dev/null || true)
+    subs=$(git config --file .gitmodules --get-regexp path 2>/dev/null | awk '$2 != "secrets" {print $2}')
+    subs_ts=$(git log -1 --format=%ct -- $subs 2>/dev/null || true)
+    check_task "Pin updates" "update-pins" "$pins_ts"
+    check_task "Submodule sync" "sync-submodules" "$subs_ts"
