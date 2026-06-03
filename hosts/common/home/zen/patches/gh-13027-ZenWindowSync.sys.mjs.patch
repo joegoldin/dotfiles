@@ -1,0 +1,260 @@
+diff --git a/src/zen/sessionstore/ZenWindowSync.sys.mjs b/src/zen/sessionstore/ZenWindowSync.sys.mjs
+index 12993d74bc..969c694907 100644
+--- a/src/zen/sessionstore/ZenWindowSync.sys.mjs
++++ b/src/zen/sessionstore/ZenWindowSync.sys.mjs
+@@ -199,6 +199,43 @@ class nsZenWindowSync {
+     }
+   }
+ 
++  // === gh-13027 debugging helpers (temporary instrumentation) ===
++  // Always logs (filter the console by "ZEN13027"). Remove before merge.
++  #dbg(tag, obj) {
++    try {
++      // eslint-disable-next-line no-console
++      console.warn(
++        "ZEN13027 " + tag + (obj === undefined ? "" : " " + JSON.stringify(obj))
++      );
++    } catch {
++      // eslint-disable-next-line no-console
++      console.warn("ZEN13027 " + tag + " <unserializable>");
++    }
++  }
++
++  #tabInfo(aTab) {
++    if (!aTab) {
++      return null;
++    }
++    return {
++      id: aTab.id,
++      uri: aTab.linkedBrowser?.currentURI?.spec,
++      remoteType: aTab.linkedBrowser?.remoteType,
++      visible: !!aTab._zenContentsVisible,
++      selected: aTab.selected,
++      pending: aTab.hasAttribute?.("pending"),
++      win: aTab.ownerGlobal?.document?.title?.slice(0, 18),
++    };
++  }
++
++  // True when a tab is actually displaying a real page (not a blank
++  // placeholder), i.e. it has live contents that could be handed off.
++  #hasLiveContent(aTab) {
++    const spec = aTab?.linkedBrowser?.currentURI?.spec;
++    return !!(spec && spec !== "about:blank");
++  }
++  // === end gh-13027 helpers ===
++
+   /**
+    * Called when a browser window is about to be shown.
+    * Adds event listeners for the specified events.
+@@ -829,8 +866,19 @@ class nsZenWindowSync {
+       aOurTab.linkedBrowser.isRemoteBrowser !=
+       aOtherTab.linkedBrowser.isRemoteBrowser
+     ) {
++      this.#dbg("canSwap:false:remoteness", {
++        our: this.#tabInfo(aOurTab),
++        other: this.#tabInfo(aOtherTab),
++      });
+       return false;
+     }
++    this.#dbg("canSwap:true", {
++      ourType: aOurTab.linkedBrowser.remoteType,
++      otherType: aOtherTab.linkedBrowser.remoteType,
++      typeMatch:
++        aOurTab.linkedBrowser.remoteType ===
++        aOtherTab.linkedBrowser.remoteType,
++    });
+     return true;
+   }
+ 
+@@ -858,6 +906,11 @@ class nsZenWindowSync {
+     // Running `swapBrowsersAndCloseOther` doesn't expect us to use the tab after
+     // the operation, so it doesn't really care about cleaning up the other tab.
+     // We need to make a new tab progress listener for the other tab after the swap.
++    this.#dbg("swapInner:before", {
++      our: this.#tabInfo(aOurTab),
++      other: this.#tabInfo(aOtherTab),
++      onClose,
++    });
+     this.#withRestoreTabProgressListener(
+       aOtherTab,
+       () => {
+@@ -868,7 +921,12 @@ class nsZenWindowSync {
+             aOtherTab,
+             false
+           );
++          this.#dbg("swapInner:afterSwap", {
++            our: this.#tabInfo(aOurTab),
++            other: this.#tabInfo(aOtherTab),
++          });
+         } catch (e) {
++          this.#dbg("swapInner:error", { msg: String(e) });
+           console.error(
+             `Error swapping browsers for tabs ${aOurTab.id} and ${aOtherTab.id}:`,
+             e
+@@ -908,6 +966,9 @@ class nsZenWindowSync {
+           this.log(
+             `Loading about:blank in our tab ${aOtherTab.id} before swap`
+           );
++          this.#dbg("swapInner:loadBlank", {
++            into: this.#tabInfo(aOtherTab),
++          });
+           aOtherTab.linkedBrowser.loadURI(Services.io.newURI("about:blank"), {
+             triggeringPrincipal:
+               Services.scriptSecurityManager.getSystemPrincipal(),
+@@ -1076,8 +1137,17 @@ class nsZenWindowSync {
+       aWindow.gZenWorkspaces.allStoredTabs.filter(
+         tab => tab._zenContentsVisible
+       );
++    this.#dbg("close:enter", {
++      closing: aWindow.document.title?.slice(0, 18),
++      target: mostRecentWindow.document.title?.slice(0, 18),
++      activeCount: activeTabsOnClosedWindow.length,
++    });
+     for (let tab of activeTabsOnClosedWindow) {
+       const targetTab = this.getItemFromWindow(mostRecentWindow, tab.id);
++      this.#dbg("close:move", {
++        tab: this.#tabInfo(tab),
++        targetTab: this.#tabInfo(targetTab),
++      });
+       if (targetTab) {
+         this.log(`Moving active tab ${tab.id} to most recent window on close`);
+         targetTab._zenContentsVisible = true;
+@@ -1119,6 +1189,11 @@ class nsZenWindowSync {
+     let activeTabs = activeBrowsers
+       .map(browser => aWindow.gBrowser.getTabForBrowser(browser))
+       .filter(tab => tab);
++    this.#dbg("onSwitch:enter", {
++      win: aWindow.document.title?.slice(0, 18),
++      prev: this.#tabInfo(aPreviousTab),
++      active: activeTabs.map(t => this.#tabInfo(t)),
++    });
+     // Ignore previous tabs that are still "active". These scenarios could happen for example,
+     // when selecting on a split view tab that was already active.
+     if (
+@@ -1135,6 +1210,10 @@ class nsZenWindowSync {
+           t =>
+             t?.splitView ? t.group.tabs.some(st => st.selected) : t?.selected
+         );
++        this.#dbg("onSwitch:prevTab", {
++          tab: this.#tabInfo(tab),
++          otherTabToShow: this.#tabInfo(otherTabToShow),
++        });
+         if (otherTabToShow) {
+           otherTabToShow._zenContentsVisible = true;
+           delete tab._zenContentsVisible;
+@@ -1154,12 +1233,40 @@ class nsZenWindowSync {
+         aWindow,
+         selectedTab.id
+       );
++      // gh-13027: decide the swap from what each tab actually holds, not just
++      // from the (sometimes stale) _zenContentsVisible flag. We only pull
++      // contents in when this tab is blank AND another window genuinely has the
++      // live page; otherwise swapping would push our own page away / blank us.
++      const selHasContent = this.#hasLiveContent(selectedTab);
++      const otherHasContent = this.#hasLiveContent(otherSelectedTab);
++      this.#dbg("onSwitch:select", {
++        selected: this.#tabInfo(selectedTab),
++        other: this.#tabInfo(otherSelectedTab),
++        selHasContent,
++        otherHasContent,
++        willSwap: !!otherSelectedTab && !selHasContent && otherHasContent,
++      });
+       selectedTab._zenContentsVisible = true;
+-      if (otherSelectedTab) {
++      if (otherSelectedTab && !selHasContent && otherHasContent) {
++        // We're blank and another window holds the live page: pull it in.
+         delete otherSelectedTab._zenContentsVisible;
+         promises.push(
+           this.#swapBrowserDocShellsAsync(selectedTab, otherSelectedTab)
+         );
++      } else if (otherSelectedTab && !otherHasContent && !selHasContent) {
++        // The flagged "owner" is blank too (stale bookkeeping). Nothing to pull;
++        // clear the stale flag and let this tab restore its own contents rather
++        // than swapping a blank in. See gh-13027.
++        this.#dbg("onSwitch:clearStaleOwner", {
++          other: this.#tabInfo(otherSelectedTab),
++        });
++        delete otherSelectedTab._zenContentsVisible;
++      } else if (otherSelectedTab && selHasContent) {
++        // We already hold the live page; do NOT swap (that would blank us).
++        // Just take ownership here. See gh-13027.
++        this.#dbg("onSwitch:keepOwnContents", {
++          selected: this.#tabInfo(selectedTab),
++        });
+       }
+     }
+     await Promise.all(promises);
+@@ -1495,35 +1602,65 @@ class nsZenWindowSync {
+       this.#lastSelectedTab = null;
+       this.on_TabSelect(event, { ignorePromise: true });
+     };
++    this.#dbg("on_focus", {
++      win: window.document.title?.slice(0, 18),
++      selected: this.#tabInfo(window.gBrowser.selectedTab),
++    });
+     this.#lastFocusedWindow = new WeakRef(window);
+     this.#lastSelectedTab = new WeakRef(window.gBrowser.selectedTab);
+     window.addEventListener("TabSelect", onTabSelect, { once: true });
+     // eslint-disable-next-line no-async-promise-executor
+     this.#docShellSwitchPromise = new Promise(async resolve => {
+-      await this.#onTabSwitchOrWindowFocus(window);
+-      window.removeEventListener("TabSelect", onTabSelect);
+-      resolve();
+-      this.#docShellSwitchPromise = null;
++      // gh-13027: always clear #docShellSwitchPromise, even if the swap throws.
++      // Otherwise a single failed swap leaves it non-null forever and jams every
++      // subsequent window-sync focus/select operation.
++      try {
++        await this.#onTabSwitchOrWindowFocus(window);
++      } catch (e) {
++        this.#dbg("on_focus:error", { msg: String(e) });
++        console.error("ZenWindowSync on_focus error:", e);
++      } finally {
++        window.removeEventListener("TabSelect", onTabSelect);
++        resolve();
++        this.#docShellSwitchPromise = null;
++      }
+     });
+   }
+ 
+   on_TabSelect(aEvent, { ignorePromise = false } = {}) {
+     const tab = aEvent.target;
+     if (this.#lastSelectedTab?.deref() === tab) {
++      this.#dbg("on_TabSelect:skip:lastSelected", { tab: this.#tabInfo(tab) });
+       return;
+     }
+     this.#lastSelectedTab = new WeakRef(tab);
+     const previousTab = aEvent.detail.previousTab;
+     let promise = this.#docShellSwitchPromise;
+     if (promise && !ignorePromise) {
++      this.#dbg("on_TabSelect:skip:promisePending", {
++        tab: this.#tabInfo(tab),
++      });
+       return;
+     }
++    this.#dbg("on_TabSelect", {
++      tab: this.#tabInfo(tab),
++      previousTab: this.#tabInfo(previousTab),
++      ignorePromise,
++    });
+     // eslint-disable-next-line no-async-promise-executor
+     this.#docShellSwitchPromise = new Promise(async resolve => {
+-      await promise;
+-      await this.#onTabSwitchOrWindowFocus(tab.ownerGlobal, previousTab);
+-      resolve();
+-      this.#docShellSwitchPromise = null;
++      // gh-13027: always clear #docShellSwitchPromise, even if the swap throws,
++      // so a single failed swap can't permanently jam window-sync.
++      try {
++        await promise;
++        await this.#onTabSwitchOrWindowFocus(tab.ownerGlobal, previousTab);
++      } catch (e) {
++        this.#dbg("on_TabSelect:error", { msg: String(e) });
++        console.error("ZenWindowSync on_TabSelect error:", e);
++      } finally {
++        resolve();
++        this.#docShellSwitchPromise = null;
++      }
+     });
+   }
+ 

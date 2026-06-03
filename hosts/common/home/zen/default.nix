@@ -11,10 +11,10 @@ let
 
   # Zen ships as a prebuilt binary (the flake repackages upstream's release, it
   # doesn't compile from source), so our gh-13027 fix can't be applied as a
-  # normal source `patches` entry — the affected module lives inside
-  # browser/omni.ja. Unpack that archive, patch the module, and repack it.
+  # normal source `patches` entry — the affected modules live inside
+  # browser/omni.ja. Unpack that archive, patch the modules, and repack it.
   # Patch source: https://github.com/joegoldin/zen-browser-desktop/pull/1
-  # (vendored at head 8156686 — re-vendor patches/ if the PR changes).
+  # (vendored at head 7a372b9 — re-vendor patches/ if the PR changes).
   zenUnwrapped = inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.zen-browser-unwrapped;
   zenPatchedUnwrapped = zenUnwrapped.overrideAttrs (old: {
     postFixup = (old.postFixup or "") + ''
@@ -22,13 +22,15 @@ let
       tmp=$(mktemp -d)
       # unzip exits non-zero on Firefox's "preloaded" omni.ja layout ("extra
       # bytes at beginning") but still extracts every entry, so tolerate the
-      # exit code and instead assert the module we need actually came out.
+      # exit code and instead assert each module we need actually came out.
       ${pkgs.unzip}/bin/unzip -q -o "$omnija" -d "$tmp" || true
-      test -f "$tmp/modules/zen/ZenSessionManager.sys.mjs"
       before=$(find "$tmp" -type f | wc -l)
-      ${pkgs.patch}/bin/patch -l --fuzz=3 --no-backup-if-mismatch \
-        "$tmp/modules/zen/ZenSessionManager.sys.mjs" \
-        < ${./patches/gh-13027-recover-blank-synced-tabs.patch}
+      apply() {
+        test -f "$tmp/$1"
+        ${pkgs.patch}/bin/patch -l --fuzz=3 --no-backup-if-mismatch "$tmp/$1" < "$2"
+      }
+      apply modules/zen/ZenSessionManager.sys.mjs ${./patches/gh-13027-ZenSessionManager.sys.mjs.patch}
+      apply modules/zen/ZenWindowSync.sys.mjs ${./patches/gh-13027-ZenWindowSync.sys.mjs.patch}
       chmod -R u+w "$(dirname "$omnija")"
       rm -f "$omnija"
       # -D omits directory entries so this count matches the file count above.
