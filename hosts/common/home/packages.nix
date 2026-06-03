@@ -55,6 +55,7 @@ let
       gnupg
       gnused
       gnutar
+      gping # ping, but with a graph
       grc
       unstable.gum
       httpie
@@ -92,12 +93,14 @@ let
       pueue
       pv
       pythonModule.packages
+      qdirstat # graphical disk usage analyzer
       ripgrep # recursively searches directories for a regex pattern
       # rustup
       socat # replacement of openbsd-netcat
       spritesModule.packages.sprite
       statix
       stripe-cli
+      sysz # fzf terminal UI for systemctl
       tesseract
       tmux
       tree
