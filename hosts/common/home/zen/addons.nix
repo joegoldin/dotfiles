@@ -24,11 +24,6 @@ let
     private_browsing = true;
   };
 
-  # Mozilla-official / low-risk: keep auto-updates ON, but not enabled in private
-  # windows (e.g. container extensions don't operate in private windows anyway).
-  autoUpdate = {
-    updates_disabled = false;
-  };
 in
 {
   ExtensionSettings =
@@ -59,8 +54,6 @@ in
       (extension "old-reddit-redirect" "{9063c2e9-e07c-4c2c-9646-cfe7ca8d0498}" { })
       (extension "reddit-enhancement-suite" "jid1-xUfzOsOFlzSOXg@jetpack" { })
       (extension "web-clipper-obsidian" "clipper@obsidian.md" { })
-      # Mozilla-official container manager — keep updated.
-      (extension "multi-account-containers" "@testpilot-containers" autoUpdate)
       # Containerise: routes work sites into the Work container. Less-trusted
       # (small maintainer, MV2, last release 2021) → pinned (updates_disabled).
       (extension "containerise" "containerise@kinte.sh" { })
