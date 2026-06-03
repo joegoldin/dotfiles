@@ -85,11 +85,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1780347621,
-        "narHash": "sha256-HTz6EZ1kJFBAA29f9FFwj+yttt4S42WfR8ZhP2l3kOk=",
+        "lastModified": 1780479329,
+        "narHash": "sha256-+NDxDI04PuqYnQhw4v+DDeX5RXCC0BzM96oi/sGgJ/c=",
         "owner": "joegoldin",
         "repo": "agent-skills",
-        "rev": "a9d8b7d8e92cbc803c751a43d7c75bd1502a76af",
+        "rev": "758cca153e237ac3b5c8ce2581e98fdb7d042dd2",
         "type": "github"
       },
       "original": {
@@ -472,11 +472,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1780474359,
-        "narHash": "sha256-onbyB5wZVCwEOoOrGDEUdNizOcpeKkezdOKeOaHkmf4=",
+        "lastModified": 1780479368,
+        "narHash": "sha256-VNL4Sj+cLm3T3mJmeFkRk3nJebP8UfLMYDsVwD0s++8=",
         "owner": "joegoldin",
         "repo": "claude-container",
-        "rev": "bb362f6ca693dcd36ad05886907f76cc7de23970",
+        "rev": "d1ae5e141eece7221b2c0b21f637eee8e9054131",
         "type": "github"
       },
       "original": {
@@ -539,11 +539,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1780279778,
-        "narHash": "sha256-8y0yKFeD4GV9r3R/WIUgmN8HjdjwYg7vivNMyZbJBfg=",
+        "lastModified": 1780431659,
+        "narHash": "sha256-fgk0UFAFd9xahz2kKE6kQLuna7+PbVKdkz5NoPt1CB8=",
         "owner": "joegoldin",
         "repo": "claude-nix",
-        "rev": "785e28cbca59ddb1620f27e4eab7bb8350cde8a0",
+        "rev": "9bed5b4bb895f6a76f93535c57fb3c69e40e7bd7",
         "type": "github"
       },
       "original": {
