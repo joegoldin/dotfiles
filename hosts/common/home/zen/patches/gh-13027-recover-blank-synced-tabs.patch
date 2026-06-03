@@ -1,237 +1,85 @@
-diff --git a/src/zen/sessionstore/ZenWindowSync.sys.mjs b/src/zen/sessionstore/ZenWindowSync.sys.mjs
-index 12993d74bc..44b5226d99 100644
---- a/src/zen/sessionstore/ZenWindowSync.sys.mjs
-+++ b/src/zen/sessionstore/ZenWindowSync.sys.mjs
-@@ -14,6 +14,8 @@ ChromeUtils.defineESModuleGetters(lazy, {
-   // eslint-disable-next-line mozilla/valid-lazy
-   ZenSessionStore: "resource:///modules/zen/ZenSessionManager.sys.mjs",
-   TabStateCache: "resource:///modules/sessionstore/TabStateCache.sys.mjs",
-+  SessionStore: "resource:///modules/sessionstore/SessionStore.sys.mjs",
-+  E10SUtils: "resource://gre/modules/E10SUtils.sys.mjs",
-   setTimeout: "resource://gre/modules/Timer.sys.mjs",
-   PrivateBrowsingUtils: "resource://gre/modules/PrivateBrowsingUtils.sys.mjs",
-   RunState: "resource:///modules/sessionstore/RunState.sys.mjs",
-@@ -730,21 +732,25 @@ class nsZenWindowSync {
-    *
-    * @param {object} aOurTab - The tab in the current window.
-    * @param {object} aOtherTab - The tab in the other window.
-+   * @returns {Promise<boolean>} Resolves to true if the contents were swapped,
-+   *   false if the swap couldn't be performed (so the caller can recover).
-    */
-   async #swapBrowserDocShellsAsync(aOurTab, aOtherTab) {
-     if (!this.#canSwapBrowsers(aOurTab, aOtherTab)) {
-       this.log(
-         `Cannot swap browsers between tabs ${aOurTab.id} and ${aOtherTab.id} due to process mismatch`
-       );
--      return;
-+      return false;
-     }
-     if (aOtherTab.closing) {
-       this.log(`Cannot swap browsers, other tab ${aOtherTab.id} is closing`);
--      return;
-+      return false;
-     }
-+    let swapped = false;
-     await this.#styleSwapedBrowsers(aOurTab, aOtherTab, () => {
-       try {
-         this.#swapBrowserDocShellsInner(aOurTab, aOtherTab);
-+        swapped = true;
-       } catch (e) {
-         console.error(
-           `Error swapping browsers for tabs ${aOurTab.id} and ${aOtherTab.id}:`,
-@@ -752,6 +758,7 @@ class nsZenWindowSync {
-         );
+diff --git a/src/zen/sessionstore/ZenSessionManager.sys.mjs b/src/zen/sessionstore/ZenSessionManager.sys.mjs
+index 39f2d0eb26..22bd953cce 100644
+--- a/src/zen/sessionstore/ZenSessionManager.sys.mjs
++++ b/src/zen/sessionstore/ZenSessionManager.sys.mjs
+@@ -737,6 +737,52 @@ export class nsZenSessionManager {
+     return tabData && !(tabData.zenIsEmpty && !tabData.groupId);
+   }
+ 
++  /**
++   * Removes trailing "about:blank" entries from a tab's saved session history.
++   *
++   * When a tab's contents are swapped to another window, ZenWindowSync loads
++   * "about:blank" into the now-empty browser so Firefox isn't left with an
++   * unloaded-but-selected tab. That "about:blank" can get persisted as the
++   * tab's active session entry; when such state is later restored (most visibly
++   * into a newly opened window, which is cloned from saved state), the tab would
++   * open on the blank artifact and show an empty "New Tab" instead of the page
++   * it was actually displaying. This strips the trailing artifact so the tab
++   * restores onto its real last entry, as long as a real entry exists to fall
++   * back to. See gh-13027.
++   *
++   * @param {object} aTabData - The tab state object to sanitize.
++   * @returns {object} The original object when there is nothing to strip, or a
++   *   shallow copy with the trailing "about:blank" entries removed and the
++   *   index clamped onto a real entry.
++   */
++  #stripBlankSwapArtifact(aTabData) {
++    const entries = aTabData?.entries;
++    if (!Array.isArray(entries) || entries.length < 2) {
++      return aTabData;
++    }
++    const isBlank = entry => !entry?.url || entry.url === "about:blank";
++    // Leave genuinely blank tabs alone: there's no real entry to fall back to.
++    if (entries.every(isBlank)) {
++      return aTabData;
++    }
++    let lastReal = entries.length - 1;
++    while (lastReal > 0 && isBlank(entries[lastReal])) {
++      lastReal--;
++    }
++    if (lastReal === entries.length - 1) {
++      // No trailing "about:blank" artifact to remove.
++      return aTabData;
++    }
++    const newEntries = entries.slice(0, lastReal + 1);
++    // Session history indices are 1-based; clamp onto the last real entry.
++    let index =
++      typeof aTabData.index === "number" ? aTabData.index : newEntries.length;
++    if (index > newEntries.length) {
++      index = newEntries.length;
++    }
++    return { ...aTabData, entries: newEntries, index };
++  }
++
+   #collectUsedTabsFromWindows(aStateWindows) {
+     const tabIdRelationMap = new Map();
+     for (const window of aStateWindows) {
+@@ -756,7 +802,12 @@ export class nsZenSessionManager {
+         }
        }
-     });
-+    return swapped;
-   }
- 
-   /**
-@@ -1085,6 +1092,9 @@ class nsZenWindowSync {
-           continue;
-         }
-         delete tab._zenContentsVisible;
-+        // Capture the permanent key before the swap closes `tab`, otherwise
-+        // `tab.linkedBrowser` may be null by the time we read it below.
-+        const closingPermanentKey = tab.linkedBrowser.permanentKey;
-         try {
-           this.#swapBrowserDocShellsInner(targetTab, tab, {
-             focus: targetTab.selected,
-@@ -1096,10 +1106,19 @@ class nsZenWindowSync {
-             e
-           );
-         }
--        this.#swapedTabsEntriesForWC.set(
--          tab.linkedBrowser.permanentKey,
--          targetTab
--        );
-+        this.#swapedTabsEntriesForWC.set(closingPermanentKey, targetTab);
-+        // Persist the swapped-in contents into the surviving window's saved
-+        // session state. The deferred reconciliation in
-+        // on_WindowCloseAndBrowserFlushed can fail to match these tabs (their
-+        // browsers are already gone from the closing window by the time it
-+        // runs), which would leave the surviving window showing the live
-+        // docshell while saving empty history for the tab. A newly opened
-+        // window clones that saved state and would then recreate the tab as a
-+        // blank "New Tab". Flushing the surviving tab here keeps its saved
-+        // history in sync with what is actually displayed. See gh-13027.
-+        if (targetTab.linkedBrowser) {
-+          lazy.TabStateFlusher.flush(targetTab.linkedBrowser).catch(() => {});
-+        }
-         // We can animate later, whats important is to always stay on the same
-         // process and avoid async operations here to avoid the closed window
-         // being unloaded before the swap is done.
-@@ -1108,6 +1127,127 @@ class nsZenWindowSync {
      }
-   }
- 
-+  /**
-+   * Determines whether a tab has a live browser currently showing a real page
-+   * (i.e. something other than a blank placeholder). Such a tab can hand off its
-+   * contents to a tab in another window.
-+   *
-+   * @param {MozTabbrowserTab} aTab - The tab to check.
-+   * @returns {boolean} True if the tab is displaying live contents.
-+   */
-+  #tabHasLiveContents(aTab) {
-+    const spec = aTab?.linkedBrowser?.currentURI?.spec;
-+    return !!(spec && spec !== "about:blank");
-+  }
-+
-+  /**
-+   * Determines whether a tab has contents to display, either a live page or
-+   * session history that will be restored on demand.
-+   *
-+   * @param {MozTabbrowserTab} aTab - The tab to check.
-+   * @returns {boolean} True if the tab has real contents, false if it is an
-+   *   empty "about:blank" placeholder.
-+   */
-+  #tabHasRealContents(aTab) {
-+    if (this.#tabHasLiveContents(aTab)) {
-+      return true;
-+    }
-+    try {
-+      const tabState = JSON.parse(lazy.SessionStore.getTabState(aTab));
-+      return !!tabState.entries?.some(
-+        entry => entry.url && entry.url !== "about:blank"
-+      );
-+    } catch {
-+      return false;
-+    }
-+  }
-+
-+  /**
-+   * Restores a tab from its stored pinned state. This is a last-resort recovery
-+   * for a pinned tab that ended up selected without any contents to show and
-+   * with no other window able to hand off its live contents. See gh-13027.
-+   *
-+   * @param {MozTabbrowserTab} aTab - The tab to restore.
-+   */
-+  #restoreTabFromPinnedState(aTab) {
-+    const initialState = aTab._zenPinnedInitialState;
-+    const initialUrl = initialState?.entry?.url;
-+    if (!initialUrl || initialUrl === "about:blank") {
-+      return;
-+    }
-+    try {
-+      const tabState = JSON.parse(lazy.SessionStore.getTabState(aTab));
-+      tabState.entries = [
-+        {
-+          ...initialState.entry,
-+          triggeringPrincipal_base64: lazy.E10SUtils.serializePrincipal(
-+            Services.scriptSecurityManager.createContentPrincipal(
-+              Services.io.newURI(initialUrl),
-+              {}
-+            )
-+          ),
-+        },
-+      ];
-+      tabState.index = 0;
-+      if (initialState.image) {
-+        tabState.image = aTab.zenStaticIcon || initialState.image;
-+      }
-+      // Avoid restoring a stale scroll position for a freshly loaded page.
-+      delete tabState.scroll;
-+      this.log(`Restoring contents for tab ${aTab.id} from pinned state`);
-+      lazy.SessionStore.setTabState(aTab, tabState);
-+    } catch (e) {
-+      console.error(`Error restoring contents for tab ${aTab.id}:`, e);
-+    }
-+  }
-+
-+  /**
-+   * Ensures a freshly-selected synced tab actually shows contents.
-+   *
-+   * The bookkeeping that tracks which window currently holds a tab's live
-+   * contents (`_zenContentsVisible`) can get out of sync, for example after a
-+   * window is closed and a new one is opened. When that happens the normal
-+   * lookup misses the window that actually has the page, and the selected tab is
-+   * left stuck on a blank "New Tab". This recovers by pulling the live contents
-+   * from whichever window actually has them (works for pinned and unpinned tabs
-+   * alike), falling back to the stored pinned state only when no live contents
-+   * exist anywhere. It is a no-op for tabs that already have contents.
-+   * See gh-13027.
-+   *
-+   * @param {MozTabbrowserTab} aTab - The tab to ensure has contents.
-+   * @returns {Promise} Resolves once recovery is complete.
-+   */
-+  async #ensureSyncedTabHasContents(aTab) {
-+    if (
-+      !aTab.linkedBrowser ||
-+      aTab.hasAttribute("zen-empty-tab") ||
-+      this.#tabHasRealContents(aTab)
-+    ) {
-+      return;
-+    }
-+    // Find the window that actually holds the live contents, even if it wasn't
-+    // flagged as the active one, and pull them in so we keep the real page.
-+    const liveOtherTab = this.#getActiveTabFromOtherWindows(
-+      aTab.ownerGlobal,
-+      aTab.id,
-+      tab => tab && tab !== aTab && this.#tabHasLiveContents(tab)
+-    return Array.from(tabIdRelationMap.values());
++    // Strip the "about:blank" swap artifact so saved state (and any window
++    // cloned from it) restores onto the real page rather than a blank tab.
++    // See gh-13027.
++    return Array.from(tabIdRelationMap.values()).map(tabData =>
++      this.#stripBlankSwapArtifact(tabData)
 +    );
-+    if (liveOtherTab) {
-+      const swapped = await this.#swapBrowserDocShellsAsync(aTab, liveOtherTab);
-+      if (swapped) {
-+        // Ownership has moved to aTab (the caller already flagged it), so the
-+        // previous holder is no longer the live owner. Only clear its flag once
-+        // the swap actually succeeded, otherwise the window that still has the
-+        // live page would be left unflagged and drift the bookkeeping further.
-+        delete liveOtherTab._zenContentsVisible;
-+        return;
-+      }
-+    }
-+    // No live contents anywhere we can hand off; restore from the pinned state
-+    // as a last resort so we never leave the user on an empty "New Tab".
-+    this.#restoreTabFromPinnedState(aTab);
-+  }
-+
+   }
+ 
    /**
-    * Handles tab switch or window focus events to synchronize tab contents visibility.
-    *
-@@ -1158,8 +1298,24 @@ class nsZenWindowSync {
-       if (otherSelectedTab) {
-         delete otherSelectedTab._zenContentsVisible;
-         promises.push(
--          this.#swapBrowserDocShellsAsync(selectedTab, otherSelectedTab)
-+          this.#swapBrowserDocShellsAsync(selectedTab, otherSelectedTab).then(
-+            swapped => {
-+              if (!swapped) {
-+                // The flagged window couldn't hand off its contents. Try harder
-+                // to recover so we don't get stuck on a blank "New Tab".
-+                // See gh-13027.
-+                return this.#ensureSyncedTabHasContents(selectedTab);
-+              }
-+              return undefined;
-+            }
-+          )
-         );
-+      } else {
-+        // No window is flagged as holding this tab's contents. After closing a
-+        // window and opening a new one the bookkeeping can drift, leaving the
-+        // tab as an empty placeholder, so make sure it still loads its contents.
-+        // See gh-13027.
-+        promises.push(this.#ensureSyncedTabHasContents(selectedTab));
-       }
+@@ -816,6 +867,13 @@ export class nsZenSessionManager {
+       aWindowData.groups = sidebar.groups;
      }
-     await Promise.all(promises);
+ 
++    // Heal any tabs whose saved state was left parked on an "about:blank" swap
++    // artifact so they restore onto their real page instead of a blank "New
++    // Tab" (covers sessions saved before this fix). See gh-13027.
++    aWindowData.tabs = (aWindowData.tabs || []).map(tabData =>
++      this.#stripBlankSwapArtifact(tabData)
++    );
++
+     // Folders are always pinned, so we dont need to check for the pinned state here.
+     aWindowData.folders = sidebar.folders;
+     aWindowData.spaces = sidebar.spaces;
