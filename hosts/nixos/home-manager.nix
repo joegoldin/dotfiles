@@ -113,7 +113,18 @@
               ];
             };
           }
-          "org.kde.plasma.digitalclock"
+          {
+            digitalClock = {
+              date.format = {
+                custom = "ddd MMM d";
+              };
+              time.showSeconds = "always";
+              font = {
+                family = "Noto Sans";
+                weight = 400;
+              };
+            };
+          }
           "org.kde.plasma.minimizeall"
         ];
       }
