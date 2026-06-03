@@ -209,6 +209,21 @@ in
     install -m644 ${configFile} ${config.xdg.configHome}/mouse-actions.json
   '';
 
+  # Always restart the daemon on switch. It exclusively grabs the pointer for
+  # drag-shift / shape-gesture detection; carrying that grab across a rebuild
+  # can wedge left-click + scroll (right-button events still pass through) until
+  # the service is restarted. Force a clean stop/start after the config is
+  # installed and systemd has reloaded the unit. Guarded so a switch outside a
+  # graphical session (unit not enabled / no user bus) doesn't fail activation.
+  home.activation.restartMouseActions = lib.hm.dag.entryAfter [
+    "reloadSystemd"
+    "mouseActionsConfig"
+  ] ''
+    if ${pkgs.systemd}/bin/systemctl --user is-enabled mouse-actions.service >/dev/null 2>&1; then
+      $DRY_RUN_CMD ${pkgs.systemd}/bin/systemctl --user restart mouse-actions.service || true
+    fi
+  '';
+
   systemd.user.services.mouse-actions = {
     Unit = {
       Description = "mouse-actions gesture daemon";
