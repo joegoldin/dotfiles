@@ -20,16 +20,28 @@ let
 
   # Containerise stores one storage.local entry per rule, keyed `map=<host>`,
   # routing by cookieStoreId (firefox-container-<id>). Seed it declaratively.
+  # The special container name "No Container" routes to firefox-default — i.e.
+  # forces the host *out* of any container (there is no `id` to look up).
   containeriseStorage = builtins.listToAttrs (
-    map (r: {
-      name = "map=${r.host}";
-      value = {
-        inherit (r) host;
-        containerName = r.container;
-        cookieStoreId = "firefox-container-${toString containerCfg.containers.${r.container}.id}";
-        enabled = true;
-      };
-    }) containerCfg.rules
+    map (
+      r:
+      let
+        cookieStoreId =
+          if r.container == "No Container" then
+            "firefox-default"
+          else
+            "firefox-container-${toString containerCfg.containers.${r.container}.id}";
+      in
+      {
+        name = "map=${r.host}";
+        value = {
+          inherit (r) host;
+          containerName = r.container;
+          inherit cookieStoreId;
+          enabled = true;
+        };
+      }
+    ) containerCfg.rules
   );
 in
 {
