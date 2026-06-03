@@ -21,3 +21,6 @@ result
 
 # ai-gen docs
 docs/
+
+# per-machine build-time history (local, not synced to secrets)
+.build-times
