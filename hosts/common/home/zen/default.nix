@@ -31,10 +31,6 @@ let
       };
     }) containerCfg.rules
   );
-
-  # Plain-text CSV fallback for Containerise's options → "CSV" import, in case
-  # the declarative storage seed isn't picked up on a given Zen build.
-  containeriseCsv = lib.concatMapStrings (r: "${r.host} , ${r.container}\n") containerCfg.rules;
 in
 {
   programs.firefox = {
@@ -397,9 +393,4 @@ in
       };
     };
   };
-
-  # Fallback: if a given Zen build ignores the declarative storage seed, import
-  # this through the Containerise options page ("CSV" editor). Generated from the
-  # same secrets source, so it always matches the declarative rules.
-  home.file.".zen/containerise-rules.csv".text = containeriseCsv;
 }
