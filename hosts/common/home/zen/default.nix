@@ -3,10 +3,38 @@
   pkgs,
   lib,
   inputs,
+  dotfiles-secrets,
   ...
 }:
 let
   addons = import ./addons.nix { inherit lib; };
+
+  # Private container routing (Work container + Containerise site rules) lives in
+  # the secrets submodule so the work domains stay out of the public dotfiles.
+  containerCfg = import "${dotfiles-secrets}/zen-containers.nix";
+
+  # containers.json definitions (name → id/color/icon).
+  containerDefs = lib.mapAttrs (_: c: {
+    inherit (c) id color icon;
+  }) containerCfg.containers;
+
+  # Containerise stores one storage.local entry per rule, keyed `map=<host>`,
+  # routing by cookieStoreId (firefox-container-<id>). Seed it declaratively.
+  containeriseStorage = builtins.listToAttrs (
+    map (r: {
+      name = "map=${r.host}";
+      value = {
+        inherit (r) host;
+        containerName = r.container;
+        cookieStoreId = "firefox-container-${toString containerCfg.containers.${r.container}.id}";
+        enabled = true;
+      };
+    }) containerCfg.rules
+  );
+
+  # Plain-text CSV fallback for Containerise's options → "CSV" import, in case
+  # the declarative storage seed isn't picked up on a given Zen build.
+  containeriseCsv = lib.concatMapStrings (r: "${r.host} , ${r.container}\n") containerCfg.rules;
 in
 {
   programs.firefox = {
@@ -70,7 +98,11 @@ in
         Enabled = true;
         Locked = true;
       };
-      ExtensionUpdate = false; # Purity Enforcement: Do not update extensions
+      # Allow updates globally, then pin individual extensions via each entry's
+      # `updates_disabled` (see addons.nix): trusted security addons (uBlock,
+      # Privacy Badger, 1Password, ClearURLs, …) auto-update; everything else is
+      # pinned. Selective control isn't possible with a global hard-off.
+      ExtensionUpdate = true;
       # Can be used to restrict domains per extension:
       # "restricted_domains": [
       # 	"TEST_BLOCKED_DOMAIN"
@@ -350,6 +382,24 @@ in
         # More info on insecure connection warnings (test: https://badssl.com)
         "browser.xul.error_pages.expert_bad_cert" = true;
       };
+
+      # Declarative container definitions (containers.json). Work is the only
+      # managed container; force so home-manager owns the file.
+      containers = containerDefs;
+      containersForce = true;
+
+      # Seed Containerise's per-site routing rules into its storage.local.
+      # Using extensions.settings makes home-manager force the legacy JSON
+      # storage backend so the extension actually reads these entries.
+      extensions.settings."containerise@kinte.sh" = {
+        force = true;
+        settings = containeriseStorage;
+      };
     };
   };
+
+  # Fallback: if a given Zen build ignores the declarative storage seed, import
+  # this through the Containerise options page ("CSV" editor). Generated from the
+  # same secrets source, so it always matches the declarative rules.
+  home.file.".zen/containerise-rules.csv".text = containeriseCsv;
 }
