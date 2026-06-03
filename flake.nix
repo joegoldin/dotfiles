@@ -556,6 +556,7 @@
                 age.secrets.attic-netrc = {
                   file = "${dotfiles-secrets}/attic-netrc.age";
                   mode = "0400";
+                  owner = specialArgs.username;
                 };
                 age.secrets.atuin_key = {
                   file = "${dotfiles-secrets}/atuin_key.age";
@@ -639,6 +640,7 @@
                 age.secrets.attic-netrc = {
                   file = "${dotfiles-secrets}/attic-netrc.age";
                   mode = "0400";
+                  owner = specialArgs.username;
                 };
               }
             )
@@ -680,6 +682,7 @@
                 age.secrets.attic-netrc = {
                   file = "${dotfiles-secrets}/attic-netrc.age";
                   mode = "0400";
+                  owner = specialArgs.username;
                 };
                 age.secrets.attic-token = {
                   file = "${dotfiles-secrets}/attic.token.age";
