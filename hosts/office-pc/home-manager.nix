@@ -8,7 +8,7 @@
   imports = [
     ../common/home
     ../common/home/default-apps.nix
-    ../common/home/firefox
+    ../common/home/zen
     ../common/home/plasma.nix
     ../common/home/zed.nix
     ../common/home/ghostty.nix
