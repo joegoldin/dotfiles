@@ -14,7 +14,7 @@ let
   # normal source `patches` entry — the affected module lives inside
   # browser/omni.ja. Unpack that archive, patch the module, and repack it.
   # Patch source: https://github.com/joegoldin/zen-browser-desktop/pull/1
-  # (vendored at head 51096d2 — re-vendor patches/ if the PR changes).
+  # (vendored at head 8156686 — re-vendor patches/ if the PR changes).
   zenUnwrapped = inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.zen-browser-unwrapped;
   zenPatchedUnwrapped = zenUnwrapped.overrideAttrs (old: {
     postFixup = (old.postFixup or "") + ''
@@ -24,10 +24,10 @@ let
       # bytes at beginning") but still extracts every entry, so tolerate the
       # exit code and instead assert the module we need actually came out.
       ${pkgs.unzip}/bin/unzip -q -o "$omnija" -d "$tmp" || true
-      test -f "$tmp/modules/zen/ZenWindowSync.sys.mjs"
+      test -f "$tmp/modules/zen/ZenSessionManager.sys.mjs"
       before=$(find "$tmp" -type f | wc -l)
       ${pkgs.patch}/bin/patch -l --fuzz=3 --no-backup-if-mismatch \
-        "$tmp/modules/zen/ZenWindowSync.sys.mjs" \
+        "$tmp/modules/zen/ZenSessionManager.sys.mjs" \
         < ${./patches/gh-13027-recover-blank-synced-tabs.patch}
       chmod -R u+w "$(dirname "$omnija")"
       rm -f "$omnija"
