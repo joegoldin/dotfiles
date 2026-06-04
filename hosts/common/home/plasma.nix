@@ -58,6 +58,13 @@
       runAll="$HOME/.local/share/plasma-manager/run_all.sh"
       if [ -x "$runAll" ] && qdbus org.kde.plasmashell >/dev/null 2>&1; then
         run "$runAll" || true
+        # The panels script recreates the icon-tasks applets and restarts
+        # plasmashell immediately, so the fresh launcher model can come up
+        # collapsed/blank even though the appletsrc on disk is already correct.
+        # Once it has settled, restart once more so plasmashell reconstructs the
+        # panels cleanly from disk (this is what reliably renders the pins).
+        run sleep 3
+        run systemctl --user restart plasma-plasmashell || true
       fi
     '';
   };
