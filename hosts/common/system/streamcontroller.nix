@@ -1,12 +1,12 @@
 { pkgs }:
 let
   package = (pkgs.unstable.streamcontroller.override { isKde = true; }).overrideAttrs (old: {
-    version = "1.5.0-unstable-2025-03-03";
+    version = "1.5.0-beta.14-unstable-2026-06-04";
     src = pkgs.fetchFromGitHub {
       owner = "joegoldin";
       repo = "StreamController";
-      rev = "3362fc0e39ea20e5d50edcc686a88e06b8b43706";
-      hash = "sha256-tcfncEFTkAa3nLVItcCQDA0VZpT6gKb+P0xDkRh8ZFo=";
+      rev = "40af8f66ff0caaf42adb79434626a95811ce40b7";
+      hash = "sha256-olXNfkCU8sPTmOcxBeN6Qwf6fpOIJbW2VeXLeoCInEc=";
     };
     nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
     postFixup = (old.postFixup or "") + ''
