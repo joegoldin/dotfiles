@@ -123,6 +123,15 @@ in
       "${pkgs.systemd}/bin/udevadm settle"
     ];
 
+  # Blacklist the DDR5 SPD temperature-sensor driver. On this Intel i801
+  # SMBus board the spd5118 chip on a DIMM (i2c 9-0053) returns -EBUSY from
+  # its resume callback, which aborts every suspend: the kernel logs
+  # "Failed to put system to sleep. System resumed again: Device or resource
+  # busy", instantly resumes, and KWin's screen-locker (already armed on the
+  # way down) drops you back at the lock screen. The module only exposes RAM
+  # temps via hwmon, so dropping it costs nothing but fixes suspend.
+  boot.blacklistedKernelModules = [ "spd5118" ];
+
   # Unload DisplayLink evdi module before suspend to prevent freeze
   systemd.services.displaylink-suspend = {
     description = "Unload evdi before suspend, reload after resume";
