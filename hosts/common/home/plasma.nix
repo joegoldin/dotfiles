@@ -28,13 +28,39 @@
   # read from ~/.config/gtk-{3,4}.0/settings.ini, which kde-gtk-config owns.
   # Append the key if missing rather than taking ownership of the file, so
   # KDE can still update theme/font/cursor entries through systemsettings.
-  home.activation.gtkDisablePrimaryPaste = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    for f in "$HOME/.config/gtk-3.0/settings.ini" "$HOME/.config/gtk-4.0/settings.ini"; do
-      if [ -f "$f" ] && ! grep -q "^gtk-enable-primary-paste" "$f"; then
-        sed -i 's/^\[Settings\]$/[Settings]\ngtk-enable-primary-paste=false/' "$f"
+  home.activation = {
+    gtkDisablePrimaryPaste = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      for f in "$HOME/.config/gtk-3.0/settings.ini" "$HOME/.config/gtk-4.0/settings.ini"; do
+        if [ -f "$f" ] && ! grep -q "^gtk-enable-primary-paste" "$f"; then
+          sed -i 's/^\[Settings\]$/[Settings]\ngtk-enable-primary-paste=false/' "$f"
+        fi
+      done
+    '';
+
+    # Apply plasma-manager's panel/desktop scripts on `nixos-rebuild` instead of
+    # only at the next login. plasma-manager wires run_all.sh to a login autostart,
+    # so a rebuild alone leaves the running session on the old panels. run_all.sh
+    # is hash-gated (it only re-runs the scripts whose generated content changed)
+    # and the panels script restarts plasmashell when it re-applies. We run it only
+    # when a live Plasma session is reachable on the bus; otherwise it's a no-op
+    # and the normal login autostart applies the changes.
+    applyPlasmaManager = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      export XDG_RUNTIME_DIR="''${XDG_RUNTIME_DIR:-/run/user/$(${pkgs.coreutils}/bin/id -u)}"
+      export DBUS_SESSION_BUS_ADDRESS="''${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus}"
+      export PATH="${
+        lib.makeBinPath [
+          pkgs.kdePackages.qttools
+          pkgs.coreutils
+          pkgs.gnused
+          pkgs.systemd
+        ]
+      }:$PATH"
+      runAll="$HOME/.local/share/plasma-manager/run_all.sh"
+      if [ -x "$runAll" ] && qdbus org.kde.plasmashell >/dev/null 2>&1; then
+        run "$runAll" || true
       fi
-    done
-  '';
+    '';
+  };
 
   # ssh with 1password
   programs.ssh = {
