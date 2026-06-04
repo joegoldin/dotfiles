@@ -26,7 +26,10 @@
 let
   # Launcher URLs, referenced per-screen below.
   apps = {
-    files = "preferred://filemanager";
+    # Use the explicit Dolphin desktop file, NOT preferred://filemanager: the
+    # preferred:// URL fails to resolve in the icon-tasks launcher model and
+    # silently drops the ENTIRE launcher list, so no pins render at all.
+    files = "applications:org.kde.dolphin.desktop";
     zen = "applications:zen.desktop";
     ghostty = "applications:com.mitchellh.ghostty.desktop";
     zed = "applications:dev.zed.Zed-Nightly.desktop";
@@ -39,13 +42,13 @@ let
     slack = "applications:slack.desktop";
   };
 
-  # Clock — identical on every panel.
-  clock = {
+  # Clock. Seconds are shown only on the main monitor; secondaries pass "never".
+  mkClock = seconds: {
     digitalClock = {
       date.format = {
         custom = "ddd MMM d";
       };
-      time.showSeconds = "always";
+      time.showSeconds = seconds;
       font = {
         family = "Noto Sans";
         weight = 400;
@@ -91,7 +94,7 @@ let
       extraSettings = configureTaskbar { inherit screen launchers; };
       widgets = [
         taskbar
-        clock
+        (mkClock "never")
       ];
     };
 in
@@ -168,7 +171,7 @@ in
             ];
           };
         }
-        clock
+        (mkClock "always")
         # "View desktop" button.
         "org.kde.plasma.minimizeall"
       ];
