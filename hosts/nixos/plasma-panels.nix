@@ -21,15 +21,22 @@
 # plasma.nix), so launching an app from a panel opens it on that panel's screen.
 {
   lib,
+  pkgs,
   ...
 }:
 let
   # Launcher URLs, referenced per-screen below.
   apps = {
-    # Use the explicit Dolphin desktop file, NOT preferred://filemanager: the
-    # preferred:// URL fails to resolve in the icon-tasks launcher model and
-    # silently drops the ENTIRE launcher list, so no pins render at all.
-    files = "applications:org.kde.dolphin.desktop";
+    # File manager pin. This MUST be a file:// URL to the .desktop, NOT
+    # "applications:org.kde.dolphin.desktop" and NOT "preferred://filemanager":
+    #   * The icon-tasks applet rewrites the *default* file manager's
+    #     applications: URL to preferred://filemanager when it processes config.
+    #   * preferred://filemanager does not resolve in this Plasma build's
+    #     launcher model, and a single unresolvable entry silently drops the
+    #     ENTIRE pinned list, so no pins render on that panel.
+    #   * A literal file:// path is not normalized, so it survives and renders.
+    # (Other apps below aren't defaults for any role, so they aren't rewritten.)
+    files = "file://${pkgs.kdePackages.dolphin}/share/applications/org.kde.dolphin.desktop";
     zen = "applications:zen.desktop";
     ghostty = "applications:com.mitchellh.ghostty.desktop";
     zed = "applications:dev.zed.Zed-Nightly.desktop";
