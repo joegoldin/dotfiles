@@ -123,14 +123,29 @@ in
       "${pkgs.systemd}/bin/udevadm settle"
     ];
 
-  # Blacklist the DDR5 SPD temperature-sensor driver. On this Intel i801
-  # SMBus board the spd5118 chip on a DIMM (i2c 9-0053) returns -EBUSY from
-  # its resume callback, which aborts every suspend: the kernel logs
-  # "Failed to put system to sleep. System resumed again: Device or resource
-  # busy", instantly resumes, and KWin's screen-locker (already armed on the
-  # way down) drops you back at the lock screen. The module only exposes RAM
-  # temps via hwmon, so dropping it costs nothing but fixes suspend.
-  boot.blacklistedKernelModules = [ "spd5118" ];
+  # The Kingston NV3 (SNV3S1000G, DRAM-less SM2268XT2 controller) at PCI
+  # 0000:07:00.0 is failing: it intermittently drops off the bus (lsblk shows
+  # the disk as 0B) and its nvme_suspend callback returns -EBUSY, which aborts
+  # every system suspend ("PM: Some devices failed to suspend ... Device or
+  # resource busy") and bounces the session straight back to the lock screen.
+  # Unbind the dead drive from the nvme driver at boot so it can't block
+  # suspend; its data3 mount has been dropped from secrets/data-drives.nix.
+  # Only this PCI address is touched — the other three NVMe drives stay bound.
+  # Re-enable by deleting this service and rebooting (or PCI-rebinding).
+  systemd.services.disable-kingston-nvme = {
+    description = "Unbind failing Kingston NV3 NVMe (0000:07:00.0) that blocks suspend";
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = pkgs.writeShellScript "disable-kingston-nvme" ''
+        dev=0000:07:00.0
+        if [ -e "/sys/bus/pci/drivers/nvme/$dev" ]; then
+          echo "$dev" > /sys/bus/pci/drivers/nvme/unbind
+        fi
+      '';
+    };
+  };
 
   # Unload DisplayLink evdi module before suspend to prevent freeze
   systemd.services.displaylink-suspend = {
