@@ -1,10 +1,12 @@
 {
   lib,
+  pkgs,
   config,
   ...
 }:
 let
   inherit (lib) mkIf;
+  isLinux = pkgs.stdenv.isLinux;
   packageNames = map (p: p.pname or p.name or null) config.home.packages;
   hasPackage = name: lib.any (x: x == name) packageNames;
   hasExa = hasPackage "eza";
@@ -16,8 +18,14 @@ in
 {
   shellAliases = {
     ls =
-      if hasExa then "eza -lA --group-directories-first -snew --icons=auto --git -h" else "ls -lArth";
+      if hasExa then
+        "eza -lA --group-directories-first -snew --icons=auto --git -h --hyperlink"
+      else
+        "ls -lArth";
     l = "command ls";
+
+    # macOS ships `open`; Linux uses `xdg-open` (routes dirs → Dolphin via XDG mime).
+    open = mkIf isLinux "xdg-open";
   };
 
   shellAbbrs = {
