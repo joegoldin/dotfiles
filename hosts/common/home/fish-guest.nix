@@ -49,7 +49,7 @@ in
     enable = true;
 
     functions = import ./fish/functions.nix;
-    inherit ((import ./fish/aliases.nix { inherit lib config; })) shellAbbrs shellAliases;
+    inherit ((import ./fish/aliases.nix { inherit lib pkgs config; })) shellAbbrs shellAliases;
 
     plugins = with pkgs.fishPlugins; [
       {

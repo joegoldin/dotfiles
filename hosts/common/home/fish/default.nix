@@ -75,8 +75,8 @@ in
     inherit ((import ./init.nix { inherit pkgs config; })) interactiveShellInit;
     functions = import ./functions.nix;
     inherit ((import ./plugins.nix { inherit pkgs fishAiSrc; })) plugins;
-    inherit ((import ./aliases.nix { inherit lib config; })) shellAbbrs;
-    inherit ((import ./aliases.nix { inherit lib config; })) shellAliases;
+    inherit ((import ./aliases.nix { inherit lib pkgs config; })) shellAbbrs;
+    inherit ((import ./aliases.nix { inherit lib pkgs config; })) shellAliases;
   };
 
   programs.atuin = import ./atuin.nix { inherit pkgs config dotfiles-secrets; };
