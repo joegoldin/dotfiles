@@ -54,7 +54,6 @@ in
       (extension "old-reddit-redirect" "{9063c2e9-e07c-4c2c-9646-cfe7ca8d0498}" { })
       (extension "reddit-enhancement-suite" "jid1-xUfzOsOFlzSOXg@jetpack" { })
       (extension "web-clipper-obsidian" "clipper@obsidian.md" { })
-      (extension "containerise" "containerise@kinte.sh" { })
       (extension "tab-session-manager" "Tab-Session-Manager@sienori" { })
       (extension "augmented-steam" "{1be309c5-3e4f-4b99-927d-bb500eb4fa88}" { })
       (extension "soundfixer" "soundfixer@unrelenting.technology" { })
