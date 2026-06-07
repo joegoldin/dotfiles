@@ -96,6 +96,7 @@ let
       qdirstat # graphical disk usage analyzer
       ripgrep # recursively searches directories for a regex pattern
       # rustup
+      sem # semantic, entity-level git diff/impact/blame/context (tree-sitter)
       socat # replacement of openbsd-netcat
       spritesModule.packages.sprite
       statix
