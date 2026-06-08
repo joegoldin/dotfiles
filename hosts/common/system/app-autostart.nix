@@ -61,14 +61,21 @@ in
     };
   };
 
+  # `1password --silent` is a long-running GUI process, so this MUST be
+  # Type=simple (unlike audio-app-autostart above, whose script exits). With
+  # Type=oneshot systemd waits for ExecStart to *exit* before the start job
+  # completes — which never happens for a persistent app, so the job stays
+  # "activating (start)" forever, wedges `systemd --user` in the "starting"
+  # state, and makes KDE's systemd-based app launching (StartTransientUnit)
+  # block for the full 25s D-Bus timeout on every launch ("Did not receive a
+  # reply" → Plasma freezes on each app start until KProcessRunner falls back).
   systemd.user.services."1password-autostart" = {
     description = "Start 1Password after login";
     wantedBy = [ "graphical-session.target" ];
     after = [ "graphical-session.target" ];
     serviceConfig = {
-      Type = "oneshot";
+      Type = "simple";
       ExecStart = "${pkgs._1password-gui}/bin/1password --silent";
-      RemainAfterExit = true;
     };
   };
 }
