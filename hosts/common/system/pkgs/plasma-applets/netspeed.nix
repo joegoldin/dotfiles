@@ -2,7 +2,25 @@
   lib,
   stdenvNoCC,
   fetchFromGitHub,
+  writeText,
 }:
+let
+  # Plasma 6 removed the `org.kde.plasma.private.quicklaunch` QML import that
+  # upstream's Launcher.qml used for its click-to-launch action. The import no
+  # longer resolves, so plasmashell logs a fatal QML error and the launcher
+  # Loader fails. Swap in a Qt.openUrlExternally launcher (routes through
+  # xdg-open / kde-open), which still opens the configured .desktop entry on
+  # Plasma 6 without depending on the removed private module.
+  launcherQml = writeText "Launcher.qml" ''
+    import QtQuick 2.5
+
+    Item {
+        function launch(url) {
+            Qt.openUrlExternally(url)
+        }
+    }
+  '';
+in
 stdenvNoCC.mkDerivation {
   pname = "plasma-applet-netspeed-widget";
   version = "3.1";
@@ -21,6 +39,8 @@ stdenvNoCC.mkDerivation {
     runHook preInstall
     install -d "$out/share/plasma/plasmoids/org.kde.netspeedWidget"
     cp -r package/. "$out/share/plasma/plasmoids/org.kde.netspeedWidget/"
+    # Plasma 6 launcher shim (drops the removed quicklaunch QML import)
+    cp ${launcherQml} "$out/share/plasma/plasmoids/org.kde.netspeedWidget/contents/ui/Launcher.qml"
     runHook postInstall
   '';
 
