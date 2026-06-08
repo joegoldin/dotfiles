@@ -147,17 +147,41 @@ in
     };
   };
 
-  # Unload DisplayLink evdi module before suspend to prevent freeze
+  # DisplayLink (evdi) freezes the whole KWin/Wayland session on resume: after
+  # waking from S3 the AMD outputs restore in ~13ms, but the evdi virtual
+  # outputs stay dead until DisplayLinkManager re-establishes its USB link
+  # (~16s). KWin's single render loop blocks on those stale outputs the entire
+  # time ("Pageflip timed out! This is a bug in the evdi kernel driver" ...
+  # "Pageflip arrived after all, 16730ms after the commit"), so the desktop is
+  # frozen even though the real monitors are already painting.
+  #
+  # The previous version only ran `modprobe -r evdi`, which fails on EVERY
+  # suspend ("Module evdi is in use") because dlm.service (DisplayLinkManager),
+  # Xwayland and other clients hold the evdi cards (/dev/dri/card0, card2) open,
+  # so it never actually did anything.
+  #
+  # Fix: stop DisplayLinkManager before sleep so it cleanly tears down the
+  # virtual outputs (nothing stale for KWin to hang on), then bring it back
+  # after resume. The evdi unload/reload is kept only as best-effort (the `-`
+  # prefix ignores failure) for the rare case nothing holds it; its failure no
+  # longer aborts the unit, so ExecStop still runs and DisplayLink always
+  # returns on resume.
   systemd.services.displaylink-suspend = {
-    description = "Unload evdi before suspend, reload after resume";
+    description = "Stop DisplayLink before suspend, restart it after resume";
     before = [ "sleep.target" ];
     wantedBy = [ "sleep.target" ];
     unitConfig.StopWhenUnneeded = true;
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
-      ExecStart = "${pkgs.kmod}/bin/modprobe -r evdi";
-      ExecStop = "${pkgs.kmod}/bin/modprobe evdi";
+      ExecStart = [
+        "-${pkgs.systemd}/bin/systemctl stop dlm.service"
+        "-${pkgs.kmod}/bin/modprobe -r evdi"
+      ];
+      ExecStop = [
+        "-${pkgs.kmod}/bin/modprobe evdi"
+        "${pkgs.systemd}/bin/systemctl start dlm.service"
+      ];
     };
   };
 
