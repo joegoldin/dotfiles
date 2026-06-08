@@ -1,12 +1,15 @@
 { pkgs }:
 let
   package = (pkgs.unstable.streamcontroller.override { isKde = true; }).overrideAttrs (old: {
-    version = "1.5.0-beta.14-unstable-2026-06-04";
+    version = "1.5.0-beta.14-unstable-2026-06-08";
     src = pkgs.fetchFromGitHub {
       owner = "joegoldin";
       repo = "StreamController";
-      rev = "40af8f66ff0caaf42adb79434626a95811ce40b7";
-      hash = "sha256-olXNfkCU8sPTmOcxBeN6Qwf6fpOIJbW2VeXLeoCInEc=";
+      # Includes the watcher-thread teardown fix (8f04298): stops the runaway
+      # kdotool/KWin-script storm that flooded the session bus and was the most
+      # likely trigger for plasmashell's D-Bus connection wedging on app launch.
+      rev = "8f04298a2ce0a1950aa3fdc5deee0ce6195ccdb8";
+      hash = "sha256-ZWXVGXFOT4OgZvfdRZvxu8pncJBjU1lUB7lP0/uMpHM=";
     };
     nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
     postFixup = (old.postFixup or "") + ''
