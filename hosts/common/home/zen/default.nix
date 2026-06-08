@@ -41,40 +41,43 @@ let
     '';
   });
 
-  # Private container routing (Work container + Containerise site rules) lives in
-  # the secrets submodule so the work domains stay out of the public dotfiles.
+  # Per-Space site routing (work domains → the Space backed by each container)
+  # lives in the secrets submodule so the work domains stay out of the public
+  # dotfiles. The same file still defines the containers themselves.
   containerCfg = import "${dotfiles-secrets}/zen-containers.nix";
 
-  # containers.json definitions (name → id/color/icon).
+  # containers.json definitions (name → id/color/icon). Spaces bind to these
+  # containers in-profile, so we keep managing the container set even though the
+  # Containerise extension is gone.
   containerDefs = lib.mapAttrs (_: c: {
     inherit (c) id color icon;
   }) containerCfg.containers;
 
-  # Containerise stores one storage.local entry per rule, keyed `map=<host>`,
-  # routing by cookieStoreId (firefox-container-<id>). Seed it declaratively.
-  # The special container name "No Container" routes to firefox-default — i.e.
-  # forces the host *out* of any container (there is no `id` to look up).
-  containeriseStorage = builtins.listToAttrs (
-    map (
-      r:
-      let
-        cookieStoreId =
-          if r.container == "No Container" then
-            "firefox-default"
-          else
-            "firefox-container-${toString containerCfg.containers.${r.container}.id}";
-      in
-      {
-        name = "map=${r.host}";
-        value = {
-          inherit (r) host;
-          containerName = r.container;
-          inherit cookieStoreId;
-          enabled = true;
-        };
-      }
-    ) containerCfg.rules
-  );
+  # Zen Space Routing rules, seeded declaratively via the
+  # zen.space-routing.managed-routes pref (read by ZenSpaceRoutingManager).
+  # Each former Containerise `{ host, container }` rule becomes a route that
+  # sends the host to the Space named after that container; because every Space
+  # carries its own default container, this preserves the old cookie-jar
+  # isolation. Routes target a Space by NAME, which survives Zen's random
+  # per-profile Space ids.
+  #
+  # `matchType = "regex"` — the host is used directly as the regex pattern.
+  # "No Container" rules have no Space to target, so they open in the current
+  # Space (most-recent-space): the closest equivalent to forcing a host out of
+  # any container. List order is preserved, so earlier exceptions still win.
+  spaceRoutes = map (
+    r:
+    {
+      reference = r.host;
+      matchType = "regex";
+    }
+    // (
+      if r.container == "No Container" then
+        { openIn = "most-recent-space"; }
+      else
+        { openInSpace = r.container; }
+    )
+  ) containerCfg.rules;
 in
 {
   programs.firefox = {
@@ -354,6 +357,12 @@ in
         "zen.pinned-tab-manager.restore-pinned-tabs-to-pinned-url" = true; # Pinned tabs reopen at pinned URL
         "zen.site-data-panel.show-callout" = false; # Suppress site-data panel callout
 
+        # Space Routing rules (replaces the Containerise extension). Built from
+        # the secret host→container rules in spaceRoutes above; routes work
+        # domains to the Space named after each container. Requires the
+        # zen.space-routing.managed-routes support from the Zen fork.
+        "zen.space-routing.managed-routes" = builtins.toJSON spaceRoutes;
+
         "media.videocontrols.picture-in-picture.enabled" = true;
         "media.videocontrols.picture-in-picture.enable-when-switching-tabs.enabled" = true;
         "media.videocontrols.picture-in-picture.video-toggle.first-seen-secs" = 1746510487;
@@ -420,18 +429,10 @@ in
         "browser.xul.error_pages.expert_bad_cert" = true;
       };
 
-      # Declarative container definitions (containers.json). Work is the only
-      # managed container; force so home-manager owns the file.
+      # Declarative container definitions (containers.json). Spaces bind to
+      # these containers in-profile; force so home-manager owns the file.
       containers = containerDefs;
       containersForce = true;
-
-      # Seed Containerise's per-site routing rules into its storage.local.
-      # Using extensions.settings makes home-manager force the legacy JSON
-      # storage backend so the extension actually reads these entries.
-      extensions.settings."containerise@kinte.sh" = {
-        force = true;
-        settings = containeriseStorage;
-      };
     };
   };
 }
