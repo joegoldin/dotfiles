@@ -115,6 +115,11 @@ in
   # audiomemo (recording + transcription CLI)
   audiomemo-packages = inputs.audiomemo.overlays.default;
 
+  # sem (semantic, entity-level version control CLI) available as pkgs.sem
+  sem-packages = final: _prev: {
+    sem = inputs.sem.packages.${final.stdenv.hostPlatform.system}.default;
+  };
+
   # claude-container (claude-code wrapper in docker container with sandboxing)
   claude-container-packages = inputs.claude-container.overlays.default;
 
