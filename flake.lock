@@ -3373,6 +3373,22 @@
         "type": "github"
       }
     },
+    "nixpkgs_20": {
+      "locked": {
+        "lastModified": 1780453794,
+        "narHash": "sha256-bXMRa9VTsHSPXL4Cw8R6JJLQeY3Y/IP4+YJCYVmQ7FY=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "6b316287bae2ee04c9b93c8c858d930fd07d7338",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-26.05",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs_3": {
       "locked": {
         "lastModified": 1777954456,
@@ -3766,7 +3782,7 @@
         "virby": "virby",
         "zed-editor": "zed-editor",
         "zed-nix-ext": "zed-nix-ext",
-        "zen-browser": "zen-browser"
+        "zen-src": "zen-src"
       }
     },
     "rust-analyzer-src": {
@@ -4280,23 +4296,22 @@
         "type": "github"
       }
     },
-    "zen-browser": {
+    "zen-src": {
       "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
+        "nixpkgs": "nixpkgs_20"
       },
       "locked": {
-        "lastModified": 1779946062,
-        "narHash": "sha256-M/2bCPYjiBTkDNV29J/00z10RM3yYnL9X74RqAHDme0=",
-        "owner": "youwen5",
-        "repo": "zen-browser-flake",
-        "rev": "2e2c38ba20a3d614d0196e0aa44851547306e861",
+        "lastModified": 1780891000,
+        "narHash": "sha256-MbD4sAaOt3n7myMoJFG1megDM4zilSWf0C/9hAgfKu8=",
+        "owner": "joegoldin",
+        "repo": "zen-browser-desktop",
+        "rev": "4c13a9c7052edcbf771c00e7b733a892d9974e51",
         "type": "github"
       },
       "original": {
-        "owner": "youwen5",
-        "repo": "zen-browser-flake",
+        "owner": "joegoldin",
+        "ref": "nightly",
+        "repo": "zen-browser-desktop",
         "type": "github"
       }
     },

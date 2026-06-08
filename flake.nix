@@ -12,11 +12,14 @@
     # Also see the 'unstable-packages' overlay at 'overlays/default.nix'.
     nixpkgs-darwin.url = "github:nixos/nixpkgs/nixpkgs-26.05-darwin";
 
-    # Zen Browser (Firefox fork) — packages only, consumed via programs.firefox.
-    zen-browser = {
-      url = "github:youwen5/zen-browser-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # Zen built from source via buildMozillaMach. Points at the fork's `nightly`
+    # branch — "dev as if all my open PRs were merged" — rebuilt by the
+    # nightly-integration GitHub Action (dev + every conflict-free PR). Pinned
+    # in flake.lock; bump with `nix flake update zen-src` when you want the
+    # latest nightly. Intentionally pins its OWN nixpkgs (matched to the fork's
+    # Firefox version) rather than following ours, so a system nixpkgs bump can't
+    # drift the Firefox base out from under buildMozillaMach's patches.
+    zen-src.url = "github:joegoldin/zen-browser-desktop/nightly";
 
     # ── Core framework ─────────────────────────────────────────────────────
     home-manager = {
