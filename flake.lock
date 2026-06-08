@@ -4301,11 +4301,11 @@
         "nixpkgs": "nixpkgs_20"
       },
       "locked": {
-        "lastModified": 1780891000,
-        "narHash": "sha256-MbD4sAaOt3n7myMoJFG1megDM4zilSWf0C/9hAgfKu8=",
+        "lastModified": 1780950863,
+        "narHash": "sha256-8C5SItafuuYAgdph1Ls0UZaQTiWaAcsoK9ZJb6bAk3U=",
         "owner": "joegoldin",
         "repo": "zen-browser-desktop",
-        "rev": "4c13a9c7052edcbf771c00e7b733a892d9974e51",
+        "rev": "4ecd1a3f77fa7180df9c9f836cc10de370ce32a2",
         "type": "github"
       },
       "original": {
