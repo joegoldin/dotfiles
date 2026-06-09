@@ -106,11 +106,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779322322,
-        "narHash": "sha256-XBoZhuBZYvlrlinuYL1FSxM1pGcvlsi+AvECYk65kBg=",
+        "lastModified": 1781027062,
+        "narHash": "sha256-HCp/ULLJFzqptXaMTNqyQe6BWxrJNE6bT6V0dKGHvv8=",
         "owner": "joegoldin",
         "repo": "antigravity-cli-nix",
-        "rev": "b470e523fb7e18782c088e71d3a3e848b6c96d80",
+        "rev": "f61704e74b5b32237b12c4e05a8bd442477094c3",
         "type": "github"
       },
       "original": {
@@ -516,11 +516,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1780558486,
-        "narHash": "sha256-asztvk9rxu9yxsUVow/YK3cX8XhvLqYYvaCfqYSb8C0=",
+        "lastModified": 1781027062,
+        "narHash": "sha256-QFgKDtBo+2gr0lS9bL2QAAxYtSmsOWisCoSHyDIvQ1E=",
         "owner": "joegoldin",
         "repo": "claude-nix",
-        "rev": "d3c97b4c7e998f60f064127afa51815ce33a44e6",
+        "rev": "614fda849f4e6e7b7869a89675c1ca84d219be29",
         "type": "github"
       },
       "original": {
@@ -560,11 +560,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1776975237,
-        "narHash": "sha256-KNW6UkvbpZ6DtPU1nEAc123/UpQ836NB0bbufAgS2Cs=",
+        "lastModified": 1781027062,
+        "narHash": "sha256-ItTRHUXqzsigIikbqWxpF0ixGz1BiSwF1ou5pN6yyRg=",
         "ref": "refs/heads/main",
-        "rev": "2651cceed18d318d546a2d89dc87b4ac8e7556c7",
-        "revCount": 2,
+        "rev": "d702bdd5476ee3e548fa6252fd074c4438d45a6c",
+        "revCount": 4,
         "type": "git",
         "url": "ssh://git@github.com/joegoldin/codex-nix.git"
       },
