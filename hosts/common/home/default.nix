@@ -37,6 +37,7 @@
     ./claude
     ./antigravity
     ./codex
+    ./mcp.nix
     ./notify.nix
     ./bin
   ];
