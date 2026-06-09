@@ -151,7 +151,9 @@ in
         # 	];
         # };
       };
-      NoDefaultBookmarks = true; # Do not set default bookmarks
+      # mkForce: home-manager's firefox module also defines this (false) at
+      # normal priority since the 2026-06 bump, which otherwise conflicts.
+      NoDefaultBookmarks = lib.mkForce true; # Do not set default bookmarks
       PasswordManagerEnabled = false; # Managed by 1pass
       PDFjs = {
         Enabled = false;
