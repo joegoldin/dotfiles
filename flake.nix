@@ -33,7 +33,7 @@
     };
     # jovian (Steam Deck)
     jovian-nixos = {
-      url = "github:Jovian-Experiments/Jovian-NixOS?rev=181c21d94c3a8c6f2198fa240e4012f0674628f7";
+      url = "github:Jovian-Experiments/Jovian-NixOS?rev=9f2b08903e80944eaf625fb0364249865939d5cc";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -111,7 +111,7 @@
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.7.0";
     # pre-built nix-index database
     nix-index-database = {
-      url = "github:nix-community/nix-index-database?rev=97df9dc0b7c924344b793a15c1e8e4522ebb854e";
+      url = "github:nix-community/nix-index-database?rev=1a2ea89c917781e88508d9fd2b507f2d2a0e173c";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # vfkit-based linux builder for nix-darwin (replaces the rosetta-builder)
@@ -136,13 +136,13 @@
     # ── Desktop / NixOS applications ───────────────────────────────────────
     # affinity apps
     affinity-nix = {
-      url = "github:mrshmllow/affinity-nix?rev=84994addd36ea35740d2cf2f9de58ed73319aad4";
+      url = "github:mrshmllow/affinity-nix?rev=7f462d47a0cd86878ae3c2e9f2813a03d72935a0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Ghostty terminal
-    ghostty.url = "github:ghostty-org/ghostty?rev=6246c288ae1087c8d67f75432a59da004b30bf25";
+    ghostty.url = "github:ghostty-org/ghostty?rev=69095e298ab88bb0eb5ba541f4c505f2c22d07f5";
     # Zed editor (built from source via flake)
-    zed-editor.url = "github:zed-industries/zed?ref=v1.5.3-pre";
+    zed-editor.url = "github:zed-industries/zed?ref=v1.6.1-pre";
     # Zed nix extension (fork with language injection for script bodies)
     zed-nix-ext = {
       url = "github:joegoldin/nix";
@@ -168,7 +168,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, antigravity)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=2f2a2d3e3422a7ad6a105c115db2a08a630a03c4";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=01273c66aa45c8ddd9573831c6e40eb0a39ae07d";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
@@ -182,7 +182,7 @@
     };
 
     # ── Homebrew (macOS) ───────────────────────────────────────────────────
-    nix-homebrew.url = "github:zhaofengli/nix-homebrew?rev=b3a87b4793205cc111f3c61e25e018ffac3b8039";
+    nix-homebrew.url = "github:zhaofengli/nix-homebrew?rev=562332f97de9f5ba51aa647d70462e88222b2988";
     brew-nix = {
       url = "github:BatteredBunny/brew-nix?rev=d40695006e0313d131c668d926d92c0fcd737e2a";
       inputs.brew-api.follows = "brew-api";
