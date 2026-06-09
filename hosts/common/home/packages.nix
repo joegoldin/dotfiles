@@ -93,7 +93,6 @@ let
       pueue
       pv
       pythonModule.packages
-      qdirstat # graphical disk usage analyzer
       ripgrep # recursively searches directories for a regex pattern
       # rustup
       socat # replacement of openbsd-netcat

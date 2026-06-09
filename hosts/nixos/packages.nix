@@ -47,6 +47,7 @@ in
       pulseaudio # pactl required by pulsemeeter's pmctl script
       unstable.pulsemeeter
       unstable.pulsemixer
+      qdirstat # graphical disk usage analyzer
       rclone
       reptyr
       rocmPackages.amdsmi
