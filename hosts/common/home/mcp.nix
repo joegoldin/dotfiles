@@ -3,10 +3,12 @@
 { pkgs, lib, ... }:
 {
   programs.agent-skills.mcpServers = lib.mkIf (pkgs ? mcp-nixos) {
-    # Zero-config NixOS/nixpkgs knowledge server. Active by default.
-    nixos.command = lib.getExe' pkgs.mcp-nixos "mcp-nixos";
-
     # ── Examples (uncomment + configure) ─────────────────────────────
+    #
+    # Zero-config NixOS/nixpkgs knowledge server. Commented out because the
+    # agent-skills nix-helper skill already ships it plugin-scoped for
+    # claude/codex — enabling it here would run a duplicate for Claude.
+    # nixos.command = lib.getExe' pkgs.mcp-nixos "mcp-nixos";
     #
     # GitHub MCP — needs a token. Reference an env var, never a raw secret.
     # github = {
