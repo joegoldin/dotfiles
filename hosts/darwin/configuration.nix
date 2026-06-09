@@ -17,6 +17,7 @@
     ./system.nix
     ./apps.nix
     ./homebrew.nix
+    ./system-packages.nix
   ];
   system.stateVersion = 5;
 
