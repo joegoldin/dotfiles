@@ -5,186 +5,53 @@
   ...
 }:
 {
+  # ---------------------------------------------------------------------------
+  # Thin Homebrew remnant — Mac App Store apps only.
+  #
+  # Homebrew is otherwise removed: CLI tools come from nixpkgs and GUI apps from
+  # brew-nix (`pkgs.brewCasks.*`), both in ./system-packages.nix. The only left
+  # that Nix can't do natively is declarative Mac App Store installs, which
+  # nix-darwin drives through `mas` via `brew bundle` (masApps live in apps.nix).
+  #
+  # macOS 27 note: this Homebrew (5.1.x) predates macOS 27, so any bottle
+  # install/upgrade raises `unknown or unsupported macOS version: :dunno`. The
+  # remnant avoids that entirely by never fetching a bottle — `mas` is already
+  # installed and `upgrade`/`autoUpdate` are off, so activation only runs
+  # `mas install`, which doesn't touch bottles.
+  # ---------------------------------------------------------------------------
   nix-homebrew = {
-    # Install Homebrew under the default prefix
     enable = true;
 
-    # Apple Silicon Only: Also install Homebrew under the default Intel prefix for Rosetta 2
+    # Apple Silicon: also expose the Intel prefix for Rosetta 2.
     enableRosetta = true;
 
-    # User owning the Homebrew prefix
     user = username;
 
-    # Automatically migrate existing Homebrew installations
     autoMigrate = true;
 
-    # Declarative tap management
+    # Only the taps needed to resolve the `mas` formula.
     taps = {
       "homebrew/homebrew-core" = inputs.homebrew-core;
-      "homebrew/homebrew-cask" = inputs.homebrew-cask;
-      "homebrew/homebrew-services" = inputs.homebrew-services;
       "homebrew/homebrew-bundle" = inputs.homebrew-bundle;
-      "argoproj/homebrew-tap" = inputs.homebrew-argoproj;
-      "assemblyai/homebrew-assemblyai" = inputs.homebrew-assemblyai;
-      "derailed/homebrew-k9s" = inputs.homebrew-k9s;
-      "ibigio/homebrew-tap" = inputs.homebrew-ibigio;
-      "saulpw/homebrew-vd" = inputs.homebrew-vd;
-      "schappim/homebrew-ocr" = inputs.homebrew-ocr;
-      "skiptools/homebrew-skip" = inputs.homebrew-skip;
-      "txn2/homebrew-tap" = inputs.homebrew-txn2;
-      "versent/homebrew-taps" = inputs.homebrew-versent;
-      "blacktop/homebrew-tap" = inputs.homebrew-blacktop;
-      "cirruslabs/homebrew-cli" = inputs.homebrew-cirruslabs;
-      "neilberkman/homebrew-clippy" = inputs.homebrew-neilberkman;
     };
 
-    # Enable fully-declarative tap management
-    # With mutableTaps disabled, taps can no longer be added imperatively with `brew tap`.
+    # Fully-declarative taps: no imperative `brew tap`.
     mutableTaps = false;
   };
 
-  # Homebrew configuration
   homebrew = {
     enable = true;
 
     onActivation = {
-      autoUpdate = true;
-      upgrade = true;
-      # 'zap': uninstalls all formulae(and related files) not listed here.
+      # Never fetch/upgrade bottles — see the macOS 27 note above.
+      autoUpdate = false;
+      upgrade = false;
       cleanup = "none";
     };
 
-    # Align taps config with nix-homebrew
     taps = builtins.attrNames config.nix-homebrew.taps;
 
-    # `brew install`
-    brews = [
-      "act"
-      "asdf"
-      "assemblyai/assemblyai/assemblyai"
-      "autoconf@2.69"
-      "awscli"
-      "cirruslabs/cli/tart"
-      "cirruslabs/cli/sshpass"
-      "cloudflared"
-      "cmake"
-      "croc"
-      "derailed/k9s/k9s"
-      "dive"
-      "direnv"
-      "docker-compose"
-      "docutils"
-      "entr"
-      "expat"
-      "fastlane"
-      "flyctl"
-      "fontforge"
-      "gh"
-      "ghostscript"
-      "git-lfs"
-      "glow"
-      "gum"
-      "helmfile"
-      "btop"
-      "httpie"
-      "jenv"
-      "jj"
-      "keyring"
-      "kubectx"
-      "lporg"
-      "mas"
-      "mysql"
-      "neilberkman/clippy/clippy"
-      "neofetch"
-      "okteto"
-      "ollama"
-      "pidgin"
-      "portaudio"
-      "profanity"
-      "protobuf"
-      "redis"
-      "ruby"
-      "saml2aws"
-      "saulpw/vd/visidata"
-      "schappim/ocr/ocr"
-      "scrcpy"
-      "sops"
-      "stern"
-      "swift-format"
-      "swiftlint"
-      "tailspin"
-      "tcl-tk"
-      "telnet"
-      "terraform"
-      "the_silver_searcher"
-      "timg"
-      "txn2/tap/kubefwd"
-      "universal-ctags"
-      "virtualenv"
-      "watchman"
-      "wget"
-      "xcbeautify"
-      "xcode-build-server"
-    ];
-
-    # `brew install --cask`
-    casks = [
-      "1password"
-      "1password-cli"
-      "affinity"
-      "android-platform-tools"
-      "android-studio"
-      "autodesk-fusion"
-      "bambu-studio"
-      "barrier"
-      "bentobox"
-      "blender"
-      "chatgpt"
-      "chromedriver"
-      "claude"
-      "crossover"
-      "cryptomator"
-      "daisydisk"
-      "discord"
-      "displaylink"
-      "docker-desktop"
-      "fantastical"
-      "figma"
-      "ghostty"
-      "gitbutler"
-      "google-chrome"
-      "hidock"
-      "httpie"
-      "iterm2"
-      "itermai"
-      "jordanbaird-ice"
-      "jump-desktop-connect"
-      "mac-mouse-fix"
-      "modern-csv"
-      "monodraw"
-      "mountain-duck"
-      "msty"
-      "notion"
-      "obsidian"
-      "orion"
-      "parsec"
-      "postico"
-      "proxyman"
-      "rocket"
-      "roon"
-      "runjs"
-      "sf-symbols"
-      # "silhouette-studio"
-      "slack"
-      "soundsource"
-      "skip"
-      "stats"
-      "sublime-merge"
-      "sublime-text"
-      "tomatobar"
-      "typora"
-      "zed"
-      "zoom"
-    ];
+    # `mas` is the only formula kept — it backs `homebrew.masApps` (apps.nix).
+    brews = [ "mas" ];
   };
 }

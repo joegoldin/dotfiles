@@ -192,71 +192,17 @@
       flake = false;
     };
 
-    # Official taps
+    # Spotlight / Launchpad / Dock integration for Nix-installed .app bundles
+    # (brew-nix casks land in the store, so they need trampolines to be found).
+    mac-app-util.url = "github:hraban/mac-app-util";
+
+    # Official taps (only those the thin MAS remnant needs to resolve `mas`).
     homebrew-core = {
       url = "github:homebrew/homebrew-core";
       flake = false;
     };
-    homebrew-cask = {
-      url = "github:homebrew/homebrew-cask";
-      flake = false;
-    };
     homebrew-bundle = {
       url = "github:homebrew/homebrew-bundle";
-      flake = false;
-    };
-    homebrew-services = {
-      url = "github:homebrew/homebrew-services";
-      flake = false;
-    };
-
-    # Third-party taps
-    homebrew-argoproj = {
-      url = "github:argoproj/homebrew-tap";
-      flake = false;
-    };
-    homebrew-assemblyai = {
-      url = "github:assemblyai/homebrew-assemblyai";
-      flake = false;
-    };
-    homebrew-blacktop = {
-      url = "github:blacktop/homebrew-tap";
-      flake = false;
-    };
-    homebrew-cirruslabs = {
-      url = "github:cirruslabs/homebrew-cli";
-      flake = false;
-    };
-    homebrew-ibigio = {
-      url = "github:ibigio/homebrew-tap";
-      flake = false;
-    };
-    homebrew-k9s = {
-      url = "github:derailed/homebrew-k9s";
-      flake = false;
-    };
-    homebrew-neilberkman = {
-      url = "github:neilberkman/homebrew-clippy";
-      flake = false;
-    };
-    homebrew-ocr = {
-      url = "github:schappim/homebrew-ocr";
-      flake = false;
-    };
-    homebrew-skip = {
-      url = "github:skiptools/homebrew-skip";
-      flake = false;
-    };
-    homebrew-txn2 = {
-      url = "github:txn2/homebrew-tap";
-      flake = false;
-    };
-    homebrew-vd = {
-      url = "github:saulpw/homebrew-vd";
-      flake = false;
-    };
-    homebrew-versent = {
-      url = "github:versent/homebrew-taps";
       flake = false;
     };
   };
@@ -898,6 +844,8 @@
             ./hosts/darwin
             nix-index-database.darwinModules.default
             nix-homebrew.darwinModules.nix-homebrew
+            # Spotlight/Launchpad/Dock trampolines for Nix-installed .app bundles
+            inputs.mac-app-util.darwinModules.default
             # vfkit-based Linux builder (enabled below, currently kept off for bootstrap)
             virby.darwinModules.default
             home-manager.darwinModules.home-manager
@@ -909,6 +857,9 @@
                   useUserPackages = true;
                   extraSpecialArgs = specialArgs;
                   backupCommand = ''mv "$1" "$1.backup-$(date +%Y%m%d-%H%M%S)"''; # timestamped so reruns never collide
+                  sharedModules = [
+                    inputs.mac-app-util.homeManagerModules.default
+                  ];
                   users.joe.imports = [
                     ./hosts/darwin/home-manager.nix
                   ];
