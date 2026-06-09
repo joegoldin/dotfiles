@@ -21,6 +21,7 @@ in
   imports = [
     ../common/home
     ../common/home/zed.nix
+    ../common/home/zen
     ./packages.nix
     ./python.nix
     ./ghostty.nix
