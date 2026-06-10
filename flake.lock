@@ -254,17 +254,17 @@
     "brew-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1779646357,
-        "narHash": "sha256-rnnAaESXxItX4D9xCMGvs3hfDBjbbTYht7OluRcvT8k=",
+        "lastModified": 1781056106,
+        "narHash": "sha256-xNsXFyiOK/tN4itodTlOlTBM7w+kjhLs42wgGQjFMmY=",
         "owner": "Homebrew",
         "repo": "brew",
-        "rev": "10a163ac127624caa80cc5cc5a705e97f3615b0e",
+        "rev": "259096ec10414b11b01561706c1debb37e631ce8",
         "type": "github"
       },
       "original": {
         "owner": "Homebrew",
-        "ref": "5.1.14",
         "repo": "brew",
+        "rev": "259096ec10414b11b01561706c1debb37e631ce8",
         "type": "github"
       }
     },
@@ -2534,7 +2534,9 @@
     },
     "nix-homebrew": {
       "inputs": {
-        "brew-src": "brew-src"
+        "brew-src": [
+          "brew-src"
+        ]
       },
       "locked": {
         "lastModified": 1780492467,
@@ -3526,6 +3528,7 @@
         "audiomemo": "audiomemo",
         "brew-api": "brew-api",
         "brew-nix": "brew-nix",
+        "brew-src": "brew-src",
         "claude-container": "claude-container",
         "claude-desktop-debian": "claude-desktop-debian",
         "desk-phone": "desk-phone",

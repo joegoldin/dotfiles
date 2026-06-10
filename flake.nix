@@ -182,7 +182,18 @@
     };
 
     # ── Homebrew (macOS) ───────────────────────────────────────────────────
-    nix-homebrew.url = "github:zhaofengli/nix-homebrew?rev=562332f97de9f5ba51aa647d70462e88222b2988";
+    nix-homebrew = {
+      url = "github:zhaofengli/nix-homebrew?rev=562332f97de9f5ba51aa647d70462e88222b2988";
+      inputs.brew-src.follows = "brew-src";
+    };
+    # Homebrew itself, pinned past the 5.1.x releases: macOS 27 support
+    # (golden_gate: "27") is only on master — every release tag still tops out
+    # at tahoe/26 and raises `unknown or unsupported macOS version: :dunno`
+    # during `brew bundle`. Bump with `nix flake update brew-src`.
+    brew-src = {
+      url = "github:Homebrew/brew?rev=259096ec10414b11b01561706c1debb37e631ce8";
+      flake = false;
+    };
     brew-nix = {
       url = "github:BatteredBunny/brew-nix?rev=d40695006e0313d131c668d926d92c0fcd737e2a";
       inputs.brew-api.follows = "brew-api";
