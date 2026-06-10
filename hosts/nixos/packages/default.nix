@@ -24,7 +24,6 @@ let
       libgcc
       reptyr
       rocmPackages.rocm-smi
-      # unstable.vllm-rocm # temporarily disabled — 15h build
     ];
 
     gui = [
