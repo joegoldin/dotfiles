@@ -3,8 +3,9 @@ _: {
     ../common/home
     ../common/home/plasma.nix
     ../common/home/zen
+    ../common/home/packages/workstation.nix
     ./android.nix
-    ./packages.nix
+    ./packages
     ./python.nix
     ../common/home/ghostty.nix
     ../common/home/zed.nix
