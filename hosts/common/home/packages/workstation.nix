@@ -20,7 +20,9 @@ let
       entr
       unstable.gradle_9
       unstable.maven
-      protobuf
+      # lowPrio: the common python env propagates python protobuf, which ships
+      # the same include/google/protobuf headers — let the env win in buildEnv.
+      (lib.lowPrio protobuf)
       universal-ctags
       watchman
     ];
