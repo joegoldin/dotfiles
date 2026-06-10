@@ -7,6 +7,5 @@ in
     streamcontroller.package
   ];
 
-  xdg.configFile."autostart/StreamController.desktop".text =
-    streamcontroller.autostartDesktopEntry;
+  xdg.configFile."autostart/StreamController.desktop".text = streamcontroller.autostartDesktopEntry;
 }
