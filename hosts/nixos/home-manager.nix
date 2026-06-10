@@ -4,6 +4,7 @@ _: {
     ../common/home/plasma.nix
     ../common/home/zen
     ../common/home/packages/workstation.nix
+    ../common/home/packages/linux-workstation.nix
     ./android.nix
     ./packages
     ./python.nix
