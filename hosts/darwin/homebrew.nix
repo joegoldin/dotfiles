@@ -82,7 +82,6 @@
       "hidock"
       "iterm2"
       "itermai"
-      "jordanbaird-ice"
       "jump-desktop-connect"
       "mac-mouse-fix"
       "modern-csv"
