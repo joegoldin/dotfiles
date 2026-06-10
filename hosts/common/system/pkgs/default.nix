@@ -10,6 +10,8 @@ pkgs: {
 
   git-hunk = pkgs.callPackage ./git-hunk.nix { };
 
+  mac-app-util = pkgs.callPackage ./mac-app-util { };
+
   google-chrome-stable = pkgs.writeShellScriptBin "google-chrome" ''
     exec -a $0 ${pkgs.google-chrome}/bin/google-chrome-stable $@
   '';

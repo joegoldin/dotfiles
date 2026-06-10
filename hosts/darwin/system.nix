@@ -45,10 +45,13 @@
 
         # Fully declarative dock layout (replaces the old lporg justfile
         # recipes). Captured from the live dock on 2026-06-09.
+        # NOTE: Zen is pinned via its mac-app-util trampoline — a stable path
+        # that survives rebuilds (the live entry pointed at a /nix/store path,
+        # which goes stale whenever Zen is rebuilt).
         persistent-apps = [
           "/System/Applications/Apps.app"
           "/System/Applications/Messages.app"
-          "/Applications/Orion.app"
+          "/Users/joe/Applications/Home Manager Trampolines/Zen.app"
           "/System/Applications/Mail.app"
           "/Applications/Fantastical.app"
           "/Applications/Discord.app"
@@ -64,11 +67,10 @@
           "/Applications/Zed.app"
           "/Applications/Ghostty.app"
           "/Applications/Android Studio.app"
-          "/Applications/Xcode.app"
-          "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app"
+          "/Applications/Xcode-beta.app"
+          "/Applications/Xcode-beta.app/Contents/Applications/DeviceHub.app"
           "/Applications/Proxyman.app"
           "/System/Applications/iPhone Mirroring.app"
-          "/Applications/ChatGPT.app"
           "/Applications/Claude.app"
           "/Applications/Sublime Text.app"
           "/Applications/Sublime Merge.app"
