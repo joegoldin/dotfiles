@@ -47,21 +47,6 @@ let
   ) containerCfg.rules;
 
   inherit (pkgs.stdenv.hostPlatform) isDarwin;
-
-  # Native-messaging-hosts: where Zen looks vs where 1Password writes. Zen
-  # resolves XREUserNativeManifests against its own user-data root (the dir
-  # holding profiles.ini), NOT the stock Firefox vendor dir that the
-  # 1Password desktop app maintains its manifest in.
-  zenNativeMessagingHosts =
-    if isDarwin then
-      "Library/Application Support/zen/NativeMessagingHosts"
-    else
-      ".zen/native-messaging-hosts";
-  mozNativeMessagingHosts =
-    if isDarwin then
-      "Library/Application Support/Mozilla/NativeMessagingHosts"
-    else
-      ".mozilla/native-messaging-hosts";
 in
 {
   programs.firefox = {
@@ -76,7 +61,9 @@ in
         { };
     # Zen's real profile root: ~/.zen on Linux, ~/Library/Application Support/zen
     # on macOS (source: surfer.json appId="zen" + MOZ_LEGACY_PROFILES=1). Not
-    # ~/.mozilla/firefox. profiles.Default therefore lands in <configPath>/Default/.
+    # ~/.mozilla/firefox. profiles.Default lands in <configPath>/Default/ on
+    # Linux but <configPath>/Profiles/Default/ on macOS (home-manager's
+    # mkFirefoxModule nests profiles under Profiles/ on darwin).
     configPath = if isDarwin then "Library/Application Support/zen" else ".zen";
     # Refer to https://mozilla.github.io/policy-templates or `about:policies#documentation` in firefox
     policies = {
@@ -442,8 +429,8 @@ in
 
   # ── 1Password desktop-app integration ───────────────────────────────────
   # https://docs.zen-browser.app/guides/1password
-  # Two pieces are needed for the extension ⇄ desktop-app connection
-  # (biometric unlock, shared lock state):
+  # Two pieces make the extension ⇄ desktop-app connection (biometric
+  # unlock, shared lock state) work:
   #
   # 1. Trusting the Zen binary, handled per platform:
   #    - Linux (NixOS): hosts/common/system/1password-browsers.nix writes
@@ -454,13 +441,12 @@ in
   #      authorize. The nix-built Zen.app is ad-hoc signed, so expect to
   #      re-do this after a Zen update changes the store path.
   #
-  # 2. The native-messaging manifest (com.1password.1password.json). The
-  #    1Password app maintains it in the stock Firefox vendor dir
-  #    (~/.mozilla/native-messaging-hosts, or Library/Application
-  #    Support/Mozilla/NativeMessagingHosts on macOS), but Zen only reads
-  #    manifests from its own user-data root — so without help it never sees
-  #    the manifest. Symlink Zen's native-messaging dir at the Firefox one so
-  #    whatever 1Password writes (and keeps updated) is visible to Zen.
-  home.file.${zenNativeMessagingHosts}.source =
-    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/${mozNativeMessagingHosts}";
+  # 2. The native-messaging manifest (com.1password.1password.json), which
+  #    needs no config: gecko hardcodes the user native-messaging base dir
+  #    to ~/.mozilla (Linux) / ~/Library/Application Support/Mozilla (macOS)
+  #    for ALL forks regardless of branding (XREUserNativeManifests in
+  #    nsXREDirProvider — Zen's libxul carries the stock literals), and
+  #    that's exactly where the 1Password app maintains its manifest. The
+  #    home-manager firefox module keeps the Linux dir alive via a .keep
+  #    file. Note this base dir is unrelated to Zen's ~/.zen profile root.
 }
