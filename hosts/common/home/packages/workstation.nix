@@ -2,7 +2,7 @@
 # office-pc). NOT imported by ./default.nix — workstation hosts import this
 # file explicitly so cloud VMs stay lean.
 #
-# Host packages/ files hold ONLY platform-specific packages; anything that
+# Host packages/files hold ONLY platform-specific packages; anything that
 # runs on both mac and linux belongs here (or in ./default.nix if the cloud
 # hosts should get it too).
 { pkgs, lib, ... }:
