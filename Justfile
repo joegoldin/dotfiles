@@ -130,18 +130,6 @@ build-macos-initial:
     sudo nix --extra-experimental-features 'nix-command flakes' run nix-darwin -- switch --flake .#Joes-MacBook-Pro
     @echo "✅  Built for macOS!"
 
-[macos]
-organize-launchpad:
-    @echo "🔨  Organizing Launchpad..."
-    @lporg load --config $(pwd)/hosts/common/system/dotconfig/lporg.yaml --yes --no-backup
-    @echo "✅  Organized Launchpad!"
-
-[macos]
-save-launchpad:
-    @echo "💾  Saving Launchpad..."
-    @lporg save --config $(pwd)/hosts/common/system/dotconfig/lporg.yaml
-    @echo "✅  Saved Launchpad!"
-
 # ── ISO images ──────────────────────────────────────────────────────────
 
 [unix]

@@ -42,6 +42,43 @@
         wvous-tr-corner = 1;
         wvous-bl-corner = 1;
         wvous-br-corner = 1;
+
+        # Fully declarative dock layout (replaces the old lporg justfile
+        # recipes). Captured from the live dock on 2026-06-09.
+        persistent-apps = [
+          "/System/Applications/Apps.app"
+          "/System/Applications/Messages.app"
+          "/Applications/Orion.app"
+          "/System/Applications/Mail.app"
+          "/Applications/Fantastical.app"
+          "/Applications/Discord.app"
+          "/Applications/Slack.app"
+          "/Applications/zoom.us.app"
+          "/Applications/Obsidian.app"
+          "/Applications/Typora.app"
+          "/Applications/Notion.app"
+          "/Applications/Roon.app"
+          "/System/Applications/Photos.app"
+          "/System/Applications/VoiceMemos.app"
+          "/Applications/DaVinci Resolve.app"
+          "/Applications/Zed.app"
+          "/Applications/Ghostty.app"
+          "/Applications/Android Studio.app"
+          "/Applications/Xcode.app"
+          "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app"
+          "/Applications/Proxyman.app"
+          "/System/Applications/iPhone Mirroring.app"
+          "/Applications/ChatGPT.app"
+          "/Applications/Claude.app"
+          "/Applications/Sublime Text.app"
+          "/Applications/Sublime Merge.app"
+          "/Applications/Parsec.app"
+          "/Users/joe/Parallels/Windows 11.pvm/Windows 11.app"
+          "/System/Applications/System Settings.app"
+        ];
+        persistent-others = [
+          "/Users/joe/Downloads"
+        ];
       };
 
       # customize finder
