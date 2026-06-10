@@ -1,7 +1,6 @@
-# Linux-ONLY home packages — only things tied to this platform belong here
-# (ROCm/AMD tooling, linux desktop apps, audio plumbing, X/Wayland helpers).
-# Anything cross-platform goes in hosts/common/home/packages/workstation.nix
-# (workstations) or hosts/common/home/packages/default.nix (all hosts).
+# Packages unique to joe-desktop — shared linux-workstation packages live in
+# hosts/common/home/packages/linux-workstation.nix, cross-platform tools in
+# hosts/common/home/packages/{default,workstation}.nix.
 {
   pkgs,
   lib,
@@ -17,26 +16,15 @@ let
       goModule.packages.claude-squad
       blip-caption
       bubblewrap
-      docker-buildx
       gcc15
       glibc
-      inotify-tools
       unstable.jdk25_headless
       # cargoModule.packages.litra
       # cargoModule.packages.litra-autotoggle
       libgcc
-      nvtopPackages.amd
-      pulseaudio # pactl required by pulsemeeter's pmctl script
-      unstable.pulsemixer
       reptyr
-      rocmPackages.amdsmi
-      rocmPackages.rocminfo
       rocmPackages.rocm-smi
-      unstable.tailscale
-      unstable.umu-launcher
       # unstable.vllm-rocm # temporarily disabled — 15h build
-      wl-clipboard
-      xclip
     ];
 
     gui = [
@@ -48,15 +36,12 @@ let
       unstable.discord
       # hyprwhspr
       unstable.jellyfin-desktop
-      localsend
       lotion
       unstable.obsidian
       unstable.parsec-bin
-      unstable.pulsemeeter
       qdirstat # graphical disk usage analyzer
       unstable.slack
       sublime-merge
-      ungoogled-chromium
       (unstable.unityhub.override {
         extraPkgs = ps: [
           ps.sqlite
@@ -84,7 +69,6 @@ in
   imports = [
     ./audiomemo.nix
     ./flatpak.nix
-    ./streamcontroller.nix
   ];
 
   home.packages =
