@@ -4083,11 +4083,11 @@
         "nixpkgs": "nixpkgs_20"
       },
       "locked": {
-        "lastModified": 1781006769,
-        "narHash": "sha256-UtQm8T+mmghrJRCu6v3IZGqjCRONPvyRKYy/FfoK2aA=",
+        "lastModified": 1781113256,
+        "narHash": "sha256-9UMQ904w5Fv/odV2gMzlvsRaEyhhZS4PAtczJUxEvXE=",
         "owner": "joegoldin",
         "repo": "zen-browser-desktop",
-        "rev": "6ce4d908128e22b1f7405d99aa0458afac758fba",
+        "rev": "14d7c42b198656afd5ab1117c937469ced34ef23",
         "type": "github"
       },
       "original": {
