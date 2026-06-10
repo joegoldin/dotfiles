@@ -33,7 +33,7 @@
     };
     # jovian (Steam Deck)
     jovian-nixos = {
-      url = "github:Jovian-Experiments/Jovian-NixOS?rev=9f2b08903e80944eaf625fb0364249865939d5cc";
+      url = "github:Jovian-Experiments/Jovian-NixOS?rev=255a964247cd3bcc68947b675ce270212e98568f";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -142,7 +142,7 @@
     # Ghostty terminal
     ghostty.url = "github:ghostty-org/ghostty?rev=69095e298ab88bb0eb5ba541f4c505f2c22d07f5";
     # Zed editor (built from source via flake)
-    zed-editor.url = "github:zed-industries/zed?ref=v1.6.1-pre";
+    zed-editor.url = "github:zed-industries/zed?ref=v1.6.2-pre";
     # Zed nix extension (fork with language injection for script bodies)
     zed-nix-ext = {
       url = "github:joegoldin/nix";
@@ -168,7 +168,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, antigravity)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=01273c66aa45c8ddd9573831c6e40eb0a39ae07d";
+    llm-agents.url = "github:numtide/llm-agents.nix?rev=af2ff595989e83142d2abd0a81bf6e582b248058";
     # declarative MCP server configuration
     mcps = {
       url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
@@ -192,13 +192,19 @@
       flake = false;
     };
 
-    # Spotlight / Launchpad / Dock integration for Nix-installed .app bundles
-    # (brew-nix casks land in the store, so they need trampolines to be found).
-    mac-app-util.url = "github:hraban/mac-app-util";
+    # NOTE: mac-app-util (Spotlight/Dock trampolines for Nix-installed .apps)
+    # was removed: it's written in Common Lisp and SBCL (even 2.6.4) cannot
+    # mmap its dynamic space on macOS 27 ("failed to allocate ... at
+    # 0x300100000"). Casks live on Homebrew in /Applications anyway. Re-add
+    # once SBCL runs on macOS 27.
 
-    # Official taps (only those the thin MAS remnant needs to resolve `mas`).
+    # Official taps
     homebrew-core = {
       url = "github:homebrew/homebrew-core";
+      flake = false;
+    };
+    homebrew-cask = {
+      url = "github:homebrew/homebrew-cask";
       flake = false;
     };
     homebrew-bundle = {
@@ -844,8 +850,6 @@
             ./hosts/darwin
             nix-index-database.darwinModules.default
             nix-homebrew.darwinModules.nix-homebrew
-            # Spotlight/Launchpad/Dock trampolines for Nix-installed .app bundles
-            inputs.mac-app-util.darwinModules.default
             # vfkit-based Linux builder (enabled below, currently kept off for bootstrap)
             virby.darwinModules.default
             home-manager.darwinModules.home-manager
@@ -857,9 +861,6 @@
                   useUserPackages = true;
                   extraSpecialArgs = specialArgs;
                   backupCommand = ''mv "$1" "$1.backup-$(date +%Y%m%d-%H%M%S)"''; # timestamped so reruns never collide
-                  sharedModules = [
-                    inputs.mac-app-util.homeManagerModules.default
-                  ];
                   users.joe.imports = [
                     ./hosts/darwin/home-manager.nix
                   ];
