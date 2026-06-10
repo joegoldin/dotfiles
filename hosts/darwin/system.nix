@@ -80,7 +80,14 @@
           "/System/Applications/System Settings.app"
         ];
         persistent-others = [
-          "/Users/joe/Downloads"
+          {
+            folder = {
+              path = "/Users/joe/Downloads";
+              arrangement = "date-added";
+              displayas = "stack";
+              showas = "automatic";
+            };
+          }
         ];
       };
 
