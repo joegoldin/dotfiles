@@ -27,7 +27,7 @@
 
     # You can also split up your configuration and import pieces of it here:
     ./fish
-    ./packages.nix
+    ./packages
     ./gh.nix
     ./git.nix
     ./1password.nix
