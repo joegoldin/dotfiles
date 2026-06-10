@@ -76,7 +76,6 @@
           "/Applications/Sublime Text.app"
           "/Applications/Sublime Merge.app"
           "/Applications/Parsec.app"
-          "/Users/joe/Parallels/Windows 11.pvm/Windows 11.app"
           "/System/Applications/System Settings.app"
         ];
         persistent-others = [
