@@ -45,13 +45,14 @@
 
         # Fully declarative dock layout (replaces the old lporg justfile
         # recipes). Captured from the live dock on 2026-06-09.
-        # NOTE: Zen is pinned via its mac-app-util trampoline — a stable path
-        # that survives rebuilds (the live entry pointed at a /nix/store path,
-        # which goes stale whenever Zen is rebuilt).
+        # NOTE: Zen is pinned via the signed copy that the zenSignedApp home
+        # activation maintains (hosts/common/home/zen) — a stable path that
+        # survives rebuilds and carries the real code signature 1Password
+        # requires.
         persistent-apps = [
           "/System/Applications/Apps.app"
           "/System/Applications/Messages.app"
-          "/Users/joe/Applications/Home Manager Trampolines/Zen.app"
+          "/Users/joe/Applications/Zen.app"
           "/System/Applications/Mail.app"
           "/Applications/Fantastical.app"
           "/Applications/Discord.app"
