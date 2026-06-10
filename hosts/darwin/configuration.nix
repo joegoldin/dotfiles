@@ -17,7 +17,6 @@
     ./system.nix
     ./apps.nix
     ./homebrew.nix
-    ./system-packages.nix
     ./mac-app-util.nix
   ];
   system.stateVersion = 5;
