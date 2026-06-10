@@ -28,10 +28,14 @@ let
   # isolation. Routes target a Space by NAME, which survives Zen's random
   # per-profile Space ids.
   #
-  # `matchType = "regex"` — the host is used directly as the regex pattern.
-  # "No Container" rules have no Space to target, so they open in the current
-  # Space (most-recent-space): the closest equivalent to forcing a host out of
-  # any container. List order is preserved, so earlier exceptions still win.
+  # `matchType = "regex"` — the host string IS the regex pattern, matched
+  # against the full URL (see containers.nix for the syntax).
+  #
+  # "No Container" rules have no container to target. We route them to the
+  # Default Space, which itself carries no container (spaces.nix: container =
+  # null), so the old "force out of any container" behaviour is preserved while
+  # landing in a concrete Space rather than wherever you happened to be.
+  # List order is preserved, so earlier exceptions still win.
   spaceRoutes = map (
     r:
     {
@@ -40,7 +44,7 @@ let
     }
     // (
       if r.container == "No Container" then
-        { openIn = "most-recent-space"; }
+        { openInSpace = "Default"; }
       else
         { openInSpace = r.container; }
     )
