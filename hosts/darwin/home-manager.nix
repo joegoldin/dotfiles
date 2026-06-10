@@ -22,7 +22,8 @@ in
     ../common/home
     ../common/home/zed.nix
     ../common/home/zen
-    ./packages.nix
+    ../common/home/packages/workstation.nix
+    ./packages
     ./python.nix
     ./ghostty.nix
   ];

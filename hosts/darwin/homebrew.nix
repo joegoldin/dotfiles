@@ -1,6 +1,7 @@
 {
   inputs,
   config,
+  pkgs,
   username,
   ...
 }:
@@ -8,8 +9,9 @@
   # ---------------------------------------------------------------------------
   # Homebrew: GUI casks + Mac App Store apps only.
   #
-  # CLI tools are managed by nixpkgs in ./system-packages.nix — `brews` stays
-  # limited to `mas` (which backs `homebrew.masApps` in apps.nix).
+  # CLI tools are managed by nixpkgs via home-manager (./packages and
+  # hosts/common/home/packages); `mas` (which backs `homebrew.masApps` in
+  # apps.nix) is installed system-side below.
   #
   # macOS 27 note: this Homebrew (5.1.x) predates macOS 27, so any bottle
   # (formula) install/upgrade raises `unknown or unsupported macOS version:
@@ -49,9 +51,8 @@
 
     taps = builtins.attrNames config.nix-homebrew.taps;
 
-    # No formulae at all — CLI tools (including `mas`, which backs
-    # `homebrew.masApps`) come from nixpkgs via ./system-packages.nix.
-    # `brew bundle` finds the nix-installed `mas` on PATH.
+    # No formulae at all — CLI tools come from nixpkgs. `brew bundle` finds
+    # the nix-installed `mas` (below) on PATH.
     brews = [ ];
 
     # `brew install --cask`
@@ -110,4 +111,8 @@
       "zoom"
     ];
   };
+
+  # `mas` backs `homebrew.masApps` at system activation, so it must be
+  # system-wide rather than in home.packages.
+  environment.systemPackages = [ pkgs.mas ];
 }
