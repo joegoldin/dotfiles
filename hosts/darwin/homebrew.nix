@@ -68,7 +68,6 @@
       "bentobox"
       "blender"
       "chatgpt"
-      "chromedriver"
       "claude"
       "crossover"
       "cryptomator"

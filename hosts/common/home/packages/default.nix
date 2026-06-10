@@ -14,7 +14,9 @@ let
 
   # Shared CLI packages for every host that imports hosts/common/home —
   # including the cloud VMs. Heavier dev tooling shared between workstations
-  # belongs in ./workstation.nix (imported per-host), not here.
+  # belongs in ./workstation.nix (imported per-host), not here. GUI apps are
+  # host-specific by nature: Homebrew casks on darwin, the `gui` groups in
+  # hosts/{nixos,office-pc}/packages on linux.
   #
   # Not listed here because dedicated modules provide them:
   #   audiomemo (programs.audiomemo), claude-code (../claude), codex (../codex),
@@ -152,6 +154,7 @@ let
     misc = [
       unstable.playwright-driver
       unstable.playwright-driver.browsers
+      shopt-script
       spritesModule.packages.sprite
     ];
   };
