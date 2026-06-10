@@ -436,10 +436,17 @@ in
   #    - Linux (NixOS): hosts/common/system/1password-browsers.nix writes
   #      /etc/1password/custom_allowed_browsers (root-owned) with the zen
   #      process names. Imported by the joe-desktop and office-pc hosts.
-  #    - macOS: one-time MANUAL step — 1Password → Settings → Browser →
-  #      "Add Browser", pick Zen from ~/Applications/Home Manager Apps, then
-  #      authorize. The nix-built Zen.app is ad-hoc signed, so expect to
-  #      re-do this after a Zen update changes the store path.
+  #    - macOS: 1Password requires the browser bundle to carry a REAL code
+  #      signature (ad-hoc and unsigned are both rejected, verified
+  #      empirically). The nix store is immutable and builds can't reach the
+  #      keychain, so the zenSignedApp activation below maintains a signed
+  #      copy at ~/Applications/Zen.app: copy out of the store, patch the
+  #      wrapper to exec the local binary (so the *running process* carries
+  #      the signature), codesign with the Apple Development identity, and
+  #      re-do all of that automatically whenever the Zen store path changes.
+  #      One-time: 1Password → Settings → Browser → "Add Browser" →
+  #      ~/Applications/Zen.app. Launch Zen from that path (dock pin points
+  #      there); the Home Manager Apps copy stays unsigned.
   #
   # 2. The native-messaging manifest (com.1password.1password.json), which
   #    needs no config: gecko hardcodes the user native-messaging base dir
@@ -449,4 +456,37 @@ in
   #    that's exactly where the 1Password app maintains its manifest. The
   #    home-manager firefox module keeps the Linux dir alive via a .keep
   #    file. Note this base dir is unrelated to Zen's ~/.zen profile root.
+
+  # Signed Zen.app copy for 1Password (see the comment block above).
+  home.activation = lib.optionalAttrs isDarwin {
+    zenSignedApp = lib.hm.dag.entryAfter [ "writeBoundary" "trampolineApps" ] ''
+      zenSrcLink="$HOME/Applications/Home Manager Apps/Zen.app"
+      zenDst="$HOME/Applications/Zen.app"
+      zenMarker="$HOME/Applications/.zen-signed-store-path"
+      zenIdentity="Apple Development: Joseph Goldin (W65UYY2D42)"
+      if [ -L "$zenSrcLink" ]; then
+        zenStore=$(/usr/bin/readlink "$zenSrcLink")
+        if [ ! -d "$zenDst" ] || [ ! -e "$zenMarker" ] || [ "$(/bin/cat "$zenMarker")" != "$zenStore" ]; then
+          if /usr/bin/security find-identity -v -p codesigning | /usr/bin/grep -qF "$zenIdentity"; then
+            verboseEcho "zen: re-signing $zenDst from $zenStore"
+            run /bin/rm -rf "$zenDst"
+            run /bin/cp -RL "$zenStore" "$zenDst"
+            run /bin/chmod -R u+w "$zenDst"
+            # Exec the local signed binary, not the unsigned store one — the
+            # running process must carry the signature for 1Password.
+            run /usr/bin/sed -i "" 's|exec "/nix/store/[^"]*/\.zen-old"|exec "$(/usr/bin/dirname "$0")/.zen-old"|' \
+              "$zenDst/Contents/MacOS/zen"
+            run /usr/bin/codesign --force --deep --sign "$zenIdentity" "$zenDst"
+            run --quiet /bin/sh -c "printf '%s' '$zenStore' > '$zenMarker'"
+          else
+            echo "zen: codesign identity '$zenIdentity' not in keychain; skipping signed copy" >&2
+          fi
+        fi
+        # The Zen trampoline would launch the unsigned store copy — drop it in
+        # favor of the signed app (Spotlight indexes ~/Applications/Zen.app
+        # directly, and the dock pin points there too).
+        run /bin/rm -rf "$HOME/Applications/Home Manager Trampolines/Zen.app"
+      fi
+    '';
+  };
 }
