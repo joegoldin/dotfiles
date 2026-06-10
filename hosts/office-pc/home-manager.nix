@@ -8,6 +8,7 @@
   imports = [
     ../common/home
     ../common/home/default-apps.nix
+    ../common/home/packages/workstation.nix
     ../common/home/zen
     ../common/home/plasma.nix
     ../common/home/zed.nix
