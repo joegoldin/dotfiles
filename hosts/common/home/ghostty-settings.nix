@@ -45,12 +45,15 @@ let
   toGhosttyConfig =
     settings:
     let
+      # toString renders Nix booleans as "1"/"" which Ghostty rejects (e.g.
+      # mouse-shift-capture wants true/false), so coerce bools to true/false.
+      fmtValue = v: if builtins.isBool v then lib.boolToString v else toString v;
       mkLine =
         key: value:
         if builtins.isList value then
-          lib.concatMapStringsSep "\n" (v: "${key} = ${toString v}") value
+          lib.concatMapStringsSep "\n" (v: "${key} = ${fmtValue v}") value
         else
-          "${key} = ${toString value}";
+          "${key} = ${fmtValue value}";
     in
     lib.concatStringsSep "\n" (lib.mapAttrsToList mkLine settings);
 in

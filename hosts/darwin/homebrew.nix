@@ -92,7 +92,6 @@
       "msty"
       "notion"
       "obsidian"
-      "orion"
       "parsec"
       "postico"
       "proxyman"
