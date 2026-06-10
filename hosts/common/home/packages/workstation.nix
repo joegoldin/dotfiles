@@ -80,7 +80,6 @@ let
     ];
 
     gui = [
-      fontforge
       mpv
       pidgin
       scrcpy
