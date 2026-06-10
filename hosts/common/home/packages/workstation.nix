@@ -10,49 +10,73 @@ let
   inherit (pkgs) unstable;
 
   packageGroups = with pkgs; {
-    cli = [
-      asdf-vm # asdf
+    system = [
       btop
-      unstable.calcurse
-      chromedriver
-      claude-container # needs native build, no QEMU — workstations only
-      cloudflared
-      cmake
-      croc
-      dive
-      docker-compose
-      unstable.dumbpipe
-      entr
       fastfetch
-      unstable.ffmpeg
-      ghostscript
+    ];
+
+    build-tools = [
+      cmake
+      entr
       unstable.gradle_9
-      inetutils # telnet
-      kubefwd
       unstable.maven
-      mysql84 # mysql
-      nodejs # node
-      okteto
-      profanity
       protobuf
-      rclone
-      redis
-      ruby
-      saml2aws
-      silver-searcher # the_silver_searcher
-      sops
-      sshpass
-      stern
-      tailspin
-      terraform
-      timg
       universal-ctags
-      visidata
       watchman
+    ];
+
+    runtimes = [
+      asdf-vm # asdf
+      nodejs # node
+      ruby
 
       python3Packages.docutils # docutils
       python3Packages.keyring # keyring
       python3Packages.virtualenv # virtualenv
+    ];
+
+    containers = [
+      claude-container # needs native build, no QEMU — workstations only
+      dive
+      docker-compose
+      kubefwd
+      okteto
+      stern
+    ];
+
+    infra = [
+      cloudflared
+      saml2aws
+      sops
+      terraform
+    ];
+
+    databases = [
+      mysql84 # mysql
+      redis
+    ];
+
+    network = [
+      croc
+      unstable.dumbpipe
+      inetutils # telnet
+      rclone
+      sshpass
+    ];
+
+    media = [
+      unstable.ffmpeg
+      ghostscript
+      timg
+    ];
+
+    misc = [
+      unstable.calcurse
+      chromedriver
+      profanity
+      silver-searcher # the_silver_searcher
+      tailspin
+      visidata
     ];
 
     gui = [
