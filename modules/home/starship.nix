@@ -1,5 +1,5 @@
-# starship prompt. Migration pattern B (pointed-at).
+# starship prompt.
 { ... }:
 {
-  den.aspects.starship.homeManager = ../../hosts/common/home/starship.nix;
+  den.aspects.starship.homeManager = ./_hm/starship.nix;
 }

@@ -1,5 +1,5 @@
-# gpg + gpg-agent. Migration pattern B (pointed-at).
+# gpg + gpg-agent.
 { ... }:
 {
-  den.aspects.gpg.homeManager = ../../hosts/common/home/gpg.nix;
+  den.aspects.gpg.homeManager = ./_hm/gpg.nix;
 }

@@ -1,13 +1,13 @@
 # User aspect: everything "joe" carries to every den-managed host.
 # Host-specific extras come from each host's provides.to-users / legacy tree.
 #
-# Every value is mkDefault'd: the not-yet-extracted host trees under hosts/
-# still define users.users.joe themselves, and those plain definitions must
-# keep winning until they migrate. On hosts where nothing else defines the
+# Every value is mkDefault'd: the per-host _configuration.nix files under
+# modules/hosts/*/ still define users.users.joe themselves, and those plain
+# definitions must keep winning. On hosts where nothing else defines the
 # user (cloud-proxy) the defaults below are the definition.
 #
-# The included feature aspects dedup against the legacy hm trees: every
-# hosts/*/home-manager.nix already imports these same files, and the module
+# The included feature aspects dedup against the per-host home trees: every
+# modules/hosts/*/_home-manager.nix imports these same files, and the module
 # system deduplicates imports by path.
 { inputs, den, ... }:
 let
@@ -24,7 +24,7 @@ in
       den.aspects.starship
     ];
 
-    # OS-level account (was users.users.joe in hosts/*/configuration.nix)
+    # OS-level account (hosts' _configuration.nix definitions override these)
     provides.to-hosts.nixos =
       { lib, pkgs, ... }:
       {

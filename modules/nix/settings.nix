@@ -1,6 +1,8 @@
-# Repo-wide nix daemon + nixpkgs settings, lifted verbatim from the nix/
-# nixpkgs blocks every hosts/*/configuration.nix repeats. den hosts include
-# `den.aspects.nix-settings`; legacy hosts keep their own copy until migrated.
+# Repo-wide nix daemon + nixpkgs settings. cloud-proxy includes
+# `den.aspects.nix-settings`; the other hosts still carry their own (nearly
+# identical) copies inside modules/hosts/*/_configuration.nix — dedup them
+# into this aspect as follow-up cleanup (watch the per-host deltas:
+# steamdeck gc 14d/auto-optimise, office-pc cores=20, macbook max-jobs).
 { config, inputs, ... }:
 let
   meta = import ../_lib/meta.nix;

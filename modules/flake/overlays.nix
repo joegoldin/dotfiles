@@ -1,10 +1,8 @@
 # Custom packages and modifications exported as overlays.
-# Still sourced from the legacy location while hosts/ exists; the overlay
-# definitions themselves move into modules/ near the end of the migration
-# (see MIGRATION.md phase 6).
+# Overlay definitions live in ./_overlays (invisible to import-tree).
 { inputs, ... }:
 {
-  flake.overlays = builtins.removeAttrs (import ../../hosts/common/system/overlays {
+  flake.overlays = builtins.removeAttrs (import ./_overlays {
     inherit inputs;
   }) [ "unstableOverlays" ];
 }

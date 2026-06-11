@@ -1,6 +1,5 @@
-# GitHub CLI + extensions. Migration pattern B (pointed-at): the legacy
-# module takes no specialArgs, so the aspect can reference it directly.
+# GitHub CLI + extensions.
 { ... }:
 {
-  den.aspects.gh.homeManager = ../../hosts/common/home/gh.nix;
+  den.aspects.gh.homeManager = ./_hm/gh.nix;
 }

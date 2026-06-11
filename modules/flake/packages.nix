@@ -8,7 +8,7 @@ in
   perSystem =
     { system, ... }:
     {
-      packages = import ../../hosts/common/system/pkgs (
+      packages = import ./_pkgs (
         import inputs.nixpkgs {
           inherit system;
           overlays = builtins.attrValues flakeOverlays;
