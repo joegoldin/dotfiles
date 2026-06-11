@@ -1,6 +1,7 @@
 # cloud-proxy VPS (caddy reverse proxy + fail2ban in front of tailnet
-# services). First host migrated from modules/flake/legacy-hosts.nix to a den
-# entity; flake output name is unchanged (nixosConfigurations.cloud-proxy).
+# services). The fully-migrated exemplar host: no hosts/ tree, no
+# specialArgs bridge; flake output name unchanged
+# (nixosConfigurations.cloud-proxy).
 #
 # System config below is verbatim from the old hosts/cloud-proxy/
 # {configuration,cloud-proxy}.nix; the caddy/fail2ban half of the aspect
