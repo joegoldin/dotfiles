@@ -10,7 +10,7 @@
     let
       # Gesture bindings (nix is source of truth). Overview uses dbus-send instead
       # of qdbus because qttools 6.11 SEGVs in QDBusConnectionManager's destructor
-      # during exit handlers — the shortcut still fires, but the non-zero exit
+      # during exit handlers; the shortcut still fires, but the non-zero exit
       # makes mouse-actions report failure.
       mouseActionsConfig = {
         shape_button = "Right";
@@ -565,7 +565,7 @@
     {
       home.packages = with pkgs; [
         mouse-actions
-        # Fork built from source with Tauri v2 — knows about modifier_remaps and
+        # Fork built from source with Tauri v2; knows about modifier_remaps and
         # chord_bindings. Symlinks `mouse-actions-gui` so the tray's
         # shutil.which() and the CLI's `show-gui` subcommand find it.
         mouse-actions-gui-fork
@@ -574,7 +574,7 @@
       ];
 
       # Copy the config into place. Each switch overwrites on-disk edits with the
-      # in-tree config — the in-tree JSON is the source of truth. Re-sync by
+      # in-tree config; the in-tree JSON is the source of truth. Re-sync by
       # copying ~/.config/mouse-actions.json back to this directory when you've
       # made edits in the GUI you want to keep.
       home.activation.mouseActionsConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''

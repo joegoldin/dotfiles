@@ -38,7 +38,7 @@
     if [ "$spec" = "." ]; then
       src=$(pwd); dst=/mnt/cwd; ro=false
     else
-      # Split on : — last segment may be ro/rw
+      # Split on ":"; the last segment may be ro/rw
       IFS=: read -ra parts <<<"$spec"
       last=''${parts[-1]}
       ro=false
@@ -56,7 +56,7 @@
     fi
     tag=$(echo "$dst" | sed 's|^/||;s|/|-|g;s|[^a-z0-9-]|-|g' | cut -c1-30)
 
-    # Guard against duplicate tag/dst — microvm.nix rejects duplicate share
+    # Guard against duplicate tag/dst; microvm.nix rejects duplicate share
     # tags at eval time (hard to recover from once meta.json is corrupt).
     if jq -e --arg dst "$dst" --arg tag "$tag" \
       '.mounts | any(.dst == $dst or .tag == $tag)' "$meta" >/dev/null; then

@@ -53,7 +53,7 @@ in
             # Fully declarative dock layout (replaces the old lporg justfile
             # recipes). Captured from the live dock on 2026-06-09.
             # NOTE: Zen is pinned via the signed copy that the zenSignedApp home
-            # activation maintains (modules/home/_hm/zen) — a stable path that
+            # activation maintains (modules/home/_hm/zen); a stable path that
             # survives rebuilds and carries the real code signature 1Password
             # requires.
             persistent-apps = [

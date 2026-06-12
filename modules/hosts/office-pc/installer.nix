@@ -1,4 +1,4 @@
-# Installer ISO for office-pc — an artifact build, not a machine, so it is a
+# Installer ISO for office-pc; an artifact build, not a machine, so it is a
 # plain flake output rather than a den entity. It embeds the den-generated
 # office-pc closure (self.nixosConfigurations.office-pc) plus all flake
 # inputs for fully-offline disko-install. Verbatim from the old flake.nix.
@@ -150,7 +150,7 @@ in
 
                 header "Step 4/5: Set User Password"
                 echo "Re-mounting installed system..."
-                # disko-install may unmount after finishing — re-mount for password step
+                # disko-install may unmount after finishing; re-mount for password step
                 if ! findmnt /mnt &>/dev/null; then
                   sudo cryptsetup open /dev/disk/by-partlabel/disk-main-luks cryptroot 2>/dev/null || true
                   sudo vgchange -ay 2>/dev/null || true

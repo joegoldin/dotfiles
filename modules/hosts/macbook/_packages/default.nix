@@ -1,4 +1,4 @@
-# Mac-ONLY home packages — only things tied to this platform belong here
+# Mac-ONLY home packages; only things tied to this platform belong here
 # (Xcode/Swift tooling, macOS VMs, iTerm2, brew-replacement build libs).
 # Anything cross-platform goes in modules/home/_hm/packages/workstation.nix
 # (workstations) or modules/home/_hm/packages/default.nix (all hosts).

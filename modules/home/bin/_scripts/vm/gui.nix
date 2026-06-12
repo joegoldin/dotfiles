@@ -42,7 +42,7 @@
     done
     [ -S "$sock" ] || die "SPICE socket never appeared at $sock (VM may still be booting; try again in a moment)"
 
-    # qemu creates the socket mode 0755 (no group write) — socket-connect
+    # qemu creates the socket mode 0755 (no group write); socket-connect
     # requires write. Make it group-accessible so vmusers/kvm can connect.
     if [ ! -w "$sock" ]; then
       sudo chmod g+w "$sock"

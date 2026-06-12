@@ -1,5 +1,5 @@
 # hosts/steamdeck/packages.nix
-# Lean package set for Steam Deck — essentials only
+# Lean package set for Steam Deck; essentials only
 { pkgs, ... }:
 {
   home.packages = with pkgs; [

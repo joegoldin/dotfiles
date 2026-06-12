@@ -1,4 +1,4 @@
-# Base system config — nix/nixpkgs settings come from den.aspects.nix-settings
+# Base system config; nix/nixpkgs settings come from den.aspects.nix-settings
 # (gc cadence and optimise diverge below); OS account from den.aspects.joe.
 { inputs, ... }:
 let
@@ -45,7 +45,7 @@ in
       # KDE Plasma desktop (for switching out of Game Mode)
       services.desktopManager.plasma6.enable = true;
 
-      # Strip default KDE bloat — keep it lean for a gaming device
+      # Strip default KDE bloat; keep it lean for a gaming device
       environment.plasma6.excludePackages = with pkgs.kdePackages; [
         discover
         elisa

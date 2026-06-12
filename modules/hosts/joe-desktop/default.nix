@@ -1,6 +1,6 @@
 # Desktop NixOS workstation (AMD GPU, KDE Plasma).
 # Aspect content lives in the sibling files (system.nix, machine.nix,
-# home.nix, wallpaper.nix, …) — they all merge into den.aspects.joe-desktop.
+# home.nix, wallpaper.nix, …); they all merge into den.aspects.joe-desktop.
 { inputs, den, ... }:
 let
   meta = import ../../_lib/meta.nix;
@@ -43,7 +43,7 @@ in
         inputs.desk-phone.nixosModules.default
         inputs.lanzaboote.nixosModules.lanzaboote
         ./_hardware-configuration.nix
-        # ./_hyprwhspr.nix  # disabled — underscored so import-tree skips it
+        # ./_hyprwhspr.nix  # disabled: underscored so import-tree skips it
       ];
 
       age.secrets.deepgram_api_key = {

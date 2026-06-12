@@ -212,7 +212,7 @@
               model = "claude-opus-4-7";
               provider = "zed.dev";
             };
-            # Workaround for https://github.com/zed-industries/zed/issues/49222 —
+            # Workaround for https://github.com/zed-industries/zed/issues/49222;
             # commit_message_model fallback to default_model was unreliable, so set
             # it explicitly.
             commit_message_model = {
@@ -240,7 +240,7 @@
         }
         // lib.optionalAttrs isLinux {
           # Roslyn LSP (from the csharp extension) needs DOTNET_ROOT to find the
-          # .NET runtime — NixOS doesn't ship /usr/share/dotnet. Set it explicitly
+          # .NET runtime; NixOS doesn't ship /usr/share/dotnet. Set it explicitly
           # at the LSP level so Zed launched from a desktop file (no shell env)
           # still finds it.
           lsp = {

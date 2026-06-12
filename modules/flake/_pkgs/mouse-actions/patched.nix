@@ -1,6 +1,6 @@
 # mouse-actions built from joegoldin/mouse-actions @ configurable-input-rules.
-# That fork adds two upstreamable Config fields — `modifier_remaps` and
-# `chord_bindings` — used to express drag-shift and the forward+back chord
+# That fork adds two upstreamable Config fields; `modifier_remaps` and
+# `chord_bindings`; used to express drag-shift and the forward+back chord
 # entirely in the JSON config instead of as out-of-process daemons.
 {
   lib,

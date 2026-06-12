@@ -1,4 +1,4 @@
-# Attic binary-cache client — the cross-class aspect: one feature, three
+# Attic binary-cache client; the cross-class aspect: one feature, three
 # Nix classes. `os` forwards into both nixos and darwin (substituter trust);
 # homeManager carries the attic-client CLI config (and its hm module, so no
 # host has to wire it separately).

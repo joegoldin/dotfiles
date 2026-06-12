@@ -1,4 +1,4 @@
-# Base system config (lanzaboote, desktop services, udev rules) —
+# Base system config (lanzaboote, desktop services, udev rules);
 # nix/nixpkgs settings come from den.aspects.nix-settings (job caps below);
 # OS account from den.aspects.joe.
 { inputs, ... }:

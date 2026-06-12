@@ -1,4 +1,4 @@
-# Steam Deck with Jovian NixOS. Lean, gaming-focused home — picks features
+# Steam Deck with Jovian NixOS. Lean, gaming-focused home; picks features
 # individually instead of home-baseline. Aspect content lives in the sibling
 # files (system.nix, jovian.nix, home.nix).
 { inputs, den, ... }:

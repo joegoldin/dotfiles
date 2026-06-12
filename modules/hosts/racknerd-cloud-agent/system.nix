@@ -1,4 +1,4 @@
-# Base system config (BIOS grub, ssh) — nix/nixpkgs settings come from
+# Base system config (BIOS grub, ssh); nix/nixpkgs settings come from
 # den.aspects.nix-settings; the OS account from den.aspects.joe.
 { inputs, ... }:
 let

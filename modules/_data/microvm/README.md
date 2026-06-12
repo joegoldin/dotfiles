@@ -8,7 +8,7 @@ the module tree:
 | Piece | Where | Job |
 | --- | --- | --- |
 | host aspect | `modules/system/microvm-host.nix` (`den.aspects.microvm-host`) | tap networking + NAT, dnsmasq serving the `.vm` domain, `/var/lib/vm-specs` state dir, installs the profiles below, wraps `module-gen.py` as `vm-module-gen` |
-| `vm` CLI | `modules/home/bin/_scripts/vm/*.nix` (subcommands of the `bin` script builder) | `vm new/start/ssh/pkg/profile/export/...` — the user-facing lifecycle |
+| `vm` CLI | `modules/home/bin/_scripts/vm/*.nix` (subcommands of the `bin` script builder) | `vm new/start/ssh/pkg/profile/export/...`, the user-facing lifecycle |
 | generator | `./module-gen.py` | turns a VM's `meta.json` + a profile into `module.nix` + `flake.nix` |
 | profiles | `./profiles/{minimal,desktop}.json` | base package/resource presets a VM starts from |
 | guest baseline | `./common-guest.nix` | the NixOS module every guest imports: user, ssh keys, networking, home-manager wiring |
@@ -24,7 +24,7 @@ the module tree:
    `flake.nix` for the VM.
 3. The generated flake references **this repo by absolute path** for its
    `microvm.nix` input, `common-guest.nix`, `fish-guest.nix`, and the bin
-   script module — the dotfiles checkout is part of the guest's closure.
+   script module; the dotfiles checkout is part of the guest's closure.
 4. `vm start` builds/runs it; dnsmasq makes it reachable as `<name>.vm`.
 
 ## Editing rules

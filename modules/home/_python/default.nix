@@ -6,12 +6,12 @@
   ...
 }:
 let
-  # Use unstable.python3 directly — do NOT override packageOverrides here.
+  # Use unstable.python3 directly; do NOT override packageOverrides here.
   # That pattern re-derives the entire python3 package set identity and
   # cascades a rebuild across every consumer in the closure (and forfeits
   # cache.nixos.org / attic substitutes). Leaf overrides needed by the env
   # are applied inside `pythonBase.withPackages` below, scoped to this env
-  # only — they don't leak into `unstable.python3Packages` at large.
+  # only; they don't leak into `unstable.python3Packages` at large.
   pythonBase = unstable.python3;
 
   # Import custom package definitions
@@ -81,14 +81,14 @@ let
   # Final Python environment.
   #
   # Leaf overrides are applied here, inside `withPackages`, instead of via
-  # `python3.override { packageOverrides = ... }` at the top of this file —
+  # `python3.override { packageOverrides = ... }` at the top of this file;
   # that would change the identity of the whole python3 package set and
   # cascade a rebuild across every transitive consumer. By patching only the
   # specific packages this env consumes (wandb) and threading the patched set
   # into `extraPackages`, the rest of `pythonBase.pkgs` stays at its upstream
   # hashes and substitutes cleanly.
   #
-  # Only patch leaves that nothing else in the env depends on transitively —
+  # Only patch leaves that nothing else in the env depends on transitively;
   # otherwise the patched derivation and the unpatched one (pulled in via
   # another package's propagatedBuildInputs) both land in buildEnv and collide
   # on overlapping output paths.

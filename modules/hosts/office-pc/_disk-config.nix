@@ -1,6 +1,6 @@
 # hosts/office-pc/disk-config.nix
 # Disko config for office-pc: LUKS-encrypted root on nvme1n1
-# IMPORTANT: nvme0n1 is Windows — do NOT touch it
+# IMPORTANT: nvme0n1 is Windows; do NOT touch it
 {
   disko.devices = {
     disk = {

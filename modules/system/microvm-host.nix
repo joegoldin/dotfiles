@@ -66,11 +66,11 @@ in
       };
 
       # ── Firewall ──────────────────────────────────────────────────────────────
-      # Trust the VM bridge fully — VMs can reach any host port, and vice versa
+      # Trust the VM bridge fully; VMs can reach any host port, and vice versa
       # (the spec calls for bidirectional open access on the host-only bridge).
       networking.firewall.trustedInterfaces = [ "vmbr0" ];
 
-      # Don't run bridged (L2) traffic through iptables/arptables — otherwise
+      # Don't run bridged (L2) traffic through iptables/arptables; otherwise
       # the host's FORWARD chain drops VM packets before they reach the bridge
       # destination. We rely on a trusted bridge for host<->VM comms.
       boot.kernel.sysctl = {
@@ -102,7 +102,7 @@ in
           local = "/vm/";
           expand-hosts = true;
           dhcp-hostsfile = "/var/lib/microvms/dnsmasq.leases";
-          # Serve authoritatively for the .vm domain — don't forward upstream.
+          # Serve authoritatively for the .vm domain; don't forward upstream.
           auth-server = "vm";
           # Don't read /etc/resolv.conf or /etc/hosts (avoid loops with resolved).
           no-resolv = true;

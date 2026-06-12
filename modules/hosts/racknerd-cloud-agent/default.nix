@@ -1,4 +1,4 @@
-# RackNerd VPS running atticd (binary cache server). Lean home environment —
+# RackNerd VPS running atticd (binary cache server). Lean home environment;
 # no home-baseline; the universal features ride on the joe user aspect.
 # Aspect content lives in the sibling files (system.nix, machine.nix,
 # attic-server.nix, home.nix).

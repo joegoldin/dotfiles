@@ -5,7 +5,7 @@
 # evaluates the whole package set into RAM) put the desktop under sustained
 # memory pressure for ~40 seconds before the machine froze. systemd-oomd
 # was running but never fired because, by NixOS default, none of the
-# enable*Slice options are on — so it had nothing to act on.
+# enable*Slice options are on; so it had nothing to act on.
 #
 # This module:
 #   1. Enables oomd monitoring on user, system, and root slices so the

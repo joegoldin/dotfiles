@@ -191,7 +191,7 @@
         gen_cmd += ["--user-pub", str(user_pub)]
     subprocess.run(gen_cmd, check=True)
 
-    # Move to /var/lib/vm-specs/<name>/ (CLI-owned, NOT /var/lib/microvms/ —
+    # Move to /var/lib/vm-specs/<name>/ (CLI-owned, NOT /var/lib/microvms/;
     # microvm.nix manages that itself).
     subprocess.run(["sudo", "mv", str(tmp), str(spec_dir)], check=True)
     subprocess.run(["sudo", "chown", "-R", "root:vmusers", str(spec_dir)], check=True)

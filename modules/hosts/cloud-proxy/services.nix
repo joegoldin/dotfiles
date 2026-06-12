@@ -1,6 +1,6 @@
 # Caddy reverse proxy + fail2ban jails (verbatim from the old
 # hosts/cloud-proxy/services.nix). Merges into den.aspects.cloud-proxy
-# alongside ./default.nix — one aspect, multiple files.
+# alongside ./default.nix; one aspect, multiple files.
 { inputs, ... }:
 let
   domains = import "${inputs.dotfiles-secrets}/domains.nix";

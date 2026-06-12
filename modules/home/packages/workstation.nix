@@ -1,5 +1,5 @@
 # Cross-platform packages shared between workstations (darwin, joe-desktop,
-# office-pc). NOT imported by ./default.nix — workstation hosts import this
+# office-pc). NOT imported by ./default.nix; workstation hosts import this
 # file explicitly so cloud VMs stay lean.
 #
 # Host packages/files hold ONLY platform-specific packages; anything that
@@ -28,7 +28,7 @@
           unstable.gradle_9
           unstable.maven
           # lowPrio: the common python env propagates python protobuf, which ships
-          # the same include/google/protobuf headers — let the env win in buildEnv.
+          # the same include/google/protobuf headers; let the env win in buildEnv.
           (lib.lowPrio protobuf)
           universal-ctags
           watchman
@@ -45,7 +45,7 @@
         ];
 
         containers = [
-          claude-container # needs native build, no QEMU — workstations only
+          claude-container # needs native build, no QEMU; workstations only
           dive
           docker-compose
           kubefwd

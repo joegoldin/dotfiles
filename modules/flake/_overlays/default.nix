@@ -124,7 +124,7 @@ in
   # MCP server packages for declarative MCP configuration
   # The upstream overlay only exports github-mcp-server; we also need mcp-language-server
   # Inlined upstream overlay to avoid deprecated pkgs.system access in mcps.overlays.default
-  # NB: mcp-nixos is deliberately NOT overridden here — nixpkgs carries a
+  # NB: mcp-nixos is deliberately NOT overridden here; nixpkgs carries a
   # working (cached) mcp-nixos, while the mcps.nix-pinned 1.0.3 fails to build
   # (fastmcp dep). pkgs.mcp-nixos therefore resolves to nixpkgs' own package.
   mcps-packages =

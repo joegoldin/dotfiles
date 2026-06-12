@@ -48,7 +48,7 @@ in
         enable = true;
 
         onActivation = {
-          # Never fetch/upgrade bottles — see the macOS 27 note above.
+          # Never fetch/upgrade bottles; see the macOS 27 note above.
           autoUpdate = false;
           upgrade = false;
           cleanup = "none";
@@ -56,7 +56,7 @@ in
 
         taps = builtins.attrNames config.nix-homebrew.taps;
 
-        # No formulae at all — CLI tools come from nixpkgs. `brew bundle` finds
+        # No formulae at all; CLI tools come from nixpkgs. `brew bundle` finds
         # the nix-installed `mas` (below) on PATH.
         brews = [ ];
 

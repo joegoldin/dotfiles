@@ -1,4 +1,4 @@
-# Base system config (lanzaboote secure boot, ROCm unstable overlay) —
+# Base system config (lanzaboote secure boot, ROCm unstable overlay);
 # nix/nixpkgs settings come from den.aspects.nix-settings (cores delta
 # below); OS account from den.aspects.joe.
 { inputs, ... }:

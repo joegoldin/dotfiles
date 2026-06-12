@@ -1,10 +1,10 @@
 # Shared module imported by every `vm`-generated VM's module.nix.
 #
 # Receives via _module.args:
-#   meta           — the VM's meta.json parsed into an attrset
-#   cliSshPubKey   — public half of /var/lib/microvms/ssh/id_ed25519 (for `vm ssh`)
-#   userSshPubKey  — the human's personal pubkey (for plain `ssh <name>.vm`)
-#   fishGuest      — the fish-guest home-manager module (passed as an import target)
+#   meta          : the VM's meta.json parsed into an attrset
+#   cliSshPubKey  : public half of /var/lib/microvms/ssh/id_ed25519 (for `vm ssh`)
+#   userSshPubKey : the human's personal pubkey (for plain `ssh <name>.vm`)
+#   fishGuest     : the fish-guest home-manager module (passed as an import target)
 {
   lib,
   pkgs,
@@ -85,7 +85,7 @@
     ];
 
     shares = [
-      # Nix store share — essential for starting up.
+      # Nix store share; essential for starting up.
       {
         source = "/nix/store";
         mountPoint = "/nix/.ro-store";

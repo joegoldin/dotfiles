@@ -62,7 +62,7 @@ python3Packages.buildPythonApplication rec {
   dontBuild = true;
 
   # wrapGAppsHook4 would wrap the bin, but we need the GI_TYPELIB_PATH value
-  # for the mic-osd subprocess too — extract it after wrapping
+  # for the mic-osd subprocess too; extract it after wrapping
   dontWrapGApps = true;
 
   postPatch = ''

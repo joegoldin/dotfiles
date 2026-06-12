@@ -3,7 +3,7 @@
 # "bastion". Aspect content lives in the sibling files (system.nix,
 # machine.nix, pelican.nix, home.nix).
 #
-# NB: ./_attic.nix is intentionally not imported — the old tree never
+# NB: ./_attic.nix is intentionally not imported; the old tree never
 # imported it either (dead file kept for reference).
 { inputs, den, ... }:
 let

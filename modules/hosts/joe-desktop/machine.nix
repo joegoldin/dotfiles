@@ -19,7 +19,7 @@ in
     {
       # Cap nix builds: 3 parallel jobs × 6 threads each = 18 max threads. Memory
       # is throttled at 32 GiB (MemoryHigh, soft) with a 42 GiB hard ceiling
-      # (MemoryMax) on the nix-daemon cgroup — High slows builds down via reclaim
+      # (MemoryMax) on the nix-daemon cgroup; High slows builds down via reclaim
       # pressure rather than OOM-killing them, while Max keeps a single runaway
       # link step from taking down the whole 64 GiB box.
       nix.settings.max-jobs = 3;
@@ -136,7 +136,7 @@ in
       # resource busy") and bounces the session straight back to the lock screen.
       # Unbind the dead drive from the nvme driver at boot so it can't block
       # suspend; its data3 mount has been dropped from secrets/data-drives.nix.
-      # Only this PCI address is touched — the other three NVMe drives stay bound.
+      # Only this PCI address is touched; the other three NVMe drives stay bound.
       # Re-enable by deleting this service and rebooting (or PCI-rebinding).
       systemd.services.disable-kingston-nvme = {
         description = "Unbind failing Kingston NV3 NVMe (0000:07:00.0) that blocks suspend";

@@ -1,7 +1,7 @@
 # vLLM ROCm build fixes overlay
 #
 # Exposes a top-level `vllm-rocm` Python application (alongside upstream
-# `vllm`). We deliberately do NOT override `python3` or `python3Packages` —
+# `vllm`). We deliberately do NOT override `python3` or `python3Packages`;
 # overriding the package set re-derives its identity, which cascades a rebuild
 # across every python package in the closure (torch, transformers, datasets,
 # everything that consumes `python3Packages`). Patching vllm and xgrammar as
@@ -9,7 +9,7 @@
 # attic / cache.nixos.org substitutes keep hitting.
 #
 # rocmSupport for torch etc. continues to come from
-# `nixpkgs.config.rocmSupport = true` in flake.nix — that is independent of
+# `nixpkgs.config.rocmSupport = true` in flake.nix; that is independent of
 # this overlay.
 final: prev:
 let
@@ -35,7 +35,7 @@ let
   };
 
   # xgrammar: test_structural_tag_converter needs HuggingFace network access.
-  # Isolated override — not added to python3Packages, so the upstream xgrammar
+  # Isolated override; not added to python3Packages, so the upstream xgrammar
   # still exists at its cached hash for anything else that might consume it.
   xgrammar' = py.xgrammar.overrideAttrs (old: {
     disabledTestPaths = (old.disabledTestPaths or [ ]) ++ [

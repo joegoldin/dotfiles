@@ -6,14 +6,14 @@
     # Every file under modules/ is a flake-parts module (the dendritic
     # pattern, https://github.com/mightyiam/dendritic). import-tree loads the
     # whole tree (paths containing "/_" are skipped); den layers an
-    # aspect-oriented entity model on top. See MIGRATION.md.
+    # aspect-oriented entity model on top. See README.md.
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
     };
     import-tree.url = "github:vic/import-tree";
     den.url = "github:denful/den";
-    # Dynamic derivations — the IFD replacement (build-time nix eval without
+    # Dynamic derivations; the IFD replacement (build-time nix eval without
     # import-from-derivation). Consumed as inputs.drowse.lib.${system}; hosts
     # opt in to the required experimental features via
     # den.aspects.dynamic-derivations.
@@ -31,7 +31,7 @@
     nixpkgs-darwin.url = "github:nixos/nixpkgs/nixpkgs-26.05-darwin";
 
     # Zen built from source via buildMozillaMach. Points at the fork's `nightly`
-    # branch — "dev as if all my open PRs were merged" — rebuilt by the
+    # branch ("dev as if all my open PRs were merged"), rebuilt by the
     # nightly-integration GitHub Action (dev + every conflict-free PR). Pinned
     # in flake.lock; bump with `nix flake update zen-src` when you want the
     # latest nightly. Intentionally pins its OWN nixpkgs (matched to the fork's
@@ -56,12 +56,12 @@
     };
 
     # ── Personal data repos (ssh) ──────────────────────────────────────────
-    # assets (fonts, sfx, etc.) — bump with `nix flake update dotfiles-assets`
+    # assets (fonts, sfx, etc.); bump with `nix flake update dotfiles-assets`
     dotfiles-assets = {
       url = "git+ssh://git@github.com/joegoldin/dotfiles-assets";
       flake = false;
     };
-    # secrets (domains, encrypted age files, etc.) — private repo over ssh;
+    # secrets (domains, encrypted age files, etc.); private repo over ssh;
     # bump with `nix flake update dotfiles-secrets`
     dotfiles-secrets = {
       url = "git+ssh://git@github.com/joegoldin/dotfiles-secrets";
@@ -79,7 +79,7 @@
       url = "github:joegoldin/claude-container";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # CIT200 desk phone — reactive dataflow engine
+    # CIT200 desk phone; reactive dataflow engine
     desk-phone = {
       url = "github:joegoldin/desk-phone-cit200";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -194,7 +194,7 @@
       inputs.home-manager.follows = "home-manager";
     };
     # Agent skills + re-exported claude-nix, antigravity-cli-nix, codex-nix
-    # modules — over ssh; bump with `nix flake update agent-skills`
+    # modules; over ssh; bump with `nix flake update agent-skills`
     agent-skills = {
       url = "git+ssh://git@github.com/joegoldin/agent-skills";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -206,7 +206,7 @@
       inputs.brew-src.follows = "brew-src";
     };
     # Homebrew itself, tracking master: macOS 27 support (golden_gate: "27")
-    # is only on master — release tags top out at tahoe/26 and raise `unknown
+    # is only on master; release tags top out at tahoe/26 and raise `unknown
     # or unsupported macOS version: :dunno` during `brew bundle`.
     brew-src = {
       url = "github:Homebrew/brew";

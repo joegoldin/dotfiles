@@ -1,4 +1,4 @@
-# Darwin base system — nix/nixpkgs settings come from den.aspects.nix-settings
+# Darwin base system; nix/nixpkgs settings come from den.aspects.nix-settings
 # (mac-specific deltas below); OS account from den.aspects.joe.
 { inputs, ... }:
 let

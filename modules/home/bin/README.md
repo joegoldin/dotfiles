@@ -71,7 +71,7 @@ The builder auto-generates:
 - `ai --help` listing all subcommands with descriptions
 - Fish completions for subcommand names and their flags
 
-Each subcommand `.nix` file uses the same format as a top-level script — all features (flags, params, runtimeInputs, etc.) work the same way.
+Each subcommand `.nix` file uses the same format as a top-level script; all features (flags, params, runtimeInputs, etc.) work the same way.
 
 ## Full Feature Example
 

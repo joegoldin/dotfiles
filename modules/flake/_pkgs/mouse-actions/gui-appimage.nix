@@ -18,7 +18,7 @@ appimageTools.wrapType2 {
   inherit pname version src;
 
   # The AppImage already sets Exec=mouse-actions-gui in its bundled .desktop
-  # file, which lines up with the wrapper's binary name — just copy it through
+  # file, which lines up with the wrapper's binary name; just copy it through
   # along with the hicolor icon theme so KDE/Plasma can find it.
   extraInstallCommands = ''
     install -Dm644 ${appimageContents}/usr/share/applications/mouse-actions-gui.desktop \

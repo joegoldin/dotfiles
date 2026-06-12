@@ -27,7 +27,7 @@
         # the default sandbox deny list. 1Password's SSH agent socket
         # covers the agent-backed signing flow; known_hosts and ~/.ssh/config
         # cover host-key verification and per-host config. Private key files
-        # (id_*) are deliberately omitted — using the 1Password agent is the
+        # (id_*) are deliberately omitted; using the 1Password agent is the
         # supported path here.
         extraSandbox.filesystem.read.allowWithinDeny = [
           "${homeDir}/.1password/agent.sock"

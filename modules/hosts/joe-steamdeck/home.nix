@@ -1,5 +1,5 @@
 # hosts/steamdeck/home-manager.nix
-# Lean home-manager for Steam Deck — cherry-picked modules, no dev tools
+# Lean home-manager for Steam Deck; cherry-picked modules, no dev tools
 { ... }:
 let
   meta = import ../../_lib/meta.nix;
@@ -25,7 +25,7 @@ in
       home = {
       };
 
-      # Override 1Password SSH agent from plasma.nix — not used on Deck
+      # Override 1Password SSH agent from plasma.nix; not used on Deck
       programs.ssh = {
         enable = true;
         enableDefaultConfig = false;

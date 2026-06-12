@@ -1,4 +1,4 @@
-# drowse (github:figsoda/drowse) — dynamic derivations as the IFD
+# drowse (github:figsoda/drowse): dynamic derivations as the IFD
 # replacement. drowse evaluates Nix at *build* time (recursive-nix) instead
 # of eval time, giving fine-grained caching without import-from-derivation
 # or committed codegen.

@@ -3,7 +3,7 @@
 # Deliberately excludes:
 #   - fish-ai (needs ANTHROPIC_API_KEY via agenix, not available in guest)
 #   - atuin (needs sync server / host keys)
-#   - host-specific init (playwright, nvm, npm-global PATH — irrelevant in a VM)
+#   - host-specific init (playwright, nvm, npm-global PATH; irrelevant in a VM)
 # Includes:
 #   - fish itself + functions + aliases/abbrs (shared with host config)
 #   - a curated subset of plugins (z, colored-man-pages, sponge, fzf, nix.fish)

@@ -21,7 +21,7 @@
     SECRETS_DIR="''${DOTFILES_SECRETS:-$HOME/dotfiles-secrets}"
 
     # Source identity command from secrets repo.
-    # identity.sh must define IDENTITY_CMD — a shell command that outputs the
+    # identity.sh must define IDENTITY_CMD; a shell command that outputs the
     # private key to stdout. Example:
     #
     #   # 1Password:

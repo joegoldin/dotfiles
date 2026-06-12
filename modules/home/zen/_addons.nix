@@ -4,7 +4,7 @@ let
 
   # Force-installed extension from AMO.
   #
-  # Update policy: extensions are PINNED by default (updates_disabled = true) —
+  # Update policy: extensions are PINNED by default (updates_disabled = true);
   # we only auto-update a small, trusted security/privacy set. `extra` overrides
   # the defaults, e.g. { updates_disabled = false; private_browsing = true; }.
   extension = shortId: uuid: extra: {

@@ -1,4 +1,4 @@
-# Packages unique to joe-desktop — shared linux-workstation packages live in
+# Packages unique to joe-desktop; shared linux-workstation packages live in
 # modules/home/_hm/packages/linux-workstation.nix, cross-platform tools in
 # modules/home/_hm/packages/{default,workstation}.nix.
 {

@@ -5,7 +5,7 @@
   makeWrapper,
   dockutil,
 }:
-# Python port of hraban/mac-app-util — Spotlight/Launchpad trampolines and
+# Python port of hraban/mac-app-util: Spotlight/Launchpad trampolines and
 # dock sync for Nix-installed .app bundles. Ported off Common Lisp because
 # SBCL cannot mmap its dynamic space on macOS 27. CLI-compatible with the
 # original (mktrampoline / sync-dock / sync-trampolines).

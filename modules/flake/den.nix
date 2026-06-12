@@ -1,4 +1,4 @@
-# den (github:denful/den) — the aspect engine on top of the dendritic
+# den (github:denful/den): the aspect engine on top of the dendritic
 # pattern. Every .nix file under modules/ is a flake-parts module imported
 # automatically by import-tree (paths containing "/_" are skipped); this one
 # wires den itself plus repo-wide entity defaults.
@@ -17,7 +17,7 @@
   # Every host entity gets:
   #  - networking.hostName from its hostName option (hostname battery)
   #  - the host aspect tree's homeManager blocks projected onto its users
-  #    (host-aspects battery) — this is how hosts select home features
+  #    (host-aspects battery); this is how hosts select home features
   #  - the shared home-manager plumbing (useGlobalPkgs/backupCommand)
   den.schema.host.includes = [
     den.batteries.hostname

@@ -1,4 +1,4 @@
-# User aspect: everything "joe" carries to every den-managed host —
+# User aspect: everything "joe" carries to every den-managed host;
 # the OS account (pushed to hosts via provides.to-hosts) and the universal
 # home features. Per-host group additions live in each host's system file
 # (list definitions merge); host-specific home features ride on the host

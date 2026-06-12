@@ -7,7 +7,7 @@ let
   username = meta.username;
   hyprwhspr = pkgs.callPackage ../../flake/_pkgs/hyprwhspr { };
 
-  # Declarative config — only include overrides, hyprwhspr uses sparse storage
+  # Declarative config; only include overrides, hyprwhspr uses sparse storage
   settings = {
     primary_shortcut = "SUPER+ALT+D";
     cancel_shortcut = "ESCAPE";

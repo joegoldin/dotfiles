@@ -30,7 +30,7 @@ in
 
         nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
-        # BIOS boot — disko owns /dev/sda, GRUB embedded in EF02 partition
+        # BIOS boot; disko owns /dev/sda, GRUB embedded in EF02 partition
         boot.loader.grub = {
           enable = lib.mkForce true;
           devices = lib.mkForce [ "/dev/sda" ];

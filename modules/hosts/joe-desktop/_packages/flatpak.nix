@@ -10,7 +10,7 @@
 
   # home.file would symlink these into ~/.var/app/.../config/ pointing at
   # /nix/store/...-home-manager-files/..., but that store path isn't
-  # accessible inside the Bambu Studio flatpak sandbox — the symlinks
+  # accessible inside the Bambu Studio flatpak sandbox; the symlinks
   # dangle, fontconfig/GTK silently skip them, and menus render as tofu.
   # Write real files via activation so the sandbox can actually read them.
   #   - settings.ini: KDE doesn't push gtk-font-name into Flatpak sandboxes,

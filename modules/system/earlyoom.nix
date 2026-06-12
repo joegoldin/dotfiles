@@ -2,7 +2,7 @@
 #
 # systemd-oomd reacts to sustained PSI memory *pressure*, which is fine for
 # slow leaks but can't keep up when something allocates very fast (e.g. a
-# `nix search` evaluation pulls all of nixpkgs into RAM in seconds — see
+# `nix search` evaluation pulls all of nixpkgs into RAM in seconds; see
 # the 2026-04-29 lockup, where the system thrashed for 40s and froze
 # without any kill firing).
 #

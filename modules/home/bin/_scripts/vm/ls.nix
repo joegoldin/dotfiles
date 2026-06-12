@@ -32,7 +32,7 @@
       profile=$(jq -r .profile "$meta" 2>/dev/null || echo "?")
       paused=$(jq -r .paused "$meta" 2>/dev/null || echo "false")
       # is-active prints state on stdout for all states but exits nonzero for
-      # anything except "active" — ignore that to stay compatible with set -e.
+      # anything except "active"; ignore that to stay compatible with set -e.
       state=$(systemctl is-active "microvm@$name" 2>/dev/null || true)
       [ -z "$state" ] && state="inactive"
       [ "$paused" = "true" ] && state="paused"

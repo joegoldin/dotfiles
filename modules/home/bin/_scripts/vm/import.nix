@@ -60,7 +60,7 @@
       --repo-root "''${VM_DOTFILES:-$HOME/dotfiles}" \
       --cli-pub /var/lib/microvms/ssh/id_ed25519.pub "''${user_flag[@]}"
 
-    # Cross-host disk restore is not supported in v1 — drop any bundled disks.
+    # Cross-host disk restore is not supported in v1; drop any bundled disks.
     if [ -d "$staging/disks" ]; then
       yellow "note: disk restore across hosts not yet supported — disks dropped"
       rm -rf "$staging/disks"

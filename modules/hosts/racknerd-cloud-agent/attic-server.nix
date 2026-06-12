@@ -1,4 +1,4 @@
-# Attic — self-hosted Nix binary cache
+# Attic: self-hosted Nix binary cache
 #
 # Generate the credentials file on the server:
 #   nix run nixpkgs#openssl -- genrsa -traditional 4096 | base64 -w0
@@ -64,7 +64,7 @@ in
         };
       };
 
-      # Caddy reverse proxy — handles ACME/Let's Encrypt automatically
+      # Caddy reverse proxy; handles ACME/Let's Encrypt automatically
       services.caddy = {
         enable = true;
         virtualHosts."${domains.atticDomain}" = {

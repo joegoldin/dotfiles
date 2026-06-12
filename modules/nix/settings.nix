@@ -1,4 +1,4 @@
-# Repo-wide nix daemon + nixpkgs settings — included by every host via its
+# Repo-wide nix daemon + nixpkgs settings; included by every host via its
 # aspect. The `os` half serves both nixos and darwin; per-host deltas
 # (cores, gc cadence, extra platforms) live in each host's system file.
 { config, inputs, ... }:
