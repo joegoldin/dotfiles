@@ -24,6 +24,64 @@ in
         pkgs.plasma-applet-resources-monitor
       ];
 
+      # plasmashell D-Bus wedge watchdog.
+      #
+      # A QtDBus/libdbus cross-thread socket-notifier race (QTBUG-34698 class)
+      # intermittently disables plasmashell's session-bus socket notifier,
+      # leaving its D-Bus connection "deaf": it stops answering D-Bus, so every
+      # app launch blocks the full 25s reply timeout and the desktop appears
+      # frozen until plasmashell is restarted. Captured trigger backtrace (via a
+      # temporary QT_MESSAGE_PATTERN=%{backtrace}): QDBusMessage::~QDBusMessage
+      # -> dbus_message_unref -> a cross-thread QSocketNotifier toggle inside
+      # libQt6DBus, on the main event loop. It is internal to Qt and triggered
+      # by D-Bus message timing, so it cannot be fixed from config. This
+      # watchdog detects the wedged state (Peer.Ping stops being answered) and
+      # restarts plasmashell, turning a multi-minute freeze into a ~45s
+      # self-healing blip.
+      systemd.user.services.plasmashell-dbus-watchdog = {
+        Unit = {
+          Description = "Restart plasmashell when its D-Bus connection wedges (QTBUG-34698)";
+          PartOf = [ "graphical-session.target" ];
+          After = [ "graphical-session.target" ];
+        };
+        Service = {
+          Type = "simple";
+          Restart = "always";
+          RestartSec = 10;
+          ExecStart = pkgs.writeShellScript "plasmashell-dbus-watchdog" ''
+            set -u
+            ping() {
+              ${pkgs.coreutils}/bin/timeout 5 \
+                ${pkgs.systemd}/bin/busctl --user call \
+                org.kde.plasmashell /MainApplication \
+                org.freedesktop.DBus.Peer Ping >/dev/null 2>&1
+            }
+            # Require 3 consecutive failures (~45s) before acting: a real wedge
+            # is permanent so it always trips, while a momentarily-busy shell
+            # recovers within a poll or two and never does - keeping false
+            # restarts at zero.
+            fails=0
+            while :; do
+              ${pkgs.coreutils}/bin/sleep 10
+              if ping; then
+                fails=0
+              else
+                fails=$(( fails + 1 ))
+                if [ "$fails" -ge 3 ]; then
+                  echo "plasmashell unresponsive on D-Bus for ~45s; restarting (QtDBus wedge)"
+                  ${pkgs.systemd}/bin/systemctl --user restart plasma-plasmashell.service || true
+                  fails=0
+                  # Let the fresh instance come up before polling again so
+                  # startup is not misread as a wedge.
+                  ${pkgs.coreutils}/bin/sleep 20
+                fi
+              fi
+            done
+          '';
+        };
+        Install.WantedBy = [ "graphical-session.target" ];
+      };
+
       # Force Electron/Chromium apps onto native Wayland so they obey the
       # kwinrc Wayland.EnablePrimarySelection=false setting below instead of
       # running through XWayland (which has its own PRIMARY selection that
