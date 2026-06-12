@@ -33,6 +33,7 @@ in
         adwaita-icon-theme
         unstable.cockatrice
         # wowup-cf  # disabled: upstream download fails with TLS handshake error
+        unstable.vintagestory
       ];
 
       users.users."${username}".extraGroups = [ "gamemode" ];
