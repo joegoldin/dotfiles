@@ -323,7 +323,8 @@ the one aspect that owns it.
   differ (bastion).
 - Every non-underscore file under `modules/` is live. New file =
   active module. Disable by underscore-renaming; there are no imports
-  to comment out.
+  to comment out. One catch: flakes only see tracked files, so a new
+  file does nothing until `git add` (it silently evaluates as if absent).
 - List merging: joe's base `extraGroups = [ "wheel" "networkmanager" ]`
   is a plain definition so host additions concatenate. If you
   `mkDefault` a list, any plain definition replaces it instead of
