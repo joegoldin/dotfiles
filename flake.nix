@@ -14,7 +14,7 @@
       inputs.nixpkgs-lib.follows = "nixpkgs";
     };
     import-tree.url = "github:vic/import-tree";
-    den.url = "github:denful/den";
+    den.url = "github:denful/den?rev=fe63b4bff3358e51687b6f88fa8746d5b3dc1bd5";
     # Dynamic derivations — the IFD replacement (build-time nix eval without
     # import-from-derivation). Consumed as inputs.drowse.lib.${system}; hosts
     # opt in to the required experimental features via

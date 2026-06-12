@@ -1,14 +1,8 @@
-# User aspect: everything "joe" carries to every den-managed host.
-# Host-specific extras come from each host's provides.to-users / legacy tree.
-#
-# Every value is mkDefault'd: the per-host _configuration.nix files under
-# modules/hosts/*/ still define users.users.joe themselves, and those plain
-# definitions must keep winning. On hosts where nothing else defines the
-# user (cloud-proxy) the defaults below are the definition.
-#
-# The included feature aspects dedup against the per-host home trees: every
-# modules/hosts/*/_home-manager.nix imports these same files, and the module
-# system deduplicates imports by path.
+# User aspect: everything "joe" carries to every den-managed host —
+# the OS account (pushed to hosts via provides.to-hosts) and the universal
+# home features. Per-host group additions live in each host's system file
+# (list definitions merge); host-specific home features ride on the host
+# aspect via the host-aspects battery.
 { inputs, den, ... }:
 let
   meta = import ../_lib/meta.nix;
@@ -24,19 +18,30 @@ in
       den.aspects.starship
     ];
 
-    # OS-level account (hosts' _configuration.nix definitions override these)
     provides.to-hosts.nixos =
-      { lib, pkgs, ... }:
+      { pkgs, ... }:
       {
         users.users.${meta.username} = {
-          uid = lib.mkDefault 1000;
-          isNormalUser = lib.mkDefault true;
-          shell = lib.mkDefault pkgs.fish;
-          openssh.authorizedKeys.keys = lib.mkDefault [ keys.${meta.username} ];
-          extraGroups = lib.mkDefault [
+          uid = 1000;
+          isNormalUser = true;
+          shell = pkgs.fish;
+          openssh.authorizedKeys.keys = [ keys.${meta.username} ];
+          extraGroups = [
             "wheel"
             "networkmanager"
           ];
+        };
+      };
+
+    provides.to-hosts.darwin =
+      { pkgs, ... }:
+      {
+        users.users.${meta.username} = {
+          # home-manager's darwin module derives home.homeDirectory from this
+          home = "/Users/${meta.username}";
+          shell = pkgs.fish;
+          openssh.authorizedKeys.keys = [ keys.${meta.username} ];
+          description = meta.username;
         };
       };
 

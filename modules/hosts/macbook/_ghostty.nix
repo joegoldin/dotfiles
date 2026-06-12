@@ -1,6 +1,6 @@
 { lib, ... }:
 let
-  ghosttySettings = import ../../home/_hm/ghostty-settings.nix { inherit lib; };
+  ghosttySettings = import ../../home/ghostty/_settings.nix { inherit lib; };
   macosSettings = ghosttySettings.baseSettings // {
     command = "/etc/profiles/per-user/joe/bin/fish";
     font-size = 13;

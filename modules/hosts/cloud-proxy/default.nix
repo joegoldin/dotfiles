@@ -16,11 +16,7 @@ in
   den.hosts.x86_64-linux.cloud-proxy.users.${meta.username} = { };
 
   den.aspects.cloud-proxy = {
-    includes = [
-      den.batteries.hostname
-      den.aspects.nix-settings
-      den.aspects.hm-settings
-    ];
+    includes = [ den.aspects.nix-settings ];
 
     nixos =
       { lib, pkgs, ... }:
@@ -52,10 +48,6 @@ in
           ssh.startAgent = true;
           zsh.enable = true;
           fish.enable = true;
-          nh = {
-            enable = true;
-            flake = "/home/${meta.username}/dotfiles";
-          };
         };
 
         environment.systemPackages = with pkgs; [
@@ -95,9 +87,9 @@ in
         system.stateVersion = lib.mkForce "25.11";
       };
 
-    # Server CLI kit for whoever logs in here
-    # (was hosts/cloud-proxy/home-manager.nix's package list).
-    provides.to-users.homeManager =
+    # Server CLI kit for whoever logs in here (projected onto users via the
+    # host-aspects battery).
+    homeManager =
       { pkgs, ... }:
       {
         home.packages = with pkgs; [

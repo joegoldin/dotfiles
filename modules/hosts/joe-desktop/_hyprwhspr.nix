@@ -1,9 +1,10 @@
 {
   pkgs,
-  username,
   ...
 }:
 let
+  meta = import ../../_lib/meta.nix;
+  username = meta.username;
   hyprwhspr = pkgs.callPackage ../../flake/_pkgs/hyprwhspr { };
 
   # Declarative config — only include overrides, hyprwhspr uses sparse storage

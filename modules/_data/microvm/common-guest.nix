@@ -46,8 +46,10 @@
     extraGroups = [ "wheel" ];
     shell = pkgs.fish;
     initialPassword = meta.user;
-    openssh.authorizedKeys.keys =
-      [ cliSshPubKey ] ++ lib.optional (userSshPubKey != null && userSshPubKey != "") userSshPubKey;
+    openssh.authorizedKeys.keys = [
+      cliSshPubKey
+    ]
+    ++ lib.optional (userSshPubKey != null && userSshPubKey != "") userSshPubKey;
   };
   users.users.root = {
     openssh.authorizedKeys.keys = [ cliSshPubKey ];
@@ -73,7 +75,6 @@
     # require a rebuild.
     writableStoreOverlay = "/nix/.rw-store";
 
-
     interfaces = [
       {
         type = "bridge";
@@ -83,22 +84,21 @@
       }
     ];
 
-    shares =
-      [
-        # Nix store share — essential for starting up.
-        {
-          source = "/nix/store";
-          mountPoint = "/nix/.ro-store";
-          tag = "ro-store";
-          proto = "virtiofs";
-        }
-      ]
-      ++ (map (m: {
-        source = m.src;
-        mountPoint = m.dst;
-        tag = m.tag;
+    shares = [
+      # Nix store share — essential for starting up.
+      {
+        source = "/nix/store";
+        mountPoint = "/nix/.ro-store";
+        tag = "ro-store";
         proto = "virtiofs";
-      }) (meta.mounts or [ ]));
+      }
+    ]
+    ++ (map (m: {
+      source = m.src;
+      mountPoint = m.dst;
+      tag = m.tag;
+      proto = "virtiofs";
+    }) (meta.mounts or [ ]));
 
     # Persistent root disk. microvm creates the qcow2 on first boot at the
     # service's WorkingDirectory (/var/lib/microvms/<name>/).

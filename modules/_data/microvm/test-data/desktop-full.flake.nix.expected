@@ -23,7 +23,7 @@
       inherit system pkgs;
       specialArgs = {
         inherit meta cliSshPubKey userSshPubKey;
-        fishGuest = dotfiles + "/modules/home/_hm/fish-guest.nix";
+        fishGuest = dotfiles + "/modules/_data/microvm/fish-guest.nix";
       };
       modules = [
         microvm-nix.nixosModules.microvm

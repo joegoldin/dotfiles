@@ -1,8 +1,7 @@
-# Oracle Cloud bastion (pelican game servers + tailnet entry).
-# Entity name (= flake output) is oracle-cloud-bastion; the machine's
-# hostName is "bastion". Host-specific modules live alongside as _-files
-# (invisible to import-tree). Module args (username, keys, …) come from the
-# shim in modules/nix/module-args.nix; `hostname` is set here.
+# Oracle Cloud bastion (pelican game servers + tailnet entry). Entity name
+# (= flake output) is oracle-cloud-bastion; the machine's hostName is
+# "bastion". Aspect content lives in the sibling files (system.nix,
+# machine.nix, pelican.nix, home.nix).
 #
 # NB: ./_attic.nix is intentionally not imported — the old tree never
 # imported it either (dead file kept for reference).
@@ -17,7 +16,12 @@ in
   };
 
   den.aspects.oracle-cloud-bastion = {
-    includes = [ den.aspects.hm-settings ];
+    includes = [
+      den.aspects.nix-settings
+      den.aspects.attic
+      den.aspects.numtide-cache
+      den.aspects.home-baseline
+    ];
 
     nixos = {
       imports = [
@@ -25,16 +29,9 @@ in
         inputs.nix-index-database.nixosModules.default
         inputs.pelican.nixosModules.default
         inputs.agenix.nixosModules.default
-        ../../system/_sys/attic.nix
-        ../../system/_sys/numtide-cache.nix
-        ./_configuration.nix
         ./_disk-config.nix
         ./_hardware-configuration.nix
-        ./_oracle-cloud.nix
-        ./_pelican.nix
       ];
-
-      _module.args.hostname = "bastion";
 
       nixpkgs.overlays = [ inputs.pelican.overlays.default ];
 
@@ -49,19 +46,6 @@ in
         mode = "0400";
       };
       age.identityPaths = [ "/home/${meta.username}/.ssh/id_ed25519" ];
-    };
-
-    provides.to-users.homeManager = {
-      imports = [
-        ./_home-manager.nix
-        # flake-input hm modules (were imports in modules/home/_hm/default.nix)
-        inputs.audiomemo.homeManagerModules.default
-        inputs.nix-attic-infra.homeManagerModules.attic-client
-        inputs.agent-skills.homeManagerModules.claude
-        inputs.agent-skills.homeManagerModules.antigravity
-        inputs.agent-skills.homeManagerModules.codex
-        inputs.agent-skills.homeManagerModules.agent-skills
-      ];
     };
   };
 }

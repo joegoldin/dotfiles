@@ -1,4 +1,7 @@
-# Joes-MacBook-Pro (aarch64-darwin).
+# Joes-MacBook-Pro (aarch64-darwin). Aspect content lives in the sibling
+# files (system.nix, mac-system.nix, apps.nix, homebrew.nix,
+# mac-app-util.nix, home.nix).
+#
 # den's stock darwin builder expects inputs.darwin; our input is named
 # nix-darwin, so instantiate is set explicitly.
 { inputs, den, ... }:
@@ -12,7 +15,16 @@ in
   };
 
   den.aspects.Joes-MacBook-Pro = {
-    includes = [ den.aspects.hm-settings ];
+    includes = [
+      den.aspects.nix-settings
+      den.aspects.attic
+      den.aspects.numtide-cache
+      # home features (projected onto users via the host-aspects battery)
+      den.aspects.home-baseline
+      den.aspects.zed
+      den.aspects.zen
+      den.aspects.workstation-packages
+    ];
 
     darwin = {
       imports = [
@@ -21,11 +33,7 @@ in
         # vfkit-based Linux builder (enabled below, currently kept off for bootstrap)
         inputs.virby.darwinModules.default
         inputs.agenix.darwinModules.default
-        # > Our main darwin configuration <
-        ./_configuration.nix
       ];
-
-      _module.args.hostname = "Joes-MacBook-Pro";
 
       age.identityPaths = [ "/var/lib/agenix/identity" ];
       age.secrets.attic-netrc = {
@@ -75,19 +83,6 @@ in
         # Build x86_64-linux via Rosetta translation (aarch64-darwin only).
         rosetta = true;
       };
-    };
-
-    provides.to-users.homeManager = {
-      imports = [
-        ./_home-manager.nix
-        # flake-input hm modules (were imports in modules/home/_hm/default.nix)
-        inputs.audiomemo.homeManagerModules.default
-        inputs.nix-attic-infra.homeManagerModules.attic-client
-        inputs.agent-skills.homeManagerModules.claude
-        inputs.agent-skills.homeManagerModules.antigravity
-        inputs.agent-skills.homeManagerModules.codex
-        inputs.agent-skills.homeManagerModules.agent-skills
-      ];
     };
   };
 }

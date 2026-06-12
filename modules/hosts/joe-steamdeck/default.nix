@@ -1,4 +1,6 @@
-# Steam Deck with Jovian NixOS.
+# Steam Deck with Jovian NixOS. Lean, gaming-focused home — picks features
+# individually instead of home-baseline. Aspect content lives in the sibling
+# files (system.nix, jovian.nix, home.nix).
 { inputs, den, ... }:
 let
   meta = import ../../_lib/meta.nix;
@@ -7,28 +9,25 @@ in
   den.hosts.x86_64-linux.joe-steamdeck.users.${meta.username} = { };
 
   den.aspects.joe-steamdeck = {
-    includes = [ den.aspects.hm-settings ];
+    includes = [
+      den.aspects.nix-settings
+      den.aspects.attic
+      den.aspects.attic-post-build-hook
+      den.aspects.numtide-cache
+      den.aspects.gaming
+      # home features (projected onto users via the host-aspects battery)
+      den.aspects.bin
+      den.aspects.plasma
+      den.aspects.default-apps
+      den.aspects.zen
+    ];
 
     nixos = {
       imports = [
         inputs.jovian-nixos.nixosModules.default
         inputs.nix-index-database.nixosModules.default
-        inputs.nix-attic-infra.nixosModules.attic-post-build-hook
         inputs.agenix.nixosModules.default
-        ../../system/_sys/attic.nix
-        ../../system/_sys/numtide-cache.nix
-        ../../system/_sys/attic-post-build-hook.nix
-        ../../system/_sys/gaming.nix
-        ./_configuration.nix
         ./_hardware-configuration.nix
-        ./_jovian.nix
-      ];
-
-      _module.args.hostname = "joe-steamdeck";
-
-      home-manager.sharedModules = [
-        inputs.plasma-manager.homeModules.plasma-manager
-        inputs.nix-attic-infra.homeManagerModules.attic-client
       ];
 
       age.secrets.attic-netrc = {
@@ -41,10 +40,6 @@ in
         mode = "0400";
         owner = meta.username;
       };
-    };
-
-    provides.to-users.homeManager = {
-      imports = [ ./_home-manager.nix ];
     };
   };
 }

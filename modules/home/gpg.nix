@@ -1,5 +1,15 @@
-# gpg + gpg-agent.
 { ... }:
 {
-  den.aspects.gpg.homeManager = ./_hm/gpg.nix;
+  den.aspects.gpg.homeManager =
+    {
+      pkgs,
+      ...
+    }:
+    {
+      programs.gpg.enable = true;
+      services.gpg-agent = {
+        enable = true;
+        pinentry.package = pkgs.pinentry-curses;
+      };
+    };
 }

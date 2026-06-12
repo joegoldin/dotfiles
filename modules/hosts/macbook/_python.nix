@@ -2,7 +2,7 @@
 { pkgs, lib, ... }:
 let
   inherit (pkgs) unstable;
-  customPackages = import ../../home/_hm/python/custom-pypi-packages.nix {
+  customPackages = import ../../home/_python/custom-pypi-packages.nix {
     inherit pkgs lib;
     pythonBase = unstable.python3;
   };

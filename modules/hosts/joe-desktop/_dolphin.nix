@@ -1,4 +1,8 @@
-{ username, ... }:
+{ ... }:
+let
+  meta = import ../../_lib/meta.nix;
+  username = meta.username;
+in
 {
   home.file.".local/share/user-places.xbel".text = ''
     <?xml version="1.0" encoding="UTF-8"?>

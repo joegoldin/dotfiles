@@ -1,72 +1,49 @@
 # Desktop NixOS workstation (AMD GPU, KDE Plasma).
+# Aspect content lives in the sibling files (system.nix, machine.nix,
+# home.nix, wallpaper.nix, …) — they all merge into den.aspects.joe-desktop.
 { inputs, den, ... }:
 let
   meta = import ../../_lib/meta.nix;
-  overlaysModule = import ../../flake/_overlays { inherit inputs; };
-  inherit (overlaysModule) unstableOverlays;
 in
 {
   den.hosts.x86_64-linux.joe-desktop.users.${meta.username} = { };
 
   den.aspects.joe-desktop = {
-    includes = [ den.aspects.hm-settings ];
+    includes = [
+      den.aspects.nix-settings
+      den.aspects.dynamic-derivations
+      # system features
+      den.aspects.attic
+      den.aspects.attic-post-build-hook
+      den.aspects.numtide-cache
+      den.aspects.howdy
+      den.aspects.microvm-host
+      den.aspects.oomd
+      den.aspects.earlyoom
+      den.aspects."1password-browsers"
+      den.aspects.app-autostart
+      den.aspects.gaming
+      # home features (projected onto users via the host-aspects battery)
+      den.aspects.home-baseline
+      den.aspects.plasma
+      den.aspects.zen
+      den.aspects.workstation-packages
+      den.aspects.linux-workstation-packages
+      den.aspects.ghostty
+      den.aspects.zed
+      den.aspects.default-apps
+      den.aspects.mouse-actions
+    ];
 
     nixos = {
       imports = [
         inputs.nix-index-database.nixosModules.default
         inputs.nix-flatpak.nixosModules.nix-flatpak
-        inputs.nix-attic-infra.nixosModules.attic-post-build-hook
         inputs.agenix.nixosModules.default
         inputs.desk-phone.nixosModules.default
         inputs.lanzaboote.nixosModules.lanzaboote
-        ../../system/_sys/attic.nix
-        ../../system/_sys/numtide-cache.nix
-        ../../system/_sys/attic-post-build-hook.nix
-        ../../system/_sys/howdy.nix
-        ../../system/_sys/microvm-host.nix
-        ../../system/_sys/oomd.nix
-        ../../system/_sys/earlyoom.nix
-        ../../system/_sys/1password-browsers.nix
-        ../../system/_sys/app-autostart.nix
-        ../../system/_sys/gaming.nix
-        ./_configuration.nix
         ./_hardware-configuration.nix
-        ./_joe-desktop.nix
-        ./_wallpaper.nix
-        ./_mounts.nix
-        ./_uxplay.nix
-        # ./_hyprwhspr.nix
-        ./_desk-phone.nix
-        ./_vban-send.nix
-        ./_vban-recv.nix
-        ./_data-drives.nix
-        ./_nut.nix
-      ];
-
-      _module.args.hostname = "joe-desktop";
-
-      # ROCm support only on desktop (has AMD GPU)
-      # temporarily disabled — rocmSupport + vllm-rocm = 15h build
-      nixpkgs.overlays = [
-        (final: prev: {
-          unstable = import inputs.nixpkgs-unstable {
-            inherit (final.stdenv.hostPlatform) system;
-            config = {
-              allowUnfree = true;
-              android_sdk.accept_license = true;
-              # rocmSupport = true;
-            };
-            overlays = unstableOverlays;
-            # overlays = unstableOverlays ++ [
-            #   (import ../../flake/_overlays/vllm-rocm.nix)
-            # ];
-          };
-        })
-      ];
-
-      home-manager.sharedModules = [
-        inputs.plasma-manager.homeModules.plasma-manager
-        inputs.nix-flatpak.homeManagerModules.nix-flatpak
+        # ./_hyprwhspr.nix  # disabled — underscored so import-tree skips it
       ];
 
       age.secrets.deepgram_api_key = {
@@ -109,19 +86,6 @@ in
         mode = "0400";
         owner = meta.username;
       };
-    };
-
-    provides.to-users.homeManager = {
-      imports = [
-        ./_home-manager.nix
-        # flake-input hm modules (were imports in modules/home/_hm/default.nix)
-        inputs.audiomemo.homeManagerModules.default
-        inputs.nix-attic-infra.homeManagerModules.attic-client
-        inputs.agent-skills.homeManagerModules.claude
-        inputs.agent-skills.homeManagerModules.antigravity
-        inputs.agent-skills.homeManagerModules.codex
-        inputs.agent-skills.homeManagerModules.agent-skills
-      ];
     };
   };
 }

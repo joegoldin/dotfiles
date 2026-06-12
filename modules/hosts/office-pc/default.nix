@@ -1,57 +1,44 @@
 # office-pc compute/training machine (AMD GPU, ROCm + vllm).
-# The offline installer ISO for this machine lives in ./installer.nix.
+# Aspect content lives in the sibling files (system.nix, machine.nix,
+# home.nix); the offline installer ISO is ./installer.nix.
 { inputs, den, ... }:
 let
   meta = import ../../_lib/meta.nix;
-  overlaysModule = import ../../flake/_overlays { inherit inputs; };
-  inherit (overlaysModule) unstableOverlays;
 in
 {
   den.hosts.x86_64-linux.office-pc.users.${meta.username} = { };
 
   den.aspects.office-pc = {
-    includes = [ den.aspects.hm-settings ];
+    includes = [
+      den.aspects.nix-settings
+      # system features
+      den.aspects.attic
+      den.aspects.attic-post-build-hook
+      den.aspects.numtide-cache
+      den.aspects.app-autostart
+      den.aspects.gaming
+      den.aspects.howdy
+      den.aspects."1password-browsers"
+      # home features (projected onto users via the host-aspects battery)
+      den.aspects.home-baseline
+      den.aspects.default-apps
+      den.aspects.workstation-packages
+      den.aspects.linux-workstation-packages
+      den.aspects.zen
+      den.aspects.plasma
+      den.aspects.zed
+      den.aspects.ghostty
+      den.aspects.mouse-actions
+    ];
 
     nixos = {
       imports = [
         inputs.disko.nixosModules.disko
         inputs.nix-index-database.nixosModules.default
-        inputs.nix-attic-infra.nixosModules.attic-post-build-hook
         inputs.agenix.nixosModules.default
         inputs.lanzaboote.nixosModules.lanzaboote
-        ../../system/_sys/attic.nix
-        ../../system/_sys/numtide-cache.nix
-        ../../system/_sys/attic-post-build-hook.nix
-        ../../system/_sys/app-autostart.nix
-        ../../system/_sys/gaming.nix
-        ../../system/_sys/howdy.nix
-        ../../system/_sys/1password-browsers.nix
-        ./_configuration.nix
         ./_disk-config.nix
         ./_hardware-configuration.nix
-        ./_office-pc.nix
-      ];
-
-      _module.args.hostname = "office-pc";
-
-      # ROCm support (AMD GPU)
-      nixpkgs.overlays = [
-        (final: prev: {
-          unstable = import inputs.nixpkgs-unstable {
-            inherit (final.stdenv.hostPlatform) system;
-            config = {
-              allowUnfree = true;
-              rocmSupport = true;
-            };
-            overlays = unstableOverlays ++ [
-              (import ../../flake/_overlays/vllm-rocm.nix)
-            ];
-          };
-        })
-      ];
-
-      home-manager.sharedModules = [
-        inputs.plasma-manager.homeModules.plasma-manager
       ];
 
       age.secrets.deepgram_api_key = {
@@ -79,19 +66,6 @@ in
         mode = "0400";
         owner = meta.username;
       };
-    };
-
-    provides.to-users.homeManager = {
-      imports = [
-        ./_home-manager.nix
-        # flake-input hm modules (were imports in modules/home/_hm/default.nix)
-        inputs.audiomemo.homeManagerModules.default
-        inputs.nix-attic-infra.homeManagerModules.attic-client
-        inputs.agent-skills.homeManagerModules.claude
-        inputs.agent-skills.homeManagerModules.antigravity
-        inputs.agent-skills.homeManagerModules.codex
-        inputs.agent-skills.homeManagerModules.agent-skills
-      ];
     };
   };
 }

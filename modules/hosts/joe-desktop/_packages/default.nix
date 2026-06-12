@@ -8,8 +8,8 @@
 }:
 let
   inherit (pkgs) unstable;
-  goModule = import ../../../home/_hm/go.nix { inherit pkgs lib; };
-  appImagePackages = import ../../../home/_hm/appimages.nix { inherit pkgs; };
+  goModule = import ../../../home/_go.nix { inherit pkgs lib; };
+  appImagePackages = import ../../../home/_appimages.nix { inherit pkgs; };
 
   packageGroups = with pkgs; {
     cli = [

@@ -1,6 +1,8 @@
-{ writeScript
-, rsync
-}: writeScript "filemap.bash" ''
+{
+  writeScript,
+  rsync,
+}:
+writeScript "filemap.bash" ''
   map_file () {
     local s=$1
     local d="$WINEPREFIX/$2"

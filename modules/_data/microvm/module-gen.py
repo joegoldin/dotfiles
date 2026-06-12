@@ -189,7 +189,7 @@ def render_flake(meta: dict, repo_root: Path, cli_pub: str, user_pub: str) -> st
         "      inherit system pkgs;\n"
         "      specialArgs = {\n"
         "        inherit meta cliSshPubKey userSshPubKey;\n"
-        f'        fishGuest = dotfiles + "/modules/home/_hm/fish-guest.nix";\n'
+        f'        fishGuest = dotfiles + "/modules/_data/microvm/fish-guest.nix";\n'
         "      };\n"
         "      modules = [\n"
         "        microvm-nix.nixosModules.microvm\n"

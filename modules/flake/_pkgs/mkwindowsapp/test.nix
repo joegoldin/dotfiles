@@ -1,4 +1,6 @@
-{ nixpkgs ? <nixpkgs> }:
+{
+  nixpkgs ? <nixpkgs>,
+}:
 let
   pkgs = import nixpkgs { };
   writeScript = pkgs.writeScript;
@@ -22,9 +24,15 @@ let
   assertHasContent = text: path: ''
     test $(cat "${path}") == "${text}" || echo "ERROR: ${path} is supposed to contain the content: ${text}"
   '';
-in {
+in
+{
   map_file = pkgs.writeShellScript "map-file-test.bash" ''
-    ${builtins.readFile (import ./filemap.nix { inherit writeScript; rsync = pkgs.rsync; })}
+    source ${
+      import ./filemap.nix {
+        inherit writeScript;
+        rsync = pkgs.rsync;
+      }
+    }
 
     declare -i count
     count=1
@@ -92,10 +100,10 @@ in {
     touch "$fake_root/data/dir/file.txt"
     map_file "$fake_root/data/dir" "drive_c/somewhereelse/dir"
     ${assertIsSymlink "$fake_root/data/dir" "$fake_root/wineprefix/drive_c/somewhereelse/dir"}
-    ${assertFileExist  "$fake_root/data/dir/file.txt"}
+    ${assertFileExist "$fake_root/data/dir/file.txt"}
     ${assertDirectoryExist "$fake_root/data/dir/dir2"}
     persist_file "drive_c/somewhereelse/dir" "$fake_root/data/dir"
-    ${assertFileExist  "$fake_root/data/dir/file.txt"}
+    ${assertFileExist "$fake_root/data/dir/file.txt"}
     ${assertDirectoryExist "$fake_root/data/dir/dir2"}
     tearDown
 
@@ -172,10 +180,10 @@ in {
     touch "$fake_root/data/dir/file.txt"
     map_file "$fake_root/data/dir" "drive_c/somewhereelse/somedir"
     ${assertIsSymlink "$fake_root/data/dir" "$fake_root/wineprefix/drive_c/somewhereelse/somedir"}
-    ${assertFileExist  "$fake_root/data/dir/file.txt"}
+    ${assertFileExist "$fake_root/data/dir/file.txt"}
     ${assertDirectoryExist "$fake_root/data/dir/dir2"}
     persist_file "drive_c/somewhereelse/somedir" "$fake_root/data/dir"
-    ${assertFileExist  "$fake_root/data/dir/file.txt"}
+    ${assertFileExist "$fake_root/data/dir/file.txt"}
     ${assertDirectoryExist "$fake_root/data/dir/dir2"}
     tearDown
 
