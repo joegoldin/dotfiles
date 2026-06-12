@@ -864,12 +864,19 @@ let
 
   mkPythonArgparseBin =
     s:
+    let
+      pythonWithPkgs =
+        if s ? pythonPackages && s.pythonPackages != [ ] then
+          pkgs.python3.withPackages (ps: map (name: ps.${name}) s.pythonPackages)
+        else
+          pkgs.python3;
+    in
     pkgs.writeTextFile {
       inherit (s) name;
       executable = true;
       destination = "/bin/${s.name}";
       text = ''
-        #!${pkgs.python3}/bin/python3
+        #!${pythonWithPkgs}/bin/python3
         ${s.body}
       '';
     };
