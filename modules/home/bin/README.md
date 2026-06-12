@@ -1,6 +1,6 @@
 # bin - Script Builder
 
-Generates CLI tools from Nix attrset definitions in `scripts/`. Each `.nix` file defines one command with metadata, and the builder produces an executable with auto-generated help, flag parsing, completions, and color output.
+Generates CLI tools from Nix attrset definitions in `_scripts/`. Each `.nix` file defines one command with metadata, and the builder produces an executable with auto-generated help, flag parsing, completions, and color output.
 
 Run `bins` to list all available commands, or `bins -i` to fuzzy-find and execute one.
 
@@ -21,7 +21,7 @@ Using the language name as the field enables tree-sitter injection for syntax hi
 ## Minimal Example
 
 ```nix
-# scripts/greet.nix
+# _scripts/greet.nix
 {
   name = "greet";
   desc = "Say hello";
@@ -33,10 +33,10 @@ Using the language name as the field enables tree-sitter injection for syntax hi
 
 ## Subcommand Groups
 
-Place `.nix` files in a subdirectory of `scripts/` to create a command group with subcommands. The directory name becomes the parent command, and each file becomes a subcommand.
+Place `.nix` files in a subdirectory of `_scripts/` to create a command group with subcommands. The directory name becomes the parent command, and each file becomes a subcommand.
 
 ```
-scripts/
+_scripts/
   ai/
     ask.nix      -> `ai ask`
     raw.nix      -> `ai raw`
@@ -44,7 +44,7 @@ scripts/
 ```
 
 ```nix
-# scripts/ai/ask.nix
+# _scripts/ai/ask.nix
 {
   name = "ask";
   desc = "Query Claude with a question";
@@ -55,7 +55,7 @@ scripts/
 ```
 
 ```nix
-# scripts/ai/image.nix
+# _scripts/ai/image.nix
 {
   name = "image";
   desc = "Analyze an image with Claude";
@@ -76,7 +76,7 @@ Each subcommand `.nix` file uses the same format as a top-level script — all f
 ## Full Feature Example
 
 ```nix
-# scripts/deploy.nix
+# _scripts/deploy.nix
 { pkgs }:
 {
   name = "deploy";
@@ -190,7 +190,7 @@ Python scripts can declare pip dependencies:
 If a script needs access to `pkgs` (for `runtimeInputs`), export a function:
 
 ```nix
-# scripts/deploy.nix
+# _scripts/deploy.nix
 { pkgs }:
 {
   name = "deploy";
