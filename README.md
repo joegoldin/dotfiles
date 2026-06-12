@@ -363,7 +363,20 @@ tree is the wiring.
 - **mkWindowsApp** (`modules/flake/_pkgs/mkwindowsapp/`) — a Nix function
   for installing Wine-compatible Windows applications, vendored from
   [emmanuelrosa/erosanix](https://github.com/emmanuelrosa/erosanix/tree/master/pkgs/mkwindowsapp)
-  by Emmanuel Rosa (MIT).
+  by Emmanuel Rosa (MIT), itself based on
+  [lucasew/nixcfg's wrapWine.nix](https://github.com/lucasew/nixcfg/blob/fd523e15ccd7ec2fd86a3c9bc4611b78f4e51608/packages/wrapWine.nix).
+- **mac-app-util** (`modules/flake/_pkgs/mac-app-util/`) — a Python port of
+  [hraban/mac-app-util](https://github.com/hraban/mac-app-util)
+  (© Hraban Luyat, **AGPL-3.0** — this component keeps its upstream license,
+  unlike the rest of the repo). Ported because the Common Lisp original
+  can't run on macOS 27.
+- **watchyt** (`modules/home/bin/_scripts/watchyt.nix`) — customized port of
+  [bradautomates/claude-video](https://github.com/bradautomates/claude-video)
+  (MIT).
+- **llm-cmd-comp fish binding** (`modules/home/fish/_init.nix`) — the
+  `__llm_cmdcomp` function is from
+  [CGamesPlay/llm-cmd-comp](https://github.com/CGamesPlay/llm-cmd-comp)
+  (Apache-2.0).
 
 ## License
 
