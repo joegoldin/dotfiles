@@ -999,6 +999,7 @@
       "original": {
         "owner": "figsoda",
         "repo": "drowse",
+        "rev": "f63dc21e120c17cbed472119097c2ecc6ef37a0a",
         "type": "github"
       }
     },
@@ -1486,6 +1487,7 @@
       "original": {
         "owner": "hercules-ci",
         "repo": "flake-parts",
+        "rev": "f7c1a2d347e4c52d5fb8d10cb4d94b5884e546fb",
         "type": "github"
       }
     },
@@ -2321,6 +2323,7 @@
       "original": {
         "owner": "vic",
         "repo": "import-tree",
+        "rev": "d321337efd0f23a9eb14a42adb7b2c29313ab274",
         "type": "github"
       }
     },

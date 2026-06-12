@@ -10,17 +10,17 @@
     # whole tree (paths containing "/_" are skipped); den layers an
     # aspect-oriented entity model on top. See MIGRATION.md.
     flake-parts = {
-      url = "github:hercules-ci/flake-parts";
+      url = "github:hercules-ci/flake-parts?rev=f7c1a2d347e4c52d5fb8d10cb4d94b5884e546fb";
       inputs.nixpkgs-lib.follows = "nixpkgs";
     };
-    import-tree.url = "github:vic/import-tree";
+    import-tree.url = "github:vic/import-tree?rev=d321337efd0f23a9eb14a42adb7b2c29313ab274";
     den.url = "github:denful/den?rev=fe63b4bff3358e51687b6f88fa8746d5b3dc1bd5";
     # Dynamic derivations — the IFD replacement (build-time nix eval without
     # import-from-derivation). Consumed as inputs.drowse.lib.${system}; hosts
     # opt in to the required experimental features via
     # den.aspects.dynamic-derivations.
     drowse = {
-      url = "github:figsoda/drowse";
+      url = "github:figsoda/drowse?rev=f63dc21e120c17cbed472119097c2ecc6ef37a0a";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

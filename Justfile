@@ -244,28 +244,6 @@ build-to-bastion local="":
 # ── Package management ───────────────────────────────────────────────────
 
 [unix]
-update-pins dry_run='':
-    #!/usr/bin/env bash
-    set -euo pipefail
-    echo "🔄  Updating pinned flake inputs..."
-    export GH_TOKEN="$(gh auth token 2>/dev/null || echo '')"
-    if [ "{{ dry_run }}" = "--dry-run" ]; then
-      DRY_RUN=true scripts/update-flake-pins.sh
-      echo "✅  Pins updated (dry-run)!"
-      exit 0
-    fi
-    scripts/update-flake-pins.sh
-    # Commit the refreshed flake.lock so this machine persists what's pinned.
-    # (The maintenance reminder reads freshness straight from flake.lock's
-    # lastModified, not from this commit — so there's no history file to sync.)
-    git add flake.nix flake.lock 2>/dev/null || true
-    if ! git diff --cached --quiet; then
-      git commit -q -m "chore: update-pins — refresh flake inputs"
-      echo "  ✓ committed flake.nix + flake.lock"
-    fi
-    echo "✅  Pins updated!"
-
-[unix]
 setup-python-packages packages='':
     @echo "🔄  Setting up Python packages..."
     @scripts/setup-python-packages.sh {{ packages }}
@@ -430,59 +408,15 @@ _finish-build host start_time exit_code:
 
 stale_days := "7"
 
-# Commits a single file inside the secrets submodule. Pulls --rebase first
-# to absorb any concurrent changes from other machines, then pushes. Silent
-# no-op if the file has no actual changes.
-[private]
-_commit-to-secrets file msg:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    relfile=$(echo "{{ file }}" | sed 's|^secrets/||')
-    cd secrets
-    git pull --rebase --autostash origin main >/dev/null 2>&1 || true
-    git add -- "$relfile"
-    if git diff --cached --quiet; then
-      exit 0
-    fi
-    git commit -q -m "{{ msg }}"
-    git push origin main >/dev/null 2>&1 \
-      && echo "  ↑ secrets pushed ({{ msg }})" \
-      || echo "  ⚠ secrets push deferred (will retry next run)"
-
-# Manual helper: after you commit inside the `secrets` submodule, this re-points
-# the parent repo's `secrets` gitlink to the submodule HEAD and re-locks the
-# dotfiles-secrets flake input — otherwise the submodule sits one commit ahead of
-# the recorded pointer (an untracked, dirty tree). Commit-only (push the parent
-# when you like); no-op when already in sync.
-[private]
-_sync-secrets-pointer:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    git add secrets
-    nix --extra-experimental-features 'nix-command flakes' flake update dotfiles-secrets \
-      --option access-tokens "github.com=$(gh auth token 2>/dev/null || echo '')" >/dev/null 2>&1 || true
-    git add flake.lock
-    if git diff --cached --quiet; then
-      exit 0
-    fi
-    git commit -q -m "chore: track secrets submodule (pointer + flake.lock)"
-    echo "  ✓ parent secrets pointer committed"
-
 [private]
 _check-maintenance:
     #!/usr/bin/env bash
     stale_seconds=$(( {{ stale_days }} * 86400 ))
     now=$(date +%s)
-    # Derive each task's freshness from the artifact it maintains rather than a
-    # synced history file:
-    #   • update-pins keeps flake.lock fresh → newest input's lastModified.
-    #     path: inputs (secrets/agent-skills/...) carry no lastModified, so the
-    #     per-build secrets re-lock can't skew this — only real upstream inputs.
-    #   • sync-submodules advances the submodule gitlinks → date of the last
-    #     parent commit touching a non-secrets gitlink (secrets is excluded
-    #     because build-time tracking advances it on every build).
-    # Both answer "how fresh is the artifact, from any source" — what the
-    # reminder actually cares about — and need nothing pushed to .secrets.
+    # Derive each task's freshness from the artifact it maintains:
+    #   • flake-update keeps flake.lock fresh → newest input's lastModified.
+    #   • sync-submodules advances the submodule gitlinks (assets) → date of
+    #     the last parent commit touching a gitlink.
     check_task() {
       local label=$1 cmd=$2 last_ts=$3
       if [[ -z "$last_ts" ]]; then
@@ -492,7 +426,7 @@ _check-maintenance:
       fi
     }
     pins_ts=$(jq -r '[.nodes[].locked.lastModified // empty] | max // empty' flake.lock 2>/dev/null || true)
-    subs=$(git config --file .gitmodules --get-regexp path 2>/dev/null | awk '$2 != "secrets" {print $2}')
+    subs=$(git config --file .gitmodules --get-regexp path 2>/dev/null | awk '{print $2}')
     subs_ts=$(git log -1 --format=%ct -- $subs 2>/dev/null || true)
-    check_task "Pin updates" "update-pins" "$pins_ts"
+    check_task "Flake inputs" "flake-update" "$pins_ts"
     check_task "Submodule sync" "sync-submodules" "$subs_ts"
