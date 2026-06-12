@@ -13,7 +13,7 @@
 #   drowse = inputs.drowse.lib.${pkgs.stdenv.hostPlatform.system};
 #   pkg = drowse.callPackage ./some-package.nix { };
 #
-# See MIGRATION.md ("drowse: replacing IFD") for the worked mkwindowsapp
+# See README.md ("drowse") for the worked mkwindowsapp
 # example and the caveats around attic/remote builders.
 { ... }:
 {

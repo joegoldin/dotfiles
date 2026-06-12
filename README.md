@@ -1,21 +1,37 @@
-# How this repo works: dendritic + den
+# dotfiles
 
-This is the explainer for the architecture this repo migrated to in June
-2026. MIGRATION.md is the short record of *what* happened and how it was
-verified; this document is *why it's shaped this way and how to think in
-it*.
+Nix configuration for all of my machines — NixOS workstations and servers,
+a MacBook (nix-darwin), and a Steam Deck — with home-manager everywhere,
+organized around the [dendritic pattern](https://github.com/mightyiam/dendritic)
+with [den](https://github.com/denful/den) as the engine and
+[drowse](https://github.com/figsoda/drowse) for dynamic derivations.
+
+| Output | Machine | Role |
+| --- | --- | --- |
+| `joe-desktop` | desktop tower (AMD GPU, Plasma) | daily driver |
+| `office-pc` (+ `office-pc-installer` ISO) | compute box (ROCm + vllm) | ML/training |
+| `Joes-MacBook-Pro` | MacBook (aarch64-darwin) | laptop |
+| `joe-steamdeck` | Steam Deck (Jovian) | gaming |
+| `cloud-proxy` | VPS | caddy reverse proxy + fail2ban |
+| `oracle-cloud-bastion` (hostName `bastion`) | Oracle Cloud | pelican game servers, tailnet entry |
+| `racknerd-cloud-agent` | VPS | attic binary cache server |
+
+Day-to-day: `just build` / `just switch` (see the Justfile), or `nh os
+switch` directly. Secrets live in the `secrets/` submodule (agenix);
+assets, snippets, and agent-skills are submodules too — clone with
+`--recurse-submodules`.
 
 ## The big picture
 
-The old repo was **host-first**: a 940-line `flake.nix` called
+This repo used to be **host-first**: a 940-line `flake.nix` called
 `nixosSystem` once per machine, each call wiring up home-manager, agenix,
 overlays and a `specialArgs` grab-bag, importing a `hosts/<name>/` tree
 that imported shared files from `hosts/common/`. To answer "what does the
 fish setup look like?" you read five files across three directories; to
 add a feature to two hosts you edited both host trees.
 
-The new repo is **feature-first**. A feature lives in exactly one file as
-an *aspect* — a bundle that can carry NixOS config, darwin config, and
+Now it is **feature-first**. A feature lives in exactly one file as an
+*aspect* — a bundle that can carry NixOS config, darwin config, and
 home-manager config together. Machines are one-line *entities* that select
 aspects. Nothing imports anything by hand at the top level: the directory
 tree itself is the wiring.
@@ -30,7 +46,6 @@ flake.nix ──▶ flake-parts.mkFlake (import-tree ./modules)
                      │  reads den.hosts.* entities + den.aspects.* registry
                      ▼
               nixosConfigurations.* / darwinConfigurations.*
-              (same output names as before — just/nh unchanged)
 ```
 
 Three projects make this work, each doing one job:
@@ -41,11 +56,10 @@ Three projects make this work, each doing one job:
 | **import-tree** | `inputs.import-tree ./modules` returns every `.nix` file under `modules/` as an import list. This is what makes "drop a file in, it's live" work. Paths containing `/_` are skipped — that's the escape hatch for files that *aren't* flake-parts modules. |
 | **den** | An aspect engine on top. It defines the `den.hosts` / `den.aspects` options, resolves which aspects apply to which entity, and instantiates `nixosSystem`/`darwinSystem` for you. |
 
-The name *dendritic* refers to the underlying pattern
-([mightyiam/dendritic](https://github.com/mightyiam/dendritic)): **every
-file is a module of one top-level configuration**, and lower-level
-configs (NixOS, home-manager) are values *inside* it rather than separate
-evaluations wired by hand.
+The name *dendritic* refers to the underlying pattern: **every file is a
+module of one top-level configuration**, and lower-level configs (NixOS,
+home-manager) are values *inside* it rather than separate evaluations
+wired by hand.
 
 ## What evaluating a host actually does
 
@@ -157,7 +171,7 @@ defaults, which hosts may override — cloud-proxy `mkForce`s 25.11).
 `modules/home/zed.nix`, `modules/system/gaming.nix`,
 `modules/ai/claude.nix` — each declares exactly one aspect. The file's
 *location* is taste; the aspect *name* is identity. Browsing `modules/`
-is browsing your feature list.
+is browsing the feature list.
 
 ### 2. Aspect merging by name (hosts as directories of concerns)
 
@@ -205,10 +219,10 @@ dotconfig copy): the "full home environment" bundle that workstations,
 the mac, and the bastion include — while the lean servers and the deck
 pick features individually. Note what it *doesn't* contain:
 git/fish/gh/gpg/starship ride on the **joe user aspect** and reach every
-host automatically, because they're properties of *you*, not of any host.
-That user/host split is deliberate: ask "is this mine everywhere, or this
-machine's?" and the aspect goes in `users/joe.nix`'s includes or the
-host's.
+host automatically, because they're properties of *the user*, not of any
+host. That user/host split is deliberate: ask "is this mine everywhere,
+or this machine's?" and the aspect goes in `users/joe.nix`'s includes or
+the host's.
 
 ### 6. Closures instead of specialArgs
 
@@ -292,7 +306,7 @@ to its linux side.
 
 **Host-specific tweak of a shared feature** — put it in the host's
 `home.nix` (or a new sibling file): host aspect hm blocks merge with
-feature aspect hm blocks in joe's home eval, ordinary module-system
+feature aspect hm blocks in the user's home eval, ordinary module-system
 rules (`mkDefault`/`mkForce`) arbitrate.
 
 **New host** — `modules/hosts/<name>/default.nix` with the entity line,
@@ -321,8 +335,8 @@ the one aspect that owns it.
   merging — that's why the account base is plain and scalars like
   `home.username` are `mkDefault`.
 - **den is pinned** (`?rev=` in flake.nix) like every other input —
-  it's a young framework; bump deliberately and re-run the parity drill
-  from MIGRATION.md.
+  it's a young framework; bump deliberately and verify with a closure
+  diff (`nvd diff`) against the previous generation before switching.
 - **darwin from linux** evaluates only until agent-skills needs an
   aarch64-darwin build (pre-existing IFD); full mac verification happens
   on the mac.
@@ -339,7 +353,18 @@ vocabulary of *features* (aspects) and *things* (entities). A feature is
 one file that owns every side of itself — linux, mac, home, upstream
 modules, secrets-derived config. A machine is a list of features plus
 its quirks, each quirk a small file merging into the machine's aspect.
-You — the user — are also an aspect, carrying your account and universal
-tools to every machine. To understand anything, find its file; to change
-where it applies, edit an `includes` list; to add something new, add a
-file. The tree is the wiring.
+The user is also an aspect, carrying the account and universal tools to
+every machine. To understand anything, find its file; to change where it
+applies, edit an `includes` list; to add something new, add a file. The
+tree is the wiring.
+
+## Attribution
+
+- **mkWindowsApp** (`modules/flake/_pkgs/mkwindowsapp/`) — a Nix function
+  for installing Wine-compatible Windows applications, vendored from
+  [emmanuelrosa/erosanix](https://github.com/emmanuelrosa/erosanix/tree/master/pkgs/mkwindowsapp)
+  by Emmanuel Rosa (MIT).
+
+## License
+
+[MIT](./LICENSE.md)
