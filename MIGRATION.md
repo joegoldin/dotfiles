@@ -1,6 +1,8 @@
 # Dendritic / den architecture
 
 This repo is fully migrated to the dendritic pattern with den as the engine.
+**Read ARCHITECTURE.md for the full explainer** — concepts, patterns,
+cookbook; this file is the migration/verification record.
 References: [mightyiam/dendritic](https://github.com/mightyiam/dendritic)
 (the pattern), [denful/den](https://github.com/denful/den) (aspects +
 entities; docs at <https://den.denful.dev>),
