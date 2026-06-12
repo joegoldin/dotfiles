@@ -185,7 +185,7 @@ write-iso device="":
 
 [unix]
 secret *args:
-    @scripts/secret-helper.sh {{ args }}
+    @secret-helper {{ args }}
 
 # ── Remote hosts ─────────────────────────────────────────────────────────
 
@@ -246,13 +246,13 @@ build-to-bastion local="":
 [unix]
 setup-python-packages packages='':
     @echo "🔄  Setting up Python packages..."
-    @scripts/setup-python-packages.sh {{ packages }}
+    @setup-python-packages {{ packages }}
     @echo "✅  Python packages setup!"
 
 [unix]
 update-python-packages:
     @echo "🔄  Updating Python packages..."
-    @scripts/update-python-packages.sh --no-build
+    @update-python-packages --no-build
     @echo "✅  Python packages updated!"
 
 # ── Maintenance ──────────────────────────────────────────────────────────
@@ -263,86 +263,11 @@ nix-gc:
     @nh clean all --keep-since 7d --keep 3
     @echo "✅  Garbage collected!"
 
-# ── Submodules ───────────────────────────────────────────────────────
-
-[unix]
-sync-submodules:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    echo "🔄  Syncing submodules..."
-    git submodule sync --recursive
-    # Ensure submodules are initialized (clones any new ones)
-    git submodule update --init --recursive
-    # First pass: fetch, validate state, push local-ahead commits on main
-    git submodule foreach --recursive '
-      git fetch origin 2>/dev/null || { echo "❌  $name: failed to fetch — aborting"; exit 1; }
-      dirty="$(git status --porcelain 2>/dev/null || true)"
-      if [ -n "$dirty" ]; then
-        echo "❌  $name: has uncommitted changes — aborting"
-        exit 1
-      fi
-      current_branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo HEAD)"
-      if [ "$current_branch" != "main" ] && [ "$current_branch" != "HEAD" ]; then
-        echo "❌  $name: on branch '\''$current_branch'\'' (expected main or detached) — aborting"
-        exit 1
-      fi
-      if [ "$current_branch" = "main" ]; then
-        local_ahead="$(git log --oneline origin/main..HEAD 2>/dev/null || true)"
-        remote_ahead="$(git log --oneline HEAD..origin/main 2>/dev/null || true)"
-        if [ -n "$local_ahead" ] && [ -n "$remote_ahead" ]; then
-          echo "❌  $name: main has diverged from origin/main — aborting (resolve manually)"
-          exit 1
-        fi
-        if [ -n "$local_ahead" ]; then
-          echo "  ⬆️  Pushing $name..."
-          git push origin main || { echo "❌  $name: push failed — aborting"; exit 1; }
-        fi
-      fi
-    '
-    # Second pass: check out main at latest origin/main for every submodule
-    git submodule foreach --recursive '
-      echo "  ⬇️  $name → origin/main"
-      if git show-ref --verify --quiet refs/heads/main; then
-        git checkout main >/dev/null 2>&1
-        git merge --ff-only origin/main
-      else
-        git checkout -B main origin/main
-      fi
-    '
-    # Third pass: re-resolve transitive flake deps from path: submodules
-    # (e.g. agent-skills pins codex-nix/claude-nix/antigravity-cli-nix which the
-    #  outer dotfiles lock caches independently)
-    echo "🔒  Re-locking transitive flake deps from submodules..."
-    git submodule foreach --quiet 'echo "$name"' | while read -r sub; do
-      for dep in $(nix flake metadata --json "path:./$sub" 2>/dev/null \
-                    | jq -r '.locks.nodes.root.inputs // {} | keys[]' 2>/dev/null); do
-        nix flake lock --update-input "$sub/$dep" 2>/dev/null || true
-      done
-    done
-    # Fourth pass: stage and commit the parent dotfiles repo's updated
-    # submodule pointers + flake.lock (so this machine's recorded HEAD
-    # matches the freshly-synced submodule and flake state).
-    echo "📌  Recording new submodule + flake state in parent repo..."
-    parent_changes=""
-    for path in flake.lock $(git config --file .gitmodules --get-regexp path 2>/dev/null | awk '{print $2}'); do
-      git add -- "$path" 2>/dev/null || true
-    done
-    # This commit advances the submodule gitlinks; the maintenance reminder
-    # reads the date of the last commit touching a (non-secrets) gitlink as
-    # "last sync" — so there's no history file to sync.
-    if ! git diff --cached --quiet; then
-      git commit -q -m "chore: sync-submodules — refresh submodule pointers + flake.lock"
-      echo "  ✓ committed parent pointer updates"
-    else
-      echo "  • parent already up to date"
-    fi
-    echo "✅  Submodules synced!"
 
 # ── Build timing ─────────────────────────────────────────────────────
 
 # Per-machine build durations, kept local (gitignored). Predictions are
-# per-host and read straight from this file, so there's nothing to sync to
-# the secrets submodule — no commit, no push, no conflict markers.
+# per-host and read straight from this file — nothing to sync anywhere.
 build_times_file := ".build-times"
 
 [private]
@@ -407,10 +332,8 @@ _check-maintenance:
     #!/usr/bin/env bash
     stale_seconds=$(( {{ stale_days }} * 86400 ))
     now=$(date +%s)
-    # Derive each task's freshness from the artifact it maintains:
-    #   • flake-update keeps flake.lock fresh → newest input's lastModified.
-    #   • sync-submodules advances the submodule gitlinks (assets) → date of
-    #     the last parent commit touching a gitlink.
+    # Freshness comes from the artifact itself: flake-update keeps flake.lock
+    # fresh → newest input's lastModified.
     check_task() {
       local label=$1 cmd=$2 last_ts=$3
       if [[ -z "$last_ts" ]]; then
@@ -420,7 +343,4 @@ _check-maintenance:
       fi
     }
     pins_ts=$(jq -r '[.nodes[].locked.lastModified // empty] | max // empty' flake.lock 2>/dev/null || true)
-    subs=$(git config --file .gitmodules --get-regexp path 2>/dev/null | awk '{print $2}')
-    subs_ts=$(git log -1 --format=%ct -- $subs 2>/dev/null || true)
     check_task "Flake inputs" "flake-update" "$pins_ts"
-    check_task "Submodule sync" "sync-submodules" "$subs_ts"

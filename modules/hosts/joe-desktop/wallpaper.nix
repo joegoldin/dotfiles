@@ -12,15 +12,13 @@ in
       ...
     }:
     let
-      scriptPath = "${config.users.users.${username}.home}/dotfiles/scripts/set-wallpaper.py";
+      # the set-wallpaper bins script (modules/home/bin/_scripts/set-wallpaper.nix)
+      # from joe's home profile
+      scriptPath = "/etc/profiles/per-user/${username}/bin/set-wallpaper";
       wallpaperDirs = [
         "${config.users.users.${username}.home}/Pictures/Wallpaper"
         "${config.users.users.${username}.home}/Pictures/Backgrounds"
       ];
-      pythonEnv = pkgs.python3.withPackages (ps: [
-        ps.dbus-python
-        ps.pillow
-      ]);
     in
     {
       systemd.user = {
@@ -36,7 +34,7 @@ in
         services = {
           "set-wallpaper" = {
             script = ''
-              ${pythonEnv}/bin/python3 ${scriptPath} ${lib.concatStringsSep " " wallpaperDirs}
+              ${scriptPath} ${lib.concatStringsSep " " wallpaperDirs}
             '';
             path = [ pkgs.xrandr ];
             serviceConfig = {

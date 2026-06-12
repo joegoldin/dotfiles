@@ -435,16 +435,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1781229117,
-        "narHash": "sha256-vMMjROGD/huIbrvTV3okyMPseleQ3dsFOabJo9TtfoI=",
+        "lastModified": 1781052888,
+        "narHash": "sha256-E/tJpBUOxYg+Jdli2Dc1bmIh7L9CWkyyTo8T0APerBE=",
         "owner": "aaddrick",
         "repo": "claude-desktop-debian",
-        "rev": "d2ce0466315033938ea6c2066d424239feffabf0",
+        "rev": "e85450c90ba38159f89f02bdd0f6c6d7e6bce065",
         "type": "github"
       },
       "original": {
         "owner": "aaddrick",
         "repo": "claude-desktop-debian",
+        "rev": "e85450c90ba38159f89f02bdd0f6c6d7e6bce065",
         "type": "github"
       }
     },
@@ -802,14 +803,18 @@
     "dotfiles-assets": {
       "flake": false,
       "locked": {
-        "path": "./assets",
-        "type": "path"
+        "lastModified": 1772492645,
+        "narHash": "sha256-5wH9vrfEhBP8kNvuhbel+AktqY5J7ZEcMjxXLg9X61s=",
+        "ref": "refs/heads/main",
+        "rev": "da897acadfb7f42134347bd5ea7b6034e785104a",
+        "revCount": 4,
+        "type": "git",
+        "url": "ssh://git@github.com/joegoldin/dotfiles-assets"
       },
       "original": {
-        "path": "./assets",
-        "type": "path"
-      },
-      "parent": []
+        "type": "git",
+        "url": "ssh://git@github.com/joegoldin/dotfiles-assets"
+      }
     },
     "dotfiles-secrets": {
       "flake": false,
@@ -3589,16 +3594,16 @@
     "zed-nix-ext": {
       "flake": false,
       "locked": {
-        "lastModified": 1775277883,
-        "narHash": "sha256-lCg/pHPpyy47HhtsGAAG1sPix1me2VoH86rNlXQlJBg=",
+        "lastModified": 1781242898,
+        "narHash": "sha256-0rqW5BdWkEKZeyduo2h8nzN3ky/E3hkZ0MSsLDKZqVg=",
         "owner": "joegoldin",
-        "repo": "nix",
-        "rev": "55662966302eb4876127d125e7509d780ef6e816",
+        "repo": "zed-extensions-nix",
+        "rev": "7a0439468f245e611c9867b2fd5484f7adaf108a",
         "type": "github"
       },
       "original": {
         "owner": "joegoldin",
-        "repo": "nix",
+        "repo": "zed-extensions-nix",
         "type": "github"
       }
     },

@@ -2,8 +2,6 @@
   description = "Joe Goldin Nix Config";
 
   inputs = {
-    self.submodules = true;
-
     # ── Dendritic core ──────────────────────────────────────────────────────
     # Every file under modules/ is a flake-parts module (the dendritic
     # pattern, https://github.com/mightyiam/dendritic). import-tree loads the
@@ -57,10 +55,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # ── Local sources ───────────────────────────────────────────────────────
-    # assets (fonts, etc.)
+    # ── Personal data repos (ssh) ──────────────────────────────────────────
+    # assets (fonts, sfx, etc.) — bump with `nix flake update dotfiles-assets`
     dotfiles-assets = {
-      url = "./assets";
+      url = "git+ssh://git@github.com/joegoldin/dotfiles-assets";
       flake = false;
     };
     # secrets (domains, encrypted age files, etc.) — private repo over ssh;
@@ -178,8 +176,13 @@
 
     # ── Claude / LLM tooling ───────────────────────────────────────────────
     # Claude Desktop for Linux.
+    # TEMP-PINNED (the one exception to the no-URL-pins rule): HEAD's
+    # d2ce0466 bumps Claude Desktop to 1.12603.1, where the .asar --add-dir
+    # filter patch fails ("pattern matches 2 times"); no fix PR upstream
+    # yet. e85450c9 = last rev before the bump (app 1.11847.5, includes the
+    # PR #666 patch fix). Unpin once upstream builds again.
     claude-desktop-debian = {
-      url = "github:aaddrick/claude-desktop-debian";
+      url = "github:aaddrick/claude-desktop-debian/e85450c90ba38159f89f02bdd0f6c6d7e6bce065";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, antigravity)
