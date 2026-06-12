@@ -2,7 +2,25 @@
   description = "Joe Goldin Nix Config";
 
   inputs = {
-    self.submodules = true;
+    # ── Dendritic core ──────────────────────────────────────────────────────
+    # Every file under modules/ is a flake-parts module (the dendritic
+    # pattern, https://github.com/mightyiam/dendritic). import-tree loads the
+    # whole tree (paths containing "/_" are skipped); den layers an
+    # aspect-oriented entity model on top. See README.md.
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
+    import-tree.url = "github:vic/import-tree";
+    den.url = "github:denful/den";
+    # Dynamic derivations; the IFD replacement (build-time nix eval without
+    # import-from-derivation). Consumed as inputs.drowse.lib.${system}; hosts
+    # opt in to the required experimental features via
+    # den.aspects.dynamic-derivations.
+    drowse = {
+      url = "github:figsoda/drowse";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # ── Nixpkgs ─────────────────────────────────────────────────────────────
     nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
@@ -13,7 +31,7 @@
     nixpkgs-darwin.url = "github:nixos/nixpkgs/nixpkgs-26.05-darwin";
 
     # Zen built from source via buildMozillaMach. Points at the fork's `nightly`
-    # branch — "dev as if all my open PRs were merged" — rebuilt by the
+    # branch ("dev as if all my open PRs were merged"), rebuilt by the
     # nightly-integration GitHub Action (dev + every conflict-free PR). Pinned
     # in flake.lock; bump with `nix flake update zen-src` when you want the
     # latest nightly. Intentionally pins its OWN nixpkgs (matched to the fork's
@@ -33,19 +51,20 @@
     };
     # jovian (Steam Deck)
     jovian-nixos = {
-      url = "github:Jovian-Experiments/Jovian-NixOS?rev=255a964247cd3bcc68947b675ce270212e98568f";
+      url = "github:Jovian-Experiments/Jovian-NixOS";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # ── Local sources ───────────────────────────────────────────────────────
-    # assets (fonts, etc.)
+    # ── Personal data repos (ssh) ──────────────────────────────────────────
+    # assets (fonts, sfx, etc.); bump with `nix flake update dotfiles-assets`
     dotfiles-assets = {
-      url = "./assets";
+      url = "git+ssh://git@github.com/joegoldin/dotfiles-assets";
       flake = false;
     };
-    # secrets (domains, encrypted age files, etc.)
+    # secrets (domains, encrypted age files, etc.); private repo over ssh;
+    # bump with `nix flake update dotfiles-secrets`
     dotfiles-secrets = {
-      url = "./secrets";
+      url = "git+ssh://git@github.com/joegoldin/dotfiles-secrets";
       flake = false;
     };
 
@@ -60,14 +79,9 @@
       url = "github:joegoldin/claude-container";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # CIT200 desk phone — reactive dataflow engine
+    # CIT200 desk phone; reactive dataflow engine
     desk-phone = {
       url = "github:joegoldin/desk-phone-cit200";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    # game server management
-    pelican = {
-      url = "github:joegoldin/nix-pelican?rev=900716d90d01a27666d65c9c112acde4c725ae9f";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -83,18 +97,23 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.attic.follows = "attic";
     };
+    # game server management
+    pelican = {
+      url = "github:Hythera/nix-pelican";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # ── Nix utilities ──────────────────────────────────────────────────────
-    flake-utils.url = "github:numtide/flake-utils?ref=v1.0.0";
-    systems.url = "github:nix-systems/default?rev=da67096a3b9bf56a91d16901293e51ba5b49a27e";
+    flake-utils.url = "github:numtide/flake-utils";
+    systems.url = "github:nix-systems/default";
     # agenix
     agenix = {
-      url = "github:ryantm/agenix?rev=b027ee29d959fda4b60b57566d64c98a202e0feb";
+      url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # disko
     disko = {
-      url = "github:nix-community/disko?ref=v1.13.0";
+      url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # microVM runtime (for the `vm` CLI)
@@ -104,14 +123,14 @@
     };
     # secure boot
     lanzaboote = {
-      url = "github:nix-community/lanzaboote/v1.0.0";
+      url = "github:nix-community/lanzaboote";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # declarative flatpak management
-    nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=v0.7.0";
+    nix-flatpak.url = "github:gmodena/nix-flatpak";
     # pre-built nix-index database
     nix-index-database = {
-      url = "github:nix-community/nix-index-database?rev=1a2ea89c917781e88508d9fd2b507f2d2a0e173c";
+      url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # vfkit-based linux builder for nix-darwin (replaces the rosetta-builder)
@@ -121,14 +140,14 @@
     };
 
     # ── Development tools ──────────────────────────────────────────────────
-    devenv.url = "github:cachix/devenv?ref=v2.1.2";
-    nixpkgs-python.url = "github:cachix/nixpkgs-python?rev=5030393c8dfde39bddef22ef7e0415f687a96e8f";
-    git-hooks.url = "github:cachix/git-hooks.nix?rev=61ab0e80d9c7ab14c256b5b453d8b3fb0189ba0a";
+    devenv.url = "github:cachix/devenv";
+    nixpkgs-python.url = "github:cachix/nixpkgs-python";
+    git-hooks.url = "github:cachix/git-hooks.nix";
 
     # ── ML / GPU compute ────────────────────────────────────────────────────
     # tinygrad with ROCm/CUDA support
     tinygrad-nix = {
-      url = "github:joegoldin/tinygrad-nix?rev=99c52bfdc5108c08d26d3d379368f9abd9d96b4d";
+      url = "github:joegoldin/tinygrad-nix";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
@@ -136,78 +155,71 @@
     # ── Desktop / NixOS applications ───────────────────────────────────────
     # affinity apps
     affinity-nix = {
-      url = "github:mrshmllow/affinity-nix?rev=7f462d47a0cd86878ae3c2e9f2813a03d72935a0";
+      url = "github:mrshmllow/affinity-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Ghostty terminal
-    ghostty.url = "github:ghostty-org/ghostty?rev=69095e298ab88bb0eb5ba541f4c505f2c22d07f5";
+    ghostty.url = "github:ghostty-org/ghostty";
     # Zed editor (built from source via flake)
-    zed-editor.url = "github:zed-industries/zed?ref=v1.6.2-pre";
+    zed-editor.url = "github:zed-industries/zed";
     # Zed nix extension (fork with language injection for script bodies)
     zed-nix-ext = {
-      url = "github:joegoldin/nix";
+      url = "github:joegoldin/zed-extensions-nix";
       flake = false;
     };
     # KDE configuration
     plasma-manager = {
-      url = "github:nix-community/plasma-manager?rev=a524a6160e6df89f7673ba293cf7d78b559eb1a5";
+      url = "github:nix-community/plasma-manager";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
 
     # ── Claude / LLM tooling ───────────────────────────────────────────────
     # Claude Desktop for Linux.
-    # TEMP: pinned to DhanushSantosh's fork PR #666 head, which retargets
-    # the .asar trusted-folder guard injection to the `async
-    # addTrustedFolder(...) {` body. The old aaddrick rev (2ae2172a) failed
-    # to build Claude Desktop 1.9659.2 with "addTrustedFolder anchor not
-    # found". Revert to `aaddrick/claude-desktop-debian` main once
-    # https://github.com/aaddrick/claude-desktop-debian/pull/666 merges.
+    # TEMP-PINNED (the one exception to the no-URL-pins rule): HEAD's
+    # d2ce0466 bumps Claude Desktop to 1.12603.1, where the .asar --add-dir
+    # filter patch fails ("pattern matches 2 times"); no fix PR upstream
+    # yet. e85450c9 = last rev before the bump (app 1.11847.5, includes the
+    # PR #666 patch fix). Unpin once upstream builds again.
     claude-desktop-debian = {
-      url = "github:DhanushSantosh/claude-desktop-debian/8667552c3cc3991a9691ee44eeeaabc5b809bbc5";
+      url = "github:aaddrick/claude-desktop-debian/e85450c90ba38159f89f02bdd0f6c6d7e6bce065";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # LLM agent tools (claude-code, codex, antigravity)
-    llm-agents.url = "github:numtide/llm-agents.nix?rev=af2ff595989e83142d2abd0a81bf6e582b248058";
+    llm-agents.url = "github:numtide/llm-agents.nix";
     # declarative MCP server configuration
     mcps = {
-      url = "github:roman/mcps.nix?rev=25acc4f20f5928a379e80341c788d80af46474b1";
+      url = "github:roman/mcps.nix";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
-    # Agent skills + re-exported claude-nix, antigravity-cli-nix, codex-nix modules
+    # Agent skills + re-exported claude-nix, antigravity-cli-nix, codex-nix
+    # modules; over ssh; bump with `nix flake update agent-skills`
     agent-skills = {
-      url = "path:./agent-skills";
+      url = "git+ssh://git@github.com/joegoldin/agent-skills";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # ── Homebrew (macOS) ───────────────────────────────────────────────────
     nix-homebrew = {
-      url = "github:zhaofengli/nix-homebrew?rev=562332f97de9f5ba51aa647d70462e88222b2988";
+      url = "github:zhaofengli/nix-homebrew";
       inputs.brew-src.follows = "brew-src";
     };
-    # Homebrew itself, pinned past the 5.1.x releases: macOS 27 support
-    # (golden_gate: "27") is only on master — every release tag still tops out
-    # at tahoe/26 and raises `unknown or unsupported macOS version: :dunno`
-    # during `brew bundle`. Bump with `nix flake update brew-src`.
+    # Homebrew itself, tracking master: macOS 27 support (golden_gate: "27")
+    # is only on master; release tags top out at tahoe/26 and raise `unknown
+    # or unsupported macOS version: :dunno` during `brew bundle`.
     brew-src = {
-      url = "github:Homebrew/brew?rev=259096ec10414b11b01561706c1debb37e631ce8";
+      url = "github:Homebrew/brew";
       flake = false;
     };
     brew-nix = {
-      url = "github:BatteredBunny/brew-nix?rev=d40695006e0313d131c668d926d92c0fcd737e2a";
+      url = "github:BatteredBunny/brew-nix";
       inputs.brew-api.follows = "brew-api";
     };
     brew-api = {
       url = "github:BatteredBunny/brew-api";
       flake = false;
     };
-
-    # NOTE: mac-app-util (Spotlight/Dock trampolines for Nix-installed .apps)
-    # was removed: it's written in Common Lisp and SBCL (even 2.6.4) cannot
-    # mmap its dynamic space on macOS 27 ("failed to allocate ... at
-    # 0x300100000"). Casks live on Homebrew in /Applications anyway. Re-add
-    # once SBCL runs on macOS 27.
 
     # Official taps
     homebrew-core = {
@@ -230,711 +242,6 @@
     experimental-features = "nix-command flakes";
   };
 
-  outputs =
-    {
-      self,
-      nixpkgs,
-      home-manager,
-      nix-darwin,
-      systems,
-      git-hooks,
-      nix-homebrew,
-      disko,
-      agenix,
-      plasma-manager,
-      lanzaboote,
-      dotfiles-assets,
-      dotfiles-secrets,
-      pelican,
-      virby,
-      nix-flatpak,
-      nix-index-database,
-      ...
-    }@inputs:
-    let
-      inherit (self) outputs;
-      username = "joe";
-      useremail = "joe@joegold.in";
-      hostname = "${username}-nix";
-      homeDirectory = nixpkgs.lib.mkForce "/home/${username}";
-      stateVersion = "24.11";
-      overlaysModule = import ./hosts/common/system/overlays { inherit inputs; };
-      inherit (overlaysModule) unstableOverlays;
-      commonOverlays = builtins.attrValues self.overlays;
-      keys = import "${dotfiles-secrets}/keys.nix";
-      commonSpecialArgs = inputs // {
-        inherit
-          inputs
-          outputs
-          commonOverlays
-          useremail
-          stateVersion
-          username
-          hostname
-          homeDirectory
-          dotfiles-assets
-          dotfiles-secrets
-          keys
-          ;
-      };
-      eachSystem = nixpkgs.lib.genAttrs (import systems);
-      basePackages = eachSystem (
-        system:
-        let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = builtins.attrValues self.overlays;
-            config.allowUnfree = true;
-          };
-        in
-        import ./hosts/common/system/pkgs pkgs
-      );
-      additionalPackages = eachSystem (system: {
-        # devenv-up = self.devShells.${system}.default.config.procfileScript;
-      });
-    in
-    {
-      # Your custom packages
-      # Accessible through 'nix build', 'nix shell', etc
-      packages = eachSystem (system: basePackages.${system} // additionalPackages.${system});
-      formatter = eachSystem (system: inputs.nixpkgs-unstable.legacyPackages.${system}.nixfmt-tree);
-
-      # Your custom packages and modifications, exported as overlays
-      overlays = builtins.removeAttrs (import ./hosts/common/system/overlays { inherit inputs; }) [
-        "unstableOverlays"
-      ];
-
-      checks = eachSystem (system: {
-        pre-commit-check = git-hooks.lib.${system}.run {
-          src = ./.;
-          hooks = {
-            nixfmt.enable = true;
-            check-yaml.enable = true;
-            end-of-file-fixer.enable = true;
-            gitleaks = {
-              enable = true;
-              name = "gitleaks";
-              entry = "${nixpkgs.legacyPackages.${system}.gitleaks}/bin/gitleaks detect --source . -v";
-            };
-          };
-        };
-      });
-
-      devShells = eachSystem (system: {
-        default = nixpkgs.legacyPackages.${system}.mkShell {
-          inherit (self.checks.${system}.pre-commit-check) shellHook;
-          buildInputs = self.checks.${system}.pre-commit-check.enabledPackages;
-        };
-      });
-
-      # NixOS configuration entrypoint
-      nixosConfigurations = {
-        oracle-cloud-bastion = nixpkgs.lib.nixosSystem {
-          specialArgs = commonSpecialArgs // {
-            hostname = "bastion";
-          };
-          modules = [
-            disko.nixosModules.disko
-            nix-index-database.nixosModules.default
-            pelican.nixosModules.default
-            { nixpkgs.overlays = [ pelican.overlays.default ]; }
-            # > Our main nixos configuration <
-            ./hosts/oracle-cloud
-            home-manager.nixosModules.home-manager
-            (
-              { specialArgs, ... }:
-              {
-                home-manager = {
-                  useGlobalPkgs = true;
-                  useUserPackages = true;
-                  extraSpecialArgs = specialArgs;
-                  backupCommand = ''mv "$1" "$1.backup-$(date +%Y%m%d-%H%M%S)"''; # timestamped so reruns never collide
-                  users.${specialArgs.username} = import ./hosts/oracle-cloud/home-manager.nix;
-                };
-              }
-            )
-            agenix.nixosModules.default
-            (
-              { specialArgs, ... }:
-              {
-                age.secrets.cf = {
-                  file = "${dotfiles-secrets}/cf.json.age";
-                  mode = "655";
-                  owner = specialArgs.username;
-                  group = "users";
-                };
-                age.secrets.attic-netrc = {
-                  file = "${dotfiles-secrets}/attic-netrc.age";
-                  mode = "0400";
-                };
-                age.identityPaths = [ "/home/${specialArgs.username}/.ssh/id_ed25519" ];
-              }
-            )
-          ];
-        };
-
-        cloud-proxy = nixpkgs.lib.nixosSystem {
-          specialArgs = commonSpecialArgs // {
-            hostname = "cloud-proxy";
-          };
-          modules = [
-            disko.nixosModules.disko
-            nix-index-database.nixosModules.default
-            # > Our main nixos configuration <
-            ./hosts/cloud-proxy
-            home-manager.nixosModules.home-manager
-            (
-              { specialArgs, ... }:
-              {
-                home-manager = {
-                  useGlobalPkgs = true;
-                  useUserPackages = true;
-                  extraSpecialArgs = specialArgs;
-                  backupCommand = ''mv "$1" "$1.backup-$(date +%Y%m%d-%H%M%S)"'';
-                  users.${specialArgs.username} = import ./hosts/cloud-proxy/home-manager.nix;
-                };
-              }
-            )
-          ];
-        };
-
-        racknerd-cloud-agent = nixpkgs.lib.nixosSystem {
-          specialArgs = commonSpecialArgs // {
-            hostname = "racknerd-cloud-agent";
-          };
-          modules = [
-            disko.nixosModules.disko
-            nix-index-database.nixosModules.default
-            inputs.attic.nixosModules.atticd
-            # > Our main nixos configuration <
-            ./hosts/racknerd-cloud
-            home-manager.nixosModules.home-manager
-            (
-              { specialArgs, ... }:
-              {
-                home-manager = {
-                  useGlobalPkgs = true;
-                  useUserPackages = true;
-                  extraSpecialArgs = specialArgs;
-                  backupCommand = ''mv "$1" "$1.backup-$(date +%Y%m%d-%H%M%S)"''; # timestamped so reruns never collide
-                  users.${specialArgs.username} = import ./hosts/racknerd-cloud/home-manager.nix;
-                };
-              }
-            )
-            agenix.nixosModules.default
-            (
-              { specialArgs, ... }:
-              {
-                age.secrets.atticd-env = {
-                  file = "${dotfiles-secrets}/atticd.env.age";
-                  mode = "0400";
-                  owner = "root";
-                  group = "root";
-                };
-                age.identityPaths = [ "/home/${specialArgs.username}/.ssh/id_rsa" ];
-              }
-            )
-          ];
-        };
-
-        # Desktop NixOS configuration
-        joe-desktop = nixpkgs.lib.nixosSystem {
-          specialArgs = commonSpecialArgs // {
-            hostname = "joe-desktop";
-          };
-          modules = [
-            # ROCm support only on desktop (has AMD GPU)
-            # temporarily disabled — rocmSupport + vllm-rocm = 15h build
-            {
-              nixpkgs.overlays = [
-                (final: prev: {
-                  unstable = import inputs.nixpkgs-unstable {
-                    inherit (final.stdenv.hostPlatform) system;
-                    config = {
-                      allowUnfree = true;
-                      android_sdk.accept_license = true;
-                      # rocmSupport = true;
-                    };
-                    overlays = unstableOverlays;
-                    # overlays = unstableOverlays ++ [
-                    #   (import ./hosts/common/system/overlays/vllm-rocm.nix)
-                    # ];
-                  };
-                })
-              ];
-            }
-            nix-index-database.nixosModules.default
-            # > Our main nixos configuration <
-            ./hosts/nixos
-            home-manager.nixosModules.home-manager
-            (
-              { specialArgs, ... }:
-              {
-                home-manager = {
-                  useGlobalPkgs = true;
-                  useUserPackages = true;
-                  extraSpecialArgs = specialArgs;
-                  backupCommand = ''mv "$1" "$1.backup-$(date +%Y%m%d-%H%M%S)"''; # timestamped so reruns never collide
-                  sharedModules = [
-                    plasma-manager.homeModules.plasma-manager
-                    nix-flatpak.homeManagerModules.nix-flatpak
-                  ];
-                  users.${specialArgs.username} = import ./hosts/nixos/home-manager.nix;
-                };
-              }
-            )
-            nix-flatpak.nixosModules.nix-flatpak
-            inputs.nix-attic-infra.nixosModules.attic-post-build-hook
-            agenix.nixosModules.default
-            (
-              { specialArgs, ... }:
-              {
-                age.secrets.deepgram_api_key = {
-                  file = "${dotfiles-secrets}/deepgram_api_key.age";
-                  mode = "0400";
-                  owner = specialArgs.username;
-                };
-                age.secrets.pixeldrain_api_key = {
-                  file = "${dotfiles-secrets}/pixeldrain_api_key.age";
-                  mode = "0400";
-                  owner = specialArgs.username;
-                };
-                age.secrets.anthropic_api_key = {
-                  file = "${dotfiles-secrets}/anthropic_api_key.age";
-                  mode = "0400";
-                  owner = specialArgs.username;
-                };
-                age.secrets.elevenlabs_api_key = {
-                  file = "${dotfiles-secrets}/elevenlabs_api_key.age";
-                  mode = "0400";
-                  owner = specialArgs.username;
-                };
-                age.secrets.wakapi_api_key = {
-                  file = "${dotfiles-secrets}/wakapi_api_key.age";
-                  mode = "0400";
-                  owner = specialArgs.username;
-                };
-                age.secrets.attic-token = {
-                  file = "${dotfiles-secrets}/attic.token.age";
-                  mode = "0400";
-                  owner = specialArgs.username;
-                };
-                age.secrets.attic-netrc = {
-                  file = "${dotfiles-secrets}/attic-netrc.age";
-                  mode = "0400";
-                  owner = specialArgs.username;
-                };
-                age.secrets.atuin_key = {
-                  file = "${dotfiles-secrets}/atuin_key.age";
-                  mode = "0400";
-                  owner = specialArgs.username;
-                };
-              }
-            )
-            inputs.desk-phone.nixosModules.default
-            lanzaboote.nixosModules.lanzaboote
-          ];
-        };
-
-        # office-pc compute/training machine
-        office-pc = nixpkgs.lib.nixosSystem {
-          specialArgs = commonSpecialArgs // {
-            hostname = "office-pc";
-          };
-          modules = [
-            # ROCm support (AMD GPU)
-            {
-              nixpkgs.overlays = [
-                (final: prev: {
-                  unstable = import inputs.nixpkgs-unstable {
-                    inherit (final.stdenv.hostPlatform) system;
-                    config = {
-                      allowUnfree = true;
-                      rocmSupport = true;
-                    };
-                    overlays = unstableOverlays ++ [
-                      (import ./hosts/common/system/overlays/vllm-rocm.nix)
-                    ];
-                  };
-                })
-              ];
-            }
-            disko.nixosModules.disko
-            nix-index-database.nixosModules.default
-            ./hosts/office-pc
-            home-manager.nixosModules.home-manager
-            (
-              { specialArgs, ... }:
-              {
-                home-manager = {
-                  useGlobalPkgs = true;
-                  useUserPackages = true;
-                  extraSpecialArgs = specialArgs;
-                  backupCommand = ''mv "$1" "$1.backup-$(date +%Y%m%d-%H%M%S)"'';
-                  sharedModules = [
-                    plasma-manager.homeModules.plasma-manager
-                  ];
-                  users.${specialArgs.username} = import ./hosts/office-pc/home-manager.nix;
-                };
-              }
-            )
-            inputs.nix-attic-infra.nixosModules.attic-post-build-hook
-            agenix.nixosModules.default
-            (
-              { specialArgs, ... }:
-              {
-                age.secrets.deepgram_api_key = {
-                  file = "${dotfiles-secrets}/deepgram_api_key.age";
-                  mode = "0400";
-                  owner = specialArgs.username;
-                };
-                age.secrets.pixeldrain_api_key = {
-                  file = "${dotfiles-secrets}/pixeldrain_api_key.age";
-                  mode = "0400";
-                  owner = specialArgs.username;
-                };
-                age.secrets.anthropic_api_key = {
-                  file = "${dotfiles-secrets}/anthropic_api_key.age";
-                  mode = "0400";
-                  owner = specialArgs.username;
-                };
-                age.secrets.attic-token = {
-                  file = "${dotfiles-secrets}/attic.token.age";
-                  mode = "0400";
-                  owner = specialArgs.username;
-                };
-                age.secrets.attic-netrc = {
-                  file = "${dotfiles-secrets}/attic-netrc.age";
-                  mode = "0400";
-                  owner = specialArgs.username;
-                };
-              }
-            )
-            lanzaboote.nixosModules.lanzaboote
-          ];
-        };
-
-        # Steam Deck with Jovian NixOS
-        joe-steamdeck = nixpkgs.lib.nixosSystem {
-          specialArgs = commonSpecialArgs // {
-            hostname = "joe-steamdeck";
-          };
-          modules = [
-            inputs.jovian-nixos.nixosModules.default
-            nix-index-database.nixosModules.default
-            ./hosts/steamdeck
-            home-manager.nixosModules.home-manager
-            (
-              { specialArgs, ... }:
-              {
-                home-manager = {
-                  useGlobalPkgs = true;
-                  useUserPackages = true;
-                  extraSpecialArgs = specialArgs;
-                  backupCommand = ''mv "$1" "$1.backup-$(date +%Y%m%d-%H%M%S)"'';
-                  sharedModules = [
-                    plasma-manager.homeModules.plasma-manager
-                    inputs.nix-attic-infra.homeManagerModules.attic-client
-                  ];
-                  users.${specialArgs.username} = import ./hosts/steamdeck/home-manager.nix;
-                };
-              }
-            )
-            inputs.nix-attic-infra.nixosModules.attic-post-build-hook
-            agenix.nixosModules.default
-            (
-              { specialArgs, ... }:
-              {
-                age.secrets.attic-netrc = {
-                  file = "${dotfiles-secrets}/attic-netrc.age";
-                  mode = "0400";
-                  owner = specialArgs.username;
-                };
-                age.secrets.attic-token = {
-                  file = "${dotfiles-secrets}/attic.token.age";
-                  mode = "0400";
-                  owner = specialArgs.username;
-                };
-              }
-            )
-          ];
-        };
-
-        # Installer ISO for office-pc
-        office-pc-installer =
-          let
-            targetSystem = self.nixosConfigurations.office-pc;
-            targetToplevel = targetSystem.config.system.build.toplevel;
-            targetDisko = targetSystem.config.system.build.diskoScript;
-            # Collect all flake input sources for offline evaluation
-            allInputs = nixpkgs.lib.collect (x: x ? outPath) self.inputs;
-          in
-          nixpkgs.lib.nixosSystem {
-            modules = [
-              "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-calamares-plasma6.nix"
-              disko.nixosModules.disko
-              ./hosts/office-pc/disk-config.nix
-              (
-                { pkgs, ... }:
-                {
-                  nixpkgs.hostPlatform = "x86_64-linux";
-                  networking.wireless.enable = nixpkgs.lib.mkForce false;
-                  networking.networkmanager.enable = true;
-
-                  # Disable Calamares installer autostart
-                  environment.etc."xdg/autostart/calamares.desktop".text = ''
-                    [Desktop Entry]
-                    Type=Application
-                    Name=Calamares
-                    Hidden=true
-                  '';
-
-                  # Enable flakes
-                  nix.settings.experimental-features = [
-                    "nix-command"
-                    "flakes"
-                  ];
-
-                  # Disable sleep/suspend/screen-off on live ISO
-                  services.logind.settings.Login.HandleLidSwitch = "ignore";
-                  systemd.targets.sleep.enable = false;
-                  systemd.targets.suspend.enable = false;
-                  systemd.targets.hibernate.enable = false;
-                  systemd.targets.hybrid-sleep.enable = false;
-                  environment.etc."xdg/powerdevilrc".text = ''
-                    [AC][DPMSControl]
-                    idleTimeout=0
-                    lockBeforeTurnOff=0
-                    [AC][SuspendAndShutdown]
-                    AutoSuspendAction=0
-                    PowerButtonAction=0
-                  '';
-                  services.logind.settings.Login = {
-                    IdleAction = "ignore";
-                    HandlePowerKey = "ignore";
-                  };
-
-                  # Auto-launch install-office-pc in Konsole
-                  environment.etc."xdg/autostart/install-office-pc.desktop".text = ''
-                    [Desktop Entry]
-                    Type=Application
-                    Name=Install Office PC
-                    Exec=kstart5 konsole -e install-office-pc
-                    X-KDE-autostart-phase=2
-                  '';
-
-                  environment.systemPackages = [
-                    pkgs.git
-                    pkgs.gh
-                    disko.packages.x86_64-linux.disko
-                    pkgs.sbctl
-                    pkgs.openssl
-                    pkgs.qrencode
-                    pkgs.kdePackages.kde-cli-tools
-                    (pkgs.writeShellScriptBin "install-office-pc" ''
-                      LOGFILE="/tmp/install-office-pc.log"
-                      exec > >(tee -a "$LOGFILE") 2>&1
-
-                      on_error() {
-                        echo ""
-                        echo "========================================"
-                        echo "  INSTALLATION FAILED"
-                        echo "  Log saved to: $LOGFILE"
-                        echo "========================================"
-                        echo ""
-                        if findmnt /mnt &>/dev/null; then
-                          sudo cp "$LOGFILE" /mnt/var/log/install-office-pc.log 2>/dev/null || true
-                          echo "  Log also saved to /mnt/var/log/install-office-pc.log"
-                        fi
-                        echo ""
-                        echo "Press Enter to close..."
-                        read -r
-                        exit 1
-                      }
-                      trap on_error ERR
-
-                      set -euo pipefail
-
-                      pkill -f calamares 2>/dev/null || true
-
-                      header() {
-                        echo ""
-                        echo "========================================"
-                        echo "  $1"
-                        echo "========================================"
-                        echo ""
-                      }
-
-                      header "Step 1/5: LUKS Password"
-                      read -s -p "Enter LUKS password: " LUKS_PASS
-                      echo
-                      read -s -p "Confirm LUKS password: " LUKS_PASS2
-                      echo
-                      if [ "$LUKS_PASS" != "$LUKS_PASS2" ]; then
-                        echo "Passwords do not match!"
-                        exit 1
-                      fi
-                      echo "$LUKS_PASS" > /tmp/luks-password
-
-                      header "Step 2/5: Generate Secure Boot Keys"
-                      SBKEYS_TMP=/tmp/sbctl-keys
-                      sudo mkdir -p "$SBKEYS_TMP"/{PK,KEK,db}
-                      for name in PK KEK db; do
-                        echo "  Generating $name key..."
-                        sudo openssl req -new -x509 -subj "/CN=$name/" -days 3650 -nodes \
-                          -newkey rsa:4096 -sha256 \
-                          -keyout "$SBKEYS_TMP/$name/$name.key" -out "$SBKEYS_TMP/$name/$name.pem" 2>/dev/null
-                      done
-                      echo "Secure Boot keys generated."
-
-                      header "Step 3/5: Install NixOS (offline disko-install)"
-                      echo "All store paths are baked into this ISO — no network needed."
-                      echo "Target system: ${targetToplevel}"
-                      echo ""
-                      sudo disko-install \
-                        --flake "${self}#office-pc" \
-                        --disk main /dev/nvme1n1 \
-                        --write-efi-boot-entries \
-                        --extra-files "$SBKEYS_TMP" /var/lib/sbctl/keys
-
-                      rm -f /tmp/luks-password
-                      echo "disko-install succeeded."
-
-                      header "Step 4/5: Set User Password"
-                      echo "Re-mounting installed system..."
-                      # disko-install may unmount after finishing — re-mount for password step
-                      if ! findmnt /mnt &>/dev/null; then
-                        sudo cryptsetup open /dev/disk/by-partlabel/disk-main-luks cryptroot 2>/dev/null || true
-                        sudo vgchange -ay 2>/dev/null || true
-                        sudo mount /dev/pool/root /mnt
-                        sudo mount /dev/disk/by-partlabel/disk-main-ESP /mnt/boot
-                      fi
-
-                      echo "Set password for ${username}:"
-                      if sudo nixos-enter --root /mnt -- passwd ${username}; then
-                        echo "Password set successfully."
-                      else
-                        echo "nixos-enter failed, trying chroot..."
-                        sudo chroot /mnt /bin/sh -c "echo '${username}:changeme' | chpasswd"
-                        echo "Password set to 'changeme' — change it after first login!"
-                      fi
-
-                      sudo mkdir -p /mnt/var/log
-                      sudo cp "$LOGFILE" /mnt/var/log/install-office-pc.log 2>/dev/null || true
-
-                      header "Step 5/5: Done!"
-                      echo "Rebooting in 10 seconds... (Ctrl+C to cancel)"
-                      for i in $(seq 10 -1 1); do
-                        printf "\r  %d..." "$i"
-                        sleep 1
-                      done
-                      echo ""
-                      sudo reboot
-                    '')
-                  ];
-
-                  # Force the target system closure into the ISO by referencing it
-                  # This makes nix include all store paths in the squashfs
-                  # Bake the target system closure and all flake inputs into the ISO
-                  isoImage.storeContents = [
-                    targetToplevel
-                    targetDisko
-                  ]
-                  ++ allInputs;
-                }
-              )
-            ];
-          };
-      };
-
-      # Darwin/macOS configuration entrypoint
-      # Available through 'darwin-rebuild --flake .#Joes-MacBook-Pro'
-      darwinConfigurations = {
-        Joes-MacBook-Pro = nix-darwin.lib.darwinSystem {
-          specialArgs = commonSpecialArgs // {
-            username = "joe";
-            hostname = "Joes-MacBook-Pro";
-            homeDirectory = nixpkgs.lib.mkForce "/Users/joe";
-          };
-          modules = [
-            # > Our main darwin configuration <
-            ./hosts/darwin
-            nix-index-database.darwinModules.default
-            nix-homebrew.darwinModules.nix-homebrew
-            # vfkit-based Linux builder (enabled below, currently kept off for bootstrap)
-            virby.darwinModules.default
-            home-manager.darwinModules.home-manager
-            (
-              { specialArgs, ... }:
-              {
-                home-manager = {
-                  useGlobalPkgs = true;
-                  useUserPackages = true;
-                  extraSpecialArgs = specialArgs;
-                  backupCommand = ''mv "$1" "$1.backup-$(date +%Y%m%d-%H%M%S)"''; # timestamped so reruns never collide
-                  users.joe.imports = [
-                    ./hosts/darwin/home-manager.nix
-                  ];
-                };
-              }
-            )
-            agenix.darwinModules.default
-            (
-              { specialArgs, ... }:
-              {
-                age.identityPaths = [ "/var/lib/agenix/identity" ];
-                age.secrets.attic-netrc = {
-                  file = "${dotfiles-secrets}/attic-netrc.age";
-                  mode = "0400";
-                  owner = specialArgs.username;
-                };
-                age.secrets.attic-token = {
-                  file = "${dotfiles-secrets}/attic.token.age";
-                  mode = "0400";
-                  owner = specialArgs.username;
-                };
-                age.secrets.wakapi_api_key = {
-                  file = "${dotfiles-secrets}/wakapi_api_key.age";
-                  mode = "0400";
-                };
-                age.secrets.atuin_key = {
-                  file = "${dotfiles-secrets}/atuin_key.age";
-                  mode = "0400";
-                  owner = specialArgs.username;
-                };
-                age.secrets.deepgram_api_key = {
-                  file = "${dotfiles-secrets}/deepgram_api_key.age";
-                  mode = "0400";
-                  owner = specialArgs.username;
-                };
-                age.secrets.pixeldrain_api_key = {
-                  file = "${dotfiles-secrets}/pixeldrain_api_key.age";
-                  mode = "0400";
-                  owner = specialArgs.username;
-                };
-                age.secrets.elevenlabs_api_key = {
-                  file = "${dotfiles-secrets}/elevenlabs_api_key.age";
-                  mode = "0400";
-                  owner = specialArgs.username;
-                };
-              }
-            )
-            {
-              # vfkit-based Linux builder. The stock nix.linux-builder is kept off;
-              # it was only used to bootstrap this rebuild (it builds virby's VM
-              # image, then virby takes over as the aarch64-/x86_64-linux builder).
-              nix.linux-builder.enable = false;
-              services.virby = {
-                enable = true;
-                # Start the VM on demand and power it down after idle (parity with
-                # the old rosetta-builder onDemand setup).
-                onDemand.enable = true;
-                # Build x86_64-linux via Rosetta translation (aarch64-darwin only).
-                rosetta = true;
-              };
-            }
-          ];
-        };
-      };
-    };
+  # The dendritic entry point: everything else lives in modules/.
+  outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./modules);
 }
