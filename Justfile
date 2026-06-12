@@ -26,14 +26,14 @@ switch *args="": (_nh-os "switch" args)
 [macos]
 build *args="": (_nh-darwin "build" args)
 
-# Build and activate immediately
-[macos]
-switch *args="": (_nh-darwin "switch" args)
-
 [macos]
 boot *args="":
     @echo "❌  nix-darwin has no boot activation; use just build or just switch"
     @exit 1
+
+# Build and activate immediately
+[macos]
+switch *args="": (_nh-darwin "switch" args)
 
 [private]
 [linux]
