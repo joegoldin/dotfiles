@@ -16,8 +16,9 @@ uses [den](https://github.com/denful/den) as the engine, and wires in
 | `oracle-cloud-bastion` (hostName `bastion`) | Oracle Cloud                    | pelican game servers, tailnet entry |
 | `racknerd-cloud-agent`                      | VPS                             | attic binary cache server           |
 
-Day-to-day: `just build` / `just switch` (see the Justfile), or `nh os
-switch` directly. Secrets (agenix), agent-skills, and assets are personal
+Day-to-day: `just build` (despite the name it builds and switches, via
+`nh os switch`); build without activating with `nh os build` or
+`nix build .#nixosConfigurations.<host>.config.system.build.toplevel`. Secrets (agenix), agent-skills, and assets are personal
 repos fetched as flake inputs over ssh.
 
 ## The big picture
