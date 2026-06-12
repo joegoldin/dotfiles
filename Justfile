@@ -255,12 +255,6 @@ update-python-packages:
     @scripts/update-python-packages.sh --no-build
     @echo "✅  Python packages updated!"
 
-[unix]
-update-node-packages:
-    @echo "🔄  Updating Node packages..."
-    @scripts/update-node-packages.sh
-    @echo "✅  Node packages updated!"
-
 # ── Maintenance ──────────────────────────────────────────────────────────
 
 [unix]
