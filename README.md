@@ -17,9 +17,9 @@ with [den](https://github.com/denful/den) as the engine and
 | `racknerd-cloud-agent` | VPS | attic binary cache server |
 
 Day-to-day: `just build` / `just switch` (see the Justfile), or `nh os
-switch` directly. Secrets live in the `secrets/` submodule (agenix);
-assets, snippets, and agent-skills are submodules too — clone with
-`--recurse-submodules`.
+switch` directly. Secrets (agenix) and agent-skills are private flake
+inputs fetched over ssh; `assets/` is the one remaining submodule —
+clone with `--recurse-submodules`.
 
 ## The big picture
 

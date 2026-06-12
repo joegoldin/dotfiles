@@ -1,4 +1,4 @@
-{ ... }:
+{ inputs, ... }:
 {
   den.aspects.joe-desktop.nixos =
     {
@@ -11,7 +11,7 @@
     in
     {
       age.secrets.nut-upsmon-password = {
-        file = ../../../secrets/nut-upsmon-password.age;
+        file = "${inputs.dotfiles-secrets}/nut-upsmon-password.age";
         mode = "0400";
       };
 

@@ -65,14 +65,18 @@
         ]
       },
       "locked": {
-        "path": "./agent-skills",
-        "type": "path"
+        "lastModified": 1781030112,
+        "narHash": "sha256-2gfNHw7THKnOzmugYzwX1MZEPFKUZoJCLOveYUultwU=",
+        "ref": "refs/heads/main",
+        "rev": "31ab4fa5dae9daef53e8f0906c7caaa32108a7ac",
+        "revCount": 99,
+        "type": "git",
+        "url": "ssh://git@github.com/joegoldin/agent-skills"
       },
       "original": {
-        "path": "./agent-skills",
-        "type": "path"
-      },
-      "parent": []
+        "type": "git",
+        "url": "ssh://git@github.com/joegoldin/agent-skills"
+      }
     },
     "agent-skills_2": {
       "inputs": {
@@ -963,14 +967,18 @@
     "dotfiles-secrets": {
       "flake": false,
       "locked": {
-        "path": "./secrets",
-        "type": "path"
+        "lastModified": 1781072456,
+        "narHash": "sha256-iLr/K8nIclgFPXu+O6w4jtjOl49Embzn5rwiP3Q0uhs=",
+        "ref": "refs/heads/main",
+        "rev": "b20a3b9f59786ec7ae4b7920c177489a14152a12",
+        "revCount": 132,
+        "type": "git",
+        "url": "ssh://git@github.com/joegoldin/dotfiles-secrets"
       },
       "original": {
-        "path": "./secrets",
-        "type": "path"
-      },
-      "parent": []
+        "type": "git",
+        "url": "ssh://git@github.com/joegoldin/dotfiles-secrets"
+      }
     },
     "drowse": {
       "inputs": {

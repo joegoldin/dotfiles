@@ -63,9 +63,10 @@
       url = "./assets";
       flake = false;
     };
-    # secrets (domains, encrypted age files, etc.)
+    # secrets (domains, encrypted age files, etc.) — private repo over ssh;
+    # bump with `nix flake update dotfiles-secrets`
     dotfiles-secrets = {
-      url = "./secrets";
+      url = "git+ssh://git@github.com/joegoldin/dotfiles-secrets";
       flake = false;
     };
 
@@ -195,9 +196,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
-    # Agent skills + re-exported claude-nix, antigravity-cli-nix, codex-nix modules
+    # Agent skills + re-exported claude-nix, antigravity-cli-nix, codex-nix
+    # modules — over ssh; bump with `nix flake update agent-skills`
     agent-skills = {
-      url = "path:./agent-skills";
+      url = "git+ssh://git@github.com/joegoldin/agent-skills";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
