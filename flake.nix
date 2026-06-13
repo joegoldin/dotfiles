@@ -54,6 +54,14 @@
       url = "github:Jovian-Experiments/Jovian-NixOS";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # NixOS on Raspberry Pi: kernel, firmware, bootloader, sd-image, optimized
+    # vendor packages (libcamera, ffmpeg). Tracks develop; follows our nixpkgs
+    # so the Pi builds on nixos-26.05 (its cachix kernel won't match, so the
+    # kernel builds from source — fine, built natively on the Mac via virby).
+    nixos-raspberrypi = {
+      url = "github:nvmd/nixos-raspberrypi/develop";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # ── Personal data repos (ssh) ──────────────────────────────────────────
     # assets (fonts, sfx, etc.); bump with `nix flake update dotfiles-assets`
