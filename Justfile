@@ -186,6 +186,72 @@ write-iso device="":
     SECS=$(( ELAPSED % 60 ))
     echo "✅  ISO written to $DEV in ${MINS}m${SECS}s"
 
+# ── Raspberry Pi SD image (crawler) ────────────────────────────────────────
+
+# Cross-builds aarch64 via binfmt on x86_64; builds natively on aarch64.
+# --accept-flake-config trusts the nixos-raspberrypi cachix substituter.
+# Build the crawler SD-card image (uncompressed .img)
+[unix]
+build-crawler-image:
+    @echo "🔨  Building crawler SD image (aarch64; builds the rpi kernel if not cached)..."
+    @nix build .#nixosConfigurations.crawler.config.system.build.sdImage --accept-flake-config --log-format internal-json -v |& nom --json
+    @echo "✅  Image built: $(ls result/sd-image/*.img)"
+
+# Inject the pre-generated SSH host key into the image's ext4 root, then flash
+# to an SD card. The injected /etc/ssh/ssh_host_ed25519_key is the agenix
+# identity used to decrypt wifi/attic on first boot (Linux host required — ext4).
+# Usage: just write-crawler-image /dev/sdX [keyfile]   (keyfile defaults to ./crawler_host_ed25519)
+[confirm("This will ERASE the target device. Continue?")]
+[linux]
+write-crawler-image device="" key="crawler_host_ed25519":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    IMG=$(ls result/sd-image/*.img 2>/dev/null | head -1)
+    if [ -z "$IMG" ]; then
+      echo "No image found. Run 'just build-crawler-image' first."
+      exit 1
+    fi
+    KEY="{{ key }}"
+    if [ ! -f "$KEY" ] || [ ! -f "$KEY.pub" ]; then
+      echo "Host key '$KEY'(.pub) not found."
+      echo "Generate it: ssh-keygen -t ed25519 -f $KEY -N '' -C 'root@crawler'"
+      exit 1
+    fi
+    DEV="{{ device }}"
+    if [ -z "$DEV" ]; then
+      echo "Usage: just write-crawler-image /dev/sdX [keyfile]"
+      exit 1
+    fi
+    DEV=$(echo "$DEV" | sed 's/[0-9]*$//')
+
+    # Work on a writable copy (the nix store result is read-only).
+    WORK=$(mktemp --suffix=.img /tmp/crawler-XXXXXX)
+    echo "Copying image -> $WORK"
+    cp --reflink=auto "$IMG" "$WORK"
+
+    # Loop-mount the ext4 root (partition 2) and drop in the host key.
+    LOOP=$(sudo losetup -fP --show "$WORK")
+    MNT=$(mktemp -d)
+    sudo mount "${LOOP}p2" "$MNT"
+    sudo mkdir -p "$MNT/etc/ssh"
+    sudo install -m 600 -o 0 -g 0 "$KEY"     "$MNT/etc/ssh/ssh_host_ed25519_key"
+    sudo install -m 644 -o 0 -g 0 "$KEY.pub" "$MNT/etc/ssh/ssh_host_ed25519_key.pub"
+    sync
+    sudo umount "$MNT"; rmdir "$MNT"
+    sudo losetup -d "$LOOP"
+
+    # Flash.
+    for part in $(lsblk -ln -o NAME "$DEV" | tail -n +2); do
+      if findmnt "/dev/$part" &>/dev/null; then
+        echo "Unmounting /dev/$part..."
+        sudo umount "/dev/$part" || true
+      fi
+    done
+    echo "Writing $WORK -> $DEV (host key injected)"
+    sudo dd if="$WORK" of="$DEV" bs=4M status=progress oflag=sync
+    rm -f "$WORK"
+    echo "✅  crawler image written to $DEV"
+
 # ── Secrets & packages ─────────────────────────────────────────────────────
 
 # Manage agenix secrets (add/edit/remove/decrypt/rekey/list)
