@@ -12,23 +12,18 @@ in
   den.aspects.crawler.nixos =
     { pkgs, ... }:
     {
-      # config.txt: i2c_arm/spi are dtparams (dtparam=…=on); enable_uart is a
-      # top-level option (enable_uart=1). Schema per nixos-raspberrypi
-      # modules/configtxt.nix.
-      hardware.raspberry-pi.config.all = {
-        base-dt-params = {
-          i2c_arm = {
-            enable = true;
-            value = "on";
-          };
-          spi = {
-            enable = true;
-            value = "on";
-          };
-        };
-        options.enable_uart = {
+      # config.txt: i2c_arm/spi are dtparams (dtparam=…=on). Schema per
+      # nixos-raspberrypi modules/configtxt.nix. UART is already enabled by the
+      # board base module (raspberrypi.nix sets enable_uart=true), so we don't
+      # redefine it here — doing so collides on that scalar option.
+      hardware.raspberry-pi.config.all.base-dt-params = {
+        i2c_arm = {
           enable = true;
-          value = 1;
+          value = "on";
+        };
+        spi = {
+          enable = true;
+          value = "on";
         };
       };
 
