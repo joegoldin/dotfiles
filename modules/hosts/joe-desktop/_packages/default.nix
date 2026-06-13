@@ -39,6 +39,7 @@ let
       unstable.obsidian
       unstable.parsec-bin
       qdirstat # graphical disk usage analyzer
+      remmina # remote desktop client
       unstable.slack
       sublime-merge
       (unstable.unityhub.override {
