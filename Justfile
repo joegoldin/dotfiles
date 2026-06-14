@@ -197,13 +197,15 @@ build-crawler-image:
     @nix build .#nixosConfigurations.crawler.config.system.build.sdImage --accept-flake-config --log-format internal-json -v |& nom --json
     @echo "✅  Image built: $(ls result/sd-image/*.img)"
 
-# Inject the pre-generated SSH host key into the image's ext4 root, then flash
-# to an SD card. The injected /etc/ssh/ssh_host_ed25519_key is the agenix
-# identity used to decrypt wifi/attic on first boot (Linux host required — ext4).
-# Usage: just write-crawler-image /dev/sdX [keyfile]   (keyfile defaults to ./crawler_host_ed25519)
-[confirm("This will ERASE the target device. Continue?")]
+# Bake the pre-generated SSH host key into the built image's ext4 root and emit
+# a standalone, ready-to-flash .img — no block device is touched. Must run on a
+# Linux host (ext4 can't be mounted on macOS). Copy the result to your Mac and
+# write it with Raspberry Pi Imager / Balena Etcher / dd.
+# The injected /etc/ssh/ssh_host_ed25519_key is the agenix identity that decrypts
+# wifi/attic on first boot.
+# Usage: just bake-crawler-image [keyfile] [out.img]   (defaults: ./crawler_host_ed25519, ./crawler-sd.img)
 [linux]
-write-crawler-image device="" key="crawler_host_ed25519":
+bake-crawler-image key="crawler_host_ed25519" out="crawler-sd.img":
     #!/usr/bin/env bash
     set -euo pipefail
     IMG=$(ls result/sd-image/*.img 2>/dev/null | head -1)
@@ -217,20 +219,16 @@ write-crawler-image device="" key="crawler_host_ed25519":
       echo "Generate it: ssh-keygen -t ed25519 -f $KEY -N '' -C 'root@crawler'"
       exit 1
     fi
-    DEV="{{ device }}"
-    if [ -z "$DEV" ]; then
-      echo "Usage: just write-crawler-image /dev/sdX [keyfile]"
-      exit 1
-    fi
-    DEV=$(echo "$DEV" | sed 's/[0-9]*$//')
+    OUT="{{ out }}"
 
-    # Work on a writable copy (the nix store result is read-only).
-    WORK=$(mktemp --suffix=.img /tmp/crawler-XXXXXX)
-    echo "Copying image -> $WORK"
-    cp --reflink=auto "$IMG" "$WORK"
+    # Copy the store image to a writable, user-owned file (store result is 0444).
+    echo "Copying image -> $OUT"
+    cp --reflink=auto "$IMG" "$OUT"
+    chmod u+w "$OUT"
 
-    # Loop-mount the ext4 root (partition 2) and drop in the host key.
-    LOOP=$(sudo losetup -fP --show "$WORK")
+    # Inject the host key into the ext4 root (partition 2). Only the ext4 inside
+    # the .img is modified; $OUT stays owned by you.
+    LOOP=$(sudo losetup -fP --show "$OUT")
     MNT=$(mktemp -d)
     sudo mount "${LOOP}p2" "$MNT"
     sudo mkdir -p "$MNT/etc/ssh"
@@ -240,17 +238,12 @@ write-crawler-image device="" key="crawler_host_ed25519":
     sudo umount "$MNT"; rmdir "$MNT"
     sudo losetup -d "$LOOP"
 
-    # Flash.
-    for part in $(lsblk -ln -o NAME "$DEV" | tail -n +2); do
-      if findmnt "/dev/$part" &>/dev/null; then
-        echo "Unmounting /dev/$part..."
-        sudo umount "/dev/$part" || true
-      fi
-    done
-    echo "Writing $WORK -> $DEV (host key injected)"
-    sudo dd if="$WORK" of="$DEV" bs=4M status=progress oflag=sync
-    rm -f "$WORK"
-    echo "✅  crawler image written to $DEV"
+    SIZE=$(du -h "$OUT" | cut -f1)
+    echo "✅  Ready: $OUT (${SIZE}) — host key injected."
+    echo "   Copy it to your Mac and write to the SD card, e.g.:"
+    echo "     • Raspberry Pi Imager / Balena Etcher → choose 'Use custom' → $OUT"
+    echo "     • or on macOS:  diskutil list   →   diskutil unmountDisk /dev/diskN"
+    echo "                     sudo dd if=$OUT of=/dev/rdiskN bs=4m   (rdiskN = raw, faster)"
 
 # ── Secrets & packages ─────────────────────────────────────────────────────
 
