@@ -20,7 +20,24 @@ in
       den.aspects.attic # binary-cache substituter + hm attic-client
       den.aspects.numtide-cache
       den.aspects.shell-tools # direnv, skim, zellij (lean)
+      den.aspects.claude # Claude Code (claude-nix) + agent-skills
     ];
+
+    # Claude only — we do NOT want the codex/antigravity binaries here. But the
+    # shared agent-skills module's per-agent MCP fan-out references the
+    # programs.codex-nix / programs.antigravity-cli-nix option *paths*
+    # (mkIf can't suppress a missing option path), so importing just the claude
+    # aspect errors with "option does not exist". Import those two agents'
+    # home-manager modules to DECLARE their options (programs stay disabled by
+    # default, so nothing is installed), which satisfies the fan-out.
+    homeManager =
+      { ... }:
+      {
+        imports = [
+          inputs.agent-skills.homeManagerModules.codex
+          inputs.agent-skills.homeManagerModules.antigravity
+        ];
+      };
 
     nixos =
       { lib, ... }:
