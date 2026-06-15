@@ -86,6 +86,11 @@ in
 
       programs.atuin = import ./_atuin.nix { inherit pkgs config dotfiles-secrets; };
 
+      # The grc.fish plugin (see _plugins.nix) shells out to `grc`; ship the
+      # binary with the fish aspect so it's present on lean hosts too (otherwise
+      # fish prints a "grc not found" warning on startup).
+      home.packages = [ pkgs.grc ];
+
       # Symlink the Nix-built fish-ai Python env to where the plugin expects it
       xdg.dataFile."fish-ai".source = fishAiPythonWrapped;
 
