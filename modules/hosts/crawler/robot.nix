@@ -66,7 +66,7 @@ in
         sox # play/rec — speaker enable anti-pop + tone playback
         alsa-utils # aplay/amixer/speaker-test
         espeak-ng # TTS engine
-        svox # pico2wave — robot_hat's default TTS engine
+        picotts # pico2wave — robot_hat's default TTS engine (was svox)
         libraspberrypi # raspi-gpio (toggle the speaker-enable pin) + vcgencmd
         libgpiod # gpioset/gpiodetect for manual GPIO poking
 
