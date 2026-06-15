@@ -83,11 +83,18 @@
         serviceConfig = {
           Type = "oneshot";
           RemainAfterExit = true;
-          # raspi-gpio set 20 op dh  -> drive GPIO20 as output, high.
-          ExecStart = [
-            "${pkgs.libraspberrypi}/bin/raspi-gpio set 20 op dh"
-            "-${pkgs.sox}/bin/play -q -n trim 0.0 0.5"
-          ];
+          # Best-effort, never fails activation. `pinctrl set 20 op dh` drives
+          # BCM20 high (pinctrl is the modern RPi GPIO tool; raspi-gpio is
+          # deprecated and errors on recent kernels). The I2S card only appears
+          # after the hifiberry-dac overlay loads (post-reboot), so the anti-pop
+          # tone is gated on it. robot_hat.enable_speaker() also asserts the pin
+          # on demand, so a miss here is harmless.
+          ExecStart = pkgs.writeShellScript "robot-hat-speaker-enable" ''
+            ${pkgs.raspberrypi-utils}/bin/pinctrl set 20 op dh || true
+            if ${pkgs.alsa-utils}/bin/aplay -l 2>/dev/null | ${pkgs.gnugrep}/bin/grep -qi sndrpihifiberry; then
+              ${pkgs.sox}/bin/play -q -n trim 0.0 0.5 >/dev/null 2>&1 || true
+            fi
+          '';
         };
       };
     };

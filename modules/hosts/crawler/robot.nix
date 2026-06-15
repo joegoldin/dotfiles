@@ -67,7 +67,8 @@ in
         alsa-utils # aplay/amixer/speaker-test
         espeak-ng # TTS engine
         picotts # pico2wave — robot_hat's default TTS engine (was svox)
-        libraspberrypi # raspi-gpio (toggle the speaker-enable pin) + vcgencmd
+        raspberrypi-utils # pinctrl (speaker-enable pin; modern raspi-gpio replacement)
+        libraspberrypi # vcgencmd (temp/throttle), raspistill legacy
         libgpiod # gpioset/gpiodetect for manual GPIO poking
 
         (python3.withPackages (
