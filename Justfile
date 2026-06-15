@@ -272,6 +272,8 @@ bake-crawler-image out="crawler-sd.img" img="" item="Crawler RasPi Nixos SSH Key
     echo "ext4 root partition at byte offset $OFF — injecting host key via debugfs"
 
     # debugfs from e2fsprogs; use it from PATH if present, else from nixpkgs.
+    # DEBUGFS_PAGER=cat stops debugfs piping output through a pager (no q prompt).
+    export DEBUGFS_PAGER=cat
     DEBUGFS=(debugfs)
     command -v debugfs >/dev/null 2>&1 || DEBUGFS=(nix shell nixpkgs#e2fsprogs -c debugfs)
 
@@ -295,13 +297,24 @@ bake-crawler-image out="crawler-sd.img" img="" item="Crawler RasPi Nixos SSH Key
     sif ssh_host_ed25519_key.pub mode 0100644
     sif ssh_host_ed25519_key.pub uid 0
     sif ssh_host_ed25519_key.pub gid 0
-    ls -l .
     EOF
-    "${DEBUGFS[@]}" -w -f "$DBG" "$OUT?offset=$OFF"
+    # Run the injection quietly; keep the log only to show it if something fails.
+    LOG=$(mktemp)
+    "${DEBUGFS[@]}" -w -f "$DBG" "$OUT?offset=$OFF" >"$LOG" 2>&1 || true
     rm -f "$DBG"
 
+    # Confirm by reading the pubkey back out of the image and matching the source.
+    want=$(awk '{print $2}' "$PUB")
+    got=$("${DEBUGFS[@]}" -R "cat /etc/ssh/ssh_host_ed25519_key.pub" "$OUT?offset=$OFF" 2>/dev/null | awk '{print $2}')
+    if [ -z "$want" ] || [ "$want" != "$got" ]; then
+      echo "❌  Host key injection failed. debugfs output:"
+      cat "$LOG"; rm -f "$LOG"
+      exit 1
+    fi
+    rm -f "$LOG"
+
     SIZE=$(du -h "$OUT" | cut -f1)
-    echo "✅  Ready: $OUT (${SIZE}) — host key injected."
+    echo "✅  Ready: $OUT (${SIZE}) — host key injected & verified."
     echo "   Copy it to your Mac and write to the SD card, e.g.:"
     echo "     • Raspberry Pi Imager / Balena Etcher → choose 'Use custom' → $OUT"
     echo "     • or on macOS:  diskutil list   →   diskutil unmountDisk /dev/diskN"
