@@ -203,14 +203,19 @@ build-crawler-image:
 # write it with Raspberry Pi Imager / Balena Etcher / dd.
 # The injected /etc/ssh/ssh_host_ed25519_key is the agenix identity that decrypts
 # wifi/attic on first boot.
-# Usage: just bake-crawler-image [keyfile] [out.img]   (defaults: ./crawler_host_ed25519, ./crawler-sd.img)
+# Pass img= to bake an image built elsewhere (e.g. scp'd from the Mac, which
+# builds the kernel natively); otherwise it auto-detects ./result/sd-image/*.img.
+# Usage: just bake-crawler-image [keyfile] [out.img] [img=/path/to/raw.img]
 [linux]
-bake-crawler-image key="crawler_host_ed25519" out="crawler-sd.img":
+bake-crawler-image key="crawler_host_ed25519" out="crawler-sd.img" img="":
     #!/usr/bin/env bash
     set -euo pipefail
-    IMG=$(ls result/sd-image/*.img 2>/dev/null | head -1)
+    IMG="{{ img }}"
     if [ -z "$IMG" ]; then
-      echo "No image found. Run 'just build-crawler-image' first."
+      IMG=$(ls result/sd-image/*.img 2>/dev/null | head -1)
+    fi
+    if [ -z "$IMG" ] || [ ! -f "$IMG" ]; then
+      echo "No image found. Pass img=/path/to/raw.img, or run 'just build-crawler-image' first."
       exit 1
     fi
     KEY="{{ key }}"
