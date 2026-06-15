@@ -52,6 +52,13 @@ in
         # ext4 root and inject the host key without a zstd round-trip.
         sdImage.compressImage = false;
 
+        # The Pi boots from the ext4 SD card and never touches ZFS, but the
+        # sd-image base profile pulls ZFS into supportedFilesystems. Drop it:
+        # avoids building zfs-kernel/zfs-user (slow + closure/RAM cost on a 1GB
+        # RPi3, and the flaky attic zfs-user NAR) and silences the 26.11
+        # boot.zfs.forceImportRoot warning.
+        boot.supportedFilesystems.zfs = lib.mkForce false;
+
         # Fresh install on 26.05 (overrides den's 24.11 default).
         system.stateVersion = lib.mkForce "26.05";
       };
