@@ -110,6 +110,22 @@ build-to-bastion local="":
     nixos-rebuild switch --flake .#oracle-cloud-bastion --target-host "$SSH_USER@$BASTION_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --ask-sudo-password --accept-flake-config
     echo "✅  Rebuilt Oracle Cloud bastion!"
 
+# Rebuild the crawler (Pi) in place over ssh, updating its active config.
+# Builds locally — aarch64 offloads to the virby linux builder — then copies the
+# closure to the Pi and switches. Deploys as the `joe` user (root ssh login is
+# disabled); joe has passwordless sudo. Pass an IP if crawler.local won't resolve
+# (e.g. just build-to-crawler 192.168.0.18). --fallback + http2=false dodge the
+# attic cache's flaky NARs/HTTP2 the way build-crawler-image does.
+[unix]
+build-to-crawler host="crawler.local" user="joe":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "🔨  Rebuilding NixOS on the crawler 🕷️  (build local → deploy {{ user }}@{{ host }})..."
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')
+    http2 = false"
+    nixos-rebuild switch --flake .#crawler --target-host "{{ user }}@{{ host }}" --build-host localhost --sudo --accept-flake-config --fallback --log-format internal-json -v |& nom --json
+    echo "✅  Rebuilt crawler! (reboot if a new kernel/overlay landed)"
+
 # ── Bootstrap (first deploy onto a fresh machine) ─────────────────────────
 
 # Install NixOS onto a fresh RackNerd VPS via nixos-anywhere
