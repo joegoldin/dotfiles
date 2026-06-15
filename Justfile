@@ -190,11 +190,13 @@ write-iso device="":
 
 # Cross-builds aarch64 via binfmt on x86_64; builds natively on aarch64.
 # --accept-flake-config trusts the nixos-raspberrypi cachix substituter.
+# --fallback builds from source when a substituter serves a corrupt/partial NAR
+# (e.g. the attic cache occasionally truncates firmware/zfs-user NARs).
 # Build the crawler SD-card image (uncompressed .img)
 [unix]
 build-crawler-image:
     @echo "🔨  Building crawler SD image (aarch64; builds the rpi kernel if not cached)..."
-    @nix build .#nixosConfigurations.crawler.config.system.build.sdImage --accept-flake-config --log-format internal-json -v |& nom --json
+    @nix build .#nixosConfigurations.crawler.config.system.build.sdImage --accept-flake-config --fallback --log-format internal-json -v |& nom --json
     @echo "✅  Image built: $(ls result/sd-image/*.img)"
 
 # Bake the pre-generated SSH host key into the built image's ext4 root and emit
