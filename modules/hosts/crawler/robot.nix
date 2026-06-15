@@ -49,6 +49,10 @@ in
         KERNEL=="gpiomem", GROUP="gpio", MODE="0660"
       '';
 
+      # gpiozero talks to the kernel via lgpio on modern Pis; pin it so it
+      # doesn't fall back to a missing RPi.GPIO backend.
+      environment.variables.GPIOZERO_PIN_FACTORY = "lgpio";
+
       environment.systemPackages = with pkgs; [
         # Camera / vision. opencv 5 is not packaged yet -> opencv4 (cv2, 4.12).
         # libcamera + ffmpeg here are the nixos-raspberrypi overlay-optimized
@@ -57,13 +61,41 @@ in
         v4l-utils
         i2c-tools # i2cdetect/i2cget for bringing up I2C peripherals
         ffmpeg
+
+        # Runtime CLI tools robot_hat shells out to (NOT python deps):
+        sox # play/rec — speaker enable anti-pop + tone playback
+        alsa-utils # aplay/amixer/speaker-test
+        espeak-ng # TTS engine
+        svox # pico2wave — robot_hat's default TTS engine
+        libraspberrypi # raspi-gpio (toggle the speaker-enable pin) + vcgencmd
+        libgpiod # gpioset/gpiodetect for manual GPIO poking
+
         (python3.withPackages (
           ps: with ps; [
+            # vision
             numpy
             opencv4
-            pyserial
-            smbus2
+            pillow
+            # SunFounder robotics stack
+            robot-hat
+            picrawler
+            sunfounder-controller
+            # hardware I/O (+ gpiozero backends)
             gpiozero
+            lgpio
+            rpi-gpio
+            smbus2
+            spidev
+            pyserial
+            pyaudio
+            pygame
+            # web / control / utilities common in these robot projects
+            flask
+            requests
+            websockets
+            readchar
+            imutils
+            pyzbar
           ]
         ))
       ];
