@@ -1,31 +1,50 @@
-# Connectivity: Tailscale (client) + onboard WiFi via wpa_supplicant. The whole
-# wpa_supplicant.conf is supplied by agenix at /etc/wpa_supplicant.conf, so both
-# SSID and PSK stay encrypted. networking.wireless.networks is left unset, so
-# the module runs wpa_supplicant against /etc/wpa_supplicant.conf directly
-# (per the NixOS option docs).
+# Connectivity: Tailscale (client) + mDNS + onboard WiFi via wpa_supplicant.
+#
+# WiFi: the agenix-decrypted secret is a full wpa_supplicant.conf with a
+# `network={…}` block (SSID + PSK both encrypted). NixOS's wireless module, when
+# `networks` is empty, launches wpa_supplicant with `-c …/imperative.conf` (an
+# empty managed file) and does NOT read /etc/wpa_supplicant.conf — so we feed our
+# conf via `extraConfigFiles`, which the module appends as `-I <path>`. With
+# hardening on (default), wpa_supplicant runs as the `wpa_supplicant` user, so
+# the secret must be owned by it to be readable.
 { inputs, ... }:
 {
-  den.aspects.crawler.nixos = {
-    services.tailscale = {
-      enable = true;
-      useRoutingFeatures = "client";
-    };
-    # Tailscale MagicDNS needs systemd-resolved.
-    services.resolved.enable = true;
+  den.aspects.crawler.nixos =
+    { config, ... }:
+    {
+      services.tailscale = {
+        enable = true;
+        useRoutingFeatures = "client";
+      };
+      # Tailscale MagicDNS needs systemd-resolved.
+      services.resolved.enable = true;
 
-    networking.firewall = {
-      enable = true;
-      allowedTCPPorts = [ 22 ];
-      trustedInterfaces = [ "tailscale0" ];
-    };
+      # mDNS so `crawler.local` resolves on the LAN (no router-snooping, no
+      # tailscale needed for first contact).
+      services.avahi = {
+        enable = true;
+        openFirewall = true;
+        publish = {
+          enable = true;
+          addresses = true;
+          workstation = true;
+        };
+      };
 
-    # networks intentionally unset -> wpa_supplicant uses /etc/wpa_supplicant.conf
-    networking.wireless.enable = true;
+      networking.firewall = {
+        enable = true;
+        allowedTCPPorts = [ 22 ];
+        trustedInterfaces = [ "tailscale0" ];
+      };
 
-    age.secrets.crawler-wlan = {
-      file = "${inputs.dotfiles-secrets}/crawler-wlan.age";
-      path = "/etc/wpa_supplicant.conf";
-      mode = "0400";
+      networking.wireless = {
+        enable = true;
+        extraConfigFiles = [ config.age.secrets.crawler-wlan.path ];
+      };
+      age.secrets.crawler-wlan = {
+        file = "${inputs.dotfiles-secrets}/crawler-wlan.age";
+        owner = "wpa_supplicant";
+        mode = "0400";
+      };
     };
-  };
 }
