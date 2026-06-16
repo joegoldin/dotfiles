@@ -110,6 +110,23 @@ build-to-bastion local="":
     nixos-rebuild switch --flake .#oracle-cloud-bastion --target-host "$SSH_USER@$BASTION_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --ask-sudo-password --accept-flake-config
     echo "✅  Rebuilt Oracle Cloud bastion!"
 
+# Rebuild the crawler (Pi) in place over ssh, updating its active config, via nh.
+# Builds locally — aarch64 offloads to the virby linux builder — then copies the
+# closure to the Pi and switches. Deploys as the `joe` user (root ssh login is
+# disabled); joe has passwordless sudo, hence --elevation-strategy passwordless.
+# Pass an IP if crawler.local won't resolve (e.g. just build-to-crawler
+# 192.168.0.18). --fallback + http2=false dodge the attic cache's flaky
+# NARs/HTTP2 the way build-crawler-image does.
+[unix]
+build-to-crawler host="crawler.local" user="joe":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "🔨  Rebuilding NixOS on the crawler 🕷️  (build local → deploy {{ user }}@{{ host }})..."
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')
+    http2 = false"
+    nh os switch . -H crawler --target-host "{{ user }}@{{ host }}" --elevation-strategy passwordless --accept-flake-config --fallback
+    echo "✅  Rebuilt crawler! (reboot if a new kernel/overlay landed)"
+
 # ── Bootstrap (first deploy onto a fresh machine) ─────────────────────────
 
 # Install NixOS onto a fresh RackNerd VPS via nixos-anywhere
@@ -185,6 +202,140 @@ write-iso device="":
     MINS=$(( ELAPSED / 60 ))
     SECS=$(( ELAPSED % 60 ))
     echo "✅  ISO written to $DEV in ${MINS}m${SECS}s"
+
+# ── Raspberry Pi SD image (crawler) ────────────────────────────────────────
+
+# Cross-builds aarch64 via binfmt on x86_64; builds natively on aarch64.
+# --accept-flake-config trusts the nixos-raspberrypi cachix substituter.
+# --fallback builds from source when a substituter serves a corrupt/partial NAR
+# (e.g. the attic cache occasionally truncates firmware/zfs-user NARs).
+# Build the crawler SD-card image (uncompressed .img)
+[unix]
+build-crawler-image:
+    @echo "🔨  Building crawler SD image (aarch64; builds the rpi kernel if not cached)..."
+    @nix build .#nixosConfigurations.crawler.config.system.build.sdImage --accept-flake-config --fallback --log-format internal-json -v |& nom --json
+    @echo "✅  Image built: $(ls result/sd-image/*.img)"
+
+# Bake the SSH host key into the built image's ext4 root and emit a standalone,
+# ready-to-flash .img — no block device is touched. Pure userspace (debugfs), so
+# it needs no root, no loopback, and no mount: runs on macOS and Linux alike
+# (macOS can't mount ext4, but debugfs writes it directly).
+# The host key is pulled from 1Password (item "Crawler RasPi Nixos SSH Key" in
+# vault "Private", fields "private key"/"public key"), the same way secret-helper
+# sources keys via `op read`. The injected /etc/ssh/ssh_host_ed25519_key is the
+# agenix identity that decrypts wifi/attic on first boot.
+# Pass img= to bake an image built elsewhere; otherwise it auto-detects
+# ./result/sd-image/*.img. Pass key=/path/to/privkey to read from disk instead
+# of 1Password.
+# Usage: just bake-crawler-image [out.img] [img=/path/to/raw.img] [item=] [vault=] [key=]
+[unix]
+bake-crawler-image out="crawler-sd.img" img="" item="Crawler RasPi Nixos SSH Key" vault="Private" key="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    IMG="{{ img }}"
+    if [ -z "$IMG" ]; then
+      IMG=$(ls result/sd-image/*.img 2>/dev/null | head -1)
+    fi
+    if [ -z "$IMG" ] || [ ! -f "$IMG" ]; then
+      echo "No image found. Pass img=/path/to/raw.img, or run 'just build-crawler-image' first."
+      exit 1
+    fi
+    OUT="{{ out }}"
+
+    # Resolve the host key into private/public temp files (mode 600, removed on
+    # exit). Default source is 1Password; key= overrides with an on-disk privkey.
+    PRIV=$(mktemp); PUB=$(mktemp)
+    chmod 600 "$PRIV" "$PUB"
+    trap 'rm -f "$PRIV" "$PUB"' EXIT
+    KEY="{{ key }}"
+    if [ -n "$KEY" ]; then
+      [ -f "$KEY" ] || { echo "Key file '$KEY' not found"; exit 1; }
+      cp "$KEY" "$PRIV"
+      if [ -f "$KEY.pub" ]; then cp "$KEY.pub" "$PUB"; else ssh-keygen -y -f "$PRIV" > "$PUB"; fi
+      echo "Using on-disk host key: $KEY"
+    else
+      command -v op >/dev/null 2>&1 || { echo "1Password CLI 'op' not found (needed to fetch the host key)"; exit 1; }
+      echo "Fetching host key from 1Password: {{ item }} (vault {{ vault }})"
+      op read "op://{{ vault }}/{{ item }}/private key?ssh-format=openssh" > "$PRIV"
+      op read "op://{{ vault }}/{{ item }}/public key" > "$PUB"
+      [ -s "$PRIV" ] && [ -s "$PUB" ] || { echo "Failed to read host key from 1Password"; exit 1; }
+    fi
+
+    # Copy the store image (0444) to a writable, user-owned file. Prefer a
+    # copy-on-write clone (instant on APFS/btrfs); fall back to a full copy.
+    echo "Copying image -> $OUT"
+    if   cp --reflink=auto "$IMG" "$OUT" 2>/dev/null; then :
+    elif cp -c             "$IMG" "$OUT" 2>/dev/null; then :
+    else cp                "$IMG" "$OUT"; fi
+    chmod u+w "$OUT"
+
+    # Find the ext4 root partition (MBR type 0x83) and its byte offset. The MBR
+    # partition table lives at byte 446; each 16-byte entry holds the type at
+    # +4 and the little-endian start LBA at +8.
+    OFF=""
+    for slot in 0 1 2 3; do
+      base=$((446 + slot * 16))
+      ptype=$(dd if="$OUT" bs=1 skip=$((base + 4)) count=1 2>/dev/null | od -An -tu1 | tr -d ' ')
+      if [ "$ptype" = "131" ]; then   # 0x83 = Linux
+        start=$(dd if="$OUT" bs=1 skip=$((base + 8)) count=4 2>/dev/null | od -An -tu4 | tr -d ' ')
+        OFF=$((start * 512))
+        break
+      fi
+    done
+    if [ -z "$OFF" ]; then
+      echo "No Linux (ext4, type 0x83) partition found in $OUT"
+      exit 1
+    fi
+    echo "ext4 root partition at byte offset $OFF — injecting host key via debugfs"
+
+    # debugfs from e2fsprogs; use it from PATH if present, else from nixpkgs.
+    # DEBUGFS_PAGER=cat stops debugfs piping output through a pager (no q prompt).
+    export DEBUGFS_PAGER=cat
+    DEBUGFS=(debugfs)
+    command -v debugfs >/dev/null 2>&1 || DEBUGFS=(nix shell nixpkgs#e2fsprogs -c debugfs)
+
+    # Inject the key into the ext4 root entirely in userspace at the partition
+    # offset. NixOS generates most of /etc at boot but preserves pre-seeded
+    # ssh_host_*_key files, so creating /etc/ssh here is enough.
+    DBG=$(mktemp)
+    cat > "$DBG" <<EOF
+    mkdir /etc
+    sif /etc mode 040755
+    mkdir /etc/ssh
+    sif /etc/ssh mode 040755
+    cd /etc/ssh
+    rm ssh_host_ed25519_key
+    rm ssh_host_ed25519_key.pub
+    write $PRIV ssh_host_ed25519_key
+    write $PUB ssh_host_ed25519_key.pub
+    sif ssh_host_ed25519_key mode 0100600
+    sif ssh_host_ed25519_key uid 0
+    sif ssh_host_ed25519_key gid 0
+    sif ssh_host_ed25519_key.pub mode 0100644
+    sif ssh_host_ed25519_key.pub uid 0
+    sif ssh_host_ed25519_key.pub gid 0
+    EOF
+    # Run the injection quietly; keep the log only to show it if something fails.
+    LOG=$(mktemp)
+    "${DEBUGFS[@]}" -w -f "$DBG" "$OUT?offset=$OFF" >"$LOG" 2>&1 || true
+    rm -f "$DBG"
+
+    # Confirm by reading the pubkey back out of the image and matching the source.
+    want=$(awk '{print $2}' "$PUB")
+    got=$("${DEBUGFS[@]}" -R "cat /etc/ssh/ssh_host_ed25519_key.pub" "$OUT?offset=$OFF" 2>/dev/null | awk '{print $2}')
+    if [ -z "$want" ] || [ "$want" != "$got" ]; then
+      echo "❌  Host key injection failed. debugfs output:"
+      cat "$LOG"; rm -f "$LOG"
+      exit 1
+    fi
+    rm -f "$LOG"
+
+    SIZE=$(du -h "$OUT" | cut -f1)
+    echo "✅  Ready: $OUT (${SIZE}) — host key injected & verified."
+    echo "   Copy it to your Mac and write to the SD card, e.g.:"
+    echo "     • Raspberry Pi Imager / Balena Etcher → choose 'Use custom' → $OUT"
+    echo "     • or on macOS:  diskutil list   →   diskutil unmountDisk /dev/diskN"
+    echo "                     sudo dd if=$OUT of=/dev/rdiskN bs=4M status=progress   (rdiskN = raw, faster)"
 
 # ── Secrets & packages ─────────────────────────────────────────────────────
 

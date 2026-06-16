@@ -49,6 +49,16 @@ in
     # ...
     # });
 
+    # SunFounder robotics Python libs for the crawler (Robot HAT / PiCrawler).
+    # Added to the python package set so they resolve via python3.withPackages.
+    pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+      (pyFinal: _pyPrev: {
+        robot-hat = pyFinal.callPackage ../_pkgs/sunfounder/robot-hat.nix { };
+        sunfounder-controller = pyFinal.callPackage ../_pkgs/sunfounder/sunfounder-controller.nix { };
+        picrawler = pyFinal.callPackage ../_pkgs/sunfounder/picrawler.nix { };
+      })
+    ];
+
     # direnv: fish integration test gets SIGKILL in the nix sandbox
     direnv = prev.direnv.overrideAttrs (old: {
       doCheck = false;
