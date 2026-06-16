@@ -15,6 +15,7 @@ uses [den](https://github.com/denful/den) as the engine, and wires in
 | `cloud-proxy`                               | VPS                             | caddy reverse proxy + fail2ban      |
 | `oracle-cloud-bastion` (hostName `bastion`) | Oracle Cloud                    | pelican game servers, tailnet entry |
 | `racknerd-cloud-agent`                      | VPS                             | attic binary cache server           |
+| `crawler`                                   | Raspberry Pi 3B+ (`nixos-raspberrypi`) | SunFounder PiCrawler quadruped robot |
 
 Day-to-day: `just build` (build only), `just boot` (activate at next
 boot), `just switch` (activate now); all three resolve the host from the
@@ -316,6 +317,24 @@ from `${inputs.dotfiles-secrets}/...`.
 
 **New flake input**: add to `flake.nix`, then reference it only inside
 the one aspect that owns it.
+
+**The crawler robot (Raspberry Pi)**: `modules/hosts/crawler/` builds via
+`nixos-raspberrypi`. It packages the SunFounder stack — `robot-hat`,
+`picrawler`, `sunfounder-controller` (see `modules/flake/_pkgs/sunfounder/`) —
+plus an I2S speaker (`audio.nix`, the declarative `i2samp.sh`), I2C/SPI/UART,
+Claude Code + agent-skills, and a tty1 status board (`diagnostics.nix`).
+Workflow (aarch64 builds offload to the virby linux builder on the Mac):
+
+```
+just build-crawler-image     # build the SD image (.img)
+just bake-crawler-image      # inject the agenix host key from 1Password (debugfs, cross-platform)
+# flash crawler-sd.img, then either reflash for big changes or, for an
+# already-running Pi, update its active config in place over ssh:
+just build-to-crawler [host|ip]   # nh os switch --target-host joe@…  (default crawler.local)
+```
+
+The robot's own control code + its project-local Claude skill live in a
+separate repo (`github.com/joegoldin/crawler`), not here.
 
 ## Invariants and gotchas
 
