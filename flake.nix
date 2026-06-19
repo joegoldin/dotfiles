@@ -92,6 +92,13 @@
       url = "github:joegoldin/desk-phone-cit200";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # PiCrawler AI brain (robotd MCP body + pi agent); private repo over ssh;
+    # bump with `nix flake update crawler`. Imported by the crawler host's
+    # brain.nix aspect (services.crawler-brain).
+    crawler = {
+      url = "git+ssh://git@github.com/joegoldin/crawler";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # ── Server services ────────────────────────────────────────────────────
     # binary cache server
