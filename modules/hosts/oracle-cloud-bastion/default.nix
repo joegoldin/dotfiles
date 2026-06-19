@@ -45,6 +45,11 @@ in
         file = "${inputs.dotfiles-secrets}/attic-netrc.age";
         mode = "0400";
       };
+      age.secrets.umans_api_key = {
+        file = "${inputs.dotfiles-secrets}/umans_api_key.age";
+        mode = "0400";
+        owner = meta.username;
+      };
       age.identityPaths = [ "/home/${meta.username}/.ssh/id_ed25519" ];
     };
   };
