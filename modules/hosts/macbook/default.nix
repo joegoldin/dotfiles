@@ -70,6 +70,11 @@ in
         mode = "0400";
         owner = meta.username;
       };
+      age.secrets.umans_api_key = {
+        file = "${inputs.dotfiles-secrets}/umans_api_key.age";
+        mode = "0400";
+        owner = meta.username;
+      };
 
       # vfkit-based Linux builder. The stock nix.linux-builder is kept off;
       # it was only used to bootstrap this rebuild (it builds virby's VM

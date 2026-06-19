@@ -64,6 +64,11 @@ in
           mode = "0400";
           owner = meta.username;
         };
+        age.secrets.umans_api_key = {
+          file = "${inputs.dotfiles-secrets}/umans_api_key.age";
+          mode = "0400";
+          owner = meta.username;
+        };
 
         # Build a raw (uncompressed) .img so the flash recipe can loop-mount the
         # ext4 root and inject the host key without a zstd round-trip.
