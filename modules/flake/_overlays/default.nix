@@ -108,6 +108,13 @@ in
       config = {
         allowUnfree = true;
         android_sdk.accept_license = true;
+        # torch-bin 2.12.0 marks itself "broken" whenever nixpkgs' cudaPackages
+        # is older than the cuda-bindings>=13.0.3 it expects (currently 12.9.7).
+        # That check is platform-agnostic, so it trips on aarch64-darwin too —
+        # even though the macOS torch-bin wheel ships no CUDA at all. Downgrade
+        # the false positive to a warning so the env still evaluates. Remove
+        # once nixpkgs' default cudaPackages reaches >=13.0.3.
+        problems.handlers.torch.unsupported-cuda-version = "warn";
       };
       overlays = unstableOverlays;
     };
