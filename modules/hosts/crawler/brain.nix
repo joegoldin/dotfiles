@@ -39,11 +39,17 @@ in
         # robot_hat / picrawler aren't in nixpkgs — inject the SunFounder overlay
         # packages this host already provides (the SAME attrs robot.nix uses),
         # plus opencv4 (cv2) so the on-device camera path is importable.
+        # robot-hat propagates gpiozero/smbus2/spidev/pyserial/pyaudio/pygame, but
+        # NOT the gpiozero pin-factory backends — add lgpio (the GPIOZERO_PIN_FACTORY
+        # the host sets) + rpi-gpio so Pin/Ultrasonic/LED work (else: "No module
+        # named 'lgpio'" on every ultrasonic read).
         extraPythonPackages =
           ps: with ps; [
             robot-hat
             picrawler
             opencv4
+            lgpio
+            rpi-gpio
           ];
       };
     };
