@@ -27,6 +27,14 @@ in
         };
       };
 
+      # dtparam=i2c_arm=on brings up the I2C *controller*, but the userspace
+      # /dev/i2c-1 char device only appears once the `i2c-dev` module is loaded
+      # (Raspberry Pi OS does this via raspi-config; NixOS does not auto-load it).
+      # Without it i2cdetect -y 1 fails ("No such file or directory") and the
+      # Robot HAT (0x14) + BerryIMU (0x6a/0x1c) are unreachable -> RealBackend
+      # can't open the bus. (Requires a reboot for the config.txt dtparam to take.)
+      boot.kernelModules = [ "i2c-dev" ];
+
       # gpio/i2c/spi are not created by default; define them so the membership
       # below is real, and grant device-node access via udev. (dialout + video
       # are standard NixOS groups.)

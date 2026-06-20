@@ -39,6 +39,15 @@ buildPythonPackage rec {
     substituteInPlace pyproject.toml \
       --replace-fail 'dynamic = ["version"]' 'version = "${version}"'
     sed -i '/^\[tool\.setuptools\.dynamic\]/,/^version = {attr/d' pyproject.toml
+
+    # Python 3.12+ removed the stdlib `distutils`; robot_hat/tts.py still does
+    # `from distutils.spawn import find_executable`. Swap it for the stdlib
+    # `shutil.which` (same call signature + semantics) so robot_hat imports on
+    # the py3.13 env -- otherwise `import robot_hat` (hence picrawler, hence
+    # RealBackend, hence crawler-robotd) dies with ModuleNotFoundError: distutils.
+    substituteInPlace robot_hat/tts.py \
+      --replace-fail 'from distutils.spawn import find_executable' \
+                     'from shutil import which as find_executable'
   '';
 
   build-system = [
