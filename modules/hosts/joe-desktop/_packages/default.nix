@@ -48,6 +48,7 @@ let
           blip-caption
         ];
       })
+      typora
       # Wrap zoom so its forked `zopen` browser-launcher helper inherits a sane
       # env. On Wayland, `zopen` aborts (SIGABRT in Qt) during the Google/SSO
       # OAuth browser hand-off; forcing XWayland (QT_QPA_PLATFORM=xcb) and giving
