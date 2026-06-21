@@ -1,17 +1,23 @@
 { pkgs }:
 let
   package = (pkgs.unstable.streamcontroller.override { isKde = true; }).overrideAttrs (old: {
-    version = "1.5.0-beta.14-unstable-2026-06-08";
+    version = "1.5.0-beta.14-unstable-2026-06-21";
     src = pkgs.fetchFromGitHub {
       owner = "joegoldin";
       repo = "StreamController";
-      # Includes the watcher-thread teardown fix (8f04298): stops the runaway
-      # kdotool/KWin-script storm that flooded the session bus and was the most
-      # likely trigger for plasmashell's D-Bus connection wedging on app launch.
-      rev = "8f04298a2ce0a1950aa3fdc5deee0ce6195ccdb8";
-      hash = "sha256-ZWXVGXFOT4OgZvfdRZvxu8pncJBjU1lUB7lP0/uMpHM=";
+      # PR #1 (MiraBox StreamDock device support) rebased onto main, so it also
+      # carries the watcher-thread teardown fix (stops the runaway kdotool/KWin
+      # script storm that wedged plasmashell's D-Bus) and the ComboRow GTK
+      # main-thread fix from main. See joegoldin/StreamController#1.
+      rev = "33a1fd69a732aef8eb1806d527d7a0c688a9eb36";
+      hash = "sha256-2h+DWiWiw/7R1q9hi2N3ZHjENfGb708V4F+M1XClGpg=";
     };
     nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
+    # The upstream nixpkgs derivation builds the Python env from a fixed list,
+    # so hidapi (added to requirements.txt by PR #1) is missing and the MiraBox
+    # StreamDock backend silently disables itself ("is 'hidapi' installed?").
+    # Add it so `import hid` resolves and StreamDock devices are detected.
+    buildInputs = (old.buildInputs or [ ]) ++ [ pkgs.unstable.python3Packages.hidapi ];
     postFixup = (old.postFixup or "") + ''
       wrapProgram $out/bin/streamcontroller \
         --set GSK_RENDERER ngl
