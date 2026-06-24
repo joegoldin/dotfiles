@@ -63,11 +63,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1781850619,
-        "narHash": "sha256-znbEQ+TnabLG+UST0W5aRhJvm1+Phd7iKFsMb/X2GmE=",
+        "lastModified": 1782162692,
+        "narHash": "sha256-FrOkvREZJ3sEf+ynje1QO3Xf4sAqDUWTNaViXPiFPwE=",
         "ref": "refs/heads/main",
-        "rev": "5f37ac5ec18a405a90487591bda701a4d5558e74",
-        "revCount": 101,
+        "rev": "06d09ebc12b6e19675351a57514844e13ea6637c",
+        "revCount": 107,
         "type": "git",
         "url": "ssh://git@github.com/joegoldin/agent-skills"
       },
