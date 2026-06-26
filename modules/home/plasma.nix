@@ -470,6 +470,11 @@ in
           # Wayland
           "kwinrc"."Wayland"."EnablePrimarySelection" = false;
           "kwinrc"."Xwayland"."Scale" = 1;
+          # Legacy applications (X11): "Scaled by the system" - KWin upscales
+          # XWayland clients instead of each app applying scaling itself. This is
+          # the "Legacy applications (X11)" radio in the Display KCM; false =
+          # scaled by the system, true = apply scaling themselves.
+          "kdeglobals"."KScreen"."XwaylandClientsScale" = false;
           # Window decoration buttons
           "kwinrc"."org.kde.kdecoration2"."ButtonsOnLeft" = "MSFB";
           "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "IAX";
