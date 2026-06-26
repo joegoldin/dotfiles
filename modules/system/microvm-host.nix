@@ -92,6 +92,11 @@ in
       # dnsmasq binds to vmbr0 only so it doesn't conflict with systemd-resolved.
       services.dnsmasq = {
         enable = true;
+        # Don't add 127.0.0.1 to the host's /etc/resolv.conf — this dnsmasq only
+        # serves the VMs on vmbr0. Leaving it on (the default) makes dnsmasq the
+        # host's system resolver, which shadows systemd-resolved and breaks
+        # Tailscale MagicDNS (the host then forwards *.ts.net to Cloudflare).
+        resolveLocalQueries = false;
         settings = {
           interface = "vmbr0";
           bind-interfaces = true;

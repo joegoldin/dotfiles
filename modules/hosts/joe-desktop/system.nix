@@ -123,6 +123,10 @@ in
         enable = true;
         package = pkgs.unstable.tailscale;
       };
+      # MagicDNS (*.ts.net) needs systemd-resolved so tailscaled can inject the
+      # tailnet split-DNS route. Without it, lookups fall through to the microvm
+      # dnsmasq (Cloudflare-only) and every ts.net name NXDOMAINs.
+      services.resolved.enable = true;
 
       services.udev.packages = [
         litra-rules
