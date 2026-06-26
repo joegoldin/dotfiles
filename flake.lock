@@ -653,11 +653,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1781935296,
-        "narHash": "sha256-jEu/SKmAZaSjgHqx0EbKWABdBadKj+8VkYjXEN30k3U=",
+        "lastModified": 1782448318,
+        "narHash": "sha256-sw7CBwtUXWsNv1Xj4xGFnGhnSV6pdflXniO8vxO6U8A=",
         "ref": "refs/heads/main",
-        "rev": "56d25c7bf4fc51ac7212a1de776f4dcabacb36d5",
-        "revCount": 139,
+        "rev": "569920179c8f05f0abea7f588a845e85273afe94",
+        "revCount": 140,
         "type": "git",
         "url": "ssh://git@github.com/joegoldin/crawler"
       },
