@@ -158,6 +158,12 @@
     devenv.url = "github:cachix/devenv";
     nixpkgs-python.url = "github:cachix/nixpkgs-python";
     git-hooks.url = "github:cachix/git-hooks.nix";
+    # sem: semantic, entity-level git diff/impact/blame/context (tree-sitter)
+    sem = {
+      url = "github:Ataraxy-Labs/sem";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
 
     # ── ML / GPU compute ────────────────────────────────────────────────────
     # tinygrad with ROCm/CUDA support
