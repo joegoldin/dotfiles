@@ -24,3 +24,10 @@ docs/
 
 # per-machine build-time history (local, not synced to secrets)
 .build-times
+
+# crawler (rpi) image artifacts + host key — never commit these
+*.img
+*.img.zst
+crawler-sd.img
+crawler_host_ed25519
+crawler_host_ed25519.pub

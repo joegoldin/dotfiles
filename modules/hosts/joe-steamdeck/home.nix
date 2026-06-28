@@ -1,0 +1,109 @@
+# hosts/steamdeck/home-manager.nix
+# Lean home-manager for Steam Deck; cherry-picked modules, no dev tools
+{ ... }:
+let
+  meta = import ../../_lib/meta.nix;
+  stateVersion = "24.11";
+  username = meta.username;
+in
+{
+  den.aspects.joe-steamdeck.homeManager =
+    {
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      imports = [
+        ./_packages.nix
+        ./_plasma-panels.nix
+      ];
+
+      programs.home-manager.enable = true;
+      systemd.user.startServices = "sd-switch";
+
+      home = {
+      };
+
+      # Override 1Password SSH agent from plasma.nix; not used on Deck
+      programs.ssh = {
+        enable = true;
+        enableDefaultConfig = false;
+        matchBlocks = { };
+        extraConfig = "";
+      };
+
+      programs.plasma = {
+        hotkeys.commands = {
+          "launch-browser" = {
+            name = "Launch Zen";
+            key = "Meta+B";
+            command = "zen";
+          };
+        };
+
+        # Disable KDE Wallet
+        configFile."kwalletrc"."Wallet"."Enabled" = false;
+        configFile."kwalletrc"."Wallet"."First Use" = false;
+
+        # Enable virtual keyboard in Plasma
+        configFile."kwinrc"."Wayland"."VirtualKeyboardEnabled" = true;
+        configFile."kwinrc"."Wayland"."InputMethod" =
+          "${pkgs.maliit-keyboard}/share/applications/com.github.maliit.keyboard.desktop";
+
+        # Fix Steam keyboard scaling in Desktop Mode (cropped at sides)
+        configFile."kwinrulesrc"."Steam Keyboard Fix"."Description" = "Steam Keyboard Fix";
+        configFile."kwinrulesrc"."Steam Keyboard Fix"."title" = "Steam Input On-screen Keyboard";
+        configFile."kwinrulesrc"."Steam Keyboard Fix"."titlematch" = 2; # substring match
+        configFile."kwinrulesrc"."Steam Keyboard Fix"."size" = "1280,800";
+        configFile."kwinrulesrc"."Steam Keyboard Fix"."sizerule" = 3; # force
+      };
+
+      # Return to Gaming Mode desktop entry + desktop shortcut icon
+      xdg.desktopEntries."return-to-gaming-mode" = {
+        name = "Return to Gaming Mode";
+        exec = "steamosctl switch-to-game-mode";
+        icon = "steam";
+        terminal = false;
+        type = "Application";
+      };
+
+      home.file."Desktop/Return to Gaming Mode.desktop".text = ''
+        [Desktop Entry]
+        Name=Return to Gaming Mode
+        Exec=steamosctl switch-to-game-mode
+        Icon=steam
+        Terminal=false
+        Type=Application
+      '';
+
+      # Autostart entries for desktop mode
+      xdg.configFile =
+        let
+          mkAutostart = name: exe: {
+            "autostart/${name}.desktop".text = "[Desktop Entry]\nType=Application\nExec=${exe}";
+          };
+          restartNetwork = lib.getExe (
+            pkgs.writeShellApplication {
+              name = "restart-network";
+              runtimeInputs = with pkgs; [ systemd ];
+              text = "systemctl restart NetworkManager";
+            }
+          );
+        in
+        (mkAutostart "restart-network" "sudo ${restartNetwork}")
+        // (mkAutostart "steam" "steam -silent %U")
+        // (mkAutostart "krfb" "krfb --nodialog %c")
+        // (mkAutostart "kde-authorize-steam" (
+          lib.getExe (
+            pkgs.writeShellApplication {
+              name = "kde-authorize-steam";
+              text = ''
+                flatpak permission-set kde-authorized remote-desktop org.kde.krdpserver yes
+                flatpak permission-set kde-authorized remote-desktop "" yes
+              '';
+            }
+          )
+        ));
+    };
+}

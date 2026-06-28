@@ -2,154 +2,164 @@
 default: system-info
     @just --list
 
+# Show architecture and OS for this machine
 system-info:
     @echo "🖥️  This is an {{ arch() }} machine on {{ os() }}"
 
-# ── Core commands ────────────────────────────────────────────────────────
+# ── Build & activate (this machine) ──────────────────────────────────────
+# build = build only, boot = activate at next boot, switch = activate now.
+# All three resolve the host from arch/hostname and run through _nh-os.
 
-[unix]
-check: lint
-    @echo "🔍  Checking Nix config for {{ arch() }}-{{ os() }}..."
-    @NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 NIXPKGS_ALLOW_UNFREE=1 NIXPKGS_ALLOW_BROKEN=1 nix --extra-experimental-features 'nix-command flakes' flake check --impure --system {{ arch() }}-{{ os() }} --show-trace
-    @echo "✅  Check completed!"
+# Build the system closure without activating
+[linux]
+build *args="": (_nh-os "build" args)
 
-[unix]
-lint:
-    @echo "📝  Linting Nix config..."
-    @nix --extra-experimental-features 'nix-command flakes' fmt
-    @echo "✅  Nix config linted!"
+# Build and set as the bootloader default (takes effect next reboot)
+[linux]
+boot *args="": (_nh-os "boot" args)
 
-[unix]
-flake-update:
-    @echo "🔄  Updating flake..."
-    @nix --extra-experimental-features 'nix-command flakes' flake update --option access-tokens "github.com=$(gh auth token 2>/dev/null || echo '')"
-    @echo "✅  Flake updated!"
+# Build and activate immediately
+[linux]
+switch *args="": (_nh-os "switch" args)
 
-# ── Build ────────────────────────────────────────────────────────────────
+# Build the darwin closure without activating
+[macos]
+build *args="": (_nh-darwin "build" args)
 
 [macos]
-build *args="": system-info _check-maintenance
+boot *args="":
+    @echo "❌  nix-darwin has no boot activation; use just build or just switch"
+    @exit 1
+
+# Build and activate immediately
+[macos]
+switch *args="": (_nh-darwin "switch" args)
+
+[private]
+[linux]
+_nh-os action *args="": system-info _check-maintenance
     #!/usr/bin/env bash
+    if [ "{{ arch() }}" = "aarch64" ]; then
+      host=oracle-cloud-bastion
+    else
+      case "$(hostname)" in
+        joe-steamdeck | office-pc | racknerd-cloud-agent | cloud-proxy) host="$(hostname)" ;;
+        *) host=joe-desktop ;;
+      esac
+    fi
+    echo "🔨  nh os {{ action }} for $host 🐧..."
+    just _show-build-prediction "$host"
+    start=$(date +%s)
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    [ -n "{{ args }}" ] && echo "📦  Extra nh args: {{ args }}"
+    nh os {{ action }} . -H "$host" --accept-flake-config {{ args }}
+    just _finish-build "$host" "$start" $?
+
+[private]
+[macos]
+_nh-darwin action *args="": system-info _check-maintenance
+    #!/usr/bin/env bash
+    echo "🔨  nh darwin {{ action }} 🍎..."
     just _show-build-prediction "darwin"
     start=$(date +%s)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    [ -n "{{args}}" ] && echo "📦  Extra nh args: {{args}}"
-    nh darwin switch . --accept-flake-config {{args}}
+    [ -n "{{ args }}" ] && echo "📦  Extra nh args: {{ args }}"
+    nh darwin {{ action }} . --accept-flake-config {{ args }}
     just _finish-build "darwin" "$start" $?
 
-[linux]
-build *args="": system-info _check-maintenance
-    @if [ "{{ arch() }}" = "aarch64" ]; then \
-      just _build-bastion {{args}}; \
-    elif [ "{{ arch() }}" = "x86_64" ] && [ "$(hostname)" = "joe-steamdeck" ]; then \
-      just _build-steamdeck {{args}}; \
-    elif [ "{{ arch() }}" = "x86_64" ] && [ "$(hostname)" = "office-pc" ]; then \
-      just _build-office-pc {{args}}; \
-    elif [ "{{ arch() }}" = "x86_64" ] && [ "$(hostname)" = "racknerd-cloud-agent" ]; then \
-      just _build-racknerd {{args}}; \
-    elif [ "{{ arch() }}" = "x86_64" ] && [ "$(hostname)" = "cloud-proxy" ]; then \
-      just _build-cloud-proxy {{args}}; \
-    elif [ "{{ arch() }}" = "x86_64" ]; then \
-      just _build-nixos {{args}}; \
-    else \
-      echo "❌  Error: Unsupported architecture: {{ arch() }}"; \
-      exit 1; \
+# ── Remote rebuilds (existing hosts) ──────────────────────────────────────
+# Domains/users come from the dotfiles-secrets flake input via _secret-domain.
+
+# Rebuild cloud-proxy in place (build locally, deploy over ssh)
+[unix]
+build-to-cloud-proxy:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "🔨  Rebuilding NixOS on cloud-proxy VPS (build locally, deploy remote)..."
+    SSH_DOMAIN=$(just _secret-domain cloudProxySshDomain)
+    SSH_USER=$(just _secret-domain sshUser)
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    nixos-rebuild switch --flake .#cloud-proxy --target-host "$SSH_USER@$SSH_DOMAIN" --build-host localhost --sudo --accept-flake-config --log-format internal-json -v |& nom --json
+    echo "✅  Rebuilt cloud-proxy VPS!"
+
+# Rebuild racknerd in place (build locally, deploy over ssh)
+[unix]
+build-to-racknerd:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "🔨  Rebuilding NixOS on RackNerd VPS (build locally, deploy remote)..."
+    SSH_DOMAIN=$(just _secret-domain racknerdSshDomain)
+    SSH_USER=$(just _secret-domain sshUser)
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    nixos-rebuild switch --flake .#racknerd-cloud-agent --target-host "$SSH_USER@$SSH_DOMAIN" --build-host localhost --sudo --accept-flake-config --fallback --log-format internal-json -v |& nom --json
+    echo "✅  Rebuilt RackNerd VPS!"
+
+# Rebuild the bastion in place (pass --local to build on this machine)
+[unix]
+build-to-bastion local="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "🔨  Rebuilding NixOS on Oracle Cloud bastion..."
+    BASTION_DOMAIN=$(just _secret-domain bastionDomain)
+    SSH_USER=$(just _secret-domain sshUser)
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    BUILD_HOST_ARGS=()
+    if [ "{{ local }}" = "--local" ]; then
+      BUILD_HOST_ARGS=(--build-host localhost)
     fi
+    nixos-rebuild switch --flake .#oracle-cloud-bastion --target-host "$SSH_USER@$BASTION_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --ask-sudo-password --accept-flake-config
+    echo "✅  Rebuilt Oracle Cloud bastion!"
 
-[private]
-_build-bastion *args="":
+# Rebuild the crawler (Pi) in place over ssh, updating its active config, via nh.
+# Builds locally — aarch64 offloads to the virby linux builder — then copies the
+# closure to the Pi and switches. Deploys as the `joe` user (root ssh login is
+# disabled); joe has passwordless sudo, hence --elevation-strategy passwordless.
+# Pass an IP if crawler.local won't resolve (e.g. just build-to-crawler
+# 192.168.0.18). --fallback + http2=false dodge the attic cache's flaky
+# NARs/HTTP2 the way build-crawler-image does.
+[unix]
+build-to-crawler host="crawler.local" user="joe":
     #!/usr/bin/env bash
-    echo "🔨  Building for Oracle Cloud bastion 🐧..."
-    just _show-build-prediction "oracle-cloud-bastion"
-    start=$(date +%s)
-    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    [ -n "{{args}}" ] && echo "📦  Extra nh args: {{args}}"
-    nh os switch . -H oracle-cloud-bastion --accept-flake-config {{args}}
-    just _finish-build "oracle-cloud-bastion" "$start" $?
+    set -euo pipefail
+    echo "🔨  Rebuilding NixOS on the crawler 🕷️  (build local → deploy {{ user }}@{{ host }})..."
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')
+    http2 = false"
+    nh os switch . -H crawler --target-host "{{ user }}@{{ host }}" --elevation-strategy passwordless --accept-flake-config --fallback
+    echo "✅  Rebuilt crawler! (reboot if a new kernel/overlay landed)"
 
-[private]
-_build-office-pc *args="":
-    #!/usr/bin/env bash
-    echo "🔨  Building for office PC 🐧..."
-    just _show-build-prediction "office-pc"
-    start=$(date +%s)
-    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    [ -n "{{args}}" ] && echo "📦  Extra nh args: {{args}}"
-    nh os switch . -H office-pc --accept-flake-config {{args}}
-    just _finish-build "office-pc" "$start" $?
+# ── Bootstrap (first deploy onto a fresh machine) ─────────────────────────
 
-[private]
-_build-racknerd *args="":
-    #!/usr/bin/env bash
-    echo "🔨  Building for RackNerd VPS 🐧..."
-    just _show-build-prediction "racknerd-cloud-agent"
-    start=$(date +%s)
-    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    [ -n "{{args}}" ] && echo "📦  Extra nh args: {{args}}"
-    nh os switch . -H racknerd-cloud-agent --accept-flake-config {{args}}
-    just _finish-build "racknerd-cloud-agent" "$start" $?
+# Install NixOS onto a fresh RackNerd VPS via nixos-anywhere
+[unix]
+deploy-racknerd IP:
+    @echo "🚀  Deploying Nix config to RackNerd VPS..."
+    , nixos-anywhere --flake .#racknerd-cloud-agent --build-on local joe@{{ IP }}
+    @echo "✅  Deployed to RackNerd VPS!"
 
-[private]
-_build-cloud-proxy *args="":
-    #!/usr/bin/env bash
-    echo "🔨  Building for cloud-proxy VPS 🐧..."
-    just _show-build-prediction "cloud-proxy"
-    start=$(date +%s)
-    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    [ -n "{{args}}" ] && echo "📦  Extra nh args: {{args}}"
-    nh os switch . -H cloud-proxy --accept-flake-config {{args}}
-    just _finish-build "cloud-proxy" "$start" $?
+# Install NixOS onto a fresh cloud-proxy VPS via nixos-anywhere
+[unix]
+deploy-cloud-proxy IP USER="ubuntu":
+    @echo "🚀  Deploying Nix config to cloud-proxy VPS..."
+    , nixos-anywhere --flake .#cloud-proxy --build-on local {{ USER }}@{{ IP }}
+    @echo "✅  Deployed to cloud-proxy VPS!"
 
-[private]
-_build-steamdeck *args="":
-    #!/usr/bin/env bash
-    echo "🔨  Building for Steam Deck 🎮..."
-    just _show-build-prediction "joe-steamdeck"
-    start=$(date +%s)
-    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    [ -n "{{args}}" ] && echo "📦  Extra nh args: {{args}}"
-    nh os switch . -H joe-steamdeck --accept-flake-config {{args}}
-    just _finish-build "joe-steamdeck" "$start" $?
-
-[private]
-_build-nixos *args="":
-    #!/usr/bin/env bash
-    echo "🔨  Building for NixOS desktop 🐧..."
-    just _show-build-prediction "joe-desktop"
-    start=$(date +%s)
-    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    [ -n "{{args}}" ] && echo "📦  Extra nh args: {{args}}"
-    nh os switch . -H joe-desktop --accept-flake-config {{args}}
-    just _finish-build "joe-desktop" "$start" $?
-
-# ── macOS-specific ───────────────────────────────────────────────────────
-
+# First darwin activation on a fresh mac (before nh exists)
 [macos]
 build-macos-initial:
     @echo "🔨  Building Nix config for macOS 🍎 (initial)..."
     sudo nix --extra-experimental-features 'nix-command flakes' run nix-darwin -- switch --flake .#Joes-MacBook-Pro
     @echo "✅  Built for macOS!"
 
-[macos]
-organize-launchpad:
-    @echo "🔨  Organizing Launchpad..."
-    @lporg load --config $(pwd)/hosts/common/system/dotconfig/lporg.yaml --yes --no-backup
-    @echo "✅  Organized Launchpad!"
+# ── Installer ISO (office-pc) ──────────────────────────────────────────────
 
-[macos]
-save-launchpad:
-    @echo "💾  Saving Launchpad..."
-    @lporg save --config $(pwd)/hosts/common/system/dotconfig/lporg.yaml
-    @echo "✅  Saved Launchpad!"
-
-# ── ISO images ──────────────────────────────────────────────────────────
-
+# Build the offline installer ISO with the full office-pc closure baked in
 [unix]
 build-office-pc-iso:
     @echo "Building office-pc installer ISO (includes full system closure)..."
     @nix build .#nixosConfigurations.office-pc-installer.config.system.build.isoImage --log-format internal-json -v |& nom --json
     echo "ISO built: $(ls result/iso/*.iso)"
 
+# Write the built ISO to a USB device (defaults to /dev/sdb)
 [confirm("This will ERASE the target device. Continue?")]
 [unix]
 write-iso device="":
@@ -193,196 +203,200 @@ write-iso device="":
     SECS=$(( ELAPSED % 60 ))
     echo "✅  ISO written to $DEV in ${MINS}m${SECS}s"
 
-# ── Secrets ──────────────────────────────────────────────────────────────
+# ── Raspberry Pi SD image (crawler) ────────────────────────────────────────
 
+# Cross-builds aarch64 via binfmt on x86_64; builds natively on aarch64.
+# --accept-flake-config trusts the nixos-raspberrypi cachix substituter.
+# --fallback builds from source when a substituter serves a corrupt/partial NAR
+# (e.g. the attic cache occasionally truncates firmware/zfs-user NARs).
+# Build the crawler SD-card image (uncompressed .img)
+[unix]
+build-crawler-image:
+    @echo "🔨  Building crawler SD image (aarch64; builds the rpi kernel if not cached)..."
+    @nix build .#nixosConfigurations.crawler.config.system.build.sdImage --accept-flake-config --fallback --log-format internal-json -v |& nom --json
+    @echo "✅  Image built: $(ls result/sd-image/*.img)"
+
+# Bake the SSH host key into the built image's ext4 root and emit a standalone,
+# ready-to-flash .img — no block device is touched. Pure userspace (debugfs), so
+# it needs no root, no loopback, and no mount: runs on macOS and Linux alike
+# (macOS can't mount ext4, but debugfs writes it directly).
+# The host key is pulled from 1Password (item "Crawler RasPi Nixos SSH Key" in
+# vault "Private", fields "private key"/"public key"), the same way secret-helper
+# sources keys via `op read`. The injected /etc/ssh/ssh_host_ed25519_key is the
+# agenix identity that decrypts wifi/attic on first boot.
+# Pass img= to bake an image built elsewhere; otherwise it auto-detects
+# ./result/sd-image/*.img. Pass key=/path/to/privkey to read from disk instead
+# of 1Password.
+# Usage: just bake-crawler-image [out.img] [img=/path/to/raw.img] [item=] [vault=] [key=]
+[unix]
+bake-crawler-image out="crawler-sd.img" img="" item="Crawler RasPi Nixos SSH Key" vault="Private" key="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    IMG="{{ img }}"
+    if [ -z "$IMG" ]; then
+      IMG=$(ls result/sd-image/*.img 2>/dev/null | head -1)
+    fi
+    if [ -z "$IMG" ] || [ ! -f "$IMG" ]; then
+      echo "No image found. Pass img=/path/to/raw.img, or run 'just build-crawler-image' first."
+      exit 1
+    fi
+    OUT="{{ out }}"
+
+    # Resolve the host key into private/public temp files (mode 600, removed on
+    # exit). Default source is 1Password; key= overrides with an on-disk privkey.
+    PRIV=$(mktemp); PUB=$(mktemp)
+    chmod 600 "$PRIV" "$PUB"
+    trap 'rm -f "$PRIV" "$PUB"' EXIT
+    KEY="{{ key }}"
+    if [ -n "$KEY" ]; then
+      [ -f "$KEY" ] || { echo "Key file '$KEY' not found"; exit 1; }
+      cp "$KEY" "$PRIV"
+      if [ -f "$KEY.pub" ]; then cp "$KEY.pub" "$PUB"; else ssh-keygen -y -f "$PRIV" > "$PUB"; fi
+      echo "Using on-disk host key: $KEY"
+    else
+      command -v op >/dev/null 2>&1 || { echo "1Password CLI 'op' not found (needed to fetch the host key)"; exit 1; }
+      echo "Fetching host key from 1Password: {{ item }} (vault {{ vault }})"
+      op read "op://{{ vault }}/{{ item }}/private key?ssh-format=openssh" > "$PRIV"
+      op read "op://{{ vault }}/{{ item }}/public key" > "$PUB"
+      [ -s "$PRIV" ] && [ -s "$PUB" ] || { echo "Failed to read host key from 1Password"; exit 1; }
+    fi
+
+    # Copy the store image (0444) to a writable, user-owned file. Prefer a
+    # copy-on-write clone (instant on APFS/btrfs); fall back to a full copy.
+    echo "Copying image -> $OUT"
+    if   cp --reflink=auto "$IMG" "$OUT" 2>/dev/null; then :
+    elif cp -c             "$IMG" "$OUT" 2>/dev/null; then :
+    else cp                "$IMG" "$OUT"; fi
+    chmod u+w "$OUT"
+
+    # Find the ext4 root partition (MBR type 0x83) and its byte offset. The MBR
+    # partition table lives at byte 446; each 16-byte entry holds the type at
+    # +4 and the little-endian start LBA at +8.
+    OFF=""
+    for slot in 0 1 2 3; do
+      base=$((446 + slot * 16))
+      ptype=$(dd if="$OUT" bs=1 skip=$((base + 4)) count=1 2>/dev/null | od -An -tu1 | tr -d ' ')
+      if [ "$ptype" = "131" ]; then   # 0x83 = Linux
+        start=$(dd if="$OUT" bs=1 skip=$((base + 8)) count=4 2>/dev/null | od -An -tu4 | tr -d ' ')
+        OFF=$((start * 512))
+        break
+      fi
+    done
+    if [ -z "$OFF" ]; then
+      echo "No Linux (ext4, type 0x83) partition found in $OUT"
+      exit 1
+    fi
+    echo "ext4 root partition at byte offset $OFF — injecting host key via debugfs"
+
+    # debugfs from e2fsprogs; use it from PATH if present, else from nixpkgs.
+    # DEBUGFS_PAGER=cat stops debugfs piping output through a pager (no q prompt).
+    export DEBUGFS_PAGER=cat
+    DEBUGFS=(debugfs)
+    command -v debugfs >/dev/null 2>&1 || DEBUGFS=(nix shell nixpkgs#e2fsprogs -c debugfs)
+
+    # Inject the key into the ext4 root entirely in userspace at the partition
+    # offset. NixOS generates most of /etc at boot but preserves pre-seeded
+    # ssh_host_*_key files, so creating /etc/ssh here is enough.
+    DBG=$(mktemp)
+    cat > "$DBG" <<EOF
+    mkdir /etc
+    sif /etc mode 040755
+    mkdir /etc/ssh
+    sif /etc/ssh mode 040755
+    cd /etc/ssh
+    rm ssh_host_ed25519_key
+    rm ssh_host_ed25519_key.pub
+    write $PRIV ssh_host_ed25519_key
+    write $PUB ssh_host_ed25519_key.pub
+    sif ssh_host_ed25519_key mode 0100600
+    sif ssh_host_ed25519_key uid 0
+    sif ssh_host_ed25519_key gid 0
+    sif ssh_host_ed25519_key.pub mode 0100644
+    sif ssh_host_ed25519_key.pub uid 0
+    sif ssh_host_ed25519_key.pub gid 0
+    EOF
+    # Run the injection quietly; keep the log only to show it if something fails.
+    LOG=$(mktemp)
+    "${DEBUGFS[@]}" -w -f "$DBG" "$OUT?offset=$OFF" >"$LOG" 2>&1 || true
+    rm -f "$DBG"
+
+    # Confirm by reading the pubkey back out of the image and matching the source.
+    want=$(awk '{print $2}' "$PUB")
+    got=$("${DEBUGFS[@]}" -R "cat /etc/ssh/ssh_host_ed25519_key.pub" "$OUT?offset=$OFF" 2>/dev/null | awk '{print $2}')
+    if [ -z "$want" ] || [ "$want" != "$got" ]; then
+      echo "❌  Host key injection failed. debugfs output:"
+      cat "$LOG"; rm -f "$LOG"
+      exit 1
+    fi
+    rm -f "$LOG"
+
+    SIZE=$(du -h "$OUT" | cut -f1)
+    echo "✅  Ready: $OUT (${SIZE}) — host key injected & verified."
+    echo "   Copy it to your Mac and write to the SD card, e.g.:"
+    echo "     • Raspberry Pi Imager / Balena Etcher → choose 'Use custom' → $OUT"
+    echo "     • or on macOS:  diskutil list   →   diskutil unmountDisk /dev/diskN"
+    echo "                     sudo dd if=$OUT of=/dev/rdiskN bs=4M status=progress   (rdiskN = raw, faster)"
+
+# ── Secrets & packages ─────────────────────────────────────────────────────
+
+# Manage agenix secrets (add/edit/remove/decrypt/rekey/list)
 [unix]
 secret *args:
-    @scripts/secret-helper.sh {{ args }}
+    @secret-helper {{ args }}
 
-# ── Remote hosts ─────────────────────────────────────────────────────────
-
-[unix]
-deploy-racknerd IP:
-    @echo "🚀  Deploying Nix config to RackNerd VPS..."
-    , nixos-anywhere --flake .#racknerd-cloud-agent --build-on local joe@{{ IP }}
-    @echo "✅  Deployed to RackNerd VPS!"
-
-[unix]
-deploy-cloud-proxy IP USER="ubuntu":
-    @echo "🚀  Deploying Nix config to cloud-proxy VPS..."
-    , nixos-anywhere --flake .#cloud-proxy --build-on local {{ USER }}@{{ IP }}
-    @echo "✅  Deployed to cloud-proxy VPS!"
-
-[unix]
-build-to-cloud-proxy:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    echo "🔨  Rebuilding NixOS on cloud-proxy VPS (build locally, deploy remote)..."
-    DOMAINS="import ./secrets/domains.nix"
-    SSH_DOMAIN=$(nix eval --impure --expr "($DOMAINS).cloudProxySshDomain" --raw)
-    SSH_USER=$(nix eval --impure --expr "($DOMAINS).sshUser" --raw)
-    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nixos-rebuild switch --flake .#cloud-proxy --target-host "$SSH_USER@$SSH_DOMAIN" --build-host localhost --sudo --accept-flake-config --log-format internal-json -v |& nom --json
-    echo "✅  Rebuilt cloud-proxy VPS!"
-
-[unix]
-build-to-racknerd:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    echo "🔨  Rebuilding NixOS on RackNerd VPS (build locally, deploy remote)..."
-    DOMAINS="import ./secrets/domains.nix"
-    SSH_DOMAIN=$(nix eval --impure --expr "($DOMAINS).racknerdSshDomain" --raw)
-    SSH_USER=$(nix eval --impure --expr "($DOMAINS).sshUser" --raw)
-    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nixos-rebuild switch --flake .#racknerd-cloud-agent --target-host "$SSH_USER@$SSH_DOMAIN" --build-host localhost --sudo --accept-flake-config --fallback --log-format internal-json -v |& nom --json
-    echo "✅  Rebuilt RackNerd VPS!"
-
-[unix]
-build-to-bastion local="":
-    #!/usr/bin/env bash
-    set -euo pipefail
-    echo "🔨  Rebuilding NixOS on Oracle Cloud bastion..."
-    DOMAINS="import ./secrets/domains.nix"
-    BASTION_DOMAIN=$(nix eval --impure --expr "($DOMAINS).bastionDomain" --raw)
-    SSH_USER=$(nix eval --impure --expr "($DOMAINS).sshUser" --raw)
-    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    BUILD_HOST_ARGS=()
-    if [ "{{ local }}" = "--local" ]; then
-      BUILD_HOST_ARGS=(--build-host localhost)
-    fi
-    nixos-rebuild switch --flake .#oracle-cloud-bastion --target-host "$SSH_USER@$BASTION_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --ask-sudo-password --accept-flake-config
-    echo "✅  Rebuilt Oracle Cloud bastion!"
-
-# ── Package management ───────────────────────────────────────────────────
-
-[unix]
-update-pins dry_run='':
-    #!/usr/bin/env bash
-    set -euo pipefail
-    echo "🔄  Updating pinned flake inputs..."
-    export GH_TOKEN="$(gh auth token 2>/dev/null || echo '')"
-    if [ "{{ dry_run }}" = "--dry-run" ]; then
-      DRY_RUN=true scripts/update-flake-pins.sh
-      echo "✅  Pins updated (dry-run)!"
-      exit 0
-    fi
-    scripts/update-flake-pins.sh
-    # Commit the refreshed flake.lock so this machine persists what's pinned.
-    # (The maintenance reminder reads freshness straight from flake.lock's
-    # lastModified, not from this commit — so there's no history file to sync.)
-    git add flake.nix flake.lock 2>/dev/null || true
-    if ! git diff --cached --quiet; then
-      git commit -q -m "chore: update-pins — refresh flake inputs"
-      echo "  ✓ committed flake.nix + flake.lock"
-    fi
-    echo "✅  Pins updated!"
-
+# Add PyPI packages to the custom python set
 [unix]
 setup-python-packages packages='':
     @echo "🔄  Setting up Python packages..."
-    @scripts/setup-python-packages.sh {{ packages }}
+    @setup-python-packages {{ packages }}
     @echo "✅  Python packages setup!"
 
+# Bump versions/hashes of the custom PyPI package set
 [unix]
 update-python-packages:
     @echo "🔄  Updating Python packages..."
-    @scripts/update-python-packages.sh --no-build
+    @update-python-packages --no-build
     @echo "✅  Python packages updated!"
 
+# ── Repo checks & maintenance ──────────────────────────────────────────────
+
+# Run nix flake check for this system
 [unix]
-update-node-packages:
-    @echo "🔄  Updating Node packages..."
-    @scripts/update-node-packages.sh
-    @echo "✅  Node packages updated!"
+check: lint
+    @echo "🔍  Checking Nix config for {{ arch() }}-{{ os() }}..."
+    @NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 NIXPKGS_ALLOW_UNFREE=1 NIXPKGS_ALLOW_BROKEN=1 nix --extra-experimental-features 'nix-command flakes' flake check --impure --system {{ arch() }}-{{ os() }} --show-trace
+    @echo "✅  Check completed!"
 
-# ── Maintenance ──────────────────────────────────────────────────────────
+# Format all nix files (nixfmt)
+[unix]
+lint:
+    @echo "📝  Linting Nix config..."
+    @nix --extra-experimental-features 'nix-command flakes' fmt
+    @echo "✅  Nix config linted!"
 
+# Update every flake input (the lock is the only pin)
+[unix]
+flake-update:
+    @echo "🔄  Updating flake..."
+    @nix --extra-experimental-features 'nix-command flakes' flake update --option access-tokens "github.com=$(gh auth token 2>/dev/null || echo '')"
+    @echo "✅  Flake updated!"
+
+# Garbage-collect old generations and store paths
 [unix]
 nix-gc:
     @echo "🧹  Garbage collecting nix..."
     @nh clean all --keep-since 7d --keep 3
     @echo "✅  Garbage collected!"
 
-# ── Submodules ───────────────────────────────────────────────────────
+# ── Private helpers ────────────────────────────────────────────────────────
 
-[unix]
-sync-submodules:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    echo "🔄  Syncing submodules..."
-    git submodule sync --recursive
-    # Ensure submodules are initialized (clones any new ones)
-    git submodule update --init --recursive
-    # First pass: fetch, validate state, push local-ahead commits on main
-    git submodule foreach --recursive '
-      git fetch origin 2>/dev/null || { echo "❌  $name: failed to fetch — aborting"; exit 1; }
-      dirty="$(git status --porcelain 2>/dev/null || true)"
-      if [ -n "$dirty" ]; then
-        echo "❌  $name: has uncommitted changes — aborting"
-        exit 1
-      fi
-      current_branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo HEAD)"
-      if [ "$current_branch" != "main" ] && [ "$current_branch" != "HEAD" ]; then
-        echo "❌  $name: on branch '\''$current_branch'\'' (expected main or detached) — aborting"
-        exit 1
-      fi
-      if [ "$current_branch" = "main" ]; then
-        local_ahead="$(git log --oneline origin/main..HEAD 2>/dev/null || true)"
-        remote_ahead="$(git log --oneline HEAD..origin/main 2>/dev/null || true)"
-        if [ -n "$local_ahead" ] && [ -n "$remote_ahead" ]; then
-          echo "❌  $name: main has diverged from origin/main — aborting (resolve manually)"
-          exit 1
-        fi
-        if [ -n "$local_ahead" ]; then
-          echo "  ⬆️  Pushing $name..."
-          git push origin main || { echo "❌  $name: push failed — aborting"; exit 1; }
-        fi
-      fi
-    '
-    # Second pass: check out main at latest origin/main for every submodule
-    git submodule foreach --recursive '
-      echo "  ⬇️  $name → origin/main"
-      if git show-ref --verify --quiet refs/heads/main; then
-        git checkout main >/dev/null 2>&1
-        git merge --ff-only origin/main
-      else
-        git checkout -B main origin/main
-      fi
-    '
-    # Third pass: re-resolve transitive flake deps from path: submodules
-    # (e.g. agent-skills pins codex-nix/claude-nix/antigravity-cli-nix which the
-    #  outer dotfiles lock caches independently)
-    echo "🔒  Re-locking transitive flake deps from submodules..."
-    git submodule foreach --quiet 'echo "$name"' | while read -r sub; do
-      for dep in $(nix flake metadata --json "path:./$sub" 2>/dev/null \
-                    | jq -r '.locks.nodes.root.inputs // {} | keys[]' 2>/dev/null); do
-        nix flake lock --update-input "$sub/$dep" 2>/dev/null || true
-      done
-    done
-    # Fourth pass: stage and commit the parent dotfiles repo's updated
-    # submodule pointers + flake.lock (so this machine's recorded HEAD
-    # matches the freshly-synced submodule and flake state).
-    echo "📌  Recording new submodule + flake state in parent repo..."
-    parent_changes=""
-    for path in flake.lock $(git config --file .gitmodules --get-regexp path 2>/dev/null | awk '{print $2}'); do
-      git add -- "$path" 2>/dev/null || true
-    done
-    # This commit advances the submodule gitlinks; the maintenance reminder
-    # reads the date of the last commit touching a (non-secrets) gitlink as
-    # "last sync" — so there's no history file to sync.
-    if ! git diff --cached --quiet; then
-      git commit -q -m "chore: sync-submodules — refresh submodule pointers + flake.lock"
-      echo "  ✓ committed parent pointer updates"
-    else
-      echo "  • parent already up to date"
-    fi
-    echo "✅  Submodules synced!"
-
-# ── Build timing ─────────────────────────────────────────────────────
+# Read a value from the dotfiles-secrets input's domains.nix
+[private]
+_secret-domain key:
+    @nix eval --raw --impure --expr '(import "${(builtins.getFlake (toString ./.)).inputs.dotfiles-secrets}/domains.nix").{{ key }}'
 
 # Per-machine build durations, kept local (gitignored). Predictions are
-# per-host and read straight from this file, so there's nothing to sync to
-# the secrets submodule — no commit, no push, no conflict markers.
+# per-host and read straight from this file; nothing to sync anywhere.
 build_times_file := ".build-times"
 
 [private]
@@ -438,73 +452,22 @@ _finish-build host start_time exit_code:
       exit {{ exit_code }}
     fi
 
-# ── Maintenance reminders ────────────────────────────────────────────
-
 stale_days := "7"
-
-# Commits a single file inside the secrets submodule. Pulls --rebase first
-# to absorb any concurrent changes from other machines, then pushes. Silent
-# no-op if the file has no actual changes.
-[private]
-_commit-to-secrets file msg:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    relfile=$(echo "{{ file }}" | sed 's|^secrets/||')
-    cd secrets
-    git pull --rebase --autostash origin main >/dev/null 2>&1 || true
-    git add -- "$relfile"
-    if git diff --cached --quiet; then
-      exit 0
-    fi
-    git commit -q -m "{{ msg }}"
-    git push origin main >/dev/null 2>&1 \
-      && echo "  ↑ secrets pushed ({{ msg }})" \
-      || echo "  ⚠ secrets push deferred (will retry next run)"
-
-# Manual helper: after you commit inside the `secrets` submodule, this re-points
-# the parent repo's `secrets` gitlink to the submodule HEAD and re-locks the
-# dotfiles-secrets flake input — otherwise the submodule sits one commit ahead of
-# the recorded pointer (an untracked, dirty tree). Commit-only (push the parent
-# when you like); no-op when already in sync.
-[private]
-_sync-secrets-pointer:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    git add secrets
-    nix --extra-experimental-features 'nix-command flakes' flake update dotfiles-secrets \
-      --option access-tokens "github.com=$(gh auth token 2>/dev/null || echo '')" >/dev/null 2>&1 || true
-    git add flake.lock
-    if git diff --cached --quiet; then
-      exit 0
-    fi
-    git commit -q -m "chore: track secrets submodule (pointer + flake.lock)"
-    echo "  ✓ parent secrets pointer committed"
 
 [private]
 _check-maintenance:
     #!/usr/bin/env bash
     stale_seconds=$(( {{ stale_days }} * 86400 ))
     now=$(date +%s)
-    # Derive each task's freshness from the artifact it maintains rather than a
-    # synced history file:
-    #   • update-pins keeps flake.lock fresh → newest input's lastModified.
-    #     path: inputs (secrets/agent-skills/...) carry no lastModified, so the
-    #     per-build secrets re-lock can't skew this — only real upstream inputs.
-    #   • sync-submodules advances the submodule gitlinks → date of the last
-    #     parent commit touching a non-secrets gitlink (secrets is excluded
-    #     because build-time tracking advances it on every build).
-    # Both answer "how fresh is the artifact, from any source" — what the
-    # reminder actually cares about — and need nothing pushed to .secrets.
+    # Freshness comes from the artifact itself: flake-update keeps flake.lock
+    # fresh (newest input's lastModified).
     check_task() {
       local label=$1 cmd=$2 last_ts=$3
       if [[ -z "$last_ts" ]]; then
-        echo -e "\033[0;33m[WARN]\033[0m $label has never been run — consider: just $cmd"
+        echo -e "\033[0;33m[WARN]\033[0m $label has never been run; consider: just $cmd"
       elif (( now - last_ts > stale_seconds )); then
-        echo -e "\033[0;33m[WARN]\033[0m $label last refreshed $(( (now - last_ts) / 86400 ))d ago — consider: just $cmd"
+        echo -e "\033[0;33m[WARN]\033[0m $label last refreshed $(( (now - last_ts) / 86400 ))d ago; consider: just $cmd"
       fi
     }
     pins_ts=$(jq -r '[.nodes[].locked.lastModified // empty] | max // empty' flake.lock 2>/dev/null || true)
-    subs=$(git config --file .gitmodules --get-regexp path 2>/dev/null | awk '$2 != "secrets" {print $2}')
-    subs_ts=$(git log -1 --format=%ct -- $subs 2>/dev/null || true)
-    check_task "Pin updates" "update-pins" "$pins_ts"
-    check_task "Submodule sync" "sync-submodules" "$subs_ts"
+    check_task "Flake inputs" "flake-update" "$pins_ts"
