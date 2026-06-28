@@ -81,6 +81,7 @@
           git-worktree-switcher
           gitleaks
           pre-commit
+          sem # semantic, entity-level git diff/impact/blame/context (tree-sitter)
         ];
 
         nix-tooling = [
