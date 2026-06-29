@@ -2,7 +2,7 @@
 # Use this to configure your home environment (it replaces ~/.config/nixpkgs/home.nix)
 { inputs, ... }:
 let
-  dotfiles-assets = inputs.dotfiles-assets;
+  inherit (inputs) dotfiles-assets;
 in
 {
   den.aspects.Joes-MacBook-Pro.homeManager =
@@ -19,6 +19,12 @@ in
           source ${pkgs.iterm2-terminal-integration}/bin/iterm2_shell_integration.fish
         end
         fish_add_path -a /Applications/Obsidian.app/Contents/MacOS
+
+        # Point SSH_AUTH_SOCK at 1Password's SSH agent. macOS launchd exports a
+        # default SSH_AUTH_SOCK into every shell; in fish that global shadows any
+        # `set -U`, so set a global here to win and make agent-aware tools (e.g.
+        # `ssh-add -l`) talk to 1Password (matches the IdentityAgent below).
+        set -gx SSH_AUTH_SOCK "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
       '';
       fonts = import ../../_data/fonts { inherit pkgs lib dotfiles-assets; };
     in
