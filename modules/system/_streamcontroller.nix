@@ -1,7 +1,7 @@
 { pkgs }:
 let
   package = (pkgs.unstable.streamcontroller.override { isKde = true; }).overrideAttrs (old: {
-    version = "1.5.0-beta.14-unstable-2026-06-25";
+    version = "1.5.0-beta.14-unstable-2026-07-01";
     src = pkgs.fetchFromGitHub {
       owner = "joegoldin";
       repo = "StreamController";
@@ -9,8 +9,8 @@ let
       # carries the watcher-thread teardown fix (stops the runaway kdotool/KWin
       # script storm that wedged plasmashell's D-Bus) and the ComboRow GTK
       # main-thread fix from main. See joegoldin/StreamController#1.
-      rev = "645f30692f4e72a93a73502f01c248e6cbee3dab";
-      hash = "sha256-Uhk1NKE9yXM00PClS2mc91Of7tjWpV/mIs+L/rjC+Qg=";
+      rev = "9a4c388b4eca1b5b820ae2cb316602dc7183f768";
+      hash = "sha256-VFxirAlEyaZyN95E0ktCH8DztW6hoNumrA3sLEBw12Q=";
     };
     nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
     # The upstream nixpkgs derivation builds the Python env from a fixed list,
