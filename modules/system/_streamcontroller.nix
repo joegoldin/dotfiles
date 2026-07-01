@@ -9,8 +9,8 @@ let
       # carries the watcher-thread teardown fix (stops the runaway kdotool/KWin
       # script storm that wedged plasmashell's D-Bus) and the ComboRow GTK
       # main-thread fix from main. See joegoldin/StreamController#1.
-      rev = "9a4c388b4eca1b5b820ae2cb316602dc7183f768";
-      hash = "sha256-VFxirAlEyaZyN95E0ktCH8DztW6hoNumrA3sLEBw12Q=";
+      rev = "8e60d45c8db8682b3a37bc9b62e1a5a44d457b43";
+      hash = "sha256-85ZR0G7Ui5jMisynSNuuRSHclSe95uYDGtXFFdrqaDM=";
     };
     nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
     # The upstream nixpkgs derivation builds the Python env from a fixed list,
