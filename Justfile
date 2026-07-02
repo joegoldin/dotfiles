@@ -207,11 +207,17 @@ deploy-erdtree IP USER="root":
         flake = builtins.getFlake (toString ./.);
         images = builtins.getFlake "github:nix-community/nixos-images";
         nixpkgs = flake.inputs.nixpkgs;
+        lib = nixpkgs.lib;
         system = "x86_64-linux";
       in (nixpkgs.legacyPackages.${system}.nixos [
         images.nixosModules.kexec-installer
         images.nixosModules.noninteractive
-        { hardware.enableRedistributableFirmware = true;
+        # The installer modules force enableRedistributableFirmware OFF (small
+        # image), so a plain `true` loses — mkForce it back on. firmwareCompression
+        # = "none" ships the blobs UNCOMPRESSED (bnx2x-e2-*.fw), so the kernel does
+        # not depend on fw-loader xz/zstd support to load the BCM57800 firmware.
+        { hardware.enableRedistributableFirmware = lib.mkForce true;
+          hardware.firmwareCompression = lib.mkForce "none";
           boot.initrd.availableKernelModules = [ "bnx2x" "megaraid_sas" ];
           boot.kernelModules = [ "bnx2x" ]; }
       ]).config.system.build.kexecInstallerTarball')
