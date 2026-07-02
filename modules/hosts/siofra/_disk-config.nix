@@ -15,16 +15,16 @@ _: {
               size = "1M";
               type = "EF02"; # BIOS boot partition
             };
-            # Root filesystem
+            # Root filesystem (fills the disk minus the swap tail)
             root = {
-              end = "-2G";
+              end = "-8G";
               content = {
                 type = "filesystem";
                 format = "ext4";
                 mountpoint = "/";
               };
             };
-            # Swap partition
+            # Swap partition (~8 GiB)
             swap = {
               size = "100%";
               content = {
