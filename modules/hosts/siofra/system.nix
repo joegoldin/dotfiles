@@ -44,9 +44,10 @@ in
       services.openssh = {
         enable = true;
         settings = {
-          # Allow root login by SSH key only (no password) so nixos-anywhere can
-          # re-install without re-imaging; fail2ban + key-only auth guard it.
-          PermitRootLogin = "prohibit-password";
+          # Forbid root SSH on the booted system — admin is joe + passwordless
+          # sudo, and the initrd LUKS-unlock uses its own separate sshd. (A
+          # re-install targets a fresh/rescue image, or nixos-anywhere over joe@.)
+          PermitRootLogin = "no";
           # Opinionated: use keys only.
           PasswordAuthentication = false;
         };
