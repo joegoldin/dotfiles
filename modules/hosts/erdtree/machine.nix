@@ -75,15 +75,13 @@ in
 
           '';
         };
-        # NIC driver(s) for initrd networking — TRIM to erdtree's actual NIC once
-        # known (check `lspci -k` / the generated hardware-config). This is a
-        # broad bare-metal net so the box can come up to be unlocked.
+        # Initrd modules for early boot: bnx2x is the Broadcom BCM57800 NIC (so
+        # the box can network + be SSHed for the LUKS unlock); megaraid_sas is
+        # the PERC H710 RAID controller (so stage-1 can even see /dev/sda to
+        # unlock the encrypted root). Both confirmed via lspci -k on the box.
         availableKernelModules = [
-          "e1000e"
-          "igb"
-          "ixgbe"
-          "r8169"
-          "tg3"
+          "bnx2x"
+          "megaraid_sas"
         ];
         network = {
           enable = true;
