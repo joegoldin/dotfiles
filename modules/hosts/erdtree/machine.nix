@@ -53,9 +53,11 @@ in
       users.extraGroups.docker.members = [ "${username}" ];
 
       # Full-disk encryption: unlock the LUKS root remotely over SSH in the
-      # initrd. On every boot the box halts here until you
-      # `ssh -p 2222 root@erdtree.turnin.quest` and enter the passphrase (then
-      # `systemd-tty-ask-password-agent` if not prompted automatically).
+      # initrd, on :22 sharing the booted system's host key (deploy-erdtree seeds
+      # the same key into both, so known_hosts doesn't churn). On every boot the
+      # box halts here until you `ssh root@erdtree.turnin.quest` (authorized with
+      # joe's key) and enter the passphrase (then `systemd-tty-ask-password-agent`
+      # if not auto-prompted). After boot, `ssh joe@…` works normally on :22.
       boot.initrd = {
         systemd.enable = true;
         # NIC driver(s) for initrd networking — TRIM to erdtree's actual NIC once
@@ -72,7 +74,7 @@ in
           enable = true;
           ssh = {
             enable = true;
-            port = 2222;
+            port = 22;
             authorizedKeys = [ keys.${username} ];
             hostKeys = [ "/etc/secrets/initrd/ssh_host_ed25519_key" ];
           };

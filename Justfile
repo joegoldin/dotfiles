@@ -175,20 +175,26 @@ deploy-cloud-proxy IP USER="ubuntu":
     , nixos-anywhere --flake .#cloud-proxy --build-on local {{ USER }}@{{ IP }}
     @echo "✅  Deployed to cloud-proxy VPS!"
 
-# Encrypted first-install via nixos-anywhere: generates the initrd SSH host key
-# (for remote LUKS unlock) into --extra-files, prompts for the LUKS passphrase
+# Encrypted first-install via nixos-anywhere: generates ONE SSH host key shared
+# by the booted system and the initrd (seeded into both via --extra-files, so
+# unlocking on :22 doesn't churn known_hosts — and it doubles as the agenix
+# identity, printed for keys.nix), prompts twice for the LUKS passphrase
 # (--disk-encryption-keys), and captures real hardware (--generate-hardware-config;
 # commit it after). Fresh box logs in as root; pass USER=ubuntu (etc.) if the
 # image differs. After first boot the box halts in the initrd — unlock with
-# `ssh -p 2222 root@<host>` and enter the passphrase.
+# `ssh root@<host>` (your joe key) and enter the passphrase.
 [unix]
 deploy-erdtree IP USER="root":
     #!/usr/bin/env bash
     set -euo pipefail
     echo "🚀  Deploying encrypted NixOS to erdtree 🌳 ..."
     TMP=$(mktemp -d); trap "rm -rf \"$TMP\"" EXIT
-    install -d -m 700 "$TMP/extra/etc/secrets/initrd"
-    ssh-keygen -t ed25519 -N "" -C erdtree-initrd -f "$TMP/extra/etc/secrets/initrd/ssh_host_ed25519_key" >/dev/null
+    install -d "$TMP/extra/etc/ssh"; install -d -m 700 "$TMP/extra/etc/secrets/initrd"
+    # One host key for the booted system + the initrd (so :22 is seamless).
+    ssh-keygen -t ed25519 -N "" -C erdtree -f "$TMP/extra/etc/ssh/ssh_host_ed25519_key" >/dev/null
+    cp "$TMP/extra/etc/ssh/ssh_host_ed25519_key" "$TMP/extra/etc/secrets/initrd/ssh_host_ed25519_key"
+    chmod 600 "$TMP/extra/etc/ssh/ssh_host_ed25519_key" "$TMP/extra/etc/secrets/initrd/ssh_host_ed25519_key"
+    echo "🔑  erdtree host key (add to keys.nix as erdtree, then rekey):"; cat "$TMP/extra/etc/ssh/ssh_host_ed25519_key.pub"
     while :; do
       read -rsp "LUKS passphrase for erdtree: " PASS; echo
       read -rsp "Confirm passphrase: " PASS2; echo
@@ -202,7 +208,7 @@ deploy-erdtree IP USER="root":
       --disk-encryption-keys /tmp/luks.key "$TMP/luks.key" \
       --extra-files "$TMP/extra" \
       --flake .#erdtree --build-on local {{ USER }}@{{ IP }}
-    echo "✅  Deployed erdtree! Unlock on boot: ssh -p 2222 root@erdtree.turnin.quest"
+    echo "✅  Deployed erdtree! Unlock on boot: ssh root@erdtree.turnin.quest"
 
 # Encrypted first-install for siofra (see deploy-erdtree for details).
 [unix]
@@ -211,8 +217,12 @@ deploy-siofra IP USER="root":
     set -euo pipefail
     echo "🚀  Deploying encrypted NixOS to siofra 🌊 ..."
     TMP=$(mktemp -d); trap "rm -rf \"$TMP\"" EXIT
-    install -d -m 700 "$TMP/extra/etc/secrets/initrd"
-    ssh-keygen -t ed25519 -N "" -C siofra-initrd -f "$TMP/extra/etc/secrets/initrd/ssh_host_ed25519_key" >/dev/null
+    install -d "$TMP/extra/etc/ssh"; install -d -m 700 "$TMP/extra/etc/secrets/initrd"
+    # One host key for the booted system + the initrd (so :22 is seamless).
+    ssh-keygen -t ed25519 -N "" -C siofra -f "$TMP/extra/etc/ssh/ssh_host_ed25519_key" >/dev/null
+    cp "$TMP/extra/etc/ssh/ssh_host_ed25519_key" "$TMP/extra/etc/secrets/initrd/ssh_host_ed25519_key"
+    chmod 600 "$TMP/extra/etc/ssh/ssh_host_ed25519_key" "$TMP/extra/etc/secrets/initrd/ssh_host_ed25519_key"
+    echo "🔑  siofra host key (add to keys.nix as siofra, then rekey):"; cat "$TMP/extra/etc/ssh/ssh_host_ed25519_key.pub"
     while :; do
       read -rsp "LUKS passphrase for siofra: " PASS; echo
       read -rsp "Confirm passphrase: " PASS2; echo
@@ -226,7 +236,7 @@ deploy-siofra IP USER="root":
       --disk-encryption-keys /tmp/luks.key "$TMP/luks.key" \
       --extra-files "$TMP/extra" \
       --flake .#siofra --build-on local {{ USER }}@{{ IP }}
-    echo "✅  Deployed siofra! Unlock on boot: ssh -p 2222 root@siofra.turnin.quest"
+    echo "✅  Deployed siofra! Unlock on boot: ssh root@siofra.turnin.quest"
 
 # First darwin activation on a fresh mac (before nh exists)
 [macos]
