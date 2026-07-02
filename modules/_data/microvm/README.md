@@ -1,6 +1,6 @@
 # microVM subsystem
 
-Declarative, disposable Linux microVMs on joe-desktop, built on
+Declarative, disposable Linux microVMs on elphael, built on
 [microvm.nix](https://github.com/microvm-nix/microvm.nix). This directory
 holds the *data half* of the subsystem; the host service and CLI live in
 the module tree:

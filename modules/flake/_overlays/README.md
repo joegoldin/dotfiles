@@ -23,12 +23,12 @@ The named overlays:
 overlays applied inside the `pkgs.unstable` evaluation: the pulsemeeter
 fork, ibis-framework/openldap test disables, tinygrad. It exists as a
 separate, reusable list so hosts that need a *custom* unstable can rebuild
-it without losing those patches: office-pc's `system.nix` adds a later
+it without losing those patches: volcano-manor's `system.nix` adds a later
 overlay that re-imports nixpkgs-unstable with `rocmSupport = true` and
 `unstableOverlays ++ [ ./vllm-rocm.nix ]`; later overlays win, replacing
 the stock `pkgs.unstable` on that host only.
 
-`./vllm-rocm.nix` is that office-pc-only overlay: a `vllm-rocm` application
+`./vllm-rocm.nix` is that volcano-manor-only overlay: a `vllm-rocm` application
 built as an isolated leaf so the rest of `unstable.python3Packages` keeps
 upstream hashes (and cache hits).
 
@@ -40,4 +40,4 @@ upstream hashes (and cache hits).
 - New **custom package** → `../_pkgs` (picked up by `additions`)
 - Overlay shipped by a **new flake input** → a new `<name>-packages` attr
 - **Host-specific** package-set variant → a later overlay in that host's
-  `system.nix` (see office-pc), not here
+  `system.nix` (see volcano-manor), not here

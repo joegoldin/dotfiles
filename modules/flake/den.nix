@@ -26,7 +26,7 @@
   ];
 
   # Default stateVersions; hosts that diverge override in their own aspect
-  # (cloud-proxy mkForces 25.11, darwin uses its own integer scheme).
+  # (dectus mkForces 25.11, darwin uses its own integer scheme).
   den.default.nixos.system.stateVersion = lib.mkDefault "24.11";
   den.default.homeManager.home.stateVersion = lib.mkDefault "24.11";
 }

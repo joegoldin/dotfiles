@@ -20,7 +20,7 @@ in
       ...
     }:
     let
-      # Uplink interface on joe-desktop. Confirmed via `ip -o link show`.
+      # Uplink interface on elphael. Confirmed via `ip -o link show`.
       uplink = "enp8s0";
       # Host's address on the VM bridge.
       hostIp = "10.100.0.1";
@@ -55,7 +55,7 @@ in
       };
 
       # Keep NetworkManager's hands off vmbr0 so it doesn't fight scripted networking.
-      # (NetworkManager is enabled globally on joe-desktop; we just carve out this one iface.)
+      # (NetworkManager is enabled globally on elphael; we just carve out this one iface.)
       networking.networkmanager.unmanaged = [ "interface-name:vmbr0" ];
 
       # ── NAT for VM -> internet ────────────────────────────────────────────────

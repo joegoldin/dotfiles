@@ -1,4 +1,4 @@
-# Packages shared by the linux workstations (joe-desktop, office-pc) but not
+# Packages shared by the linux workstations (elphael, volcano-manor) but not
 # macOS or the cloud hosts. Imported explicitly by those hosts alongside
 # ./workstation.nix. Host packages files keep only what is unique to that
 # machine.

@@ -1,5 +1,5 @@
-# Cross-platform packages shared between workstations (darwin, joe-desktop,
-# office-pc). NOT imported by ./default.nix; workstation hosts import this
+# Cross-platform packages shared between workstations (darwin, elphael,
+# volcano-manor). NOT imported by ./default.nix; workstation hosts import this
 # file explicitly so cloud VMs stay lean.
 #
 # Host packages/files hold ONLY platform-specific packages; anything that

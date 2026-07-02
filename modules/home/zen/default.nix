@@ -443,7 +443,7 @@ in
       # 1. Trusting the Zen binary, handled per platform:
       #    - Linux (NixOS): modules/system/_sys/1password-browsers.nix writes
       #      /etc/1password/custom_allowed_browsers (root-owned) with the zen
-      #      process names. Imported by the joe-desktop and office-pc hosts.
+      #      process names. Imported by the elphael and volcano-manor hosts.
       #    - macOS: 1Password requires the browser bundle to carry a REAL code
       #      signature (ad-hoc and unsigned are both rejected, verified
       #      empirically). The nix store is immutable and builds can't reach the

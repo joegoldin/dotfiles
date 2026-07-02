@@ -14,7 +14,7 @@
       desc = "Connect as current user";
     }
     {
-      cmd = "rdp admin@office-pc";
+      cmd = "rdp admin@rykard";
       desc = "Connect as admin";
     }
   ];

@@ -1,5 +1,5 @@
 # Push builds to the attic cache after each local build (workstations and
-# the steam deck; servers and cloud-proxy don't push).
+# the steam deck; servers and dectus don't push).
 { inputs, ... }:
 let
   dotfiles-secrets = inputs.dotfiles-secrets;
