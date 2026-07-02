@@ -8,14 +8,14 @@ uses [den](https://github.com/denful/den) as the engine, and wires in
 
 | Output                                      | Machine                         | Role                                |
 | ------------------------------------------- | ------------------------------- | ----------------------------------- |
-| `joe-desktop`                               | desktop tower (AMD GPU, Plasma) | daily driver                        |
-| `office-pc` (+ `office-pc-installer` ISO)   | compute box (ROCm + vllm)       | ML/training                         |
-| `Joes-MacBook-Pro`                          | MacBook (aarch64-darwin)        | laptop                              |
-| `joe-steamdeck`                             | Steam Deck (Jovian)             | gaming                              |
-| `cloud-proxy`                               | VPS                             | caddy reverse proxy + fail2ban      |
-| `oracle-cloud-bastion` (hostName `bastion`) | Oracle Cloud                    | pelican game servers, tailnet entry |
-| `racknerd-cloud-agent`                      | VPS                             | attic binary cache server           |
-| `crawler`                                   | Raspberry Pi 3B+ (`nixos-raspberrypi`) | SunFounder PiCrawler quadruped robot |
+| `elphael`                               | desktop tower (AMD GPU, Plasma) | daily driver                        |
+| `volcano-manor` (+ `volcano-manor-installer` ISO)   | compute box (ROCm + vllm)       | ML/training                         |
+| `torrent`                          | MacBook (aarch64-darwin)        | laptop                              |
+| `malenia`                             | Steam Deck (Jovian)             | gaming                              |
+| `dectus`                               | VPS                             | caddy reverse proxy + fail2ban      |
+| `farum-azula` (hostName `bastion`) | Oracle Cloud                    | pelican game servers, tailnet entry |
+| `rennala`                      | VPS                             | attic binary cache server           |
+| `scarab`                                   | Raspberry Pi 3B+ (`nixos-raspberrypi`) | SunFounder PiCrawler quadruped robot |
 
 Day-to-day: `just build` (build only), `just boot` (activate at next
 boot), `just switch` (activate now); all three resolve the host from the
@@ -65,21 +65,21 @@ wired by hand.
 ## What evaluating a host actually does
 
 When you run `nh os switch` or `just build` (which evaluate
-`.#nixosConfigurations.joe-desktop`):
+`.#nixosConfigurations.elphael`):
 
 1. Nix calls `flake.nix`'s one-line `outputs`. flake-parts evaluates the
    ~90 files import-tree found under `modules/` as one module system.
 2. One of those files (`modules/flake/den.nix`) imports `den.flakeModule`,
    which declares the `den.*` options. All the other files' `den.aspects.*`
    and `den.hosts.*` definitions merge into them.
-3. den sees the entity `den.hosts.x86_64-linux.joe-desktop.users.joe`.
-   It resolves the host's aspect (`den.aspects.joe-desktop`, matched by
+3. den sees the entity `den.hosts.x86_64-linux.elphael.users.joe`.
+   It resolves the host's aspect (`den.aspects.elphael`, matched by
    name), walks its `includes` graph, pulls in the schema-level batteries,
    and sorts every class block it finds into buckets: `nixos` blocks become
    modules of the NixOS eval, `homeManager` blocks become modules of
    joe's home-manager eval, `os` blocks go to both nixos and darwin.
 4. den calls `nixosSystem { modules = [ ...all of that... ]; }` and
-   assigns the result to `flake.nixosConfigurations.joe-desktop`.
+   assigns the result to `flake.nixosConfigurations.elphael`.
 
 A normal NixOS evaluation still sits at the bottom; den assembles its
 module list from the aspect graph instead of you writing it out.
@@ -89,7 +89,7 @@ module list from the aspect graph instead of you writing it out.
 **Entity**: a thing that exists, a host or a user. Declared once:
 
 ```nix
-den.hosts.x86_64-linux.joe-desktop.users.joe = { };
+den.hosts.x86_64-linux.elphael.users.joe = { };
 ```
 
 That single line gives you a flake output, a hostname (via battery), a
@@ -119,7 +119,7 @@ battery forwards `os` into both nixos and darwin; see
 you write anymore:
 
 ```nix
-den.aspects.joe-desktop = {
+den.aspects.elphael = {
   includes = [
     den.aspects.nix-settings
     den.aspects.attic
@@ -161,7 +161,7 @@ account once, for both platforms.
 **Schema and defaults**: `den.schema.user.classes = [ "homeManager" ]`
 makes every user entity a home-manager user; `den.default.<class>` merges
 config into every entity of a class (used here for `stateVersion`
-defaults, which hosts may override; cloud-proxy `mkForce`s 25.11).
+defaults, which hosts may override; dectus `mkForce`s 25.11).
 
 ## The repo's patterns, file by file
 
@@ -175,15 +175,15 @@ is browsing the feature list.
 ### 2. Aspect merging by name (hosts as directories of concerns)
 
 The same aspect can be defined in many files; den merges them. Host
-directories use this: `modules/hosts/joe-desktop/` contains
+directories use this: `modules/hosts/elphael/` contains
 `default.nix` (entity + includes + secrets), `system.nix` (boot, base
 services), `machine.nix` (hardware tuning), `home.nix` (host-specific
 home config), `wallpaper.nix`, `nut.nix`, `vban-send.nix`, and so on,
-and every one of them assigns into `den.aspects.joe-desktop.*`. One
+and every one of them assigns into `den.aspects.elphael.*`. One
 aspect, a directory of single-purpose files, no aggregator imports.
 
 Corollary to remember: dropping a non-underscore file into
-`modules/hosts/joe-desktop/` activates it. To keep a file around in a
+`modules/hosts/elphael/` activates it. To keep a file around in a
 disabled state, underscore it (see `_hyprwhspr.nix`).
 
 ### 3. Features carry their own plumbing
@@ -276,7 +276,7 @@ does this per-crate for Rust). It needs three experimental features
 (`ca-derivations`, `dynamic-derivations`, `recursive-nix`) on the
 building machine, so enablement is the opt-in aspect
 `den.aspects.dynamic-derivations`, currently included only by
-joe-desktop. The repo's one real IFD (mkwindowsapp splicing a built
+elphael. The repo's one real IFD (mkwindowsapp splicing a built
 script's text at eval time) now uses a runtime `source` instead;
 drowse is there for cases that need eval-at-build, such as
 lockfile-driven package trees and Rust side projects.
@@ -318,7 +318,7 @@ from `${inputs.dotfiles-secrets}/...`.
 **New flake input**: add to `flake.nix`, then reference it only inside
 the one aspect that owns it.
 
-**The crawler robot (Raspberry Pi)**: `modules/hosts/crawler/` builds via
+**The scarab robot (Raspberry Pi)**: `modules/hosts/scarab/` builds via
 `nixos-raspberrypi`. It packages the SunFounder stack — `robot-hat`,
 `picrawler`, `sunfounder-controller` (see `modules/flake/_pkgs/sunfounder/`) —
 plus an I2S speaker (`audio.nix`, the declarative `i2samp.sh`), I2C/SPI/UART,
@@ -326,15 +326,15 @@ Claude Code + agent-skills, and a tty1 status board (`diagnostics.nix`).
 Workflow (aarch64 builds offload to the virby linux builder on the Mac):
 
 ```
-just build-crawler-image     # build the SD image (.img)
-just bake-crawler-image      # inject the agenix host key from 1Password (debugfs, cross-platform)
-# flash crawler-sd.img, then either reflash for big changes or, for an
+just build-scarab-image     # build the SD image (.img)
+just bake-scarab-image      # inject the agenix host key from 1Password (debugfs, cross-platform)
+# flash scarab-sd.img, then either reflash for big changes or, for an
 # already-running Pi, update its active config in place over ssh:
-just build-to-crawler [host|ip]   # nh os switch --target-host joe@…  (default crawler.local)
+just build-to-scarab [host|ip]   # nh os switch --target-host joe@…  (default scarab.local)
 ```
 
 The robot's own control code + its project-local Claude skill live in a
-separate repo (`github.com/joegoldin/crawler`), not here.
+separate repo (`github.com/joegoldin/scarab`), not here.
 
 ## Invariants and gotchas
 

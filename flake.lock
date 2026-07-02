@@ -855,11 +855,11 @@
     "dotfiles-secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1783024978,
-        "narHash": "sha256-6uTXtBeHlfSOuwbsybtg2ZHo5Ouu5f9x3yawfX16I+Y=",
+        "lastModified": 1783027569,
+        "narHash": "sha256-m9bzIQSnlfdIWUgl98t4+HTtcz/IUg/09ZlYhRLjedM=",
         "ref": "refs/heads/main",
-        "rev": "8fae131ad0ad696b34e35357d7d8ac95c752f775",
-        "revCount": 153,
+        "rev": "f33209339af19057e0cdd06df67e46f7761177e0",
+        "revCount": 154,
         "type": "git",
         "url": "ssh://git@github.com/joegoldin/dotfiles-secrets"
       },
@@ -3763,11 +3763,11 @@
         "nixpkgs": "nixpkgs_16"
       },
       "locked": {
-        "lastModified": 1782901433,
-        "narHash": "sha256-ZXsmIBzCQMOD84oQTqtVxQKrtXOPy6kEFznHWM1CTcs=",
+        "lastModified": 1783026708,
+        "narHash": "sha256-qIC9sK/1iRqvM/617erm1de+l3DJ2xUYJmFvyeQbM+s=",
         "owner": "joegoldin",
         "repo": "zen-browser-desktop",
-        "rev": "eb23337e41eb814c6aae99460be11fabd0de9b22",
+        "rev": "db28e14dac7e9f7ef252081b9d1b7bb8b19f0042",
         "type": "github"
       },
       "original": {

@@ -1,6 +1,6 @@
 # Lightweight home-manager config for the headless siofra server.
 # Does NOT import the full home (too large for a small VPS); imports only the
-# tools a server needs (mirrors racknerd-cloud-agent).
+# tools a server needs (mirrors rennala).
 { ... }:
 {
   den.aspects.siofra.homeManager =

@@ -28,6 +28,6 @@ docs/
 # crawler (rpi) image artifacts + host key — never commit these
 *.img
 *.img.zst
-crawler-sd.img
-crawler_host_ed25519
-crawler_host_ed25519.pub
+scarab-sd.img
+scarab_host_ed25519
+scarab_host_ed25519.pub

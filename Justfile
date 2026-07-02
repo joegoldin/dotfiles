@@ -40,11 +40,16 @@ switch *args="": (_nh-darwin "switch" args)
 _nh-os action *args="": system-info _check-maintenance
     #!/usr/bin/env bash
     if [ "{{ arch() }}" = "aarch64" ]; then
-      host=oracle-cloud-bastion
+      host=farum-azula
     else
+      # Match old + new hostnames so the first switch (before a box adopts its
+      # renamed hostName) still builds the right config.
       case "$(hostname)" in
-        joe-steamdeck | office-pc | racknerd-cloud-agent | cloud-proxy) host="$(hostname)" ;;
-        *) host=joe-desktop ;;
+        malenia | joe-steamdeck)        host=malenia ;;
+        volcano-manor | office-pc)      host=volcano-manor ;;
+        rennala | racknerd-cloud-agent) host=rennala ;;
+        dectus | cloud-proxy)           host=dectus ;;
+        *)                              host=elphael ;; # elphael / joe-desktop
       esac
     fi
     echo "🔨  nh os {{ action }} for $host 🐧..."
@@ -70,45 +75,45 @@ _nh-darwin action *args="": system-info _check-maintenance
 # ── Remote rebuilds (existing hosts) ──────────────────────────────────────
 # Domains/users come from the dotfiles-secrets flake input via _secret-domain.
 
-# Rebuild cloud-proxy in place (build locally, deploy over ssh)
+# Rebuild dectus in place (build locally, deploy over ssh)
 [unix]
-build-to-cloud-proxy:
+build-to-dectus:
     #!/usr/bin/env bash
     set -euo pipefail
-    echo "🔨  Rebuilding NixOS on cloud-proxy VPS (build locally, deploy remote)..."
-    SSH_DOMAIN=$(just _secret-domain cloudProxySshDomain)
+    echo "🔨  Rebuilding NixOS on dectus VPS (build locally, deploy remote)..."
+    SSH_DOMAIN=$(just _secret-domain dectusSshDomain)
     SSH_USER=$(just _secret-domain sshUser)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nixos-rebuild switch --flake .#cloud-proxy --target-host "$SSH_USER@$SSH_DOMAIN" --build-host localhost --sudo --accept-flake-config --log-format internal-json -v |& nom --json
-    echo "✅  Rebuilt cloud-proxy VPS!"
+    nixos-rebuild switch --flake .#dectus --target-host "$SSH_USER@$SSH_DOMAIN" --build-host localhost --sudo --accept-flake-config --log-format internal-json -v |& nom --json
+    echo "✅  Rebuilt dectus VPS!"
 
-# Rebuild racknerd in place (build locally, deploy over ssh)
+# Rebuild rennala in place (build locally, deploy over ssh)
 [unix]
-build-to-racknerd:
+build-to-rennala:
     #!/usr/bin/env bash
     set -euo pipefail
-    echo "🔨  Rebuilding NixOS on RackNerd VPS (build locally, deploy remote)..."
-    SSH_DOMAIN=$(just _secret-domain racknerdSshDomain)
+    echo "🔨  Rebuilding NixOS on rennala VPS (build locally, deploy remote)..."
+    SSH_DOMAIN=$(just _secret-domain rennalaSshDomain)
     SSH_USER=$(just _secret-domain sshUser)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nixos-rebuild switch --flake .#racknerd-cloud-agent --target-host "$SSH_USER@$SSH_DOMAIN" --build-host localhost --sudo --accept-flake-config --fallback --log-format internal-json -v |& nom --json
-    echo "✅  Rebuilt RackNerd VPS!"
+    nixos-rebuild switch --flake .#rennala --target-host "$SSH_USER@$SSH_DOMAIN" --build-host localhost --sudo --accept-flake-config --fallback --log-format internal-json -v |& nom --json
+    echo "✅  Rebuilt rennala VPS!"
 
-# Rebuild the bastion in place (pass --local to build on this machine)
+# Rebuild farum-azula in place (pass --local to build on this machine)
 [unix]
-build-to-bastion local="":
+build-to-farum-azula local="":
     #!/usr/bin/env bash
     set -euo pipefail
-    echo "🔨  Rebuilding NixOS on Oracle Cloud bastion..."
-    BASTION_DOMAIN=$(just _secret-domain bastionDomain)
+    echo "🔨  Rebuilding NixOS on farum-azula..."
+    FARUM_AZULA_DOMAIN=$(just _secret-domain farumAzulaDomain)
     SSH_USER=$(just _secret-domain sshUser)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
     BUILD_HOST_ARGS=()
     if [ "{{ local }}" = "--local" ]; then
       BUILD_HOST_ARGS=(--build-host localhost)
     fi
-    nixos-rebuild switch --flake .#oracle-cloud-bastion --target-host "$SSH_USER@$BASTION_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --ask-sudo-password --accept-flake-config
-    echo "✅  Rebuilt Oracle Cloud bastion!"
+    nixos-rebuild switch --flake .#farum-azula --target-host "$SSH_USER@$FARUM_AZULA_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --ask-sudo-password --accept-flake-config
+    echo "✅  Rebuilt farum-azula!"
 
 # Rebuild erdtree (beefy dedicated gaming/HPC box) in place (pass --local to build here)
 [unix]
@@ -142,38 +147,38 @@ build-to-siofra local="":
     nixos-rebuild switch --flake .#siofra --target-host "$SSH_USER@$SIOFRA_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --accept-flake-config
     echo "✅  Rebuilt siofra!"
 
-# Rebuild the crawler (Pi) in place over ssh, updating its active config, via nh.
+# Rebuild the scarab (Pi) in place over ssh, updating its active config, via nh.
 # Builds locally — aarch64 offloads to the virby linux builder — then copies the
 # closure to the Pi and switches. Deploys as the `joe` user (root ssh login is
 # disabled); joe has passwordless sudo, hence --elevation-strategy passwordless.
-# Pass an IP if crawler.local won't resolve (e.g. just build-to-crawler
+# Pass an IP if scarab.local won't resolve (e.g. just build-to-scarab
 # 192.168.0.18). --fallback + http2=false dodge the attic cache's flaky
-# NARs/HTTP2 the way build-crawler-image does.
+# NARs/HTTP2 the way build-scarab-image does.
 [unix]
-build-to-crawler host="crawler.local" user="joe":
+build-to-scarab host="scarab.local" user="joe":
     #!/usr/bin/env bash
     set -euo pipefail
-    echo "🔨  Rebuilding NixOS on the crawler 🕷️  (build local → deploy {{ user }}@{{ host }})..."
+    echo "🔨  Rebuilding NixOS on the scarab 🕷️  (build local → deploy {{ user }}@{{ host }})..."
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')
     http2 = false"
-    nh os switch . -H crawler --target-host "{{ user }}@{{ host }}" --elevation-strategy passwordless --accept-flake-config --fallback
-    echo "✅  Rebuilt crawler! (reboot if a new kernel/overlay landed)"
+    nh os switch . -H scarab --target-host "{{ user }}@{{ host }}" --elevation-strategy passwordless --accept-flake-config --fallback
+    echo "✅  Rebuilt scarab! (reboot if a new kernel/overlay landed)"
 
 # ── Bootstrap (first deploy onto a fresh machine) ─────────────────────────
 
-# Install NixOS onto a fresh RackNerd VPS via nixos-anywhere
+# Install NixOS onto a fresh rennala VPS via nixos-anywhere
 [unix]
-deploy-racknerd IP:
-    @echo "🚀  Deploying Nix config to RackNerd VPS..."
-    , nixos-anywhere --flake .#racknerd-cloud-agent --build-on local joe@{{ IP }}
-    @echo "✅  Deployed to RackNerd VPS!"
+deploy-rennala IP:
+    @echo "🚀  Deploying Nix config to rennala VPS..."
+    , nixos-anywhere --flake .#rennala --build-on local joe@{{ IP }}
+    @echo "✅  Deployed to rennala VPS!"
 
-# Install NixOS onto a fresh cloud-proxy VPS via nixos-anywhere
+# Install NixOS onto a fresh dectus VPS via nixos-anywhere
 [unix]
-deploy-cloud-proxy IP USER="ubuntu":
-    @echo "🚀  Deploying Nix config to cloud-proxy VPS..."
-    , nixos-anywhere --flake .#cloud-proxy --build-on local {{ USER }}@{{ IP }}
-    @echo "✅  Deployed to cloud-proxy VPS!"
+deploy-dectus IP USER="ubuntu":
+    @echo "🚀  Deploying Nix config to dectus VPS..."
+    , nixos-anywhere --flake .#dectus --build-on local {{ USER }}@{{ IP }}
+    @echo "✅  Deployed to dectus VPS!"
 
 # Encrypted first-install via nixos-anywhere: generates ONE SSH host key shared
 # by the booted system and the initrd (seeded into both via --extra-files, so
@@ -271,16 +276,16 @@ deploy-siofra IP USER="root":
 [macos]
 build-macos-initial:
     @echo "🔨  Building Nix config for macOS 🍎 (initial)..."
-    sudo nix --extra-experimental-features 'nix-command flakes' run nix-darwin -- switch --flake .#Joes-MacBook-Pro
+    sudo nix --extra-experimental-features 'nix-command flakes' run nix-darwin -- switch --flake .#torrent
     @echo "✅  Built for macOS!"
 
-# ── Installer ISO (office-pc) ──────────────────────────────────────────────
+# ── Installer ISO (volcano-manor) ──────────────────────────────────────────────
 
-# Build the offline installer ISO with the full office-pc closure baked in
+# Build the offline installer ISO with the full volcano-manor closure baked in
 [unix]
-build-office-pc-iso:
-    @echo "Building office-pc installer ISO (includes full system closure)..."
-    @nix build .#nixosConfigurations.office-pc-installer.config.system.build.isoImage --log-format internal-json -v |& nom --json
+build-volcano-manor-iso:
+    @echo "Building volcano-manor installer ISO (includes full system closure)..."
+    @nix build .#nixosConfigurations.volcano-manor-installer.config.system.build.isoImage --log-format internal-json -v |& nom --json
     echo "ISO built: $(ls result/iso/*.iso)"
 
 # Write the built ISO to a USB device (defaults to /dev/sdb)
@@ -291,7 +296,7 @@ write-iso device="":
     set -euo pipefail
     ISO=$(ls result/iso/*.iso 2>/dev/null | head -1)
     if [ -z "$ISO" ]; then
-      echo "No ISO found. Run 'just build-office-pc-iso' first."
+      echo "No ISO found. Run 'just build-volcano-manor-iso' first."
       exit 1
     fi
     DEV="{{ device }}"
@@ -327,17 +332,17 @@ write-iso device="":
     SECS=$(( ELAPSED % 60 ))
     echo "✅  ISO written to $DEV in ${MINS}m${SECS}s"
 
-# ── Raspberry Pi SD image (crawler) ────────────────────────────────────────
+# ── Raspberry Pi SD image (scarab) ────────────────────────────────────────
 
 # Cross-builds aarch64 via binfmt on x86_64; builds natively on aarch64.
 # --accept-flake-config trusts the nixos-raspberrypi cachix substituter.
 # --fallback builds from source when a substituter serves a corrupt/partial NAR
 # (e.g. the attic cache occasionally truncates firmware/zfs-user NARs).
-# Build the crawler SD-card image (uncompressed .img)
+# Build the scarab SD-card image (uncompressed .img)
 [unix]
-build-crawler-image:
-    @echo "🔨  Building crawler SD image (aarch64; builds the rpi kernel if not cached)..."
-    @nix build .#nixosConfigurations.crawler.config.system.build.sdImage --accept-flake-config --fallback --log-format internal-json -v |& nom --json
+build-scarab-image:
+    @echo "🔨  Building scarab SD image (aarch64; builds the rpi kernel if not cached)..."
+    @nix build .#nixosConfigurations.scarab.config.system.build.sdImage --accept-flake-config --fallback --log-format internal-json -v |& nom --json
     @echo "✅  Image built: $(ls result/sd-image/*.img)"
 
 # Bake the SSH host key into the built image's ext4 root and emit a standalone,
@@ -351,9 +356,9 @@ build-crawler-image:
 # Pass img= to bake an image built elsewhere; otherwise it auto-detects
 # ./result/sd-image/*.img. Pass key=/path/to/privkey to read from disk instead
 # of 1Password.
-# Usage: just bake-crawler-image [out.img] [img=/path/to/raw.img] [item=] [vault=] [key=]
+# Usage: just bake-scarab-image [out.img] [img=/path/to/raw.img] [item=] [vault=] [key=]
 [unix]
-bake-crawler-image out="crawler-sd.img" img="" item="Crawler RasPi Nixos SSH Key" vault="Private" key="":
+bake-scarab-image out="scarab-sd.img" img="" item="Crawler RasPi Nixos SSH Key" vault="Private" key="":
     #!/usr/bin/env bash
     set -euo pipefail
     IMG="{{ img }}"
@@ -361,7 +366,7 @@ bake-crawler-image out="crawler-sd.img" img="" item="Crawler RasPi Nixos SSH Key
       IMG=$(ls result/sd-image/*.img 2>/dev/null | head -1)
     fi
     if [ -z "$IMG" ] || [ ! -f "$IMG" ]; then
-      echo "No image found. Pass img=/path/to/raw.img, or run 'just build-crawler-image' first."
+      echo "No image found. Pass img=/path/to/raw.img, or run 'just build-scarab-image' first."
       exit 1
     fi
     OUT="{{ out }}"
