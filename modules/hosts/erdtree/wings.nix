@@ -21,6 +21,7 @@ in
     { config, ... }:
     let
       domains = import "${dotfiles-secrets}/domains.nix";
+      pelicanNodes = import "${dotfiles-secrets}/pelican-nodes.nix";
     in
     {
       # Wings waits for agenix (its node token)
@@ -33,8 +34,7 @@ in
       services.pelican.wings = {
         enable = true;
         openFirewall = false; # ports declared explicitly in the firewall block
-        # TODO(deploy): node UUID generated when this node is created in the panel.
-        uuid = "REPLACE-WITH-ERDTREE-WINGS-NODE-UUID";
+        uuid = pelicanNodes.erdtree; # from dotfiles-secrets/pelican-nodes.nix
         remote = "https://${domains.pelicanDomain}"; # the shared panel
         tokenIdFile = config.age.secrets.erdtree-pelican-token-id.path;
         tokenFile = config.age.secrets.erdtree-pelican-token.path;
