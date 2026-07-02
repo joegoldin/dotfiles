@@ -175,23 +175,46 @@ deploy-cloud-proxy IP USER="ubuntu":
     , nixos-anywhere --flake .#cloud-proxy --build-on local {{ USER }}@{{ IP }}
     @echo "✅  Deployed to cloud-proxy VPS!"
 
-# --generate-hardware-config captures the box's real hardware into
-# _hardware-configuration.nix (commit it after). Fresh box logs in as root;
-# pass USER=ubuntu (etc.) if the provider image differs.
-
-# First-install erdtree from scratch via nixos-anywhere
+# Encrypted first-install via nixos-anywhere: generates the initrd SSH host key
+# (for remote LUKS unlock) into --extra-files, prompts for the LUKS passphrase
+# (--disk-encryption-keys), and captures real hardware (--generate-hardware-config;
+# commit it after). Fresh box logs in as root; pass USER=ubuntu (etc.) if the
+# image differs. After first boot the box halts in the initrd — unlock with
+# `ssh -p 2222 root@<host>` and enter the passphrase.
 [unix]
 deploy-erdtree IP USER="root":
-    @echo "🚀  Deploying Nix config to erdtree 🌳..."
-    , nixos-anywhere --generate-hardware-config nixos-generate-config ./modules/hosts/erdtree/_hardware-configuration.nix --flake .#erdtree --build-on local {{ USER }}@{{ IP }}
-    @echo "✅  Deployed to erdtree!"
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "🚀  Deploying encrypted NixOS to erdtree 🌳 ..."
+    TMP=$(mktemp -d); trap "rm -rf \"$TMP\"" EXIT
+    install -d -m 700 "$TMP/extra/etc/secrets/initrd"
+    ssh-keygen -t ed25519 -N "" -C erdtree-initrd -f "$TMP/extra/etc/secrets/initrd/ssh_host_ed25519_key" >/dev/null
+    read -rsp "LUKS passphrase for erdtree: " PASS; echo
+    printf %s "$PASS" > "$TMP/luks.key"; chmod 600 "$TMP/luks.key"
+    , nixos-anywhere \
+      --generate-hardware-config nixos-generate-config ./modules/hosts/erdtree/_hardware-configuration.nix \
+      --disk-encryption-keys /tmp/luks.key "$TMP/luks.key" \
+      --extra-files "$TMP/extra" \
+      --flake .#erdtree --build-on local {{ USER }}@{{ IP }}
+    echo "✅  Deployed erdtree! Unlock on boot: ssh -p 2222 root@erdtree.turnin.quest"
 
-# Install NixOS onto the fresh siofra VPS via nixos-anywhere.
+# Encrypted first-install for siofra (see deploy-erdtree for details).
 [unix]
 deploy-siofra IP USER="root":
-    @echo "🚀  Deploying Nix config to siofra 🌊..."
-    , nixos-anywhere --generate-hardware-config nixos-generate-config ./modules/hosts/siofra/_hardware-configuration.nix --flake .#siofra --build-on local {{ USER }}@{{ IP }}
-    @echo "✅  Deployed to siofra!"
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "🚀  Deploying encrypted NixOS to siofra 🌊 ..."
+    TMP=$(mktemp -d); trap "rm -rf \"$TMP\"" EXIT
+    install -d -m 700 "$TMP/extra/etc/secrets/initrd"
+    ssh-keygen -t ed25519 -N "" -C siofra-initrd -f "$TMP/extra/etc/secrets/initrd/ssh_host_ed25519_key" >/dev/null
+    read -rsp "LUKS passphrase for siofra: " PASS; echo
+    printf %s "$PASS" > "$TMP/luks.key"; chmod 600 "$TMP/luks.key"
+    , nixos-anywhere \
+      --generate-hardware-config nixos-generate-config ./modules/hosts/siofra/_hardware-configuration.nix \
+      --disk-encryption-keys /tmp/luks.key "$TMP/luks.key" \
+      --extra-files "$TMP/extra" \
+      --flake .#siofra --build-on local {{ USER }}@{{ IP }}
+    echo "✅  Deployed siofra! Unlock on boot: ssh -p 2222 root@siofra.turnin.quest"
 
 # First darwin activation on a fresh mac (before nh exists)
 [macos]

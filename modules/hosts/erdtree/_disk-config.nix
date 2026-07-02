@@ -1,39 +1,46 @@
-# disko spec — PLACEHOLDER for the bare-metal dedicated server. This assumes a
-# single BIOS/GPT disk at /dev/sda with a 32 GiB swap tail. CONFIRM at provision
-# time: real device name (/dev/sda vs /dev/nvme0n1), BIOS vs UEFI (swap the EF02
-# BIOS-boot partition for an ESP + systemd-boot if UEFI), and whether you want a
-# multi-disk / RAID / separate data-volume layout for game + HPC data. disko
-# ERASES this disk.
+# LUKS-encrypted root, unlocked remotely over SSH in the initrd (see machine.nix).
+# Bare-metal PLACEHOLDER: assumes a single BIOS/GPT disk at /dev/sda. Layout:
+# EF02 GRUB stub + UNENCRYPTED /boot + the LUKS container filling the rest; swap
+# is a 16 GiB swapfile on the encrypted root (machine.nix). CONFIRM at provision:
+# real device (/dev/sda vs nvme), BIOS vs UEFI (swap EF02 → ESP + systemd-boot if
+# UEFI), and multi-disk/RAID layout. Passphrase set at install via
+# nixos-anywhere --disk-encryption-keys; typed over initrd SSH on every boot.
 _: {
-  disko.devices = {
-    disk = {
-      main = {
-        device = "/dev/sda";
-        type = "disk";
-        content = {
-          type = "gpt";
-          partitions = {
-            # GRUB BIOS boot partition
-            boot = {
-              size = "1M";
-              type = "EF02"; # BIOS boot partition
-            };
-            # Root filesystem (fills the disk minus the swap tail)
-            root = {
-              end = "-32G";
-              content = {
-                type = "filesystem";
-                format = "ext4";
-                mountpoint = "/";
-              };
-            };
-            # Swap partition (~32 GiB; plenty with 192 GB RAM)
-            swap = {
-              size = "100%";
-              content = {
-                type = "swap";
-                discardPolicy = "both";
-              };
+  disko.devices.disk.main = {
+    device = "/dev/sda";
+    type = "disk";
+    content = {
+      type = "gpt";
+      partitions = {
+        # GRUB BIOS boot partition
+        boot = {
+          size = "1M";
+          type = "EF02";
+        };
+        # Unencrypted /boot — GRUB loads the kernel + initrd from here, then the
+        # initrd unlocks the LUKS root (so GRUB never touches LUKS).
+        bootfs = {
+          size = "1G";
+          content = {
+            type = "filesystem";
+            format = "ext4";
+            mountpoint = "/boot";
+          };
+        };
+        # LUKS-encrypted root
+        luks = {
+          size = "100%";
+          content = {
+            type = "luks";
+            name = "cryptroot";
+            settings.allowDiscards = true;
+            # install-time passphrase source (nixos-anywhere --disk-encryption-keys);
+            # NOT used at boot — you enter the passphrase over the initrd SSH session.
+            passwordFile = "/tmp/luks.key";
+            content = {
+              type = "filesystem";
+              format = "ext4";
+              mountpoint = "/";
             };
           };
         };
