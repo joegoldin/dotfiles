@@ -215,7 +215,7 @@ deploy-erdtree IP USER="root":
           boot.initrd.availableKernelModules = [ "bnx2x" "megaraid_sas" ];
           boot.kernelModules = [ "bnx2x" ]; }
       ]).config.system.build.kexecInstallerTarball')
-    KEXEC_TAR="$KEXEC_OUT/nixos-kexec-installer-noninteractive-x86_64-linux.tar.gz"
+    KEXEC_TAR=$(echo "$KEXEC_OUT"/*.tar.gz)
     echo "🧩  kexec image: $KEXEC_TAR"
     while :; do
       read -rsp "LUKS passphrase for erdtree: " PASS; echo
