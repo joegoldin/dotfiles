@@ -1,6 +1,5 @@
-# Base system config (BIOS grub, ssh, fail2ban). Bare-metal dedicated server:
-# confirm the real boot mode (BIOS vs UEFI) and disk device at provision time
-# and adjust boot.loader + _disk-config.nix accordingly.
+# Base system config (UEFI systemd-boot, ssh, fail2ban). erdtree is a UEFI Dell
+# server; the ESP + LUKS root layout lives in _disk-config.nix.
 { inputs, ... }:
 let
   meta = import ../../_lib/meta.nix;
@@ -11,11 +10,10 @@ in
     {
       nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
-      # GRUB BIOS boot — PLACEHOLDER device. Confirm /dev/sda vs nvme and
-      # BIOS vs UEFI on the real box before deploy (see _disk-config.nix).
-      boot.loader.grub = {
-        enable = lib.mkForce true;
-        devices = lib.mkForce [ "/dev/sda" ];
+      # UEFI boot via systemd-boot (ESP mounted at /boot by disko).
+      boot.loader = {
+        systemd-boot.enable = lib.mkForce true;
+        efi.canTouchEfiVariables = true;
       };
 
       users.users.${meta.username}.extraGroups = [
