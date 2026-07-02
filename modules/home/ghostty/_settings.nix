@@ -30,7 +30,7 @@ let
     scrollbar = "system";
     scrollback-limit = 1000000000;
     shell-integration = "fish";
-    shell-integration-features = "cursor,sudo,title";
+    shell-integration-features = "cursor,sudo,title,ssh-env,ssh-terminfo";
     background-opacity = 0.95;
     keybind = [
       "ctrl+shift+c=copy_to_clipboard"
