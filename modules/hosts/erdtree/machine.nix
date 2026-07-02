@@ -61,21 +61,18 @@ in
       boot.initrd = {
         systemd = {
           enable = true;
-          # On SSH into the initrd, show a banner and auto-answer the pending LUKS
-          # passphrase prompt (the initrd shell is a login shell, so it sources
-          # /root/.profile). Ctrl-C drops to a rescue shell.
+          # sshd prints /etc/motd on login; it names the command to unlock.
+          # (Auto-running it from a shell profile isn't reliable in the initrd —
+          # /root/.profile isn't sourced — so we just tell you the command.)
           contents."/etc/motd".text = ''
 
             🔒  ${config.networking.hostName}: root filesystem is encrypted and LOCKED.
-                Enter the LUKS passphrase to unlock and continue booting.
-                (Ctrl-C for a rescue shell.)
 
-          '';
-          contents."/root/.profile".text = ''
-            cat /etc/motd
-            # --watch keeps prompting: re-asks on a wrong passphrase, and blocks
-            # until the root unlocks (boot proceeds → this session is torn down).
-            systemd-tty-ask-password-agent --watch
+                To unlock, run:   systemd-tty-ask-password-agent
+
+                Enter the LUKS passphrase; on success the system finishes booting
+                and this SSH session closes. Wrong passphrase? Run it again.
+
           '';
         };
         # NIC driver(s) for initrd networking — TRIM to erdtree's actual NIC once
