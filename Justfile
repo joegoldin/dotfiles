@@ -110,6 +110,38 @@ build-to-bastion local="":
     nixos-rebuild switch --flake .#oracle-cloud-bastion --target-host "$SSH_USER@$BASTION_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --ask-sudo-password --accept-flake-config
     echo "✅  Rebuilt Oracle Cloud bastion!"
 
+# Rebuild erdtree (beefy dedicated gaming/HPC box) in place (pass --local to build here)
+[unix]
+build-to-erdtree local="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "🔨  Rebuilding NixOS on erdtree 🌳..."
+    ERDTREE_DOMAIN=$(just _secret-domain erdtreeSshDomain)
+    SSH_USER=$(just _secret-domain sshUser)
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    BUILD_HOST_ARGS=()
+    if [ "{{ local }}" = "--local" ]; then
+      BUILD_HOST_ARGS=(--build-host localhost)
+    fi
+    nixos-rebuild switch --flake .#erdtree --target-host "$SSH_USER@$ERDTREE_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --ask-sudo-password --accept-flake-config
+    echo "✅  Rebuilt erdtree!"
+
+# Rebuild siofra (misc-cloud VPS) in place (pass --local to build here)
+[unix]
+build-to-siofra local="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "🔨  Rebuilding NixOS on siofra 🌊..."
+    SIOFRA_DOMAIN=$(just _secret-domain siofraSshDomain)
+    SSH_USER=$(just _secret-domain sshUser)
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    BUILD_HOST_ARGS=()
+    if [ "{{ local }}" = "--local" ]; then
+      BUILD_HOST_ARGS=(--build-host localhost)
+    fi
+    nixos-rebuild switch --flake .#siofra --target-host "$SSH_USER@$SIOFRA_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --ask-sudo-password --accept-flake-config
+    echo "✅  Rebuilt siofra!"
+
 # Rebuild the crawler (Pi) in place over ssh, updating its active config, via nh.
 # Builds locally — aarch64 offloads to the virby linux builder — then copies the
 # closure to the Pi and switches. Deploys as the `joe` user (root ssh login is
@@ -142,6 +174,24 @@ deploy-cloud-proxy IP USER="ubuntu":
     @echo "🚀  Deploying Nix config to cloud-proxy VPS..."
     , nixos-anywhere --flake .#cloud-proxy --build-on local {{ USER }}@{{ IP }}
     @echo "✅  Deployed to cloud-proxy VPS!"
+
+# --generate-hardware-config captures the box's real hardware into
+# _hardware-configuration.nix (commit it after). Fresh box logs in as root;
+# pass USER=ubuntu (etc.) if the provider image differs.
+
+# First-install erdtree from scratch via nixos-anywhere
+[unix]
+deploy-erdtree IP USER="root":
+    @echo "🚀  Deploying Nix config to erdtree 🌳..."
+    , nixos-anywhere --generate-hardware-config nixos-generate-config ./modules/hosts/erdtree/_hardware-configuration.nix --flake .#erdtree --build-on local {{ USER }}@{{ IP }}
+    @echo "✅  Deployed to erdtree!"
+
+# Install NixOS onto the fresh siofra VPS via nixos-anywhere.
+[unix]
+deploy-siofra IP USER="root":
+    @echo "🚀  Deploying Nix config to siofra 🌊..."
+    , nixos-anywhere --generate-hardware-config nixos-generate-config ./modules/hosts/siofra/_hardware-configuration.nix --flake .#siofra --build-on local {{ USER }}@{{ IP }}
+    @echo "✅  Deployed to siofra!"
 
 # First darwin activation on a fresh mac (before nh exists)
 [macos]
