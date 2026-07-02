@@ -59,7 +59,25 @@ in
       # joe's key) and enter the passphrase (then `systemd-tty-ask-password-agent`
       # if not auto-prompted). After boot, `ssh joe@…` works normally on :22.
       boot.initrd = {
-        systemd.enable = true;
+        systemd = {
+          enable = true;
+          # On SSH into the initrd, show a banner and auto-answer the pending LUKS
+          # passphrase prompt (the initrd shell is a login shell, so it sources
+          # /root/.profile). Ctrl-C drops to a rescue shell.
+          contents."/etc/motd".text = ''
+
+            🔒  ${config.networking.hostName}: root filesystem is encrypted and LOCKED.
+                Enter the LUKS passphrase to unlock and continue booting.
+                (Ctrl-C for a rescue shell.)
+
+          '';
+          contents."/root/.profile".text = ''
+            cat /etc/motd
+            # --watch keeps prompting: re-asks on a wrong passphrase, and blocks
+            # until the root unlocks (boot proceeds → this session is torn down).
+            systemd-tty-ask-password-agent --watch
+          '';
+        };
         # NIC driver(s) for initrd networking — TRIM to erdtree's actual NIC once
         # known (check `lspci -k` / the generated hardware-config). This is a
         # broad bare-metal net so the box can come up to be unlocked.
