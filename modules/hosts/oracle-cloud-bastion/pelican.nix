@@ -92,7 +92,9 @@ in
         remote = "https://${domains.pelicanDomain}";
         tokenIdFile = config.age.secrets.pelican-token-id.path;
         tokenFile = config.age.secrets.pelican-token.path;
-        allowedMounts = [ "/home/joe/pelican-mounts" ];
+        # `allowedMounts` was removed from the module; the equivalent Wings
+        # config key `allowed_mounts` is now set through extraConfig.
+        extraConfig.allowed_mounts = [ "/home/joe/pelican-mounts" ];
         system.sftp = {
           host = "0.0.0.0";
           port = 2022;
