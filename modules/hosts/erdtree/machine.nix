@@ -52,6 +52,42 @@ in
       virtualisation.docker.enable = true;
       users.extraGroups.docker.members = [ "${username}" ];
 
+      # Full-disk encryption: unlock the LUKS root remotely over SSH in the
+      # initrd. On every boot the box halts here until you
+      # `ssh -p 2222 root@erdtree.turnin.quest` and enter the passphrase (then
+      # `systemd-tty-ask-password-agent` if not prompted automatically).
+      boot.initrd = {
+        systemd.enable = true;
+        # NIC driver(s) for initrd networking — TRIM to erdtree's actual NIC once
+        # known (check `lspci -k` / the generated hardware-config). This is a
+        # broad bare-metal net so the box can come up to be unlocked.
+        availableKernelModules = [
+          "e1000e"
+          "igb"
+          "ixgbe"
+          "r8169"
+          "tg3"
+        ];
+        network = {
+          enable = true;
+          ssh = {
+            enable = true;
+            port = 2222;
+            authorizedKeys = [ keys.${username} ];
+            hostKeys = [ "/etc/secrets/initrd/ssh_host_ed25519_key" ];
+          };
+        };
+      };
+      boot.kernelParams = [ "ip=dhcp" ]; # bring up networking in the initrd
+
+      # 16 GiB swap as a file on the (encrypted) root.
+      swapDevices = [
+        {
+          device = "/swapfile";
+          size = 16 * 1024;
+        }
+      ];
+
       # First NixOS release installed on this machine (fresh install off the
       # nixos-26.05 flake). Never change after install — see the NixOS manual.
       system.stateVersion = lib.mkForce "26.05";
