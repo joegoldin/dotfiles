@@ -3,13 +3,14 @@
 # panel manages this node remotely; Wings runs the game-server containers here.
 #
 # The Wings API needs HTTPS for the panel's web console, so Caddy + Let's Encrypt
-# fronts it on this node's direct FQDN (siofra.turnin.quest → :443 → Wings :8080).
-# The node can't sit behind Cloudflare: SFTP (:2022) and game traffic can't ride
-# CF's free proxy, and Pelican ties SFTP to the node FQDN.
+# fronts it on a dedicated subdomain (wings.siofra.turnin.quest → :443 → Wings
+# :8080), off the base domain so siofra.turnin.quest's :443 stays free. The node
+# can't sit behind Cloudflare: SFTP (:2022) and game traffic can't ride CF's free
+# proxy, and Pelican ties SFTP to the node FQDN.
 #
-# After deploy: create the node in the panel (FQDN siofra.turnin.quest, SSL on,
-# Daemon Port 443, Behind Proxy on, SFTP 2022), then put its token-id/token into
-# agenix and set `uuid` below.
+# After deploy: create the node in the panel (FQDN wings.siofra.turnin.quest, SSL
+# on, Daemon Port 443, Behind Proxy on, SFTP 2022), then put its token-id/token
+# into agenix and set `uuid` below.
 { inputs, ... }:
 let
   meta = import ../../_lib/meta.nix;
@@ -47,11 +48,13 @@ in
       # Docker is required for Wings
       virtualisation.docker.enable = true;
 
-      # TLS front for the Wings API: Caddy (Let's Encrypt) on the node's direct
-      # FQDN, reverse-proxied to Wings on loopback. In the panel the node is set
-      # "Behind Proxy" + SSL, Daemon Port 443; Wings stays plain-HTTP on :8080.
+      # TLS front for the Wings API: Caddy (Let's Encrypt) on a dedicated
+      # subdomain (wings.siofra.turnin.quest, direct A → this node), reverse-
+      # proxied to Wings on loopback — off the base domain so its :443 is free.
+      # Panel node: FQDN wings.siofra.turnin.quest, SSL on, Daemon Port 443,
+      # Behind Proxy on; Wings stays plain-HTTP on :8080.
       services.caddy.enable = true;
-      services.caddy.virtualHosts."${domains.siofraSshDomain}" = {
+      services.caddy.virtualHosts."${domains.siofraWingsDomain}" = {
         extraConfig = ''
           reverse_proxy localhost:8080
         '';
