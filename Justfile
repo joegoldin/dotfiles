@@ -123,7 +123,7 @@ build-to-erdtree local="":
     if [ "{{ local }}" = "--local" ]; then
       BUILD_HOST_ARGS=(--build-host localhost)
     fi
-    nixos-rebuild switch --flake .#erdtree --target-host "$SSH_USER@$ERDTREE_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --ask-sudo-password --accept-flake-config
+    nixos-rebuild switch --flake .#erdtree --target-host "$SSH_USER@$ERDTREE_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --accept-flake-config
     echo "✅  Rebuilt erdtree!"
 
 # Rebuild siofra (misc-cloud VPS) in place (pass --local to build here)
@@ -139,7 +139,7 @@ build-to-siofra local="":
     if [ "{{ local }}" = "--local" ]; then
       BUILD_HOST_ARGS=(--build-host localhost)
     fi
-    nixos-rebuild switch --flake .#siofra --target-host "$SSH_USER@$SIOFRA_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --ask-sudo-password --accept-flake-config
+    nixos-rebuild switch --flake .#siofra --target-host "$SSH_USER@$SIOFRA_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --accept-flake-config
     echo "✅  Rebuilt siofra!"
 
 # Rebuild the crawler (Pi) in place over ssh, updating its active config, via nh.

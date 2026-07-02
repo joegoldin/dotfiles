@@ -45,6 +45,10 @@ in
 
       programs.ssh.startAgent = true;
 
+      # Passwordless sudo for wheel — joe is key-only (no password on a fresh
+      # install) and remote `just build-to-siofra` needs non-interactive sudo.
+      security.sudo.wheelNeedsPassword = false;
+
       virtualisation.docker.enable = true;
       users.extraGroups.docker.members = [ "${username}" ];
 
