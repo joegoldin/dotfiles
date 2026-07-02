@@ -110,6 +110,99 @@
           }
         ];
 
+        # Git Graph custom command tasks (right-click a commit, or a ref label,
+        # in the Git Graph). Each is tagged "git-command" and resolved against
+        # the selected commit ($ZED_GIT_SHA / $ZED_GIT_SHA_SHORT) and repo
+        # ($ZED_GIT_REPOSITORY_PATH); ref-label menus additionally provide the
+        # clicked ref ($ZED_GIT_REF). Tasks that reference $ZED_GIT_REF fail to
+        # resolve unless a ref was clicked, so they only surface in the ref menu.
+        userTasks =
+          let
+            gitTask = label: args: {
+              inherit label args;
+              command = "git";
+              cwd = "$ZED_GIT_REPOSITORY_PATH";
+              tags = [ "git-command" ];
+            };
+            # Interactive variant: prompts in the task terminal via `read`. Zed
+            # only substitutes its own $ZED_* variables, so the shell's $name /
+            # $tag references pass through untouched to `sh`.
+            promptTask = label: script: {
+              inherit label;
+              command = "sh";
+              args = [
+                "-c"
+                script
+              ];
+              cwd = "$ZED_GIT_REPOSITORY_PATH";
+              tags = [ "git-command" ];
+            };
+          in
+          [
+            # Commit menu — resolved against the clicked commit.
+            (gitTask "Checkout $ZED_GIT_SHA_SHORT (detached)" [
+              "checkout"
+              "$ZED_GIT_SHA"
+            ])
+            (promptTask "Branch from $ZED_GIT_SHA_SHORT…" "printf 'New branch name: '; read name; git switch -c \"$name\" $ZED_GIT_SHA")
+            (promptTask "Tag $ZED_GIT_SHA_SHORT…" "printf 'New tag name: '; read tag; git tag \"$tag\" $ZED_GIT_SHA")
+            (gitTask "Cherry-pick $ZED_GIT_SHA_SHORT" [
+              "cherry-pick"
+              "$ZED_GIT_SHA"
+            ])
+            (gitTask "Revert $ZED_GIT_SHA_SHORT" [
+              "revert"
+              "--no-edit"
+              "$ZED_GIT_SHA"
+            ])
+            (gitTask "Reset branch --soft to $ZED_GIT_SHA_SHORT" [
+              "reset"
+              "--soft"
+              "$ZED_GIT_SHA"
+            ])
+            (gitTask "Reset branch --mixed to $ZED_GIT_SHA_SHORT" [
+              "reset"
+              "--mixed"
+              "$ZED_GIT_SHA"
+            ])
+            (gitTask "Reset branch --hard to $ZED_GIT_SHA_SHORT ⚠" [
+              "reset"
+              "--hard"
+              "$ZED_GIT_SHA"
+            ])
+            (gitTask "Interactive rebase onto $ZED_GIT_SHA_SHORT" [
+              "rebase"
+              "-i"
+              "$ZED_GIT_SHA"
+            ])
+            (gitTask "Show $ZED_GIT_SHA_SHORT" [
+              "--no-pager"
+              "show"
+              "--stat"
+              "$ZED_GIT_SHA"
+            ])
+
+            # Ref-label menu — reference $ZED_GIT_REF, so hidden from the plain
+            # commit menu (unresolved $ZED_GIT_REF makes resolution fail).
+            (gitTask "Checkout $ZED_GIT_REF" [
+              "checkout"
+              "$ZED_GIT_REF"
+            ])
+            (gitTask "Merge $ZED_GIT_REF into current" [
+              "merge"
+              "$ZED_GIT_REF"
+            ])
+            (gitTask "Rebase current onto $ZED_GIT_REF" [
+              "rebase"
+              "$ZED_GIT_REF"
+            ])
+            (gitTask "Delete branch $ZED_GIT_REF ⚠" [
+              "branch"
+              "-D"
+              "$ZED_GIT_REF"
+            ])
+          ];
+
         userSettings = {
           telemetry = {
             diagnostics = false;
