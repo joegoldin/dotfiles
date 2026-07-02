@@ -5,6 +5,7 @@
 let
   meta = import ../../_lib/meta.nix;
   keys = import "${inputs.dotfiles-secrets}/keys.nix";
+  cfTunnels = import "${inputs.dotfiles-secrets}/cloudflared.nix";
   username = meta.username;
 in
 {
@@ -26,7 +27,7 @@ in
         cloudflared = {
           enable = true;
           tunnels = {
-            "dd9aada3-d855-47fd-b782-f5314c2bb81e" = {
+            "${cfTunnels.bastion}" = {
               credentialsFile = config.age.secrets.cf.path;
               default = "http_status:404";
             };

@@ -1,15 +1,21 @@
-# Machine-specific config: root ssh key, timezone, tailscale, docker.
-# (Wings node — no cloudflared; the Wings API is fronted by Caddy/LE, see
-# wings.nix.)
+# Machine-specific config: root ssh key, timezone, cloudflared tunnel, tailscale,
+# docker. The cloudflared tunnel is a general-purpose ingress for misc web
+# services on this box; the Wings API itself is fronted by direct Caddy/LE (see
+# wings.nix), since SFTP + game traffic can't ride Cloudflare.
 { inputs, ... }:
 let
   meta = import ../../_lib/meta.nix;
   keys = import "${inputs.dotfiles-secrets}/keys.nix";
+  cfTunnels = import "${inputs.dotfiles-secrets}/cloudflared.nix";
   username = meta.username;
 in
 {
   den.aspects.siofra.nixos =
-    { lib, ... }:
+    {
+      config,
+      lib,
+      ...
+    }:
     {
       users.users.root.openssh.authorizedKeys.keys = [
         keys.${username}
@@ -18,9 +24,23 @@ in
       # Set your time zone.
       time.timeZone = "America/Los_Angeles";
 
-      services.tailscale = {
-        enable = true;
-        useRoutingFeatures = "server";
+      services = {
+        cloudflared = {
+          enable = true;
+          tunnels = {
+            # Tunnel ID lives in cloudflared.nix (replace the placeholder there
+            # after `cloudflared tunnel create siofra`); creds in siofra-cf.json.age.
+            "${cfTunnels.siofra}" = {
+              credentialsFile = config.age.secrets.cf.path;
+              default = "http_status:404";
+            };
+          };
+        };
+
+        tailscale = {
+          enable = true;
+          useRoutingFeatures = "server";
+        };
       };
 
       programs.ssh.startAgent = true;

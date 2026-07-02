@@ -32,6 +32,12 @@ in
 
       nixpkgs.overlays = [ inputs.pelican.overlays.default ];
 
+      age.secrets.cf = {
+        file = "${inputs.dotfiles-secrets}/siofra-cf.json.age";
+        mode = "655";
+        owner = meta.username;
+        group = "users";
+      };
       age.secrets.umans_api_key = {
         file = "${inputs.dotfiles-secrets}/umans_api_key.age";
         mode = "0400";
