@@ -16,6 +16,7 @@ in
     }:
     let
       domains = import "${dotfiles-secrets}/domains.nix";
+      pelicanNodes = import "${dotfiles-secrets}/pelican-nodes.nix";
       panelCfg = config.services.pelican.panel;
     in
     {
@@ -88,7 +89,7 @@ in
       services.pelican.wings = {
         enable = true;
         openFirewall = true; # Opens API (8080) and SFTP (2022) ports
-        uuid = "dab990d7-ea48-498a-846c-d4afe46cee1e";
+        uuid = pelicanNodes.bastion; # from dotfiles-secrets/pelican-nodes.nix
         remote = "https://${domains.pelicanDomain}";
         tokenIdFile = config.age.secrets.pelican-token-id.path;
         tokenFile = config.age.secrets.pelican-token.path;
