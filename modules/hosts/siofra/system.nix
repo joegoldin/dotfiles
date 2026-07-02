@@ -44,8 +44,9 @@ in
       services.openssh = {
         enable = true;
         settings = {
-          # Opinionated: forbid root login through SSH.
-          PermitRootLogin = "no";
+          # Allow root login by SSH key only (no password) so nixos-anywhere can
+          # re-install without re-imaging; fail2ban + key-only auth guard it.
+          PermitRootLogin = "prohibit-password";
           # Opinionated: use keys only.
           PasswordAuthentication = false;
         };
