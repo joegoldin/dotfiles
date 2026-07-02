@@ -183,6 +183,11 @@ deploy-cloud-proxy IP USER="ubuntu":
 # commit it after). Fresh box logs in as root; pass USER=ubuntu (etc.) if the
 # image differs. After first boot the box halts in the initrd — unlock with
 # `ssh root@<host>` (your joe key) and enter the passphrase.
+#
+# erdtree is a Dell w/ a Broadcom BCM57800 NIC: the stock nixos-anywhere kexec
+# image lacks bnx2x firmware, so the installer boots but never gets network
+# (deploy hangs polling :22). We build our own kexec image (26.05 + all
+# redistributable firmware + bnx2x/megaraid_sas) and pass it via --kexec.
 [unix]
 deploy-erdtree IP USER="root":
     #!/usr/bin/env bash
@@ -195,6 +200,23 @@ deploy-erdtree IP USER="root":
     cp "$TMP/extra/etc/ssh/ssh_host_ed25519_key" "$TMP/extra/etc/secrets/initrd/ssh_host_ed25519_key"
     chmod 600 "$TMP/extra/etc/ssh/ssh_host_ed25519_key" "$TMP/extra/etc/secrets/initrd/ssh_host_ed25519_key"
     echo "🔑  erdtree host key (add to keys.nix as erdtree, then rekey):"; cat "$TMP/extra/etc/ssh/ssh_host_ed25519_key.pub"
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    echo "🧩  Building custom kexec image (bnx2x + megaraid_sas + firmware)..."
+    KEXEC_OUT=$(nix build --no-link --print-out-paths --impure --accept-flake-config --expr '
+      let
+        flake = builtins.getFlake (toString ./.);
+        images = builtins.getFlake "github:nix-community/nixos-images";
+        nixpkgs = flake.inputs.nixpkgs;
+        system = "x86_64-linux";
+      in (nixpkgs.legacyPackages.${system}.nixos [
+        images.nixosModules.kexec-installer
+        images.nixosModules.noninteractive
+        { hardware.enableRedistributableFirmware = true;
+          boot.initrd.availableKernelModules = [ "bnx2x" "megaraid_sas" ];
+          boot.kernelModules = [ "bnx2x" ]; }
+      ]).config.system.build.kexecInstallerTarball')
+    KEXEC_TAR="$KEXEC_OUT/nixos-kexec-installer-noninteractive-x86_64-linux.tar.gz"
+    echo "🧩  kexec image: $KEXEC_TAR"
     while :; do
       read -rsp "LUKS passphrase for erdtree: " PASS; echo
       read -rsp "Confirm passphrase: " PASS2; echo
@@ -204,6 +226,7 @@ deploy-erdtree IP USER="root":
     done
     printf %s "$PASS" > "$TMP/luks.key"; chmod 600 "$TMP/luks.key"
     , nixos-anywhere \
+      --kexec "$KEXEC_TAR" \
       --generate-hardware-config nixos-generate-config ./modules/hosts/erdtree/_hardware-configuration.nix \
       --disk-encryption-keys /tmp/luks.key "$TMP/luks.key" \
       --extra-files "$TMP/extra" \
