@@ -189,7 +189,13 @@ deploy-erdtree IP USER="root":
     TMP=$(mktemp -d); trap "rm -rf \"$TMP\"" EXIT
     install -d -m 700 "$TMP/extra/etc/secrets/initrd"
     ssh-keygen -t ed25519 -N "" -C erdtree-initrd -f "$TMP/extra/etc/secrets/initrd/ssh_host_ed25519_key" >/dev/null
-    read -rsp "LUKS passphrase for erdtree: " PASS; echo
+    while :; do
+      read -rsp "LUKS passphrase for erdtree: " PASS; echo
+      read -rsp "Confirm passphrase: " PASS2; echo
+      if [ -z "$PASS" ]; then echo "  ✗ empty passphrase — try again"; continue; fi
+      if [ "$PASS" = "$PASS2" ]; then break; fi
+      echo "  ✗ passphrases did not match — try again"
+    done
     printf %s "$PASS" > "$TMP/luks.key"; chmod 600 "$TMP/luks.key"
     , nixos-anywhere \
       --generate-hardware-config nixos-generate-config ./modules/hosts/erdtree/_hardware-configuration.nix \
@@ -207,7 +213,13 @@ deploy-siofra IP USER="root":
     TMP=$(mktemp -d); trap "rm -rf \"$TMP\"" EXIT
     install -d -m 700 "$TMP/extra/etc/secrets/initrd"
     ssh-keygen -t ed25519 -N "" -C siofra-initrd -f "$TMP/extra/etc/secrets/initrd/ssh_host_ed25519_key" >/dev/null
-    read -rsp "LUKS passphrase for siofra: " PASS; echo
+    while :; do
+      read -rsp "LUKS passphrase for siofra: " PASS; echo
+      read -rsp "Confirm passphrase: " PASS2; echo
+      if [ -z "$PASS" ]; then echo "  ✗ empty passphrase — try again"; continue; fi
+      if [ "$PASS" = "$PASS2" ]; then break; fi
+      echo "  ✗ passphrases did not match — try again"
+    done
     printf %s "$PASS" > "$TMP/luks.key"; chmod 600 "$TMP/luks.key"
     , nixos-anywhere \
       --generate-hardware-config nixos-generate-config ./modules/hosts/siofra/_hardware-configuration.nix \
