@@ -10,8 +10,9 @@ let
   meta = import ../../_lib/meta.nix;
 in
 {
-  # Oracle Cloud Ampere = aarch64 (A1.Flex). Declared here so the platform comes
-  # from den, not a mkForce hack in the generated hardware config.
+  # Oracle Cloud Ampere = aarch64 (A1.Flex). den.hosts groups the output under
+  # aarch64; nixpkgs.hostPlatform is set to aarch64 in system.nix (must match, or
+  # it conflicts with the generated hardware config).
   den.hosts.aarch64-linux.farum-azula = {
     hostName = "farum-azula";
     users.${meta.username} = { };

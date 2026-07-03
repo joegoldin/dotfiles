@@ -8,7 +8,7 @@ in
   den.aspects.farum-azula.nixos =
     { lib, pkgs, ... }:
     {
-      nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+      nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux"; # Oracle Ampere A1.Flex
 
       # Use the systemd-boot EFI boot loader.
       boot.loader.systemd-boot.enable = true;
