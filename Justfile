@@ -346,6 +346,7 @@ deploy-farum-azula IP USER="ubuntu":
       --generate-hardware-config nixos-generate-config ./modules/hosts/farum-azula/_hardware-configuration.nix \
       --disk-encryption-keys /tmp/luks.key "$TMP/luks.key" \
       --extra-files "$TMP/extra" \
+      --no-substitute-on-destination \
       --flake .#farum-azula --build-on remote {{ USER }}@{{ IP }}
     echo "✅  Deployed farum-azula! Unlock on boot: ssh root@farum-azula.turnin.quest, then replace the key in keys.nix, rekey, push, just build-to-farum-azula."
 
