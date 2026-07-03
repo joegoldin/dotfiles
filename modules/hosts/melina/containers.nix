@@ -29,6 +29,9 @@ _: {
             "--network=host"
             "--privileged"
             "--security-opt=label=disable"
+            # habluetooth needs these even under --privileged on some setups
+            "--cap-add=NET_ADMIN"
+            "--cap-add=NET_RAW"
           ];
         };
 
@@ -45,6 +48,22 @@ _: {
           ];
         };
       };
+    };
+
+    # The containers use host networking, so their ports are on the host —
+    # open the web UIs + the discovery/HomeKit traffic. (LAN box behind the
+    # router; if HomeKit pairing needs more, trust the LAN iface enp1s0.)
+    networking.firewall = {
+      allowedTCPPorts = [
+        8123 # Home Assistant
+        8581 # Homebridge UI
+        21063 # HA HomeKit integration bridge (if used)
+        51826 # Homebridge HomeKit bridge (default)
+      ];
+      allowedUDPPorts = [
+        5353 # mDNS (HomeKit + local discovery)
+        1900 # SSDP (UPnP/DLNA discovery)
+      ];
     };
   };
 }
