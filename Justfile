@@ -342,11 +342,17 @@ deploy-farum-azula IP USER="ubuntu":
       echo "  ✗ passphrases did not match — try again"
     done
     printf %s "$PASS" > "$TMP/luks.key"; chmod 600 "$TMP/luks.key"
+    # --build-on remote builds the closure on the ARM installer, substituting from
+    # our attic + numtide caches — pass their signing keys so it trusts those
+    # signatures (read from the flake so no secrets land in this public Justfile).
+    EXTRA_SUBS=$(nix eval --raw .#nixosConfigurations.farum-azula.config.nix.settings.extra-substituters --apply 'builtins.concatStringsSep " "')
+    EXTRA_KEYS=$(nix eval --raw .#nixosConfigurations.farum-azula.config.nix.settings.extra-trusted-public-keys --apply 'builtins.concatStringsSep " "')
     , nixos-anywhere \
       --generate-hardware-config nixos-generate-config ./modules/hosts/farum-azula/_hardware-configuration.nix \
       --disk-encryption-keys /tmp/luks.key "$TMP/luks.key" \
       --extra-files "$TMP/extra" \
-      --no-substitute-on-destination \
+      --option extra-substituters "$EXTRA_SUBS" \
+      --option extra-trusted-public-keys "$EXTRA_KEYS" \
       --flake .#farum-azula --build-on remote {{ USER }}@{{ IP }}
     echo "✅  Deployed farum-azula! Unlock on boot: ssh root@farum-azula.turnin.quest, then replace the key in keys.nix, rekey, push, just build-to-farum-azula."
 
