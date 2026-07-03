@@ -17,7 +17,6 @@ in
       users.users.${meta.username}.extraGroups = [
         "audio"
         "video"
-        "docker"
       ];
 
       programs = {

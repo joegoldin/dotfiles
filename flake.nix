@@ -112,11 +112,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.attic.follows = "attic";
     };
-    # game server management
-    pelican = {
-      url = "github:Hythera/nix-pelican";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
 
     # ── Nix utilities ──────────────────────────────────────────────────────
     flake-utils.url = "github:numtide/flake-utils";
