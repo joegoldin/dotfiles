@@ -344,9 +344,10 @@ deploy-farum-azula IP USER="ubuntu":
     printf %s "$PASS" > "$TMP/luks.key"; chmod 600 "$TMP/luks.key"
     # --build-on remote builds the closure on the ARM installer, substituting from
     # our attic + numtide caches + their signing keys (read from the flake so no
-    # secrets land in this public Justfile). require-sigs=false too: attic signs
-    # build outputs but serves the flake's `-source` path unsigned, so trusting the
-    # key alone can't cover it. One-shot install from our own machine + caches → safe.
+    # secrets land in this public Justfile). On a clean deploy the flake source is
+    # copied directly from this (trusted) machine, so no require-sigs override is
+    # needed; the "-source lacks a signature" failure only showed up when re-running
+    # into a half-installed installer.
     EXTRA_SUBS=$(nix eval --raw .#nixosConfigurations.farum-azula.config.nix.settings.extra-substituters --apply 'builtins.concatStringsSep " "')
     EXTRA_KEYS=$(nix eval --raw .#nixosConfigurations.farum-azula.config.nix.settings.extra-trusted-public-keys --apply 'builtins.concatStringsSep " "')
     , nixos-anywhere \
@@ -355,7 +356,6 @@ deploy-farum-azula IP USER="ubuntu":
       --extra-files "$TMP/extra" \
       --option extra-substituters "$EXTRA_SUBS" \
       --option extra-trusted-public-keys "$EXTRA_KEYS" \
-      --option require-sigs false \
       --flake .#farum-azula --build-on remote {{ USER }}@{{ IP }}
     echo "✅  Deployed farum-azula! Unlock on boot: ssh root@farum-azula.turnin.quest, then replace the key in keys.nix, rekey, push, just build-to-farum-azula."
 
