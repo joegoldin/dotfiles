@@ -8,7 +8,7 @@ let
 in
 {
   den.aspects.melina.nixos =
-    { lib, ... }:
+    { config, lib, ... }:
     {
       users.users.root.openssh.authorizedKeys.keys = [
         keys.${username}
@@ -54,6 +54,55 @@ in
 
       virtualisation.docker.enable = true;
       users.extraGroups.docker.members = [ "${username}" ];
+
+      # Full-disk encryption: unlock the LUKS root remotely over SSH in the
+      # initrd, on :22 sharing the booted system's host key (deploy-melina seeds
+      # the same key into both, so known_hosts doesn't churn). On every boot the
+      # box halts here until you `ssh root@192.168.0.236` (LAN only — the initrd
+      # has no tailscale) and enter the passphrase. After boot, `ssh joe@…` works.
+      boot.initrd = {
+        systemd = {
+          enable = true;
+          # sshd prints /etc/motd on login; it names the command to unlock.
+          contents."/etc/motd".text = ''
+
+            🔒  ${config.networking.hostName}: root filesystem is encrypted and LOCKED.
+
+                To unlock, run:   systemd-tty-ask-password-agent
+
+                Enter the LUKS passphrase; on success the system finishes booting
+                and this SSH session closes. Wrong passphrase? Run it again.
+
+          '';
+        };
+        # igc = Intel I225-V NIC (initrd networking for the unlock); nvme so
+        # stage-1 can see the disk to unlock the encrypted root.
+        availableKernelModules = [
+          "igc"
+          "nvme"
+        ];
+        network = {
+          enable = true;
+          ssh = {
+            enable = true;
+            port = 22;
+            authorizedKeys = [ keys.${username} ];
+            hostKeys = [ "/etc/secrets/initrd/ssh_host_ed25519_key" ];
+          };
+        };
+      };
+      # Bring up networking in the initrd. DHCP relies on the router giving this
+      # box its usual 192.168.0.236 (it has been consistently); if the initrd ends
+      # up on a different IP, switch this to a static ip=192.168.0.236::… form.
+      boot.kernelParams = [ "ip=dhcp" ];
+
+      # 16 GiB swap as a file on the (encrypted) root.
+      swapDevices = [
+        {
+          device = "/swapfile";
+          size = 16 * 1024;
+        }
+      ];
 
       # First NixOS release installed on this machine (fresh install off the
       # nixos-26.05 flake). Never change after install — see the NixOS manual.

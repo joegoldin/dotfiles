@@ -283,15 +283,37 @@ deploy-siofra IP USER="root":
       --flake .#siofra --build-on local {{ USER }}@{{ IP }}
     echo "✅  Deployed siofra! Unlock on boot: ssh root@siofra.turnin.quest"
 
-# Install NixOS onto the mini-PC (melina) via nixos-anywhere. Unencrypted (must
-# auto-boot for Home Assistant); captures real hardware. Back up + verify the HA
-# and Homebridge data OFF-box first — this WIPES /dev/nvme0n1. Fresh box logs in
-# as root; pass USER=joe if using an Ubuntu-with-sudo staging login instead.
+# Encrypted first-install of the mini-PC (melina) via nixos-anywhere: generates
+# ONE shared SSH host key (booted system + initrd, so :22 unlock doesn't churn
+# known_hosts), prompts twice for the LUKS passphrase, captures real hardware.
+# Back up + VERIFY the HA/Homebridge data OFF-box first — this WIPES
+# /dev/nvme0n1. After first boot the box halts in the initrd — unlock with
+# `ssh root@192.168.0.236` (LAN) and enter the passphrase.
 [unix]
 deploy-melina IP USER="root":
-    @echo "🚀  Deploying Nix config to melina 🏡..."
-    , nixos-anywhere --generate-hardware-config nixos-generate-config ./modules/hosts/melina/_hardware-configuration.nix --flake .#melina --build-on local {{ USER }}@{{ IP }}
-    @echo "✅  Deployed to melina! Restore HA/Homebridge data, then just build-to-melina"
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "🚀  Deploying encrypted NixOS to melina 🏡 ..."
+    TMP=$(mktemp -d); trap "rm -rf \"$TMP\"" EXIT
+    install -d "$TMP/extra/etc/ssh"; install -d -m 700 "$TMP/extra/etc/secrets/initrd"
+    ssh-keygen -t ed25519 -N "" -C melina -f "$TMP/extra/etc/ssh/ssh_host_ed25519_key" >/dev/null
+    cp "$TMP/extra/etc/ssh/ssh_host_ed25519_key" "$TMP/extra/etc/secrets/initrd/ssh_host_ed25519_key"
+    chmod 600 "$TMP/extra/etc/ssh/ssh_host_ed25519_key" "$TMP/extra/etc/secrets/initrd/ssh_host_ed25519_key"
+    echo "🔑  melina host key:"; cat "$TMP/extra/etc/ssh/ssh_host_ed25519_key.pub"
+    while :; do
+      read -rsp "LUKS passphrase for melina: " PASS; echo
+      read -rsp "Confirm passphrase: " PASS2; echo
+      if [ -z "$PASS" ]; then echo "  ✗ empty passphrase — try again"; continue; fi
+      if [ "$PASS" = "$PASS2" ]; then break; fi
+      echo "  ✗ passphrases did not match — try again"
+    done
+    printf %s "$PASS" > "$TMP/luks.key"; chmod 600 "$TMP/luks.key"
+    , nixos-anywhere \
+      --generate-hardware-config nixos-generate-config ./modules/hosts/melina/_hardware-configuration.nix \
+      --disk-encryption-keys /tmp/luks.key "$TMP/luks.key" \
+      --extra-files "$TMP/extra" \
+      --flake .#melina --build-on local {{ USER }}@{{ IP }}
+    echo "✅  Deployed melina! Unlock on boot: ssh root@192.168.0.236 (LAN), then restore HA/Homebridge data + just build-to-melina"
 
 # First darwin activation on a fresh mac (before nh exists)
 [macos]
