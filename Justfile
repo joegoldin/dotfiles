@@ -342,10 +342,14 @@ deploy-farum-azula IP USER="ubuntu":
       echo "  ✗ passphrases did not match — try again"
     done
     printf %s "$PASS" > "$TMP/luks.key"; chmod 600 "$TMP/luks.key"
+    # Oracle Ampere: the kexec into the installer wedges on the pre-kexec sync()
+    # (jbd2/sda journal blocks, kexec task hangs). --no-sync skips it — safe here
+    # since disko wipes the disk anyway, so unsynced Ubuntu writes are irrelevant.
     , nixos-anywhere \
       --generate-hardware-config nixos-generate-config ./modules/hosts/farum-azula/_hardware-configuration.nix \
       --disk-encryption-keys /tmp/luks.key "$TMP/luks.key" \
       --extra-files "$TMP/extra" \
+      --kexec-extra-flags "--no-sync" \
       --flake .#farum-azula --build-on remote {{ USER }}@{{ IP }}
     echo "✅  Deployed farum-azula! Unlock on boot: ssh root@farum-azula.turnin.quest, then replace the key in keys.nix, rekey, push, just build-to-farum-azula."
 
