@@ -1,6 +1,7 @@
 # Base system config (UEFI systemd-boot, ssh). A LAN home-automation box, so no
-# fail2ban (not public); it must auto-boot unattended after a power blip, so no
-# disk encryption. nix/nixpkgs settings come from den.aspects.nix-settings.
+# fail2ban (not public). LUKS-encrypted root with initrd-SSH unlock (see
+# machine.nix / _disk-config.nix) — so it does NOT auto-boot after a power loss;
+# HA stays down until unlocked. nix settings come from den.aspects.nix-settings.
 _: {
   den.aspects.melina.nixos =
     { lib, pkgs, ... }:
