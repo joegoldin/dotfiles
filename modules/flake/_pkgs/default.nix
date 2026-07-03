@@ -8,6 +8,8 @@ pkgs: {
 
   blip-caption = pkgs.callPackage ./blip-caption.nix { };
 
+  calagopus-wings = pkgs.callPackage ./calagopus-wings.nix { };
+
   git-hunk = pkgs.callPackage ./git-hunk.nix { };
 
   mac-app-util = pkgs.callPackage ./mac-app-util { };
