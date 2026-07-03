@@ -1,7 +1,7 @@
-# Oracle Cloud bastion (pelican game servers + tailnet entry). Entity name
-# (= flake output) is farum-azula; the machine's hostName is
-# "bastion". Aspect content lives in the sibling files (system.nix,
-# machine.nix, pelican.nix, home.nix).
+# Oracle Cloud bastion — tailnet entry (exit/subnet router) + cloudflared ingress
+# + attic binary-cache client. Entity name (= flake output) and hostName are both
+# "farum-azula". Pelican was removed (game servers migrated to Calagopus). Aspect
+# content lives in the sibling files (system.nix, machine.nix, home.nix).
 #
 # NB: ./_attic.nix is intentionally not imported; the old tree never
 # imported it either (dead file kept for reference).
@@ -27,13 +27,10 @@ in
       imports = [
         inputs.disko.nixosModules.disko
         inputs.nix-index-database.nixosModules.default
-        inputs.pelican.nixosModules.default
         inputs.agenix.nixosModules.default
         ./_disk-config.nix
         ./_hardware-configuration.nix
       ];
-
-      nixpkgs.overlays = [ inputs.pelican.overlays.default ];
 
       age.secrets.cf = {
         file = "${inputs.dotfiles-secrets}/cf.json.age";

@@ -855,11 +855,11 @@
     "dotfiles-secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1783071968,
-        "narHash": "sha256-jRsq3cIecWq4vPxBcesnASIMLYe38LPg9xjamG2Krz0=",
+        "lastModified": 1783073662,
+        "narHash": "sha256-RwutwFfbGVGFm0wxvkETg6U+Y4NSrKBqWZ8TZL6jzDo=",
         "ref": "refs/heads/main",
-        "rev": "5e97313b102e1f54621a28f615a07e4b850a35c6",
-        "revCount": 161,
+        "rev": "260169f359de4d94f3b17a77d6e44a6361a8f66a",
+        "revCount": 162,
         "type": "git",
         "url": "ssh://git@github.com/joegoldin/dotfiles-secrets"
       },
@@ -1471,24 +1471,6 @@
     "flake-utils_8": {
       "inputs": {
         "systems": "systems_13"
-      },
-      "locked": {
-        "lastModified": 1731533236,
-        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "type": "github"
-      }
-    },
-    "flake-utils_9": {
-      "inputs": {
-        "systems": "systems_14"
       },
       "locked": {
         "lastModified": 1731533236,
@@ -3019,27 +3001,6 @@
         "type": "github"
       }
     },
-    "pelican": {
-      "inputs": {
-        "flake-utils": "flake-utils_9",
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1778415035,
-        "narHash": "sha256-iOZHkxwdxxmO1b3WjYUgSHX5adYG1zfBlHR6OaGIQQE=",
-        "owner": "Hythera",
-        "repo": "nix-pelican",
-        "rev": "e79d2d141a58876bbfe72a45721c16469fac2d1e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "Hythera",
-        "repo": "nix-pelican",
-        "type": "github"
-      }
-    },
     "plasma-manager": {
       "inputs": {
         "home-manager": [
@@ -3197,10 +3158,9 @@
         "nixpkgs-darwin": "nixpkgs-darwin",
         "nixpkgs-python": "nixpkgs-python",
         "nixpkgs-unstable": "nixpkgs-unstable_2",
-        "pelican": "pelican",
         "plasma-manager": "plasma-manager",
         "sem": "sem",
-        "systems": "systems_15",
+        "systems": "systems_14",
         "tinygrad-nix": "tinygrad-nix",
         "virby": "virby",
         "zed-editor": "zed-editor",
@@ -3425,21 +3385,6 @@
       }
     },
     "systems_14": {
-      "locked": {
-        "lastModified": 1681028828,
-        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
-        "owner": "nix-systems",
-        "repo": "default",
-        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-systems",
-        "repo": "default",
-        "type": "github"
-      }
-    },
-    "systems_15": {
       "locked": {
         "lastModified": 1681028828,
         "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
