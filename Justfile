@@ -99,20 +99,22 @@ build-to-rennala:
     nixos-rebuild switch --flake .#rennala --target-host "$SSH_USER@$SSH_DOMAIN" --build-host localhost --sudo --accept-flake-config --fallback --log-format internal-json -v |& nom --json
     echo "✅  Rebuilt rennala VPS!"
 
-# Rebuild farum-azula in place (pass --local to build on this machine)
+# Rebuild farum-azula in place. It's aarch64 (Oracle ARM), so build ON the box
+# (--build-host = target); cross-building locally on x86_64 goes through QEMU
+# emulation, which segfaults on large C builds (e.g. openldap). Eval is still local
+# (arch-independent); only the realisation happens on the ARM box.
 [unix]
-build-to-farum-azula local="":
+build-to-farum-azula:
     #!/usr/bin/env bash
     set -euo pipefail
-    echo "🔨  Rebuilding NixOS on farum-azula..."
+    echo "🔨  Rebuilding NixOS on farum-azula (aarch64 — builds on the box)..."
     FARUM_AZULA_DOMAIN=$(just _secret-domain farumAzulaDomain)
     SSH_USER=$(just _secret-domain sshUser)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    BUILD_HOST_ARGS=()
-    if [ "{{ local }}" = "--local" ]; then
-      BUILD_HOST_ARGS=(--build-host localhost)
-    fi
-    nixos-rebuild switch --flake .#farum-azula --target-host "$SSH_USER@$FARUM_AZULA_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --accept-flake-config
+    nixos-rebuild switch --flake .#farum-azula \
+      --target-host "$SSH_USER@$FARUM_AZULA_DOMAIN" \
+      --build-host "$SSH_USER@$FARUM_AZULA_DOMAIN" \
+      --sudo --accept-flake-config
     echo "✅  Rebuilt farum-azula!"
 
 # Rebuild erdtree (beefy dedicated gaming/HPC box) in place (pass --local to build here)
