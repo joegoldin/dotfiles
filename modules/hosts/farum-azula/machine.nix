@@ -42,6 +42,10 @@ in
 
       programs.ssh.startAgent = true;
 
+      # Passwordless sudo for wheel — so remote `just build-to-farum-azula` runs
+      # non-interactively, like the other servers.
+      security.sudo.wheelNeedsPassword = false;
+
       # This option defines the first version of NixOS you have installed on this particular machine,
       # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
       #

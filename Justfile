@@ -112,7 +112,7 @@ build-to-farum-azula local="":
     if [ "{{ local }}" = "--local" ]; then
       BUILD_HOST_ARGS=(--build-host localhost)
     fi
-    nixos-rebuild switch --flake .#farum-azula --target-host "$SSH_USER@$FARUM_AZULA_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --ask-sudo-password --accept-flake-config
+    nixos-rebuild switch --flake .#farum-azula --target-host "$SSH_USER@$FARUM_AZULA_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --accept-flake-config
     echo "✅  Rebuilt farum-azula!"
 
 # Rebuild erdtree (beefy dedicated gaming/HPC box) in place (pass --local to build here)
