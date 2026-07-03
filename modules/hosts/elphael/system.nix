@@ -79,6 +79,8 @@ in
         "video"
         "docker"
         "input"
+        # Serial device access (/dev/ttyACM*, /dev/ttyUSB*) for PlatformIO/esptool
+        "dialout"
       ];
 
       programs = {
@@ -133,6 +135,9 @@ in
         streamcontroller-rules
         (import ../../system/_streamcontroller.nix { inherit pkgs; }).package
         vial-rules
+        # 99-platformio-udev.rules: per-board device nodes + silences esptool's
+        # udev warning. dialout membership (above) covers plain ttyACM/ttyUSB.
+        pkgs.platformio-core.udev
       ];
 
       # Fix Gigabyte motherboard immediate wake from suspend
