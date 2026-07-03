@@ -1,8 +1,7 @@
 # Home Assistant, run as a Docker container via oci-containers — faithfully
 # reproducing the mini-ubuntu setup (from `docker inspect`). Its state is
 # restored from the Ubuntu box into /var/lib/homeassistant. Host networking +
-# privileged (device / Bluetooth / discovery access). Homebridge was NOT
-# migrated (backup was lost; not needed).
+# privileged (device / Bluetooth / discovery access).
 _: {
   den.aspects.melina.nixos = _: {
     # Data dir HA bind-mounts (restored from the Ubuntu backup). Container procs

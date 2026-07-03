@@ -286,7 +286,7 @@ deploy-siofra IP USER="root":
 # Encrypted first-install of the mini-PC (melina) via nixos-anywhere: generates
 # ONE shared SSH host key (booted system + initrd, so :22 unlock doesn't churn
 # known_hosts), prompts twice for the LUKS passphrase, captures real hardware.
-# Back up + VERIFY the HA/Homebridge data OFF-box first — this WIPES
+# Back up + VERIFY the Home Assistant data OFF-box first — this WIPES
 # /dev/nvme0n1. After first boot the box halts in the initrd — unlock with
 # `ssh root@192.168.0.236` (LAN) and enter the passphrase.
 [unix]
@@ -313,7 +313,7 @@ deploy-melina IP USER="root":
       --disk-encryption-keys /tmp/luks.key "$TMP/luks.key" \
       --extra-files "$TMP/extra" \
       --flake .#melina --build-on local {{ USER }}@{{ IP }}
-    echo "✅  Deployed melina! Unlock on boot: ssh root@192.168.0.236 (LAN), then restore HA/Homebridge data + just build-to-melina"
+    echo "✅  Deployed melina! Unlock on boot: ssh root@192.168.0.236 (LAN), then restore Home Assistant data + just build-to-melina"
 
 # First darwin activation on a fresh mac (before nh exists)
 [macos]
