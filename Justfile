@@ -147,6 +147,17 @@ build-to-siofra local="":
     nixos-rebuild switch --flake .#siofra --target-host "$SSH_USER@$SIOFRA_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --accept-flake-config
     echo "✅  Rebuilt siofra!"
 
+# Rebuild melina (home-automation box) in place over ssh (defaults to its LAN IP)
+[unix]
+build-to-melina host="192.168.0.236":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "🔨  Rebuilding NixOS on melina 🏡..."
+    SSH_USER=$(just _secret-domain sshUser)
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    nixos-rebuild switch --flake .#melina --target-host "$SSH_USER@{{ host }}" --sudo --accept-flake-config
+    echo "✅  Rebuilt melina!"
+
 # Rebuild the scarab (Pi) in place over ssh, updating its active config, via nh.
 # Builds locally — aarch64 offloads to the virby linux builder — then copies the
 # closure to the Pi and switches. Deploys as the `joe` user (root ssh login is
@@ -271,6 +282,16 @@ deploy-siofra IP USER="root":
       --extra-files "$TMP/extra" \
       --flake .#siofra --build-on local {{ USER }}@{{ IP }}
     echo "✅  Deployed siofra! Unlock on boot: ssh root@siofra.turnin.quest"
+
+# Install NixOS onto the mini-PC (melina) via nixos-anywhere. Unencrypted (must
+# auto-boot for Home Assistant); captures real hardware. Back up + verify the HA
+# and Homebridge data OFF-box first — this WIPES /dev/nvme0n1. Fresh box logs in
+# as root; pass USER=joe if using an Ubuntu-with-sudo staging login instead.
+[unix]
+deploy-melina IP USER="root":
+    @echo "🚀  Deploying Nix config to melina 🏡..."
+    , nixos-anywhere --generate-hardware-config nixos-generate-config ./modules/hosts/melina/_hardware-configuration.nix --flake .#melina --build-on local {{ USER }}@{{ IP }}
+    @echo "✅  Deployed to melina! Restore HA/Homebridge data, then just build-to-melina"
 
 # First darwin activation on a fresh mac (before nh exists)
 [macos]
