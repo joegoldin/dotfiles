@@ -46,6 +46,52 @@ in
       # non-interactively, like the other servers.
       security.sudo.wheelNeedsPassword = false;
 
+      # Full-disk encryption: unlock the LUKS root remotely over SSH in the initrd,
+      # on :22 sharing the booted system's host key (deploy-farum-azula seeds the
+      # same key into both, so known_hosts doesn't churn). On every boot the box
+      # halts here until you `ssh root@farum-azula.turnin.quest` and enter the
+      # passphrase. After boot, `ssh joe@…` works normally.
+      boot.initrd = {
+        systemd = {
+          enable = true;
+          # sshd prints /etc/motd on login; it names the command to unlock.
+          contents."/etc/motd".text = ''
+
+            🔒  ${config.networking.hostName}: root filesystem is encrypted and LOCKED.
+
+                To unlock, run:   systemd-tty-ask-password-agent
+
+                Enter the LUKS passphrase; on success the system finishes booting
+                and this SSH session closes. Wrong passphrase? Run it again.
+
+          '';
+        };
+        # Oracle A1.Flex primary VNIC = virtio-net — needed in the initrd so the
+        # SSH-unlock session has networking.
+        availableKernelModules = [
+          "virtio_net"
+          "virtio_pci"
+        ];
+        network = {
+          enable = true;
+          ssh = {
+            enable = true;
+            port = 22;
+            authorizedKeys = [ keys.${username} ];
+            hostKeys = [ "/etc/secrets/initrd/ssh_host_ed25519_key" ];
+          };
+        };
+      };
+      boot.kernelParams = [ "ip=dhcp" ]; # bring up networking in the initrd
+
+      # 8 GiB swap as a file on the (encrypted) root.
+      swapDevices = [
+        {
+          device = "/swapfile";
+          size = 8 * 1024;
+        }
+      ];
+
       # This option defines the first version of NixOS you have installed on this particular machine,
       # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
       #
@@ -63,6 +109,7 @@ in
       # and migrated your data accordingly.
       #
       # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
-      system.stateVersion = lib.mkForce "24.11"; # Did you read the comment?
+      # Fresh install off the nixos-26.05 flake — never change after install.
+      system.stateVersion = lib.mkForce "26.05";
     };
 }

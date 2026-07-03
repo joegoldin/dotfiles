@@ -10,7 +10,9 @@ let
   meta = import ../../_lib/meta.nix;
 in
 {
-  den.hosts.x86_64-linux.farum-azula = {
+  # Oracle Cloud Ampere = aarch64 (A1.Flex). Declared here so the platform comes
+  # from den, not a mkForce hack in the generated hardware config.
+  den.hosts.aarch64-linux.farum-azula = {
     hostName = "farum-azula";
     users.${meta.username} = { };
   };
@@ -47,7 +49,10 @@ in
         mode = "0400";
         owner = meta.username;
       };
-      age.identityPaths = [ "/home/${meta.username}/.ssh/id_ed25519" ];
+      # Decrypt with the machine's own SSH host key (seeded by deploy-farum-azula),
+      # not a personal user key on a public box. After a fresh deploy, replace the
+      # farum-azula key in keys.nix with the printed one and rekey.
+      age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
     };
   };
 }
