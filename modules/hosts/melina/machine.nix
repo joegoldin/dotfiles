@@ -25,6 +25,10 @@ in
       hardware.enableRedistributableFirmware = true;
       hardware.cpu.amd.updateMicrocode = true;
 
+      # BlueZ on the host — Home Assistant's Bluetooth integration talks to it
+      # over the /run/dbus mount (the box was running BT on Ubuntu).
+      hardware.bluetooth.enable = true;
+
       # Static LAN IP (the box was DHCP→192.168.0.236; pin it so Home Assistant
       # integrations that reference the IP keep working). Confirm the interface
       # name is enp1s0 after install (Intel I225-V) and adjust if it differs.
