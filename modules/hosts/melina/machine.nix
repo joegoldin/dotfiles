@@ -45,8 +45,6 @@ in
           "192.168.0.1"
           "1.1.1.1"
         ];
-        # Homebridge runs its own avahi in-container for HomeKit mDNS, so keep the
-        # host's avahi off (avoid a 5353 conflict). (avahi is off by default.)
       };
 
       services.tailscale = {
