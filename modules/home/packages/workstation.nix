@@ -68,7 +68,8 @@
         network = [
           croc
           unstable.dumbpipe
-          inetutils # telnet
+          iputils # ping (gping needs iputils ping, not inetutils's)
+          (lib.lowPrio inetutils) # telnet; lowPrio so iputils wins the bin/ping collision
           rclone
           sshpass
         ];
