@@ -318,11 +318,11 @@ deploy-melina IP USER="root":
     echo "✅  Deployed melina! Unlock on boot: ssh root@192.168.0.236 (LAN), then restore Home Assistant data + just build-to-melina"
 
 # Encrypted first-install for farum-azula — Oracle Cloud Ampere ARM64 (aarch64),
-# fresh Ubuntu. Same flow as deploy-siofra/melina (LUKS root + initrd-SSH unlock,
-# one host key seeded into both), but builds on the ARM target (--build-on remote)
-# to avoid local aarch64 emulation, and connects as the Ubuntu default user. The
-# printed host key is NEW — replace the farum-azula entry in keys.nix with it,
-# rekey, push, then `just build-to-farum-azula`.
+# fresh Ubuntu. Identical flags to deploy-siofra/melina (LUKS root + initrd-SSH
+# unlock, one host key seeded into both); the only differences are --build-on
+# remote (aarch64 builds natively on the box, not under local QEMU) and the Ubuntu
+# default user. The printed host key is NEW — replace the farum-azula entry in
+# keys.nix with it, rekey, push, then `just build-to-farum-azula`.
 [unix]
 deploy-farum-azula IP USER="ubuntu":
     #!/usr/bin/env bash
@@ -342,20 +342,10 @@ deploy-farum-azula IP USER="ubuntu":
       echo "  ✗ passphrases did not match — try again"
     done
     printf %s "$PASS" > "$TMP/luks.key"; chmod 600 "$TMP/luks.key"
-    # aarch64: build on the ARM box (--build-on remote). 462 overlay-affected paths
-    # aren't cached for aarch64 and must compile natively — building locally would
-    # emulate them under QEMU and segfault (openldap cc1). --no-use-machine-substituters
-    # keeps our attic OUT of the installer: nixos-anywhere otherwise copies this
-    # machine's substituters in, and the installer then fetches the flake `-source`
-    # from attic UNSIGNED and rejects it. Without attic the installer uses only
-    # cache.nixos.org (trusted) for cached aarch64 deps, builds the rest natively, and
-    # gets the flake source pushed directly from this (trusted) machine. attic is
-    # x86_64-heavy anyway, so it wouldn't have helped this aarch64 build.
     , nixos-anywhere \
       --generate-hardware-config nixos-generate-config ./modules/hosts/farum-azula/_hardware-configuration.nix \
       --disk-encryption-keys /tmp/luks.key "$TMP/luks.key" \
       --extra-files "$TMP/extra" \
-      --no-use-machine-substituters \
       --flake .#farum-azula --build-on remote {{ USER }}@{{ IP }}
     echo "✅  Deployed farum-azula! Unlock on boot: ssh root@farum-azula.turnin.quest, then replace the key in keys.nix, rekey, push, just build-to-farum-azula."
 
