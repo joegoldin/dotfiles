@@ -342,20 +342,20 @@ deploy-farum-azula IP USER="ubuntu":
       echo "  ✗ passphrases did not match — try again"
     done
     printf %s "$PASS" > "$TMP/luks.key"; chmod 600 "$TMP/luks.key"
-    # --build-on remote builds the closure on the ARM installer, substituting from
-    # our attic + numtide caches + their signing keys (read from the flake so no
-    # secrets land in this public Justfile). On a clean deploy the flake source is
-    # copied directly from this (trusted) machine, so no require-sigs override is
-    # needed; the "-source lacks a signature" failure only showed up when re-running
-    # into a half-installed installer.
-    EXTRA_SUBS=$(nix eval --raw .#nixosConfigurations.farum-azula.config.nix.settings.extra-substituters --apply 'builtins.concatStringsSep " "')
-    EXTRA_KEYS=$(nix eval --raw .#nixosConfigurations.farum-azula.config.nix.settings.extra-trusted-public-keys --apply 'builtins.concatStringsSep " "')
+    # aarch64: build on the ARM box (--build-on remote). 462 overlay-affected paths
+    # aren't cached for aarch64 and must compile natively — building locally would
+    # emulate them under QEMU and segfault (openldap cc1). --no-use-machine-substituters
+    # keeps our attic OUT of the installer: nixos-anywhere otherwise copies this
+    # machine's substituters in, and the installer then fetches the flake `-source`
+    # from attic UNSIGNED and rejects it. Without attic the installer uses only
+    # cache.nixos.org (trusted) for cached aarch64 deps, builds the rest natively, and
+    # gets the flake source pushed directly from this (trusted) machine. attic is
+    # x86_64-heavy anyway, so it wouldn't have helped this aarch64 build.
     , nixos-anywhere \
       --generate-hardware-config nixos-generate-config ./modules/hosts/farum-azula/_hardware-configuration.nix \
       --disk-encryption-keys /tmp/luks.key "$TMP/luks.key" \
       --extra-files "$TMP/extra" \
-      --option extra-substituters "$EXTRA_SUBS" \
-      --option extra-trusted-public-keys "$EXTRA_KEYS" \
+      --no-use-machine-substituters \
       --flake .#farum-azula --build-on remote {{ USER }}@{{ IP }}
     echo "✅  Deployed farum-azula! Unlock on boot: ssh root@farum-azula.turnin.quest, then replace the key in keys.nix, rekey, push, just build-to-farum-azula."
 
