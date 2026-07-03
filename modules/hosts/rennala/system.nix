@@ -46,5 +46,16 @@ in
           PasswordAuthentication = false;
         };
       };
+
+      # Brute-force protection for the public VPS (default sshd jail) — matches
+      # the other public hosts.
+      services.fail2ban = {
+        enable = true;
+        bantime = "1h";
+        bantime-increment = {
+          enable = true;
+          maxtime = "24h";
+        };
+      };
     };
 }
