@@ -1,8 +1,8 @@
-# Erdtree — beefy dedicated server (2× E5-2670v2, 192 GB DDR3), gaming/HPC host
-# with its own standalone Pelican Panel + Wings. Entity name (= flake output)
-# and hostName are both "erdtree". Installed on bare metal via nixos-anywhere;
-# lean home like racknerd. Aspect content lives in the sibling files
-# (system.nix, machine.nix, pelican.nix, home.nix).
+# Erdtree — beefy dedicated server (2× E5-2670v2, 192 GB DDR3), gaming/HPC host.
+# Calagopus Wings node (wings-rs) registered to the Calagopus panel on roundtable
+# (unraid). Entity name (= flake output) and hostName are both "erdtree".
+# Installed on bare metal via nixos-anywhere; lean home like rennala. Aspect
+# content lives in the sibling files (system.nix, machine.nix, wings.nix, home.nix).
 { inputs, den, ... }:
 let
   meta = import ../../_lib/meta.nix;
@@ -25,13 +25,10 @@ in
       imports = [
         inputs.disko.nixosModules.disko
         inputs.nix-index-database.nixosModules.default
-        inputs.pelican.nixosModules.default
         inputs.agenix.nixosModules.default
         ./_disk-config.nix
         ./_hardware-configuration.nix
       ];
-
-      nixpkgs.overlays = [ inputs.pelican.overlays.default ];
 
       age.secrets.cf = {
         file = "${inputs.dotfiles-secrets}/erdtree-cf.json.age";
