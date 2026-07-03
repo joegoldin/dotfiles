@@ -52,6 +52,10 @@ in
 
       programs.ssh.startAgent = true;
 
+      # Passwordless sudo for wheel — joe is key-only (no password), and
+      # `just build-to-melina` needs non-interactive sudo.
+      security.sudo.wheelNeedsPassword = false;
+
       virtualisation.docker.enable = true;
       users.extraGroups.docker.members = [ "${username}" ];
 
