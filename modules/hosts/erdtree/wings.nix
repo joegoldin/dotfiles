@@ -71,6 +71,17 @@ in
         };
       };
 
+      # wings-rs's `system.username` (default "pterodactyl") is the uid that
+      # game-server containers run as. On a normal host wings tries to create it
+      # via `useradd` — which isn't in the service PATH (and isn't the NixOS way).
+      # Declare it so `ensure_user` just finds it; wings then reads its uid/gid.
+      users.groups.pterodactyl = { };
+      users.users.pterodactyl = {
+        isSystemUser = true;
+        group = "pterodactyl";
+        description = "Calagopus Wings game-server user";
+      };
+
       # Docker is required for Wings
       virtualisation.docker.enable = true;
 
