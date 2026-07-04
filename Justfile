@@ -318,11 +318,13 @@ deploy-melina IP USER="root":
     echo "✅  Deployed melina! Unlock on boot: ssh root@192.168.0.236 (LAN), then restore Home Assistant data + just build-to-melina"
 
 # Encrypted first-install for farum-azula — Oracle Cloud Ampere ARM64 (aarch64),
-# fresh Ubuntu. Identical flags to deploy-siofra/melina (LUKS root + initrd-SSH
-# unlock, one host key seeded into both); the only differences are --build-on
-# remote (aarch64 builds natively on the box, not under local QEMU) and the Ubuntu
-# default user. The printed host key is NEW — replace the farum-azula entry in
-# keys.nix with it, rekey, push, then `just build-to-farum-azula`.
+# fresh Ubuntu. Same flags/flow as deploy-siofra/melina (LUKS root + initrd-SSH
+# unlock, one host key seeded into both). RUN FROM THE MAC (torrent): virby gives it
+# a native aarch64-linux builder, so --build-on local builds the closure without
+# QEMU and copies only the finished system to the installer (no flake eval there,
+# which is what tripped --build-on remote on an input `-source`). The printed host
+# key is NEW — replace the farum-azula entry in keys.nix with it, rekey, push, then
+# `just build-to-farum-azula`.
 [unix]
 deploy-farum-azula IP USER="ubuntu":
     #!/usr/bin/env bash
@@ -342,15 +344,18 @@ deploy-farum-azula IP USER="ubuntu":
       echo "  ✗ passphrases did not match — try again"
     done
     printf %s "$PASS" > "$TMP/luks.key"; chmod 600 "$TMP/luks.key"
-    # Oracle Ampere: the kexec into the installer wedges on the pre-kexec sync()
-    # (jbd2/sda journal blocks, kexec task hangs). --no-sync skips it — safe here
-    # since disko wipes the disk anyway, so unsynced Ubuntu writes are irrelevant.
+    # --build-on local: RUN THIS FROM THE MAC (torrent) — virby gives it a native
+    # aarch64-linux builder, so the closure builds natively (no QEMU crash) and only
+    # the finished system is copied to the installer. That avoids --build-on remote,
+    # where the installer evaluates the flake and chokes fetching an input `-source`
+    # unsigned. --no-sync: Oracle Ampere wedges on the pre-kexec sync() (jbd2/sda +
+    # kexec block); safe to skip since disko wipes the disk anyway.
     , nixos-anywhere \
       --generate-hardware-config nixos-generate-config ./modules/hosts/farum-azula/_hardware-configuration.nix \
       --disk-encryption-keys /tmp/luks.key "$TMP/luks.key" \
       --extra-files "$TMP/extra" \
       --kexec-extra-flags "--no-sync" \
-      --flake .#farum-azula --build-on remote {{ USER }}@{{ IP }}
+      --flake .#farum-azula --build-on local {{ USER }}@{{ IP }}
     echo "✅  Deployed farum-azula! Unlock on boot: ssh root@farum-azula.turnin.quest, then replace the key in keys.nix, rekey, push, just build-to-farum-azula."
 
 # First darwin activation on a fresh mac (before nh exists)
