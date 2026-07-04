@@ -32,6 +32,7 @@
       packageGroups = with pkgs; {
         core = [
           bc
+          btop # resource monitor (all boxes)
           coreutils
           file
           gawk

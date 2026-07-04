@@ -18,7 +18,6 @@
 
       packageGroups = with pkgs; {
         system = [
-          btop
           fastfetch
         ];
 
