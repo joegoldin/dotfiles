@@ -30,9 +30,13 @@
   den.default = {
     nixos = {
       system.stateVersion = lib.mkDefault "24.11";
-      # `unlock` alias for the initrd LUKS-unlock command (no-op off the encrypted
-      # initrd-SSH hosts — see the module for details).
-      imports = [ ./_initrd-unlock.nix ];
+      imports = [
+        # `unlock` alias for the initrd LUKS-unlock command (no-op off the encrypted
+        # initrd-SSH hosts — see the module for details).
+        ./_initrd-unlock.nix
+        # btop + gping (+ iputils) on every box, system-wide (see the module).
+        ./_core-packages.nix
+      ];
     };
     homeManager.home.stateVersion = lib.mkDefault "24.11";
   };
