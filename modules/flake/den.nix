@@ -27,6 +27,13 @@
 
   # Default stateVersions; hosts that diverge override in their own aspect
   # (dectus mkForces 25.11, darwin uses its own integer scheme).
-  den.default.nixos.system.stateVersion = lib.mkDefault "24.11";
-  den.default.homeManager.home.stateVersion = lib.mkDefault "24.11";
+  den.default = {
+    nixos = {
+      system.stateVersion = lib.mkDefault "24.11";
+      # `unlock` alias for the initrd LUKS-unlock command (no-op off the encrypted
+      # initrd-SSH hosts — see the module for details).
+      imports = [ ./_initrd-unlock.nix ];
+    };
+    homeManager.home.stateVersion = lib.mkDefault "24.11";
+  };
 }

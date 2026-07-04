@@ -59,7 +59,7 @@ in
 
             🔒  ${config.networking.hostName}: root filesystem is encrypted and LOCKED.
 
-                To unlock, run:   systemd-tty-ask-password-agent
+                To unlock, run:   unlock
 
                 Enter the LUKS passphrase; on success the system finishes booting
                 and this SSH session closes. Wrong passphrase? Run it again.

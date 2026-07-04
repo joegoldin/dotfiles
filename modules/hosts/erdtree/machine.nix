@@ -56,7 +56,7 @@ in
       # initrd, on :22 sharing the booted system's host key (deploy-erdtree seeds
       # the same key into both, so known_hosts doesn't churn). On every boot the
       # box halts here until you `ssh root@erdtree.turnin.quest` (authorized with
-      # joe's key) and enter the passphrase (then `systemd-tty-ask-password-agent`
+      # joe's key) and enter the passphrase (then `unlock`
       # if not auto-prompted). After boot, `ssh joe@…` works normally on :22.
       boot.initrd = {
         systemd = {
@@ -68,7 +68,7 @@ in
 
             🔒  ${config.networking.hostName}: root filesystem is encrypted and LOCKED.
 
-                To unlock, run:   systemd-tty-ask-password-agent
+                To unlock, run:   unlock
 
                 Enter the LUKS passphrase; on success the system finishes booting
                 and this SSH session closes. Wrong passphrase? Run it again.
