@@ -1,6 +1,6 @@
-# Oracle Cloud bastion — tailnet entry (exit/subnet router) + cloudflared ingress
-# + attic binary-cache client + a Calagopus Wings node (aarch64; Pelican was
-# retired, this now runs wings-rs against the Calagopus panel). Entity name
+# Oracle Cloud bastion — tailnet entry (exit/subnet router) + attic binary-cache
+# client + a Calagopus Wings node (aarch64; Pelican was retired, this now runs
+# wings-rs against the Calagopus panel; cloudflared removed). Entity name
 # (= flake output) and hostName are both "farum-azula". Aspect content lives in the
 # sibling files (system.nix, machine.nix, wings.nix, home.nix).
 #
@@ -36,12 +36,6 @@ in
         ./_hardware-configuration.nix
       ];
 
-      age.secrets.cf = {
-        file = "${inputs.dotfiles-secrets}/cf.json.age";
-        mode = "655";
-        owner = meta.username;
-        group = "users";
-      };
       age.secrets.attic-netrc = {
         file = "${inputs.dotfiles-secrets}/attic-netrc.age";
         mode = "0400";
