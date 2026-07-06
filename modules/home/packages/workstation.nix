@@ -67,10 +67,13 @@
         network = [
           croc
           unstable.dumbpipe
-          iputils # ping (gping needs iputils ping, not inetutils's)
           (lib.lowPrio inetutils) # telnet; lowPrio so iputils wins the bin/ping collision
           rclone
           sshpass
+        ]
+        ++ lib.optionals stdenv.hostPlatform.isLinux [
+          # linux-only (needs libcap/prctl); macOS ships its own BSD ping
+          iputils # ping (gping needs iputils ping, not inetutils's)
         ];
 
         media = [

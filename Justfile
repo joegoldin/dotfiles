@@ -64,12 +64,16 @@ _nh-os action *args="": system-info _check-maintenance
 [macos]
 _nh-darwin action *args="": system-info _check-maintenance
     #!/usr/bin/env bash
-    echo "🔨  nh darwin {{ action }} 🍎..."
+    # The Mac keeps its factory hostname (Joes-MacBook-Pro), so resolve the
+    # darwinConfigurations name explicitly instead of letting nh fall back to
+    # hostname.
+    host=torrent
+    echo "🔨  nh darwin {{ action }} for $host 🍎..."
     just _show-build-prediction "darwin"
     start=$(date +%s)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
     [ -n "{{ args }}" ] && echo "📦  Extra nh args: {{ args }}"
-    nh darwin {{ action }} . --accept-flake-config {{ args }}
+    nh darwin {{ action }} . -H "$host" --accept-flake-config {{ args }}
     just _finish-build "darwin" "$start" $?
 
 # ── Remote rebuilds (existing hosts) ──────────────────────────────────────
