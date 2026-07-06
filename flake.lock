@@ -855,11 +855,11 @@
     "dotfiles-secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1783130057,
-        "narHash": "sha256-R26u2TUOSrb2kIN3C4LZy71EfiKFBcGoNaYy15EoRew=",
+        "lastModified": 1783141175,
+        "narHash": "sha256-IFqHEzEkav+fvQ0CaA4QqeMmhk7E+n9+W2xLEf07jQc=",
         "ref": "refs/heads/main",
-        "rev": "93c7fa5fa46dd2573a16e526a4f0692d1c439803",
-        "revCount": 164,
+        "rev": "b3b3e00488ae10104ae7f88d36764099844b2a6d",
+        "revCount": 166,
         "type": "git",
         "url": "ssh://git@github.com/joegoldin/dotfiles-secrets"
       },

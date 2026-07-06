@@ -5,7 +5,6 @@
 let
   meta = import ../../_lib/meta.nix;
   keys = import "${inputs.dotfiles-secrets}/keys.nix";
-  cfTunnels = import "${inputs.dotfiles-secrets}/cloudflared.nix";
   username = meta.username;
 in
 {
@@ -23,21 +22,9 @@ in
       # Set your time zone.
       time.timeZone = "America/Los_Angeles";
 
-      services = {
-        cloudflared = {
-          enable = true;
-          tunnels = {
-            "${cfTunnels.bastion}" = {
-              credentialsFile = config.age.secrets.cf.path;
-              default = "http_status:404";
-            };
-          };
-        };
-
-        tailscale = {
-          enable = true;
-          useRoutingFeatures = "server";
-        };
+      services.tailscale = {
+        enable = true;
+        useRoutingFeatures = "server";
       };
 
       programs.ssh.startAgent = true;
