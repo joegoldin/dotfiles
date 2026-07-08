@@ -8,6 +8,11 @@
     set -gx PLAYWRIGHT_BROWSERS_PATH ${pkgs.unstable.playwright-driver.browsers}
     set -gx PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS true
 
+    # gws (Google Workspace CLI): shared OAuth credentials via agenix
+    if test -r /run/agenix/gws-credentials
+        set -gx GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE /run/agenix/gws-credentials
+    end
+
     direnv hook fish | source
 
     fish_add_path $HOME/.local/bin

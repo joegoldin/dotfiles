@@ -96,6 +96,11 @@ in
         mode = "0400";
         owner = meta.username;
       };
+      age.secrets.gws-credentials = {
+        file = "${inputs.dotfiles-secrets}/gws-credentials.age";
+        mode = "0400";
+        owner = meta.username;
+      };
     };
   };
 }
