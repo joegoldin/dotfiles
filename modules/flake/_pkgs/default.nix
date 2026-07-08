@@ -88,4 +88,6 @@ pkgs: {
     done
     shopt $args;
   '';
+
+  zmx = pkgs.callPackage ./zmx.nix { };
 }
