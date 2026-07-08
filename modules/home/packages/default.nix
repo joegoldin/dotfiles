@@ -2,6 +2,7 @@
 {
   den.aspects.cli-packages.includes = [
     den.aspects.audiomemo
+    den.aspects.pueue
     den.aspects.shell-tools
     den.aspects.zmx
   ];
@@ -29,6 +30,7 @@
       #
       # Not listed here because dedicated modules provide them:
       #   audiomemo (programs.audiomemo), claude-code (../claude), codex (../codex),
+      #   pueue (services.pueue via ../pueue.nix),
       # claude-container is added per-host (needs native build, no QEMU).
       packageGroups = with pkgs; {
         core = [
@@ -65,7 +67,6 @@
           grc
           unstable.gum
           nnn # terminal file manager
-          pueue
           ripgrep # recursively searches directories for a regex pattern
           sysz # fzf terminal UI for systemctl
           tmux
