@@ -85,6 +85,7 @@
         misc = [
           unstable.calcurse
           chromedriver
+          unstable.gws # Google Workspace CLI (calendar, drive, docs, sheets, slides)
           profanity
           silver-searcher # the_silver_searcher
           tailspin

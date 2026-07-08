@@ -91,6 +91,11 @@ in
         mode = "0400";
         owner = meta.username;
       };
+      age.secrets.kanary-notion-api-token = {
+        file = "${inputs.dotfiles-secrets}/kanary-notion-api-token.age";
+        mode = "0400";
+        owner = meta.username;
+      };
     };
   };
 }
