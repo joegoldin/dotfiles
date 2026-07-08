@@ -54,6 +54,7 @@
 
         infra = [
           cloudflared
+          google-cloud-sdk # gcloud; needed by `gws auth setup`
           saml2aws
           sops
           terraform
