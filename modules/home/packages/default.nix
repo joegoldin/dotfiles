@@ -3,6 +3,7 @@
   den.aspects.cli-packages.includes = [
     den.aspects.audiomemo
     den.aspects.shell-tools
+    den.aspects.zmx
   ];
 
   den.aspects.cli-packages.homeManager =

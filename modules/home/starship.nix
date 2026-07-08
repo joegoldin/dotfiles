@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   den.aspects.starship.homeManager = _: {
     programs.starship = {
       enable = true;
@@ -11,6 +10,10 @@
 
       settings = {
         command_timeout = 2000;
+
+        # Lead the prompt with the zmx session name (only set inside zmx);
+        # $all keeps every other module in its default position.
+        format = "\${env_var.ZMX_SESSION}$all";
 
         aws = {
           format = "\\[[$symbol($profile)(\\($region\\))(\\[$duration\\])]($style)\\]";
@@ -74,6 +77,13 @@
 
         erlang = {
           format = "\\[[$symbol($version)]($style)\\]";
+        };
+
+        env_var.ZMX_SESSION = {
+          symbol = " ";
+          format = "[$symbol$env_value]($style) ";
+          description = "zmx session name";
+          style = "bold magenta";
         };
 
         gcloud = {
