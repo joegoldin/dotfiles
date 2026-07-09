@@ -37,13 +37,13 @@ let
 in
 python3Packages.buildPythonApplication rec {
   pname = "hyprwhspr";
-  version = "1.24.0";
+  version = "1.36.1";
 
   src = fetchFromGitHub {
     owner = "goodroot";
     repo = "hyprwhspr";
     tag = "v${version}";
-    hash = "sha256-WNvAVuSU/DXWJp2NZjfKlFczwHd6YRTg9s3NiOY+NGU=";
+    hash = "sha256-G+YF8EL90fmINEg24P1Li41vEUeUqTFDP16YsYLn64Q=";
   };
 
   format = "other";
