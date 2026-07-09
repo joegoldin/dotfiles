@@ -39,4 +39,9 @@ in
         ];
       };
     };
+
+  # Kick the user audio stack when the VBAN stream wedges.
+  den.aspects.elphael.homeManager = {
+    programs.fish.shellAbbrs.vban-restart = "systemctl --user restart pipewire pipewire-pulse wireplumber";
+  };
 }

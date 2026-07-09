@@ -5,16 +5,6 @@
     set -Ux nvm_default_version lts
     set -Ux sponge_delay 5
 
-    set -gx PLAYWRIGHT_BROWSERS_PATH ${pkgs.unstable.playwright-driver.browsers}
-    set -gx PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS true
-
-    # gws (Google Workspace CLI): shared OAuth credentials via agenix
-    if test -r /run/agenix/gws-credentials
-        set -gx GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE /run/agenix/gws-credentials
-    end
-
-    direnv hook fish | source
-
     fish_add_path $HOME/.local/bin
     fish_add_path $HOME/.cargo/bin
 
@@ -31,21 +21,6 @@
     end
     fish_add_path -a $HOME/.npm-global/bin
     fish_add_path -a $HOME/.npm/_npx/bin
-
-    # from https://github.com/CGamesPlay/llm-cmd-comp/blob/main/share/llm-cmd-comp.fish
-    bind \e\\ __llm_cmdcomp
-
-    function __llm_cmdcomp -d "Fill in the command using an LLM"
-      set __llm_oldcmd (commandline -b)
-      set __llm_cursor_pos (commandline -C)
-      echo # Start the program on a blank line
-      set result (llm cmdcomp $__llm_oldcmd)
-      if test $status -eq 0
-        commandline -r $result
-        echo # Move down a line to prevent fish from overwriting the program output
-      end
-      commandline -f repaint
-    end
 
     ${pkgs.nix-your-shell}/bin/nix-your-shell fish | source
 

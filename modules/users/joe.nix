@@ -13,6 +13,7 @@ in
     includes = [
       den.aspects.git
       den.aspects.fish
+      den.aspects.atuin
       den.aspects.gh
       den.aspects.gpg
       den.aspects.starship

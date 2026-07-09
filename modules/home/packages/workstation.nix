@@ -102,5 +102,14 @@
     in
     {
       home.packages = lib.flatten (lib.attrValues packageGroups);
+
+      # gws (Google Workspace CLI, `misc` group above): point it at the shared
+      # OAuth credentials on hosts that deploy the agenix secret (elphael,
+      # torrent); the test keeps it a no-op elsewhere.
+      programs.fish.interactiveShellInit = ''
+        if test -r /run/agenix/gws-credentials
+            set -gx GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE /run/agenix/gws-credentials
+        end
+      '';
     };
 }

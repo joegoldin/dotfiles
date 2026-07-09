@@ -3,19 +3,20 @@
 # Deliberately excludes:
 #   - fish-ai (needs ANTHROPIC_API_KEY via agenix, not available in guest)
 #   - atuin (needs sync server / host keys)
-#   - host-specific init (playwright, nvm, npm-global PATH; irrelevant in a VM)
+#   - host-specific init (nvm, npm-global PATH; irrelevant in a VM)
 # Includes:
-#   - fish itself + functions + aliases/abbrs (shared with host config)
+#   - fish itself + functions + aliases/abbrs + git abbrs (shared with host config)
 #   - a curated subset of plugins (z, colored-man-pages, sponge, fzf, nix.fish)
 #   - starship prompt
 #   - repo bin scripts with `vmGuest = true;` so `hostOnly` ones are stripped
 {
   pkgs,
   lib,
-  config,
   ...
 }:
 let
+  fishAliases = import ../../home/fish/_aliases.nix { inherit lib pkgs; };
+
   # Upstream nix.fish appends ~/.nix-defexpr/channels to $NIX_PATH unconditionally,
   # which produces a warning on every nix invocation when channels are disabled.
   # Guard the append with `test -e` so it only fires when the path actually exists.
@@ -49,10 +50,8 @@ in
     enable = true;
 
     functions = import ../../home/fish/_functions.nix;
-    inherit ((import ../../home/fish/_aliases.nix { inherit lib pkgs config; }))
-      shellAbbrs
-      shellAliases
-      ;
+    shellAbbrs = fishAliases.shellAbbrs // import ../../home/_git-abbrs.nix;
+    inherit (fishAliases) shellAliases;
 
     plugins = with pkgs.fishPlugins; [
       {

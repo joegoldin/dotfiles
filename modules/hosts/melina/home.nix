@@ -6,13 +6,20 @@
   den.aspects.melina.homeManager =
     { pkgs, ... }:
     {
-      programs.home-manager.enable = true;
+      programs = {
+        home-manager.enable = true;
+
+        # direnv with automatic fish/bash hooking (the fish aspect no longer
+        # hooks direnv manually).
+        direnv.enable = true;
+
+        fish.shellAbbrs.lzd = "lazydocker";
+      };
       systemd.user.startServices = "sd-switch";
 
       home.packages = with pkgs; [
         comma
         coreutils
-        direnv
         dua
         file
         fish

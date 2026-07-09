@@ -15,6 +15,10 @@
       '';
 
       programs = {
+        # Shell-side counterparts to the git/git-stack aliases below;
+        # inert on hosts where fish isn't enabled.
+        fish.shellAbbrs = import ./_git-abbrs.nix;
+
         delta = {
           enable = true;
           enableGitIntegration = true;
