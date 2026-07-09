@@ -39,7 +39,7 @@ in
 
     # Lean CLI kit projected onto joe via the host-aspects battery. fish/git/
     # starship/gh/gpg come from the joe user aspect; shell-tools (an include in
-    # default.nix) adds direnv/skim/zellij. This list is just extra utilities.
+    # default.nix) adds direnv/skim. This list is just extra utilities.
     homeManager =
       { pkgs, ... }:
       {

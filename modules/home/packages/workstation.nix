@@ -5,16 +5,16 @@
 # Host packages/files hold ONLY platform-specific packages; anything that
 # runs on both mac and linux belongs here (or in ./default.nix if the cloud
 # hosts should get it too).
-{ inputs, ... }:
-let
-  daySync = import "${inputs.dotfiles-secrets}/day-sync.nix";
-in
+{ den, ... }:
 {
+  # day-sync's rendered config travels with the workstations (see
+  # ../../ai/day-sync.nix).
+  den.aspects.workstation-packages.includes = [ den.aspects.day-sync ];
+
   den.aspects.workstation-packages.homeManager =
     {
       pkgs,
       lib,
-      config,
       ...
     }:
     let
@@ -106,18 +106,6 @@ in
     in
     {
       home.packages = lib.flatten (lib.attrValues packageGroups);
-
-      # day-sync (agent-skills skill): render its private config from
-      # dotfiles-secrets; `force` supersedes any hand-written file.
-      xdg.configFile."day-sync/config.json" = {
-        force = true;
-        text = builtins.toJSON (
-          {
-            vault = "${config.home.homeDirectory}/${daySync.vaultRelative}";
-          }
-          // removeAttrs daySync [ "vaultRelative" ]
-        );
-      };
 
       # gws (Google Workspace CLI, `misc` group above): point it at the shared
       # OAuth credentials on hosts that deploy the agenix secret (elphael,

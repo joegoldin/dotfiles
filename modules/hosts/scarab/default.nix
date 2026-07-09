@@ -19,7 +19,7 @@ in
       den.aspects.nix-settings
       den.aspects.attic # binary-cache substituter + hm attic-client
       den.aspects.numtide-cache
-      den.aspects.shell-tools # direnv, skim, zellij (lean)
+      den.aspects.shell-tools # direnv, skim (lean)
       den.aspects.claude # Claude Code (claude-nix) + agent-skills
     ];
 

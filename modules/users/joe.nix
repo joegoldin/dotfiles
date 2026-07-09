@@ -56,6 +56,13 @@ in
         home.homeDirectory = lib.mkDefault (
           (if pkgs.stdenv.isDarwin then "/Users/" else "/home/") + meta.username
         );
+
+        # For ad-hoc nix tooling that reads ~/.config/nixpkgs (the flake and
+        # home-manager use their own nixpkgs config); was in the baseline
+        # dotconfig grab-bag, but belongs everywhere joe's home goes.
+        xdg.configFile."nixpkgs/config.nix".text = ''
+          { allowUnfree = true; }
+        '';
       };
   };
 }
