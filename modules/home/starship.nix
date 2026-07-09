@@ -83,9 +83,9 @@ _: {
           symbol = " ";
           format = "\\[[$symbol$env_value]($style)\\] ";
           description = "zmx session name";
-          # starship style strings use "purple", not "magenta" — an unknown
-          # color name silently disables the whole style.
-          style = "bold purple";
+          # Gruvbox bright orange — unused by any other prompt segment
+          # (purple collides with the git branch color).
+          style = "bold #fe8019";
         };
 
         gcloud = {
