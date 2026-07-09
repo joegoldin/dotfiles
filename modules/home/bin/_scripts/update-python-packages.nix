@@ -30,9 +30,6 @@
     WORK_DIR=$(mktemp -d)
     trap 'rm -rf "$WORK_DIR"' EXIT
 
-    # Make sure setup-python-packages.sh can be executed
-    chmod +x "$SCRIPT_DIR/setup-python-packages.sh"
-
     # Function to compare version strings
     version_gt() {
       test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"
