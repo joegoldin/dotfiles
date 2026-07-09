@@ -658,6 +658,13 @@ update-pkgs *names:
       echo "✅  package update pass complete — review the diff, then \`just build\`"
     fi
 
+# Full update sweep: flake inputs (+ Firefox hash pin), custom nix packages, and
+# custom Python packages, then a non-activating build to catch breakage. Leaves
+# a dirty tree on purpose — review the diff, then `just switch` and commit.
+[unix]
+update-all: flake-update update-pkgs update-python-packages build
+    @echo "✅  Update sweep built. Review the diff, then: just switch"
+
 # Garbage-collect old generations and store paths
 [unix]
 nix-gc:
