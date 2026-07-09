@@ -1,5 +1,5 @@
 # The shared home baseline: what every "full" home environment gets
-# (workstations, the mac, and the bastion; NOT the lean servers or the
+# (workstations, the mac, and farum-azula; NOT the lean servers or the
 # deck, which pick features individually). Replaces the old
 # hosts/common/home/default.nix aggregator.
 #

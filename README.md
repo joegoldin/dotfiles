@@ -12,8 +12,11 @@ uses [den](https://github.com/denful/den) as the engine, and wires in
 | `volcano-manor` (+ `volcano-manor-installer` ISO)   | compute box (ROCm + vllm)       | ML/training                         |
 | `torrent`                          | MacBook (aarch64-darwin)        | laptop                              |
 | `malenia`                             | Steam Deck (Jovian)             | gaming                              |
+| `melina`                              | mini PC (Ryzen 7 5700U)         | Home Assistant + home automation    |
 | `dectus`                               | VPS                             | caddy reverse proxy + fail2ban      |
-| `farum-azula` (hostName `bastion`) | Oracle Cloud                    | pelican game servers, tailnet entry |
+| `farum-azula`                      | Oracle Cloud Ampere (aarch64)   | bastion / tailnet entry + Calagopus Wings node |
+| `erdtree`                             | dedicated (2× E5-2670v2, 192 GB) | gaming/HPC — Calagopus Wings node  |
+| `siofra`                              | VPS (16 GB)                     | misc cloud — Calagopus Wings node   |
 | `rennala`                      | VPS                             | attic binary cache server           |
 | `scarab`                                   | Raspberry Pi 3B+ (`nixos-raspberrypi`) | SunFounder PiCrawler quadruped robot |
 
@@ -95,8 +98,8 @@ den.hosts.x86_64-linux.elphael.users.joe = { };
 That single line gives you a flake output, a hostname (via battery), a
 user account with a home-manager environment, and a pointer at the
 host's aspect. Entities carry options (`hostName`, `instantiate`, ...):
-the bastion keeps its old output name with a different machine name via
-`hostName = "bastion"`; the mac sets `instantiate =
+`hostName` defaults to the entity name (via the hostname battery) and
+exists for when the machine name must differ; the mac sets `instantiate =
 inputs.nix-darwin.lib.darwinSystem` because den's default looks for an
 input literally named `darwin`.
 
@@ -214,7 +217,7 @@ answers "how does this machine relate to the cache".
 
 `modules/home/baseline.nix` is an `includes` list plus the xdg
 dotconfig copy: the "full home environment" bundle that workstations,
-the mac, and the bastion include, while the lean servers and the deck
+the mac, and farum-azula include, while the lean servers and the deck
 pick features individually. git/fish/gh/gpg/starship stay out of the
 bundle; they ride on the joe user aspect and reach every host, since
 they describe the user rather than any machine. When placing a new
@@ -340,7 +343,7 @@ separate repo (`github.com/joegoldin/scarab`), not here.
 
 - Names are stable: entity names = flake output names = what
   Justfile/nh expect. `hostName` exists for when the machine name must
-  differ (bastion).
+  differ (no host needs it today — every machine matches its entity name).
 - Every non-underscore file under `modules/` is live. New file =
   active module. Disable by underscore-renaming; there are no imports
   to comment out. One catch: flakes only see tracked files, so a new

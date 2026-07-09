@@ -17,7 +17,7 @@ in
         inherit (attic) cacheName;
         serverEndpoint = "https://${domains.atticDomain}/";
         tokenFile = config.age.secrets.attic-token.path;
-        serverHostnames = [ "bastion" ];
+        serverHostnames = [ "rennala" ];
       };
     };
 }
