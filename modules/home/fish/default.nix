@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   den.aspects.fish.homeManager =
     {
       pkgs,
@@ -87,8 +86,14 @@
       # fish prints a "grc not found" warning on startup).
       home.packages = [ pkgs.grc ];
 
-      # Symlink the Nix-built fish-ai Python env to where the plugin expects it
-      xdg.dataFile."fish-ai".source = fishAiPythonWrapped;
+      xdg = {
+        # Symlink the Nix-built fish-ai Python env to where the plugin expects it
+        dataFile."fish-ai".source = fishAiPythonWrapped;
+
+        # fish-ai settings; co-located with the plugin so lean hosts (which
+        # skip home-baseline) get a configured fish-ai too.
+        configFile."fish-ai.ini".source = ./fish-ai.ini;
+      };
 
       # Clean up any old venv that was manually installed
       home.activation.fishAiCleanup = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''

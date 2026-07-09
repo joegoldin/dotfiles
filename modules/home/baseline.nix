@@ -20,15 +20,5 @@
       den.aspects.bin
       den.aspects.audiomemo
     ];
-
-    homeManager =
-      { config, ... }:
-      {
-        # copy xdg config files
-        home.file."${config.xdg.configHome}/." = {
-          source = ../_data/dotconfig;
-          recursive = true;
-        };
-      };
   };
 }
