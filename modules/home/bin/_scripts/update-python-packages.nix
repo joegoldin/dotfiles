@@ -1,7 +1,7 @@
 {
   name = "update-python-packages";
   desc = "Bump versions + hashes of the custom PyPI package set";
-  usage = "update-python-packages [--no-build]";
+  usage = "update-python-packages";
   hostOnly = true;
   bash = ''
     # Script to update Python package definitions in custom-pypi-packages.nix to their latest versions
