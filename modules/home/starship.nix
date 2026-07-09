@@ -90,6 +90,10 @@ _: {
 
         gcloud = {
           format = "\\[[$symbol$account(@$domain)(\\($region\\))]($style)\\]";
+          # Starship's default symbol is "☁️  " with two trailing spaces
+          # (overhang padding for terminals that render the emoji too wide);
+          # this terminal sizes it correctly, so one space is enough.
+          symbol = "☁️ ";
         };
 
         git_branch = {
