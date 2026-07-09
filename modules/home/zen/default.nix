@@ -65,8 +65,29 @@ in
         # wrapFirefox so that home-manager's `package.override { extraPolicies }`
         # (mkFirefoxModule.nix) actually threads our policies into policies.json.
         package =
-          pkgs.wrapFirefox inputs.zen-src.packages.${pkgs.stdenv.hostPlatform.system}.zen-browser-unwrapped
-            { };
+          let
+            zenUnwrapped = inputs.zen-src.packages.${pkgs.stdenv.hostPlatform.system}.zen-browser-unwrapped;
+            # Firefox base version the current nightly targets.
+            ffVersion = (builtins.fromJSON (builtins.readFile "${inputs.zen-src}/surfer.json")).version.version;
+            # Locally maintained source-hash pin (see _firefox-src.nix). zen-src's
+            # own hash can lag when upstream bumps the FF base, failing the build
+            # with a fixed-output hash mismatch; when our pin matches the base the
+            # nightly targets, swap in the correct source. `just flake-update`
+            # refreshes the pin whenever zen updates, so a mismatch here just means
+            # "run just flake-update" — we fall back to zen-src's own source then.
+            ffPin = import ./_firefox-src.nix;
+            zenBrowser =
+              if ffPin.version == ffVersion then
+                zenUnwrapped.overrideAttrs (_: {
+                  src = pkgs.fetchurl {
+                    url = "mirror://mozilla/firefox/releases/${ffVersion}/source/firefox-${ffVersion}.source.tar.xz";
+                    hash = ffPin.sha512;
+                  };
+                })
+              else
+                zenUnwrapped;
+          in
+          pkgs.wrapFirefox zenBrowser { };
         # Zen's real profile root: ~/.zen on Linux, ~/Library/Application Support/zen
         # on macOS (source: surfer.json appId="zen" + MOZ_LEGACY_PROFILES=1). Not
         # ~/.mozilla/firefox. profiles.Default lands in <configPath>/Default/ on

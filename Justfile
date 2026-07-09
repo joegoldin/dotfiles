@@ -593,12 +593,70 @@ lint:
     @nix --extra-experimental-features 'nix-command flakes' fmt
     @echo "✅  Nix config linted!"
 
-# Update every flake input (the lock is the only pin)
+# Update every flake input (the lock is the only pin). If zen-src changed and it
+# now targets a different Firefox base, refresh the local FF source-hash pin
+# (modules/home/zen/_firefox-src.nix) so the build can't die on a stale hash.
 [unix]
 flake-update:
-    @echo "🔄  Updating flake..."
-    @nix --extra-experimental-features 'nix-command flakes' flake update --option access-tokens "github.com=$(gh auth token 2>/dev/null || echo '')"
-    @echo "✅  Flake updated!"
+    #!/usr/bin/env bash
+    set -euo pipefail
+    nixflags=(--extra-experimental-features 'nix-command flakes')
+    echo "🔄  Updating flake..."
+    before=$(jq -r '.nodes."zen-src".locked.rev // ""' flake.lock 2>/dev/null || echo "")
+    nix "${nixflags[@]}" flake update --option access-tokens "github.com=$(gh auth token 2>/dev/null || echo '')"
+    after=$(jq -r '.nodes."zen-src".locked.rev // ""' flake.lock 2>/dev/null || echo "")
+    echo "✅  Flake updated!"
+    if [[ "$before" != "$after" ]]; then
+      echo "🦊  zen-src changed; checking Firefox base…"
+      ffVer=$(nix "${nixflags[@]}" eval --raw --impure \
+        --expr '(builtins.fromJSON (builtins.readFile "${(builtins.getFlake (toString ./.)).inputs.zen-src}/surfer.json")).version.version')
+      pinVer=$(nix "${nixflags[@]}" eval --raw --impure \
+        --expr '(import ./modules/home/zen/_firefox-src.nix).version' 2>/dev/null || echo "")
+      if [[ "$ffVer" != "$pinVer" ]]; then
+        echo "🦊  Firefox base ${pinVer:-none} → $ffVer; refreshing source-hash pin…"
+        url="https://archive.mozilla.org/pub/firefox/releases/$ffVer/source/firefox-$ffVer.source.tar.xz"
+        hash=$(nix "${nixflags[@]}" store prefetch-file --hash-type sha512 --json "$url" | jq -r .hash)
+        sed -i \
+          -e "s|version = \".*\";|version = \"$ffVer\";|" \
+          -e "s|sha512 = \".*\";|sha512 = \"$hash\";|" \
+          modules/home/zen/_firefox-src.nix
+        echo "✅  Pinned Firefox $ffVer source hash."
+      else
+        echo "✅  Firefox base unchanged ($ffVer); pin already current."
+      fi
+    fi
+
+# Bump custom flake packages (modules/flake/_pkgs) to latest upstream + refresh
+# hashes via nix-update. No args = the curated AUTO list; pass names to target
+# specific ones (e.g. `just update-pkgs git-hunk lotion`). Deliberately-pinned
+# packages are excluded on purpose — see the notes in the recipe.
+[unix]
+update-pkgs *names:
+    #!/usr/bin/env bash
+    set -uo pipefail
+    # Track upstream releases cleanly (nix-update does version discovery + the
+    # src hash + cargoHash/vendorHash/npmDepsHash where present).
+    auto=(blip-caption git-hunk hyprwhspr lotion plasma-applet-netspeed plasma-applet-resources-monitor)
+    # NOT auto-updated (edit the list above to change):
+    #   mouse-actions-{patched,gui-fork,gui-appimage} – joegoldin fork / appimage, pinned
+    #   sunfounder-*, mac-app-util, mkWindowsApp       – hardware libs / vendored tooling
+    #   calagopus-wings                                – fetchurl asset; bump by hand
+    #   zmx                                            – nix-update bumps src+version, but its
+    #     zigDeps FOD (outputHash) is NOT rehashed. To update: run
+    #     `nix run nixpkgs#nix-update -- --flake zmx`, then `just build` and paste the
+    #     "got: sha256-…" from the zigDeps failure into modules/flake/_pkgs/zmx.nix.
+    targets=({{ names }})
+    [[ ${#targets[@]} -eq 0 ]] && targets=("${auto[@]}")
+    fails=()
+    for p in "${targets[@]}"; do
+      echo "⬆️   $p"
+      nix run nixpkgs#nix-update -- --flake "$p" || fails+=("$p")
+    done
+    if [[ ${#fails[@]} -gt 0 ]]; then
+      echo "⚠️   nix-update couldn't finish: ${fails[*]} (custom FOD hash or manual bump needed)"
+    else
+      echo "✅  package update pass complete — review the diff, then \`just build\`"
+    fi
 
 # Garbage-collect old generations and store paths
 [unix]
