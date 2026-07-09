@@ -1,13 +1,9 @@
-{ inputs, ... }:
-let
-  dotfiles-secrets = inputs.dotfiles-secrets;
-in
+{ ... }:
 {
   den.aspects.fish.homeManager =
     {
       pkgs,
       lib,
-      config,
       ...
     }:
     let
@@ -77,14 +73,14 @@ in
     {
       programs.fish = {
         enable = true;
-        inherit ((import ./_init.nix { inherit pkgs config; })) interactiveShellInit;
+        inherit ((import ./_init.nix { inherit pkgs; })) interactiveShellInit;
         functions = import ./_functions.nix;
         inherit ((import ./_plugins.nix { inherit pkgs fishAiSrc; })) plugins;
-        inherit ((import ./_aliases.nix { inherit lib pkgs config; })) shellAbbrs;
-        inherit ((import ./_aliases.nix { inherit lib pkgs config; })) shellAliases;
+        inherit ((import ./_aliases.nix { inherit lib pkgs; }))
+          shellAbbrs
+          shellAliases
+          ;
       };
-
-      programs.atuin = import ./_atuin.nix { inherit pkgs config dotfiles-secrets; };
 
       # The grc.fish plugin (see _plugins.nix) shells out to `grc`; ship the
       # binary with the fish aspect so it's present on lean hosts too (otherwise
@@ -100,22 +96,6 @@ in
         if [ -d "$INSTALL_DIR" ] && [ ! -L "$INSTALL_DIR" ]; then
           echo "Removing old fish-ai venv (now managed by Nix)..."
           rm -rf "$INSTALL_DIR"
-        fi
-      '';
-
-      # Symlink atuin's encryption key from agenix so it stays in sync across hosts.
-      # Skips on hosts that don't manage atuin_key via agenix.
-      home.activation.linkAtuinKey = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        AGENIX_KEY=/run/agenix/atuin_key
-        TARGET="$HOME/.local/share/atuin/key"
-        if [ -e "$AGENIX_KEY" ]; then
-          mkdir -p "$(dirname "$TARGET")"
-          if [ -e "$TARGET" ] && [ ! -L "$TARGET" ]; then
-            backup="$TARGET.pre-agenix-$(date +%s)"
-            echo "Backing up existing atuin key to $backup"
-            mv "$TARGET" "$backup"
-          fi
-          ln -sfn "$AGENIX_KEY" "$TARGET"
         fi
       '';
     };

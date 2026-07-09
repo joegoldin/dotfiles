@@ -1,27 +1,16 @@
 {
   lib,
   pkgs,
-  config,
   ...
 }:
 let
-  inherit (lib) mkIf;
+  inherit (lib) mkDefault mkIf;
   isLinux = pkgs.stdenv.isLinux;
-  packageNames = map (p: p.pname or p.name or null) config.home.packages;
-  hasPackage = name: lib.any (x: x == name) packageNames;
-  hasExa = hasPackage "eza";
-  hasSpecialisationCli = hasPackage "specialisation";
-  hasAwsCli = hasPackage "awscli2";
-  hasKubectl = hasPackage "kubectl";
-  hasLazydocker = hasPackage "lazydocker";
 in
 {
   shellAliases = {
-    ls =
-      if hasExa then
-        "eza -lA --group-directories-first -snew --icons=auto --git -h --hyperlink"
-      else
-        "ls -lArth";
+    # Hosts with the cli-packages aspect override this with the eza variant.
+    ls = mkDefault "ls -lArth";
     l = "command ls";
 
     # macOS ships `open`; Linux uses `xdg-open` (routes dirs → Dolphin via XDG mime).
@@ -42,39 +31,5 @@ in
     nb = "nix build";
     nbn = "nix build nixpkgs#";
     nf = "nix flake";
-
-    ga = "git add";
-    gp = "git push";
-    gc = "git commit";
-    gcm = "git commit -m";
-    gd = "git diff";
-    gf = "git fetch";
-    gl = "git log";
-    gs = "git status";
-    # git-stack aliases
-    gss = "git stack sync";
-    gnext = "git stack next";
-    gprev = "git stack prev";
-    greword = "git stack reword";
-    gamend = "git stack amend";
-    grs = "git rs";
-    gps = "git ps";
-    grb = "git rbs";
-    graps = "git sync && git rs && git ps";
-
-    s = mkIf hasSpecialisationCli "specialisation";
-
-    exa = mkIf hasExa "eza";
-    lst = mkIf hasExa "eza -lath";
-
-    awsswitch = mkIf hasAwsCli "export AWS_PROFILE=(aws configure list-profiles | fzf)";
-    awslogin = mkIf hasAwsCli "aws sso login";
-
-    k = mkIf hasKubectl "kubectl";
-    lzd = mkIf hasLazydocker "lazydocker";
-
-    uxplay = "uxplay -p";
-
-    vban-restart = "systemctl --user restart pipewire pipewire-pulse wireplumber";
   };
 }

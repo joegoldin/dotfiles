@@ -2,11 +2,6 @@
 # Does NOT import ../../home/_hm (too large for VPS disk)
 # Instead, imports only the modules a server needs
 { ... }:
-let
-  meta = import ../../_lib/meta.nix;
-  stateVersion = "24.11";
-  username = meta.username;
-in
 {
   den.aspects.rennala.homeManager =
     {
@@ -17,7 +12,15 @@ in
       imports = [
       ];
 
-      programs.home-manager.enable = true;
+      programs = {
+        home-manager.enable = true;
+
+        # direnv with automatic fish/bash hooking (the fish aspect no longer
+        # hooks direnv manually).
+        direnv.enable = true;
+
+        fish.shellAbbrs.lzd = "lazydocker";
+      };
       systemd.user.startServices = "sd-switch";
 
       home = {
@@ -25,7 +28,6 @@ in
         packages = with pkgs; [
           comma
           coreutils
-          direnv
           dua
           file
           fish
