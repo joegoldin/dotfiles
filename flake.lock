@@ -63,11 +63,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783617035,
-        "narHash": "sha256-e0KrvkkEq+x0r8tTKR4pdl4hcQMs3PRcddNgpl9HxUI=",
+        "lastModified": 1783623147,
+        "narHash": "sha256-QnQ17BUzw6Lxs3IEIf5i5Ld6fjaK59bk/nFhDq+z7Qs=",
         "ref": "refs/heads/main",
-        "rev": "f335a87f9346e24f6a4bbc548df26ab4e2cf9fa6",
-        "revCount": 118,
+        "rev": "7cfefcec434c22640060ebe87bbf231c86bf6a42",
+        "revCount": 119,
         "type": "git",
         "url": "ssh://git@github.com/joegoldin/agent-skills"
       },
@@ -108,11 +108,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1781027062,
-        "narHash": "sha256-HCp/ULLJFzqptXaMTNqyQe6BWxrJNE6bT6V0dKGHvv8=",
+        "lastModified": 1783622948,
+        "narHash": "sha256-V+jDE+lm/yWBQ+7/b4ms/uMmnKxaTZF++iv4FbqxIc0=",
         "owner": "joegoldin",
         "repo": "antigravity-cli-nix",
-        "rev": "f61704e74b5b32237b12c4e05a8bd442477094c3",
+        "rev": "7275089162f5c093d993e5b7cf1a9108b616ae80",
         "type": "github"
       },
       "original": {
@@ -518,11 +518,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1781027062,
-        "narHash": "sha256-ItTRHUXqzsigIikbqWxpF0ixGz1BiSwF1ou5pN6yyRg=",
+        "lastModified": 1783622841,
+        "narHash": "sha256-fnVClMw0u0BfOCJsQGOXRSCzAFU4Nj5yPCMy5Aji7Uk=",
         "ref": "refs/heads/main",
-        "rev": "d702bdd5476ee3e548fa6252fd074c4438d45a6c",
-        "revCount": 4,
+        "rev": "ee2693cd637dd860579c25b59762a21d201a1b84",
+        "revCount": 5,
         "type": "git",
         "url": "ssh://git@github.com/joegoldin/codex-nix.git"
       },
@@ -1817,11 +1817,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1783618622,
-        "narHash": "sha256-pkLHjxDWgRUNP8oPVScHvmI7SwvtaS1Aj3bEoLGdwsA=",
+        "lastModified": 1783620786,
+        "narHash": "sha256-Mm9RWan8bf7dysvNEYSII5ClyLmv0pkfH8ezEk4m7Rk=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "8835e2f327239f9e0efe388660c03186045b5110",
+        "rev": "3c4f940d71f54d0c85c83326dcd3ca139c656d77",
         "type": "github"
       },
       "original": {
@@ -1833,11 +1833,11 @@
     "homebrew-core": {
       "flake": false,
       "locked": {
-        "lastModified": 1783617735,
-        "narHash": "sha256-AD2EQ9QK1JQTxKmcu4Hz23M8O+q9O65eVRxZqL/229A=",
+        "lastModified": 1783622428,
+        "narHash": "sha256-bst12KeZ41B5M3+a1ax1MtC4z8SDtqNAOr3JrLOsnEE=",
         "owner": "homebrew",
         "repo": "homebrew-core",
-        "rev": "71d636951d97560c2c2009e0f39785e405e2f5b5",
+        "rev": "777326d7d189dd00934752f88b4098d6e7539f45",
         "type": "github"
       },
       "original": {
@@ -3627,11 +3627,11 @@
         "rust-overlay": "rust-overlay_4"
       },
       "locked": {
-        "lastModified": 1783619476,
-        "narHash": "sha256-qYgzRzN+ocDw3GYBgQzFV/f99Gjw8czBgGI3FTViS54=",
+        "lastModified": 1783620360,
+        "narHash": "sha256-dHHokm4D8WcSvgqASP7tLHrQdBulv8cECYpe4Uw+xBU=",
         "owner": "zed-industries",
         "repo": "zed",
-        "rev": "35ffa8f480838257ae9650027cb9847505a0882b",
+        "rev": "2c4e44704c37ee87e59ac84e3e17388178b28545",
         "type": "github"
       },
       "original": {
