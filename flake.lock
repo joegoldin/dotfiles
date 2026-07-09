@@ -63,11 +63,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783561179,
-        "narHash": "sha256-ZstY/EiurFhuwQPGW2AKGuhkvbHpZ/c+RBKT4gjJS48=",
+        "lastModified": 1783617035,
+        "narHash": "sha256-e0KrvkkEq+x0r8tTKR4pdl4hcQMs3PRcddNgpl9HxUI=",
         "ref": "refs/heads/main",
-        "rev": "ec7649316ae2d40d6cf0f4be00e22bbb8eff3280",
-        "revCount": 117,
+        "rev": "f335a87f9346e24f6a4bbc548df26ab4e2cf9fa6",
+        "revCount": 118,
         "type": "git",
         "url": "ssh://git@github.com/joegoldin/agent-skills"
       },
@@ -855,11 +855,11 @@
     "dotfiles-secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1783577467,
-        "narHash": "sha256-nRUdMHr0V3KfCLNqeyyVG15cdJ6FOjhPrTX0muwzqbA=",
+        "lastModified": 1783617050,
+        "narHash": "sha256-NhDwXQZgtZ77wn+QD0cqMAFLq4pNuvph9YJQ/zDHAXg=",
         "ref": "refs/heads/main",
-        "rev": "bb2fc6946fe27d466ddf54d4d8f61e963591870e",
-        "revCount": 172,
+        "rev": "99d4cc5bbb837850b3c2aba23da4bc29f67a68e7",
+        "revCount": 173,
         "type": "git",
         "url": "ssh://git@github.com/joegoldin/dotfiles-secrets"
       },
