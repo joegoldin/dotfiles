@@ -574,7 +574,7 @@ setup-python-packages packages='':
 [unix]
 update-python-packages:
     @echo "🔄  Updating Python packages..."
-    @update-python-packages --no-build
+    @update-python-packages
     @echo "✅  Python packages updated!"
 
 # ── Repo checks & maintenance ──────────────────────────────────────────────
