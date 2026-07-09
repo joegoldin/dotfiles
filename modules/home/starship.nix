@@ -80,10 +80,12 @@ _: {
         };
 
         env_var.ZMX_SESSION = {
-          symbol = " ";
-          format = "[$symbol$env_value]($style) ";
+          symbol = " ";
+          format = "\\[[$symbol$env_value]($style)\\] ";
           description = "zmx session name";
-          style = "bold magenta";
+          # starship style strings use "purple", not "magenta" — an unknown
+          # color name silently disables the whole style.
+          style = "bold purple";
         };
 
         gcloud = {
