@@ -63,11 +63,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783623147,
-        "narHash": "sha256-QnQ17BUzw6Lxs3IEIf5i5Ld6fjaK59bk/nFhDq+z7Qs=",
+        "lastModified": 1783664734,
+        "narHash": "sha256-Y72qYHU3uk2837UmtepOYnFUZv0I9XG7g8h+E3cmgtk=",
         "ref": "refs/heads/main",
-        "rev": "7cfefcec434c22640060ebe87bbf231c86bf6a42",
-        "revCount": 119,
+        "rev": "2b64cf3692d9e5fb170f3af3fabb5070e98b95cf",
+        "revCount": 120,
         "type": "git",
         "url": "ssh://git@github.com/joegoldin/agent-skills"
       },
@@ -542,11 +542,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783622841,
-        "narHash": "sha256-fnVClMw0u0BfOCJsQGOXRSCzAFU4Nj5yPCMy5Aji7Uk=",
+        "lastModified": 1783664711,
+        "narHash": "sha256-BLFCULC/0OnIJnCZ74KD0aNCwi3/bsOtTKBZMTvBMFo=",
         "ref": "refs/heads/main",
-        "rev": "ee2693cd637dd860579c25b59762a21d201a1b84",
-        "revCount": 5,
+        "rev": "b7ba57f107b688e9b79501b340026d07ef7667be",
+        "revCount": 6,
         "type": "git",
         "url": "ssh://git@github.com/joegoldin/codex-nix.git"
       },
