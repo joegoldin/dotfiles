@@ -39,6 +39,17 @@
     # drift the Firefox base out from under buildMozillaMach's patches.
     zen-src.url = "github:joegoldin/zen-browser-desktop/nightly";
 
+    # ClearURLs built from the fork's `patched` branch (upstream master + PR
+    # #514 fixing the padded-hash-fragment bug that breaks Claude/OpenAI magic
+    # links, + PR #516 per-site disable). Packaged as an unsigned XPI by the
+    # zen module and force-installed from the store; drop this input and
+    # restore the AMO install_url in _addons.nix once upstream ships a release
+    # containing #514 (> 1.27.3).
+    clearurls-src = {
+      url = "github:joegoldin/ClearURLs-Addon/patched";
+      flake = false;
+    };
+
     # ── Core framework ─────────────────────────────────────────────────────
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";

@@ -534,6 +534,23 @@
         "type": "github"
       }
     },
+    "clearurls-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1783708772,
+        "narHash": "sha256-Z9ekpFDzUPwN8sfr//xBpmEL/pCwhUG3t3PqholzS4Y=",
+        "owner": "joegoldin",
+        "repo": "ClearURLs-Addon",
+        "rev": "1a81acc6fa2941ed02465e791937163cc313cbe9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "joegoldin",
+        "ref": "patched",
+        "repo": "ClearURLs-Addon",
+        "type": "github"
+      }
+    },
     "codex-nix": {
       "inputs": {
         "nixpkgs": [
@@ -3105,6 +3122,7 @@
         "chatgpt-desktop-linux": "chatgpt-desktop-linux",
         "claude-container": "claude-container",
         "claude-desktop-debian": "claude-desktop-debian",
+        "clearurls-src": "clearurls-src",
         "crawler": "crawler",
         "den": "den",
         "desk-phone": "desk-phone",
