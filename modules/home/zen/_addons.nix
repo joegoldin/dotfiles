@@ -1,6 +1,42 @@
-{ lib, ... }:
+{
+  lib,
+  pkgs,
+  # The joegoldin/ClearURLs-Addon `patched` branch (see the `clearurls-src`
+  # flake input); packaged into an XPI by clearurlsXpi below.
+  clearurls-src,
+  ...
+}:
 let
   inherit (lib) mkForce;
+
+  # ClearURLs built from the fork: upstream 1.27.3 + PR #514 (padded-hash fix,
+  # unbreaks Claude/OpenAI magic-link logins) + PR #516 (per-site disable).
+  # Packaging mirrors upstream's .gitlab-ci.yml `bundle addon` job (a plain
+  # zip — no npm, no data/ submodule). The version is bumped to 1.27.3.1 so
+  # Firefox upgrades over the installed AMO 1.27.3 and a future upstream
+  # 1.27.4 release upgrades over us. The XPI is unsigned, which our Zen build
+  # accepts (requireSigning = false) because default.nix turns off
+  # xpinstall.signatures.required in the profile.
+  clearurlsXpi = pkgs.stdenvNoCC.mkDerivation {
+    pname = "clearurls-patched";
+    version = "1.27.3.1";
+    src = clearurls-src;
+    nativeBuildInputs = with pkgs; [
+      zip
+      jq
+    ];
+    buildPhase = ''
+      jq '.version = "1.27.3.1"' manifest.json > manifest.patched.json
+      mv manifest.patched.json manifest.json
+      zip -q -r -FS ClearURLs.xpi \
+        clearurls.js browser-polyfill.js manifest.json \
+        img external_js html core_js css fonts _locales
+    '';
+    installPhase = ''
+      mkdir -p $out
+      cp ClearURLs.xpi $out/
+    '';
+  };
 
   # Force-installed extension from AMO.
   #
@@ -40,7 +76,21 @@ in
       (extension "libredirect" "7esoorv3@alefvanoon.anonaddy.me" trusted)
       (extension "terms-of-service-didnt-read" "jid0-3GUEt1r69sQNSrca5p8kx9Ezc3U@jetpack" { })
       (extension "refined-github-" "{a4c4eda4-fb84-4a84-b4a1-f7c1cbf2a1ad}" { })
-      (extension "clearurls" "{74145f27-f039-47ce-a470-a662b129930a}" trusted)
+      # ClearURLs: the self-built XPI above instead of AMO — upstream 1.27.3
+      # corrupts `=`-padded hash fragments and breaks Claude/OpenAI magic-link
+      # logins. Updates stay DISABLED (unlike the usual `trusted` policy) so
+      # AMO can't clobber the patched build; revert to
+      # `(extension "clearurls" ... trusted)` once upstream releases a version
+      # > 1.27.3 with #514 merged.
+      {
+        name = "{74145f27-f039-47ce-a470-a662b129930a}";
+        value = {
+          install_url = "file://${clearurlsXpi}/ClearURLs.xpi";
+          installation_mode = "force_installed";
+          updates_disabled = true;
+          private_browsing = true;
+        };
+      }
       (extension "sponsorblock" "sponsorBlocker@ajay.app" trusted)
       (extension "ublock-origin" "uBlock0@raymondhill.net" trusted)
       (extension "kagi-search-for-firefox" "search@kagi.com" trusted)

@@ -1,6 +1,6 @@
 { inputs, ... }:
 let
-  dotfiles-secrets = inputs.dotfiles-secrets;
+  inherit (inputs) dotfiles-secrets;
 in
 {
   den.aspects.zen.homeManager =
@@ -11,7 +11,10 @@ in
       ...
     }:
     let
-      addons = import ./_addons.nix { inherit lib; };
+      addons = import ./_addons.nix {
+        inherit lib pkgs;
+        inherit (inputs) clearurls-src;
+      };
 
       # Private container routing (Work container + Containerise site rules) lives in
       # the secrets submodule so the work domains stay out of the public dotfiles.
@@ -308,6 +311,12 @@ in
             # Auto-enable force-installed extensions in a fresh profile, so the
             # declarative add-ons activate without manual approval after migration.
             "extensions.autoDisableScopes" = 0;
+
+            # Accept unsigned add-ons: the self-built ClearURLs XPI (see
+            # clearurlsXpi in _addons.nix) carries no AMO signature. Only
+            # honored because our Zen is built with requireSigning = false
+            # (dev-edition behavior); stock release Firefox ignores this pref.
+            "xpinstall.signatures.required" = false;
 
             # Disable middle-click paste from PRIMARY selection. Firefox has its
             # own pref independent of GTK's gtk-enable-primary-paste.
