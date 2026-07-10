@@ -15,8 +15,8 @@
           # First-class defaults. Note: codex-nix's activation merges
           # generated-over-existing, so these pin the model/effort and win over
           # interactive /model + /config edits on every switch.
-          model = "gpt-5.6";
-          model_reasoning_effort = "high";
+          model = "gpt-5.6-sol";
+          model_reasoning_effort = "xhigh";
         };
       };
     };
