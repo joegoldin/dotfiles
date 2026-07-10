@@ -10,8 +10,8 @@ let
       # Carries the N3 sleep/lock recovery: USB reset + official MOD handshake
       # clears the firmware's "host gone" latch (frozen display after suspend
       # or lock; writes ACKed but ignored). See joegoldin/StreamController#1.
-      rev = "1ede6ed8fde34dcecbf5f01dc63b8d9cfacbafbd";
-      hash = "sha256-M5UJGNelp6DoFzQje9ziIfvm6YJXu1wjxXKTY1CV9O0=";
+      rev = "c14ead9e32444988460fa119e9cef7b800e9d2b4";
+      hash = "sha256-GgI1cowszEr+n9lvlgYGBfYWWbhONGjo5hzCbNwXXTA=";
     };
     nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
     # The upstream nixpkgs derivation builds the Python env from a fixed list,
