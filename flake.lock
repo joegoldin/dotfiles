@@ -421,6 +421,30 @@
         "type": "github"
       }
     },
+    "chatgpt-desktop-linux": {
+      "inputs": {
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1783642387,
+        "narHash": "sha256-QW86fz5Q0j85oNoxvRkjcdipqoUL/gSlJyCxCtZb3EI=",
+        "owner": "EricKrouss",
+        "repo": "chatgpt-desktop-linux",
+        "rev": "7b0ff84e130037a31700deb32cb361bd35ae4535",
+        "type": "github"
+      },
+      "original": {
+        "owner": "EricKrouss",
+        "repo": "chatgpt-desktop-linux",
+        "rev": "7b0ff84e130037a31700deb32cb361bd35ae4535",
+        "type": "github"
+      }
+    },
     "claude-container": {
       "inputs": {
         "agent-skills": "agent-skills_2",
@@ -3078,6 +3102,7 @@
         "brew-api": "brew-api",
         "brew-nix": "brew-nix",
         "brew-src": "brew-src",
+        "chatgpt-desktop-linux": "chatgpt-desktop-linux",
         "claude-container": "claude-container",
         "claude-desktop-debian": "claude-desktop-debian",
         "crawler": "crawler",
