@@ -1,16 +1,17 @@
 { pkgs }:
 let
   package = (pkgs.unstable.streamcontroller.override { isKde = true; }).overrideAttrs (old: {
-    version = "1.5.0-beta.14-unstable-2026-07-01";
+    version = "1.5.0-beta.15-unstable-2026-07-10";
     src = pkgs.fetchFromGitHub {
       owner = "joegoldin";
       repo = "StreamController";
-      # PR #1 (MiraBox StreamDock device support) rebased onto main, so it also
-      # carries the watcher-thread teardown fix (stops the runaway kdotool/KWin
-      # script storm that wedged plasmashell's D-Bus) and the ComboRow GTK
-      # main-thread fix from main. See joegoldin/StreamController#1.
-      rev = "8e60d45c8db8682b3a37bc9b62e1a5a44d457b43";
-      hash = "sha256-85ZR0G7Ui5jMisynSNuuRSHclSe95uYDGtXFFdrqaDM=";
+      # PR #1 (MiraBox StreamDock device support), rebased onto fork main =
+      # upstream beta.15 + the fork's GTK-threading/watcher stability fixes.
+      # Carries the N3 sleep/lock recovery: USB reset + official MOD handshake
+      # clears the firmware's "host gone" latch (frozen display after suspend
+      # or lock; writes ACKed but ignored). See joegoldin/StreamController#1.
+      rev = "1ede6ed8fde34dcecbf5f01dc63b8d9cfacbafbd";
+      hash = "sha256-M5UJGNelp6DoFzQje9ziIfvm6YJXu1wjxXKTY1CV9O0=";
     };
     nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
     # The upstream nixpkgs derivation builds the Python env from a fixed list,
