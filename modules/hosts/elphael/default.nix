@@ -33,6 +33,7 @@ in
       den.aspects.zed
       den.aspects.default-apps
       den.aspects.mouse-actions
+      den.aspects.chatgpt-desktop
     ];
 
     nixos = {

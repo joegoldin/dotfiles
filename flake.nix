@@ -201,6 +201,16 @@
       url = "github:aaddrick/claude-desktop-debian/e85450c90ba38159f89f02bdd0f6c6d7e6bce065";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # ChatGPT Desktop for Linux (unofficial Electron repack of the official
+    # macOS app, which OpenAI renamed from Codex to ChatGPT; torrent gets the
+    # official apps via its chatgpt/codex-app casks). PINNED to the security-
+    # reviewed rev (2026-07-09, full diff vs ilysenko/codex-desktop-linux
+    # merge-base ddcd9b5 audited clean); review new commits before bumping.
+    chatgpt-desktop-linux = {
+      url = "github:EricKrouss/chatgpt-desktop-linux/7b0ff84e130037a31700deb32cb361bd35ae4535";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
     # LLM agent tools (claude-code, codex, antigravity)
     llm-agents.url = "github:numtide/llm-agents.nix";
     # declarative MCP server configuration

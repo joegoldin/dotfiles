@@ -74,6 +74,7 @@ in
           "blender"
           "chatgpt"
           "claude"
+          "codex-app"
           "crossover"
           "cryptomator"
           "daisydisk"
