@@ -282,6 +282,14 @@ in
           }
         '';
         "${domains.garnixCacheDomain}".extraConfig = ''
+          # Never trust client-supplied auth headers on any garnix vhost.
+          request_header -X-Auth-Request-User
+          request_header -X-Auth-Request-Email
+          request_header -X-Auth-Request-Groups
+          # Nix queries the substituter root (/nix-cache-info, /<hash>.narinfo); the
+          # backend serves the cache under /api/cache/. Rewrite so ONLY the cache
+          # surface is reachable here (login/API paths become /api/cache/... -> 404).
+          rewrite * /api/cache{uri}
           reverse_proxy 127.0.0.1:8321
         '';
       };
