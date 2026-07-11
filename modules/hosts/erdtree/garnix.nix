@@ -96,7 +96,25 @@ in
       ];
       # The opensearch module defaults `package = pkgs.opensearch-dashboards`,
       # which only exists via the fork's overlay. Apply it host-wide.
-      nixpkgs.overlays = [ inputs.garnix-ci.overlays.default ];
+      nixpkgs.overlays = [
+        inputs.garnix-ci.overlays.default
+        # The fork's opensearch module pins opensearch 2.12.0 by overriding only
+        # `version` + `src`, inheriting nixpkgs' installPhase. Current nixpkgs
+        # (26.05) ships pkgs.opensearch 3.x, whose installPhase copies an `agent/`
+        # dir that exists only in 3.x tarballs; the pinned 2.12.0 tarball lacks it,
+        # so `cp -R ... agent` fails the build. Drop `agent` from the copy so the
+        # 2.12.0 pin builds — this restores exactly the file set the fork's own
+        # (older-nixpkgs) opensearch installPhase copied. No-op if the string ever
+        # changes upstream. Mirrors the fork's own installPhase-patch overlay.
+        (final: prev: {
+          opensearch = prev.opensearch.overrideAttrs (old: {
+            installPhase = builtins.replaceStrings
+              [ "cp -R bin config lib modules plugins agent $out" ]
+              [ "cp -R bin config lib modules plugins $out" ]
+              old.installPhase;
+          });
+        })
+      ];
 
       _module.args.flakePackages = inputs.garnix-ci.packages.x86_64-linux;
       _module.args.flakeInputs = inputs.garnix-ci.inputs;
