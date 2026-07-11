@@ -123,6 +123,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.attic.follows = "attic";
     };
+    # self-hosted garnix CI (fork with self-hosting patches). No `follows` —
+    # the fork's pinned nixpkgs builds its Haskell/Node packages reproducibly.
+    garnix-ci = {
+      url = "github:joegoldin/garnix-ci/self-hosting";
+    };
 
     # ── Nix utilities ──────────────────────────────────────────────────────
     flake-utils.url = "github:numtide/flake-utils";
