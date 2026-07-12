@@ -60,11 +60,28 @@ stdenv.mkDerivation {
 
   # Zig needs a writable global cache directory; seed its package store from
   # the fixed-output deps derivation so the build never touches the network.
+  #
+  # On darwin, ghostty's build insists on Zig's native SDK detection, which
+  # shells out to `xcode-select --print-path` and `xcrun --sdk X
+  # --show-sdk-path` — and with default options it configures xcframework
+  # steps that probe for the *iphoneos* SDK, which no nixpkgs package can
+  # ever answer (the sandbox has no Xcode at all). Shim both tools to echo
+  # $SDKROOT (the stdenv apple-sdk): the macos answer is the real SDK the
+  # compile steps need, and the iOS answer only has to be non-empty because
+  # zmx never builds those steps — it only consumes the ghostty-vt module.
   preBuild = ''
     export ZIG_GLOBAL_CACHE_DIR=$TMPDIR/zig-cache
     mkdir -p "$ZIG_GLOBAL_CACHE_DIR"
     cp -r ${zigDeps} "$ZIG_GLOBAL_CACHE_DIR/p"
     chmod -R u+w "$ZIG_GLOBAL_CACHE_DIR/p"
+  ''
+  + lib.optionalString stdenv.hostPlatform.isDarwin ''
+    mkdir -p "$TMPDIR/xcode-shims"
+    for tool in xcode-select xcrun; do
+      printf '#!/bin/sh\necho "$SDKROOT"\n' > "$TMPDIR/xcode-shims/$tool"
+      chmod +x "$TMPDIR/xcode-shims/$tool"
+    done
+    export PATH="$TMPDIR/xcode-shims:$PATH"
   '';
 
   buildPhase = ''
