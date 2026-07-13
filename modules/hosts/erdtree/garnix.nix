@@ -193,6 +193,9 @@ in
         githubAppName = garnixData.github.appName; # slug from the app-manifest bootstrap
         selfHostMode = true;
         adminGroup = garnixData.authentik.adminGroup;
+        # Publish modules from our own org's repos (the 7 forked + 3 authored
+        # module repos live under joegoldin). Upstream default is "garnix-io".
+        modulesOrg = "joegoldin";
         opensearchUrl = "http://[::1]:9200/_msearch";
         cacheUrl = "https://${domains.garnixCacheDomain}";
         cachePublicKey = garnixData.cachePublicKey;
