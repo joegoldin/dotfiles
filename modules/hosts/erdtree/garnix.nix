@@ -13,6 +13,11 @@ in
       domains = import "${dotfiles-secrets}/domains.nix";
       garnixData = import "${dotfiles-secrets}/garnix.nix";
       dbFqdn = "garnix-db.internal";
+      # The Next.js frontend build ships static assets (JS/CSS/fonts) under
+      # `${frontendPkg}/public/_next/static`; the standalone server on :3000 does
+      # NOT serve them (upstream nginx served them from disk). Caddy serves
+      # /_next/* from this path so the SPA actually loads.
+      frontendPkg = inputs.garnix-ci.packages.x86_64-linux.frontend_default;
       # agenix file -> /run/secrets/<name>. Everything owned by garnix:garnix 0440
       # except noted; postgres/systemd read via root LoadCredential.
       garnixSecrets = {
@@ -293,6 +298,13 @@ in
           }
           handle /oauth2/* {
             reverse_proxy 127.0.0.1:4180
+          }
+          # Next.js static assets: served from disk (the :3000 standalone server
+          # doesn't). Ungated — client-side JS/CSS/fonts are inherently public,
+          # and gating them would break on the 401->redirect-returns-HTML path.
+          handle /_next/* {
+            root * ${frontendPkg}/public
+            file_server
           }
           handle {
             forward_auth 127.0.0.1:4180 {
