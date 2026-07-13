@@ -18,6 +18,12 @@ in
       # NOT serve them (upstream nginx served them from disk). Caddy serves
       # /_next/* from this path so the SPA actually loads.
       frontendPkg = inputs.garnix-ci.packages.x86_64-linux.frontend_default;
+      # Static mirror of garnix.io/docs, served ungated at /docs so the
+      # self-hosted app's doc links stay on-domain. Layout: ${docsRoot}/docs/**
+      # (pages as .../index.html; assets rewritten to absolute /docs/_next,
+      # /docs/images, /docs/favicon.ico so they never collide with the
+      # frontend's own /_next/* handler). Refresh via the dotfiles-assets input.
+      docsRoot = "${inputs.dotfiles-assets}/garnix-docs";
       # agenix file -> /run/secrets/<name>. Everything owned by garnix:garnix 0440
       # except noted; postgres/systemd read via root LoadCredential.
       garnixSecrets = {
@@ -304,6 +310,17 @@ in
           # and gating them would break on the 401->redirect-returns-HTML path.
           handle /_next/* {
             root * ${frontendPkg}/public
+            file_server
+          }
+          # Mirrored garnix docs (static HTML). Ungated public docs, same as
+          # /_next above. Pages live at ${docsRoot}/docs/<slug>/index.html and
+          # reference their assets via absolute /docs/_next|images|favicon
+          # paths, so this single handle serves pages + assets. try_files
+          # resolves trailing-slash, no-slash, and .html forms, falling back to
+          # the docs index for anything missing (graceful 404).
+          handle /docs* {
+            root * ${docsRoot}
+            try_files {path} {path}index.html {path}/index.html {path}.html /docs/index.html
             file_server
           }
           handle {
