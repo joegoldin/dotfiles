@@ -7,6 +7,7 @@ let
   dotfiles-secrets = inputs.dotfiles-secrets;
   domains = import "${dotfiles-secrets}/domains.nix";
   attic = import "${dotfiles-secrets}/attic.nix";
+  garnix = import "${dotfiles-secrets}/garnix.nix";
 in
 {
   den.aspects.attic = {
@@ -17,8 +18,18 @@ in
       in
       {
         nix.settings = {
-          extra-substituters = [ "https://${domains.atticDomain}/${attic.cacheName}" ];
-          extra-trusted-public-keys = [ attic.publicKey ];
+          # Two binary caches: attic + the self-hosted garnix CI cache, so
+          # local builds skip anything either has already built. The combined
+          # attic-netrc carries a `machine` entry for each (nix takes one
+          # netrc-file), so no separate netrc is needed for garnix.
+          extra-substituters = [
+            "https://${domains.atticDomain}/${attic.cacheName}"
+            "https://${domains.garnixCacheDomain}"
+          ];
+          extra-trusted-public-keys = [
+            attic.publicKey
+            garnix.cachePublicKey
+          ];
           netrc-file = lib.mkIf hasNetrc config.age.secrets.attic-netrc.path;
         };
       };
