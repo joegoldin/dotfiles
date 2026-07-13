@@ -10,7 +10,7 @@
   den.aspects.home-baseline = {
     includes = [
       den.aspects."1password"
-      den.aspects.attic
+      den.aspects.binary-caches
       den.aspects.cli-packages
       den.aspects.claude
       den.aspects.antigravity

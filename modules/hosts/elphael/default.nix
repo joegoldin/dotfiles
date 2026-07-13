@@ -13,7 +13,7 @@ in
       den.aspects.nix-settings
       den.aspects.dynamic-derivations
       # system features
-      den.aspects.attic
+      den.aspects.binary-caches
       den.aspects.attic-post-build-hook
       den.aspects.numtide-cache
       den.aspects.howdy

@@ -1,7 +1,8 @@
-# Attic binary-cache client; the cross-class aspect: one feature, three
-# Nix classes. `os` forwards into both nixos and darwin (substituter trust);
-# homeManager carries the attic-client CLI config (and its hm module, so no
-# host has to wire it separately).
+# Binary-cache client aspect. Trusts + substitutes from TWO caches — attic and
+# the self-hosted garnix CI cache — so local builds skip anything either has
+# already built. Cross-class: `os` forwards into nixos + darwin (substituter
+# trust + combined netrc); homeManager carries the attic-client CLI config (and
+# its hm module, so no host has to wire it separately).
 { inputs, ... }:
 let
   dotfiles-secrets = inputs.dotfiles-secrets;
@@ -10,7 +11,7 @@ let
   garnix = import "${dotfiles-secrets}/garnix.nix";
 in
 {
-  den.aspects.attic = {
+  den.aspects.binary-caches = {
     os =
       { config, lib, ... }:
       let

@@ -11,7 +11,7 @@ in
   den.aspects.malenia = {
     includes = [
       den.aspects.nix-settings
-      den.aspects.attic
+      den.aspects.binary-caches
       den.aspects.attic-post-build-hook
       den.aspects.numtide-cache
       den.aspects.gaming

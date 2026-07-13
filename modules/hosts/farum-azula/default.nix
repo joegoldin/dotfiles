@@ -22,7 +22,7 @@ in
   den.aspects.farum-azula = {
     includes = [
       den.aspects.nix-settings
-      den.aspects.attic
+      den.aspects.binary-caches
       den.aspects.numtide-cache
       den.aspects.home-baseline
     ];
