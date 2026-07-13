@@ -949,11 +949,11 @@
     "dotfiles-assets": {
       "flake": false,
       "locked": {
-        "lastModified": 1783974141,
-        "narHash": "sha256-01UwWjQ1Dr1qjDuHKtQJFc18jWl+advxEKmDu5KgVPI=",
+        "lastModified": 1783974461,
+        "narHash": "sha256-YfwwFG5UJjQWPvYKP/q74+NAD97jbuRxiiRHyhrwTzk=",
         "ref": "refs/heads/main",
-        "rev": "ea831f44900fbe0a7b12d2783283d564402884ba",
-        "revCount": 8,
+        "rev": "91d2369375c6c50d6c6172702f18ba47aaf30f21",
+        "revCount": 9,
         "type": "git",
         "url": "ssh://git@github.com/joegoldin/dotfiles-assets"
       },
