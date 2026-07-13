@@ -262,6 +262,15 @@ in
           # oidc-groups-claim defaults to "groups" (what the mapping returns).
           # allowed-group is the entitlement gate; repeatable flag -> list value.
           allowed-group = garnixData.authentik.allowedGroups;
+          # Authentik issues id_tokens with email_verified=false for accounts
+          # that never went through an email-verification flow; oauth2-proxy
+          # rejects those by default (500 on /oauth2/callback). We fully trust
+          # this IdP (single-tenant, self-hosted), so accept unverified emails.
+          insecure-oidc-allow-unverified-email = true;
+          # Caddy forward_auth builds an absolute rd=https://<host>/... redirect;
+          # oauth2-proxy only honors post-login redirects to whitelisted domains,
+          # else it drops them. Whitelist our own app domain (repeatable flag).
+          whitelist-domain = [ domains.garnixDomain ];
         };
       };
       systemd.services.oauth2-proxy = {
