@@ -77,13 +77,13 @@
     # ── Personal data repos (ssh) ──────────────────────────────────────────
     # assets (fonts, sfx, etc.); bump with `nix flake update dotfiles-assets`
     dotfiles-assets = {
-      url = "git+ssh://git@github.com/joegoldin/dotfiles-assets";
+      url = "github:joegoldin/dotfiles-assets";
       flake = false;
     };
     # secrets (domains, encrypted age files, etc.); private repo over ssh;
     # bump with `nix flake update dotfiles-secrets`
     dotfiles-secrets = {
-      url = "git+ssh://git@github.com/joegoldin/dotfiles-secrets";
+      url = "github:joegoldin/dotfiles-secrets";
       flake = false;
     };
 
@@ -107,7 +107,7 @@
     # bump with `nix flake update crawler`. Imported by the crawler host's
     # brain.nix aspect (services.crawler-brain).
     crawler = {
-      url = "git+ssh://git@github.com/joegoldin/crawler";
+      url = "github:joegoldin/crawler";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -238,7 +238,7 @@
     # Agent skills + re-exported claude-nix, antigravity-cli-nix, codex-nix
     # modules; over ssh; bump with `nix flake update agent-skills`
     agent-skills = {
-      url = "git+ssh://git@github.com/joegoldin/agent-skills";
+      url = "github:joegoldin/agent-skills";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

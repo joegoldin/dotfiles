@@ -65,15 +65,15 @@
       "locked": {
         "lastModified": 1783664734,
         "narHash": "sha256-Y72qYHU3uk2837UmtepOYnFUZv0I9XG7g8h+E3cmgtk=",
-        "ref": "refs/heads/main",
+        "owner": "joegoldin",
+        "repo": "agent-skills",
         "rev": "2b64cf3692d9e5fb170f3af3fabb5070e98b95cf",
-        "revCount": 120,
-        "type": "git",
-        "url": "ssh://git@github.com/joegoldin/agent-skills"
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "ssh://git@github.com/joegoldin/agent-skills"
+        "owner": "joegoldin",
+        "repo": "agent-skills",
+        "type": "github"
       }
     },
     "agent-skills_2": {
@@ -765,15 +765,15 @@
       "locked": {
         "lastModified": 1782451640,
         "narHash": "sha256-I7pGc9j+arMyB5bcW3cGIrbdT0KbjNb8NeWF006Unu4=",
-        "ref": "refs/heads/main",
+        "owner": "joegoldin",
+        "repo": "crawler",
         "rev": "aa6d216ab51f48c22ee3fc7d158951df152e5cf0",
-        "revCount": 141,
-        "type": "git",
-        "url": "ssh://git@github.com/joegoldin/crawler"
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "ssh://git@github.com/joegoldin/crawler"
+        "owner": "joegoldin",
+        "repo": "crawler",
+        "type": "github"
       }
     },
     "darwin": {
@@ -951,15 +951,15 @@
       "locked": {
         "lastModified": 1783974970,
         "narHash": "sha256-xvxAzfvGHvsL+5MflnZhI9vFATqzX9p8Wj58Ki53ojs=",
-        "ref": "refs/heads/main",
+        "owner": "joegoldin",
+        "repo": "dotfiles-assets",
         "rev": "168562d3b3b5142146bd8e67ce83b046b3da5b7d",
-        "revCount": 10,
-        "type": "git",
-        "url": "ssh://git@github.com/joegoldin/dotfiles-assets"
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "ssh://git@github.com/joegoldin/dotfiles-assets"
+        "owner": "joegoldin",
+        "repo": "dotfiles-assets",
+        "type": "github"
       }
     },
     "dotfiles-secrets": {
@@ -967,15 +967,15 @@
       "locked": {
         "lastModified": 1783982864,
         "narHash": "sha256-H2DY1Fl/MlizjXZpxPoWJ2kylTq4BNvjf4YG59xNB0E=",
-        "ref": "refs/heads/main",
+        "owner": "joegoldin",
+        "repo": "dotfiles-secrets",
         "rev": "b817e32bc4ea644ef516ae0d71cd899d327a0b6f",
-        "revCount": 182,
-        "type": "git",
-        "url": "ssh://git@github.com/joegoldin/dotfiles-secrets"
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "ssh://git@github.com/joegoldin/dotfiles-secrets"
+        "owner": "joegoldin",
+        "repo": "dotfiles-secrets",
+        "type": "github"
       }
     },
     "drowse": {
