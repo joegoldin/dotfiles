@@ -184,7 +184,7 @@ in
       services.garnixServer = {
         enable = true;
         url = "https://${domains.garnixDomain}";
-        githubAppName = "pending"; # updated in the GitHub App task
+        githubAppName = garnixData.github.appName; # slug from the app-manifest bootstrap
         selfHostMode = true;
         adminGroup = garnixData.authentik.adminGroup;
         opensearchUrl = "http://[::1]:9200/_msearch";
