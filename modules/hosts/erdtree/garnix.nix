@@ -240,19 +240,19 @@ in
         experimental-features = [ "nix-command" "flakes" "recursive-nix" ];
         system-features = [ "nixos-test" "benchmark" "big-parallel" "kvm" "recursive-nix" ];
         trusted-users = [ "garnix" ];
-        # Half the box per derivation: the machine has 20 threads; a single
-        # build (ghc, chromium, …) may use at most 10. Total build CPU/RAM is
-        # capped by the nix-daemon cgroup below. (mkForce: the garnix module
-        # hardcodes cores = 4.)
-        cores = lib.mkForce 10;
+        # Half the box per derivation: erdtree is a dual E5-2667 v2 = 32
+        # threads, so a single build (ghc, rustc, …) may use up to 16. Total
+        # build CPU/RAM is capped by the nix-daemon cgroup below. (mkForce: the
+        # garnix module hardcodes cores = 4.)
+        cores = lib.mkForce 16;
       };
 
       # CI must not starve the machine (it's also a gaming/HPC box): cap the
-      # cgroups where build work actually runs to ~half of 20 threads / 251G.
-      #  - nix-daemon: the actual derivation builds (ghc/xz/… as nixbld*)
+      # cgroups where build work actually runs to ~half of 32 threads / 251G.
+      #  - nix-daemon: the actual derivation builds (ghc/rustc/… as nixbld*)
       #  - garnixServer: sandboxed evals, nar packing, cache uploads
       systemd.services.nix-daemon.serviceConfig = {
-        CPUQuota = "1000%"; # 10 of 20 threads
+        CPUQuota = "1600%"; # 16 of 32 threads
         MemoryHigh = "115G"; # throttle before the hard cap
         MemoryMax = "125G"; # half of 251G
       };
