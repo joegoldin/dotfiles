@@ -1,0 +1,15 @@
+# garnix CI (self-hosted at garnix.turnin.quest). Build every NixOS host config
+# on push so other machines pull the pre-built system closures from the garnix
+# cache (garnix-cache.turnin.quest, wired into the binary-caches aspect) instead
+# of rebuilding.
+#
+# Only nixosConfigurations are built:
+#   - darwinConfigurations are omitted — no darwin (macOS) remote builder is
+#     registered with garnix yet (services.garnixServer.buildMachines = []).
+#     Register a Mac as a remote builder to cache those too.
+#   - The default set also builds all checks/packages/devShells/homeConfigurations;
+#     we skip those here to avoid long builds and failures from impure/networked
+#     checks. Add them back to `include` if you want them cached.
+builds:
+  include:
+    - "nixosConfigurations.*"

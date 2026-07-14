@@ -17,7 +17,7 @@ in
   den.aspects.torrent = {
     includes = [
       den.aspects.nix-settings
-      den.aspects.attic
+      den.aspects.binary-caches
       den.aspects.numtide-cache
       # home features (projected onto users via the host-aspects battery)
       den.aspects.home-baseline
