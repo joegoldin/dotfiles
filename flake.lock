@@ -965,11 +965,11 @@
     "dotfiles-secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1783982864,
-        "narHash": "sha256-H2DY1Fl/MlizjXZpxPoWJ2kylTq4BNvjf4YG59xNB0E=",
+        "lastModified": 1784006362,
+        "narHash": "sha256-hR+TUTZhp5smycZ6yUibDE00BOyfWeZmGb8bk5sYmg4=",
         "owner": "joegoldin",
         "repo": "dotfiles-secrets",
-        "rev": "b817e32bc4ea644ef516ae0d71cd899d327a0b6f",
+        "rev": "f2e80a29fd46ce22b47de7eb2bf598c4b806bc9c",
         "type": "github"
       },
       "original": {
