@@ -18,7 +18,14 @@ let
     # so hidapi (added to requirements.txt by PR #1) is missing and the MiraBox
     # StreamDock backend silently disables itself ("is 'hidapi' installed?").
     # Add it so `import hid` resolves and StreamDock devices are detected.
-    buildInputs = (old.buildInputs or [ ]) ++ [ pkgs.unstable.python3Packages.hidapi ];
+    # Same for dasbus: beta.15 added src/api.py (D-Bus API), imported
+    # unconditionally at startup, so the app crashes at launch without it.
+    buildInputs =
+      (old.buildInputs or [ ])
+      ++ (with pkgs.unstable.python3Packages; [
+        hidapi
+        dasbus
+      ]);
     postFixup = (old.postFixup or "") + ''
       wrapProgram $out/bin/streamcontroller \
         --set GSK_RENDERER ngl
