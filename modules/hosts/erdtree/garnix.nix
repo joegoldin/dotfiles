@@ -47,6 +47,10 @@ in
         "s3-cache-secret-access-key" = "garnix-s3-secret-access-key.age";
         "s3-cache-private-access-key-id" = "garnix-s3-private-access-key-id.age";
         "s3-cache-private-secret-access-key" = "garnix-s3-private-secret-access-key.age";
+        # Gitea forge integration: bot API token + webhook HMAC secret. The
+        # backend reads /run/secrets/gitea-token + /run/secrets/gitea-webhook-secret.
+        "gitea-token" = "garnix-gitea-token.age";
+        "gitea-webhook-secret" = "garnix-gitea-webhook-secret.age";
       };
       # Self-minted CA + cert for postgres TLS (verify-full against dbFqdn).
       # Generated at runtime into /var/lib/garnix-db-certs, NOT the nix store
@@ -201,6 +205,10 @@ in
         githubAppName = garnixData.github.appName; # slug from the app-manifest bootstrap
         selfHostMode = true;
         adminGroup = garnixData.authentik.adminGroup;
+        # Second forge: our self-hosted Gitea. Enables the /api/events/gitea
+        # webhook (Caddy @webhook bypass added above) + Gitea commit-status
+        # reporting; token/secret via the gitea-* agenix secrets.
+        giteaUrl = "https://${domains.giteaDomain}";
         # Publish modules from our own org's repos (the 7 forked + 3 authored
         # module repos live under joegoldin). Upstream default is "garnix-io".
         modulesOrg = "joegoldin";
@@ -332,7 +340,7 @@ in
           request_header -X-Auth-Request-User
           request_header -X-Auth-Request-Email
           request_header -X-Auth-Request-Groups
-          @webhook path /api/events/github/*
+          @webhook path /api/events/github/* /api/events/gitea /api/events/gitea/*
           handle @webhook {
             reverse_proxy 127.0.0.1:8321
           }
