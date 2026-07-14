@@ -150,6 +150,14 @@ in
         # `age.secrets.* = …`) because `age.secrets` is already a non-literal
         # `//`-merge, and Nix can't merge a nested path into that.
         garnix-oauth2-proxy-env.file = "${dotfiles-secrets}/garnix-oauth2-proxy-env.age";
+        # garnix builds substitute from attic: the sandbox binds the combined
+        # netrc (attic + garnix cache, declared in attic-cache.nix), which must
+        # be readable by the garnix service user — agenix defaults to
+        # root:root 0400. Declared here for the same `//`-merge reason.
+        attic-netrc = {
+          mode = "0440";
+          group = "garnix";
+        };
       };
 
       networking.hosts."127.0.0.1" = [ dbFqdn ];
@@ -201,7 +209,15 @@ in
         cachePublicKey = garnixData.cachePublicKey;
         enableNginx = false;
         journaldMaxUse = "10G";
-        maxLocalJobs = 16;
+        # Half the box (20 threads): garnix schedules at most this many
+        # concurrent package builds; the nix-daemon cgroup caps below bound the
+        # actual CPU/RAM they can consume.
+        maxLocalJobs = 8;
+        # Authenticate sandboxed evals/builds to attic (and the garnix cache)
+        # so substitution works inside the bubblewrap sandbox — the sandbox
+        # can't read the host nix.conf's netrc path unless it's bound in and
+        # readable by the garnix user (see age.secrets.attic-netrc below).
+        buildNetRcFile = config.age.secrets.attic-netrc.path;
         buildMachines = [ ]; # Macs/arm64 builders registered later
         # backend/nixos-module.nix hardcodes garnix.io's R2 fleet values
         # (host/buckets/baseUrl) at NORMAL priority in both dev/prod branches —
@@ -224,6 +240,21 @@ in
         experimental-features = [ "nix-command" "flakes" "recursive-nix" ];
         system-features = [ "nixos-test" "benchmark" "big-parallel" "kvm" "recursive-nix" ];
         trusted-users = [ "garnix" ];
+        # Half the box per derivation: the machine has 20 threads; a single
+        # build (ghc, chromium, …) may use at most 10. Total build CPU/RAM is
+        # capped by the nix-daemon cgroup below. (mkForce: the garnix module
+        # hardcodes cores = 4.)
+        cores = lib.mkForce 10;
+      };
+
+      # CI must not starve the machine (it's also a gaming/HPC box): cap the
+      # cgroups where build work actually runs to ~half of 20 threads / 251G.
+      #  - nix-daemon: the actual derivation builds (ghc/xz/… as nixbld*)
+      #  - garnixServer: sandboxed evals, nar packing, cache uploads
+      systemd.services.nix-daemon.serviceConfig = {
+        CPUQuota = "1000%"; # 10 of 20 threads
+        MemoryHigh = "115G"; # throttle before the hard cap
+        MemoryMax = "125G"; # half of 251G
       };
 
       # DB certs before postgres; secrets before the services that read them.
