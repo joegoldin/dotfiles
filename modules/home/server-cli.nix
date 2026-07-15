@@ -2,6 +2,9 @@
 # melina). They skip home-baseline (too heavy for small VPSes); this aspect
 # is the curated set they share instead. git/fish/gh/gpg/starship still ride
 # on the joe user aspect. dectus keeps its own hand-rolled variant.
+# comma (`,`) is intentionally absent: the system-wide one wrapped with the
+# prebuilt nix-index db (den.default in modules/flake/den.nix) would be
+# shadowed by an unwrapped copy here.
 _: {
   den.aspects.server-cli.homeManager =
     { pkgs, ... }:
@@ -18,7 +21,6 @@ _: {
       systemd.user.startServices = "sd-switch";
 
       home.packages = with pkgs; [
-        comma
         coreutils
         dua
         file

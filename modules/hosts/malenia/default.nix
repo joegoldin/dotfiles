@@ -25,7 +25,6 @@ in
     nixos = {
       imports = [
         inputs.jovian-nixos.nixosModules.default
-        inputs.nix-index-database.nixosModules.default
         inputs.agenix.nixosModules.default
         ./_hardware-configuration.nix
       ];

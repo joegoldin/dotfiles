@@ -23,7 +23,6 @@ in
       {
         imports = [
           inputs.disko.nixosModules.disko
-          inputs.nix-index-database.nixosModules.default
           ./_disk-config.nix
           ./_hardware-configuration.nix
         ];

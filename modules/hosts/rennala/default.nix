@@ -15,7 +15,6 @@ in
     nixos = {
       imports = [
         inputs.disko.nixosModules.disko
-        inputs.nix-index-database.nixosModules.default
         inputs.attic.nixosModules.atticd
         inputs.agenix.nixosModules.default
         ./_disk-config.nix

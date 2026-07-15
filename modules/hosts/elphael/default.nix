@@ -38,7 +38,6 @@ in
 
     nixos = {
       imports = [
-        inputs.nix-index-database.nixosModules.default
         inputs.nix-flatpak.nixosModules.nix-flatpak
         inputs.agenix.nixosModules.default
         inputs.desk-phone.nixosModules.default

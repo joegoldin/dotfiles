@@ -34,7 +34,6 @@ in
     nixos = {
       imports = [
         inputs.disko.nixosModules.disko
-        inputs.nix-index-database.nixosModules.default
         inputs.agenix.nixosModules.default
         inputs.lanzaboote.nixosModules.lanzaboote
         ./_disk-config.nix

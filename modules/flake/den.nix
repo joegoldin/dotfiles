@@ -36,7 +36,13 @@
         ./_initrd-unlock.nix
         # btop + gping (+ iputils) on every box, system-wide (see the module).
         ./_core-packages.nix
+        # Prebuilt nix-index database on every box: wrapped nix-locate backs the
+        # command-not-found handler, and comma (`,`) below rides the same db —
+        # nothing to generate in ~/.cache/nix-index. torrent wires the darwin
+        # flavor of this module itself.
+        inputs.nix-index-database.nixosModules.default
       ];
+      programs.nix-index-database.comma.enable = true;
     };
     homeManager.home.stateVersion = lib.mkDefault "24.11";
   };

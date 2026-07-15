@@ -49,7 +49,6 @@ in
           ])
           ++ [
             inputs.agenix.nixosModules.default
-            inputs.nix-index-database.nixosModules.default
           ];
 
         # Reuse the SSH host key as the agenix identity. It is pre-generated and

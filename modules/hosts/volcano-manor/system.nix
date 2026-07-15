@@ -68,7 +68,6 @@ in
           polkitPolicyOwners = [ meta.username ];
         };
         nix-ld.enable = true;
-        nix-index-database.comma.enable = true;
       };
 
       environment.systemPackages = with pkgs; [
