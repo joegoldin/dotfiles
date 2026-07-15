@@ -127,7 +127,13 @@ in
   claude-desktop-packages = inputs.claude-desktop-debian.overlays.default;
 
   # LLM agent packages (claude-code, codex, antigravity) available as pkgs.llm-agents.*
-  llm-agents-packages = inputs.llm-agents.overlays.default;
+  # Upstream dropped overlays.default (a passthrough of the flake's own
+  # prebuilt packages), keeping only overlays.shared-nixpkgs, which rebuilds
+  # everything against our nixpkgs and misses the numtide binary cache.
+  # Replicate the old passthrough so the cache keeps hitting.
+  llm-agents-packages = final: _prev: {
+    llm-agents = inputs.llm-agents.packages.${final.stdenv.hostPlatform.system};
+  };
 
   # audiomemo (recording + transcription CLI)
   audiomemo-packages = inputs.audiomemo.overlays.default;
