@@ -88,7 +88,7 @@ build-to-dectus:
     SSH_DOMAIN=$(just _secret-domain dectusSshDomain)
     SSH_USER=$(just _secret-domain sshUser)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nixos-rebuild switch --flake .#dectus --target-host "$SSH_USER@$SSH_DOMAIN" --build-host localhost --sudo --accept-flake-config --log-format internal-json -v |& nom --json
+    nixos-rebuild switch --flake .#dectus --target-host "$SSH_USER@$SSH_DOMAIN" --sudo --accept-flake-config --log-format internal-json |& nom --json
     echo "✅  Rebuilt dectus VPS!"
 
 # Rebuild rennala in place (build locally, deploy over ssh)
@@ -100,25 +100,34 @@ build-to-rennala:
     SSH_DOMAIN=$(just _secret-domain rennalaSshDomain)
     SSH_USER=$(just _secret-domain sshUser)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nixos-rebuild switch --flake .#rennala --target-host "$SSH_USER@$SSH_DOMAIN" --build-host localhost --sudo --accept-flake-config --fallback --log-format internal-json -v |& nom --json
+    nixos-rebuild switch --flake .#rennala --target-host "$SSH_USER@$SSH_DOMAIN" --sudo --accept-flake-config --fallback --log-format internal-json |& nom --json
     echo "✅  Rebuilt rennala VPS!"
 
-# Rebuild farum-azula in place. It's aarch64 (Oracle ARM), so build ON the box
-# (--build-host = target); cross-building locally on x86_64 goes through QEMU
-# emulation, which segfaults on large C builds (e.g. openldap). Eval is still local
-# (arch-independent); only the realisation happens on the ARM box.
+# Rebuild farum-azula (aarch64, Oracle ARM). Default builds ON the box. On an
+# Apple-Silicon Mac, `--local` builds here instead: aarch64-linux offloads to
+# the virby linux builder (native ARM under HVF), which is fast and correct —
+# unlike x86_64 hosts, where cross-building aarch64 goes through QEMU emulation
+# and segfaults on large C builds (e.g. openldap), hence the default stays remote.
 [unix]
-build-to-farum-azula:
+build-to-farum-azula local="":
     #!/usr/bin/env bash
     set -euo pipefail
-    echo "🔨  Rebuilding NixOS on farum-azula (aarch64 — builds on the box)..."
+    echo "🔨  Rebuilding NixOS on farum-azula (aarch64)..."
     FARUM_AZULA_DOMAIN=$(just _secret-domain farumAzulaDomain)
     SSH_USER=$(just _secret-domain sshUser)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    # Default: build on the box (--build-host = target). --local: build here —
+    # OMIT --build-host so nixos-rebuild-ng builds in-process on the Mac
+    # (aarch64-linux offloads to virby, HVF-accelerated), then copies the result
+    # over. (--build-host localhost would instead ssh to localhost:22.)
+    BUILD_HOST=(--build-host "$SSH_USER@$FARUM_AZULA_DOMAIN")
+    if [ "{{ local }}" = "--local" ]; then
+      BUILD_HOST=()
+    fi
     nixos-rebuild switch --flake .#farum-azula \
       --target-host "$SSH_USER@$FARUM_AZULA_DOMAIN" \
-      --build-host "$SSH_USER@$FARUM_AZULA_DOMAIN" \
-      --sudo --accept-flake-config --log-format internal-json -v |& nom --json
+      "${BUILD_HOST[@]}" \
+      --sudo --accept-flake-config --log-format internal-json |& nom --json
     echo "✅  Rebuilt farum-azula!"
 
 # Rebuild erdtree (beefy dedicated gaming/HPC box) in place (pass --local to build here)
@@ -130,11 +139,14 @@ build-to-erdtree local="":
     ERDTREE_DOMAIN=$(just _secret-domain erdtreeSshDomain)
     SSH_USER=$(just _secret-domain sshUser)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    BUILD_HOST_ARGS=()
+    # Default: build in place on the box (native x86_64, 32 cores — beats
+    # building on the Mac, where x86_64-linux runs emulated under virby).
+    # --local: build here instead (omit --build-host; localhost would ssh to :22).
+    BUILD_HOST_ARGS=(--build-host "$SSH_USER@$ERDTREE_DOMAIN")
     if [ "{{ local }}" = "--local" ]; then
-      BUILD_HOST_ARGS=(--build-host localhost)
+      BUILD_HOST_ARGS=()
     fi
-    nixos-rebuild switch --flake .#erdtree --target-host "$SSH_USER@$ERDTREE_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --accept-flake-config
+    nixos-rebuild switch --flake .#erdtree --target-host "$SSH_USER@$ERDTREE_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --accept-flake-config --log-format internal-json |& nom --json
     echo "✅  Rebuilt erdtree!"
 
 # Rebuild siofra (misc-cloud VPS) in place (pass --local to build here)
@@ -146,11 +158,13 @@ build-to-siofra local="":
     SIOFRA_DOMAIN=$(just _secret-domain siofraSshDomain)
     SSH_USER=$(just _secret-domain sshUser)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    BUILD_HOST_ARGS=()
+    # Default: build in place on the box. --local: build here (omit --build-host;
+    # localhost would ssh to :22). Use --local if the small VPS can't build.
+    BUILD_HOST_ARGS=(--build-host "$SSH_USER@$SIOFRA_DOMAIN")
     if [ "{{ local }}" = "--local" ]; then
-      BUILD_HOST_ARGS=(--build-host localhost)
+      BUILD_HOST_ARGS=()
     fi
-    nixos-rebuild switch --flake .#siofra --target-host "$SSH_USER@$SIOFRA_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --accept-flake-config
+    nixos-rebuild switch --flake .#siofra --target-host "$SSH_USER@$SIOFRA_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --accept-flake-config --log-format internal-json |& nom --json
     echo "✅  Rebuilt siofra!"
 
 # Rebuild melina (home-automation box) in place over ssh (defaults to its LAN IP)
@@ -161,7 +175,7 @@ build-to-melina host="192.168.0.236":
     echo "🔨  Rebuilding NixOS on melina 🏡..."
     SSH_USER=$(just _secret-domain sshUser)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nixos-rebuild switch --flake .#melina --target-host "$SSH_USER@{{ host }}" --sudo --accept-flake-config
+    nixos-rebuild switch --flake .#melina --target-host "$SSH_USER@{{ host }}" --sudo --accept-flake-config --log-format internal-json |& nom --json
     echo "✅  Rebuilt melina!"
 
 # Rebuild the scarab (Pi) in place over ssh, updating its active config, via nh.
