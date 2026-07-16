@@ -81,6 +81,11 @@ in
       # nixosModules.self-hosted; see that file's header for the contract.
       imports = [
         inputs.garnix-ci.inputs.sops-nix.nixosModules.sops
+        # Phase 2 microVM hosting: the fork's provisioner module needs the
+        # microvm.nix host module (microvm CLI + microvm@ service template)
+        # imported by the consumer — the fork itself stays input-free.
+        "${inputs.garnix-ci}/provisioner/nixos-module.nix"
+        inputs.microvm-nix.nixosModules.host
         "${inputs.garnix-ci}/backend/nixos-module.nix"
         "${inputs.garnix-ci}/opensearch/nixos-module.nix"
         "${inputs.garnix-ci}/nix/modules/custom-gc.nix"
@@ -144,7 +149,11 @@ in
           symlink = false;
           owner = "garnix";
           group = "garnix";
-          mode = "0440";
+          # The hosting SSH private key is used by the backend (garnix user) as
+          # an ssh identity to deploy into guest microVMs; OpenSSH refuses a
+          # private key that is group-readable when the caller owns it, so this
+          # one must be 0400 (not the blanket 0440 the other garnix secrets use).
+          mode = if name == "garnix_server_ssh_hosting" then "0400" else "0440";
         })
         garnixSecrets)
       // {
@@ -239,6 +248,13 @@ in
           host = garnixData.b2.endpoint;
           region = garnixData.b2.region;
         };
+        # Phase 2 microVM hosting: branch deployments become local microVMs
+        # (LocalProvisioner talks to garnix-provisionerd over this socket) at
+        # <pkg>.<branch>.<repo>.<owner>.<hostingDomain>. provisionServerPool
+        # keeps the pool pre-warmed (self-host default: one i2x4 guest).
+        hostingDomain = domains.garnixAppsDomain;
+        provisionerSocket = "/run/garnix-provisioner/provisioner.sock";
+        provisionServerPool = true;
       };
 
       # erdtree is the builder: allow emulated aarch64 + the features garnix schedules.
@@ -264,6 +280,12 @@ in
         MemoryHigh = "115G"; # throttle before the hard cap
         MemoryMax = "125G"; # half of 251G
       };
+
+      # The garnix database module sets enableTCPIP (listen_addresses = "*"),
+      # binding postgres to 0.0.0.0. Only the local backend connects (over
+      # loopback via garnix-db.internal → 127.0.0.1), so pin it to loopback so
+      # nothing on the hosting bridge / network can reach the CI database.
+      services.postgresql.settings.listen_addresses = lib.mkForce "localhost";
 
       # DB certs before postgres; secrets before the services that read them.
       systemd.services.postgresql.serviceConfig.ExecStartPre = lib.mkBefore [ "+${mkDbCerts}" ];
@@ -331,10 +353,96 @@ in
         wants = [ "agenix.service" ];
       };
 
+      # ── Phase 2: microVM hosting infrastructure ─────────────────────────────
+      # garnix-provisionerd (fork provisioner module) creates guests on the
+      # garnixbr0 bridge; the microvm.nix host module supplies the microvm CLI
+      # + microvm@ template it drives.
+      microvm.host.enable = true;
+      garnix.local-provisioner = {
+        enable = true;
+        # erdtree's uplink (`ip route show default` -> dev eno1); guests NAT
+        # out through it.
+        uplinkInterface = "eno1";
+        # Store-path flakerefs: the per-VM flakes pin to the host's own inputs
+        # so guest builds need no network fetch.
+        nixpkgsFlake = "path:${inputs.nixpkgs}";
+        microvmFlake = "path:${inputs.microvm-nix}";
+      };
+      # The daemon's ExecStartPre derives the guest pubkey from the
+      # agenix-installed hosting key; order it after secrets exist.
+      systemd.services.garnix-provisionerd = {
+        after = [ "agenix.service" ];
+        wants = [ "agenix.service" ];
+      };
+
+      # Traefik routes app domains to guest IPs, polling the backend's
+      # dynamic-config endpoint. Loopback plain HTTP; Caddy terminates TLS in
+      # front. The backend tags every router with the `heartbeatmiddleware`
+      # plugin, so we load it as a Yaegi local plugin (same as upstream's
+      # hosting-gateway) — otherwise Traefik would error every router. The
+      # plugin only records seen hosts + POSTs them to /api/hosts/heartbeat in a
+      # background goroutine; with the self-host reaper disabled those reports
+      # are harmless (and the POST 401s at the auth gate), but loading it keeps
+      # routing valid with zero backend divergence.
+      services.traefik = {
+        enable = true;
+        staticConfigOptions = {
+          entryPoints.web.address = "127.0.0.1:8090";
+          providers.http = {
+            endpoint = "http://127.0.0.1:8321/api/hosts/traefik";
+            pollInterval = "5s";
+          };
+          experimental.localPlugins.heartbeatmiddleware.moduleName =
+            "github.com/garnix-io/garnix/heartbeatmiddleware";
+        };
+      };
+      # Yaegi loads local plugins from <workdir>/plugins-local/src/<moduleName>;
+      # stage the fork's plugin source there before Traefik starts.
+      systemd.services.traefik.serviceConfig.ExecStartPre = [
+        (pkgs.writeShellScript "init-traefik-heartbeat-plugin" ''
+          set -eu
+          dst=/var/lib/traefik/plugins-local/src/github.com/garnix-io/garnix
+          # The source is copied from the read-only nix store, so a prior copy
+          # leaves read-only dirs that `rm -rf` can't descend into. Make the
+          # tree writable first, and writable again after copying, so this stays
+          # idempotent across redeploys/restarts.
+          [ -e "$dst" ] && chmod -R u+w "$dst"
+          rm -rf "$dst"
+          mkdir -p "$dst"
+          cp -r ${inputs.garnix-ci}/hosting-gateway/heartbeatmiddleware "$dst/heartbeatmiddleware"
+          chmod -R u+w "$dst"
+        '')
+      ];
+
+      # On-demand TLS: before issuing a per-SNI cert, Caddy asks the backend
+      # whether the domain belongs to a currently-deployed server. Deployed
+      # domains sit 2 or 4 labels below the apps domain and Caddy site
+      # wildcards only match one label, so a catch-all HTTPS site (gated by
+      # the ask endpoint) handles them instead of a *.apps.<domain> block.
+      services.caddy.globalConfig = ''
+        on_demand_tls {
+          ask http://127.0.0.1:8321/api/hosts/on-demand-check
+        }
+      '';
+
       # Caddy front (Caddy already enabled by wings.nix; 80/443 already open).
       # Webhooks bypass the auth gate (GitHub posts there, HMAC-verified);
       # everything else on the app domain requires an Authentik session.
       services.caddy.virtualHosts = {
+        # Deployed-server app domains (any depth under apps.<domain>): per-SNI
+        # on-demand certs, then straight to Traefik. Unknown SNI never gets a
+        # cert (the ask endpoint 404s), so the catch-all is issuance-gated.
+        "https://".extraConfig = ''
+          tls {
+            on_demand
+          }
+          reverse_proxy 127.0.0.1:8090
+        '';
+        # The apps apex itself (not covered by the *.apps DNS wildcard or the
+        # on-demand gate): normal managed cert; Traefik 404s unknown hosts.
+        "https://${domains.garnixAppsDomain}".extraConfig = ''
+          reverse_proxy 127.0.0.1:8090
+        '';
         "${domains.garnixDomain}".extraConfig = ''
           # Never trust client-supplied auth headers; only forward_auth sets them.
           request_header -X-Auth-Request-User

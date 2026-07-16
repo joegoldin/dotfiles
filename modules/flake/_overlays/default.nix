@@ -32,6 +32,44 @@ let
       openldap = uPrev.openldap.overrideAttrs (old: {
         doCheck = false;
       });
+
+      pythonPackagesExtensions = uPrev.pythonPackagesExtensions ++ [
+        (pyFinal: pyPrev: {
+          # torch 2.12.0 wheels declare "setuptools<82" but nixpkgs ships
+          # setuptools 82.0.1, so pythonRuntimeDepsCheckHook rejects the wheel.
+          # Relax the bound. Remove once torch-bin does this upstream.
+          torch-bin = pyPrev.torch-bin.overridePythonAttrs (
+            old:
+            {
+              pythonRelaxDeps = (old.pythonRelaxDeps or [ ]) ++ [ "setuptools" ];
+            }
+            # macOS 27 beta's dyld rejects nixpkgs libffi's trampoline dylib
+            # (chained-fixups metadata), so any ctypes closure — including
+            # "import torch" — aborts. Skip the imports check so the system
+            # still builds; torch stays runtime-broken on the beta OS until
+            # NixOS/nixpkgs#541990 reaches our pins. That fix merged to
+            # staging-next on 2026-07-15 (darwin-stdenv mass rebuild), so it
+            # lands in the nixpkgs-unstable branch only once the staging
+            # cycle completes (~1-2 weeks). It's in when this prints
+            # "behind" or "identical" (still "diverged" = keep waiting):
+            #   gh api repos/NixOS/nixpkgs/compare/nixpkgs-unstable...3f92b6968d747ef729ea147ec8baedf010e7e232 --jq .status
+            # Then flake-update and remove both this and the torchvision-bin
+            # override below.
+            // uPrev.lib.optionalAttrs uPrev.stdenv.hostPlatform.isDarwin {
+              pythonImportsCheck = [ ];
+            }
+          );
+
+          # Same macOS 27 beta libffi issue: torchvision's imports check
+          # pulls in torch and hits the same abort.
+          torchvision-bin = pyPrev.torchvision-bin.overridePythonAttrs (
+            old:
+            uPrev.lib.optionalAttrs uPrev.stdenv.hostPlatform.isDarwin {
+              pythonImportsCheck = [ ];
+            }
+          );
+        })
+      ];
     })
   ];
 in

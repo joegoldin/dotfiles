@@ -47,6 +47,7 @@ in
         git
         jdk
         nh
+        nixos-rebuild-ng
         wget
         inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
         # darwin.xcode_16_3  # TODO: enable this when available in nixpkgs
