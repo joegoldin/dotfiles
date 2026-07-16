@@ -42,7 +42,6 @@ in
         "repo-secrets-key" = "garnix-repo-secrets-key.age";
         "repo-secrets-key-pub" = "garnix-repo-secrets-key-pub.age";
         "opensearch-garnix" = "garnix-opensearch-password.age";
-        "hetzner-token" = "garnix-hetzner-token.age";
         "cache-priv-key" = "garnix-cache-priv-key.age";
         "s3-cache-access-key-id" = "garnix-s3-access-key-id.age";
         "s3-cache-secret-access-key" = "garnix-s3-secret-access-key.age";
@@ -209,6 +208,15 @@ in
         };
       };
 
+      # Host metrics for the self-host Monitoring page (loopback only; the
+      # garnix backend scrapes 127.0.0.1:9100).
+      services.prometheus.exporters.node = {
+        enable = true;
+        listenAddress = "127.0.0.1";
+        port = 9100;
+        enabledCollectors = [ "systemd" ];
+      };
+
       services.garnixServer = {
         enable = true;
         url = "https://${domains.garnixDomain}";
@@ -269,6 +277,13 @@ in
         hostingDomain = domains.garnixAppsDomain;
         provisionerSocket = "/run/garnix-provisioner/provisioner.sock";
         provisionServerPool = true;
+        # External SSH host the Servers page uses to build the ssh command for a
+        # deployed server's DNAT'd port (garnix.yaml sshExpose) and the ProxyJump
+        # into the guest subnet.
+        sshHost = domains.erdtreeSshDomain;
+        # Monitoring page scrape targets (node-exporter on loopback; garnix's own
+        # Prometheus defaults to 127.0.0.1:<metricsPort>).
+        nodeExporterUrl = "http://127.0.0.1:9100/metrics";
       };
 
       # Trust farum-azula's host key so the remote-builder ssh (as root, batch
