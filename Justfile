@@ -88,7 +88,7 @@ build-to-dectus:
     SSH_DOMAIN=$(just _secret-domain dectusSshDomain)
     SSH_USER=$(just _secret-domain sshUser)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nixos-rebuild switch --flake .#dectus --target-host "$SSH_USER@$SSH_DOMAIN" --sudo --accept-flake-config --log-format internal-json |& nom --json
+    nh os switch . -H dectus --target-host "$SSH_USER@$SSH_DOMAIN" --elevation-strategy passwordless --accept-flake-config
     echo "✅  Rebuilt dectus VPS!"
 
 # Rebuild rennala in place (build locally, deploy over ssh)
@@ -100,7 +100,7 @@ build-to-rennala:
     SSH_DOMAIN=$(just _secret-domain rennalaSshDomain)
     SSH_USER=$(just _secret-domain sshUser)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nixos-rebuild switch --flake .#rennala --target-host "$SSH_USER@$SSH_DOMAIN" --sudo --accept-flake-config --fallback --log-format internal-json |& nom --json
+    nh os switch . -H rennala --target-host "$SSH_USER@$SSH_DOMAIN" --elevation-strategy passwordless --accept-flake-config --fallback
     echo "✅  Rebuilt rennala VPS!"
 
 # Rebuild farum-azula (aarch64, Oracle ARM). Default builds ON the box. On an
@@ -117,17 +117,17 @@ build-to-farum-azula local="":
     SSH_USER=$(just _secret-domain sshUser)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
     # Default: build on the box (--build-host = target). --local: build here —
-    # OMIT --build-host so nixos-rebuild-ng builds in-process on the Mac
+    # OMIT --build-host so nh builds in-process on the Mac
     # (aarch64-linux offloads to virby, HVF-accelerated), then copies the result
     # over. (--build-host localhost would instead ssh to localhost:22.)
     BUILD_HOST=(--build-host "$SSH_USER@$FARUM_AZULA_DOMAIN")
     if [ "{{ local }}" = "--local" ]; then
       BUILD_HOST=()
     fi
-    nixos-rebuild switch --flake .#farum-azula \
+    nh os switch . -H farum-azula \
       --target-host "$SSH_USER@$FARUM_AZULA_DOMAIN" \
       "${BUILD_HOST[@]}" \
-      --sudo --accept-flake-config --log-format internal-json |& nom --json
+      --elevation-strategy passwordless --accept-flake-config
     echo "✅  Rebuilt farum-azula!"
 
 # Rebuild erdtree (beefy dedicated gaming/HPC box) in place (pass --local to build here)
@@ -146,7 +146,7 @@ build-to-erdtree local="":
     if [ "{{ local }}" = "--local" ]; then
       BUILD_HOST_ARGS=()
     fi
-    nixos-rebuild switch --flake .#erdtree --target-host "$SSH_USER@$ERDTREE_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --accept-flake-config --log-format internal-json |& nom --json
+    nh os switch . -H erdtree --target-host "$SSH_USER@$ERDTREE_DOMAIN" "${BUILD_HOST_ARGS[@]}" --elevation-strategy passwordless --accept-flake-config
     echo "✅  Rebuilt erdtree!"
 
 # Rebuild siofra (misc-cloud VPS) in place (pass --local to build here)
@@ -164,7 +164,7 @@ build-to-siofra local="":
     if [ "{{ local }}" = "--local" ]; then
       BUILD_HOST_ARGS=()
     fi
-    nixos-rebuild switch --flake .#siofra --target-host "$SSH_USER@$SIOFRA_DOMAIN" "${BUILD_HOST_ARGS[@]}" --sudo --accept-flake-config --log-format internal-json |& nom --json
+    nh os switch . -H siofra --target-host "$SSH_USER@$SIOFRA_DOMAIN" "${BUILD_HOST_ARGS[@]}" --elevation-strategy passwordless --accept-flake-config
     echo "✅  Rebuilt siofra!"
 
 # Rebuild melina (home-automation box) in place over ssh (defaults to its LAN IP)
@@ -175,7 +175,7 @@ build-to-melina host="192.168.0.236":
     echo "🔨  Rebuilding NixOS on melina 🏡..."
     SSH_USER=$(just _secret-domain sshUser)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nixos-rebuild switch --flake .#melina --target-host "$SSH_USER@{{ host }}" --sudo --accept-flake-config --log-format internal-json |& nom --json
+    nh os switch . -H melina --target-host "$SSH_USER@{{ host }}" --elevation-strategy passwordless --accept-flake-config
     echo "✅  Rebuilt melina!"
 
 # Rebuild the scarab (Pi) in place over ssh, updating its active config, via nh.
