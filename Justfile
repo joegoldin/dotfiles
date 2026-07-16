@@ -118,7 +118,7 @@ build-to-farum-azula:
     nixos-rebuild switch --flake .#farum-azula \
       --target-host "$SSH_USER@$FARUM_AZULA_DOMAIN" \
       --build-host "$SSH_USER@$FARUM_AZULA_DOMAIN" \
-      --sudo --accept-flake-config
+      --sudo --accept-flake-config --log-format internal-json -v |& nom --json
     echo "✅  Rebuilt farum-azula!"
 
 # Rebuild erdtree (beefy dedicated gaming/HPC box) in place (pass --local to build here)
