@@ -34,6 +34,9 @@
         # `unlock` alias for the initrd LUKS-unlock command (no-op off the encrypted
         # initrd-SSH hosts — see the module for details).
         ./_initrd-unlock.nix
+        # fail2ban ignorecommand: never ban an IP with a recent successful SSH
+        # key login (no-op where fail2ban is off — see the module for details).
+        ./_fail2ban-key-exempt.nix
         # btop + gping (+ iputils) on every box, system-wide (see the module).
         ./_core-packages.nix
         # Prebuilt nix-index database on every box: wrapped nix-locate backs the
