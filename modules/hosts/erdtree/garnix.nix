@@ -484,6 +484,13 @@ in
           handle @publickeys {
             reverse_proxy 127.0.0.1:8321
           }
+          # Status badges (/api/badges/<owner>/<repo>): public by design so they
+          # render in READMEs for anonymous viewers. No auth on the backend
+          # route; bypass the Authentik gate.
+          @badges path /api/badges/*
+          handle @badges {
+            reverse_proxy 127.0.0.1:8321
+          }
           handle /oauth2/* {
             reverse_proxy 127.0.0.1:4180
           }
