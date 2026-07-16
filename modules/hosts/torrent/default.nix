@@ -85,6 +85,13 @@ in
         mode = "0400";
         owner = meta.username;
       };
+      # Authentik API token for the garnix authentik-provision helper. Read via
+      # `authentik-provision --token-file /run/agenix/authentik-api-token`.
+      age.secrets.authentik-api-token = {
+        file = "${inputs.dotfiles-secrets}/authentik-api-token.age";
+        mode = "0400";
+        owner = meta.username;
+      };
 
       # vfkit-based Linux builder. The stock nix.linux-builder is kept off;
       # it was only used to bootstrap this rebuild (it builds virby's VM
