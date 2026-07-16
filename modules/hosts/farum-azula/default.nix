@@ -48,6 +48,19 @@ in
       # not a personal user key on a public box. After a fresh deploy, replace the
       # farum-azula key in keys.nix with the printed one and rekey.
       age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+
+      # Native aarch64 remote builder for the self-hosted garnix CI on erdtree.
+      # Without this, erdtree builds aarch64 configs (farum-azula, scarab, …) by
+      # emulating aarch64 via qemu — 10-50x slower. erdtree's nix-daemon connects
+      # here as the nix-ssh user with the garnix builder key and builds natively.
+      # `write` is required so the client can push derivation inputs / pull
+      # outputs.
+      nix.sshServe = {
+        enable = true;
+        protocol = "ssh-ng";
+        write = true;
+        keys = [ (import "${inputs.dotfiles-secrets}/garnix.nix").builderSshPubKey ];
+      };
     };
   };
 }

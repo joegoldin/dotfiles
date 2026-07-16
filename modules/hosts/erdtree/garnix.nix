@@ -12,6 +12,7 @@ in
     let
       domains = import "${dotfiles-secrets}/domains.nix";
       garnixData = import "${dotfiles-secrets}/garnix.nix";
+      keys = import "${dotfiles-secrets}/keys.nix";
       dbFqdn = "garnix-db.internal";
       # The Next.js frontend build ships static assets (JS/CSS/fonts) under
       # `${frontendPkg}/public/_next/static`; the standalone server on :3000 does
@@ -235,7 +236,20 @@ in
         # can't read the host nix.conf's netrc path unless it's bound in and
         # readable by the garnix user (see age.secrets.attic-netrc below).
         buildNetRcFile = config.age.secrets.attic-netrc.path;
-        buildMachines = [ ]; # Macs/arm64 builders registered later
+        # Native aarch64 builder (farum-azula, Ampere) so garnix stops emulating
+        # aarch64 configs (farum-azula, scarab) via qemu — 10-50x faster. The
+        # nix-daemon (root) SSHes as nix-ssh with the remote-builder key; the
+        # known-hosts entry below lets it verify the host non-interactively.
+        buildMachines = [
+          {
+            hostName = "farum-azula-builder";
+            hostAddress = domains.farumAzulaDomain;
+            systems = [ "aarch64-linux" ];
+            maxJobs = 1; # 2-core box shared with game servers
+            speedFactor = 2; # native >> emulation
+            supportedFeatures = [ "big-parallel" ];
+          }
+        ];
         # backend/nixos-module.nix hardcodes garnix.io's R2 fleet values
         # (host/buckets/baseUrl) at NORMAL priority in both dev/prod branches —
         # Task 3 parameterized only the cache *domain*, not the S3 bucket config.
@@ -255,6 +269,14 @@ in
         hostingDomain = domains.garnixAppsDomain;
         provisionerSocket = "/run/garnix-provisioner/provisioner.sock";
         provisionServerPool = true;
+      };
+
+      # Trust farum-azula's host key so the remote-builder ssh (as root, batch
+      # mode) verifies it without an interactive prompt. keys.farum-azula is the
+      # machine's ed25519 host key (also its agenix recipient).
+      programs.ssh.knownHosts."farum-azula-builder" = {
+        hostNames = [ "farum-azula-builder" domains.farumAzulaDomain "147.224.12.5" ];
+        publicKey = keys.farum-azula;
       };
 
       # erdtree is the builder: allow emulated aarch64 + the features garnix schedules.
