@@ -97,6 +97,10 @@ in
         onDemand.enable = true;
         # Build x86_64-linux via Rosetta translation (aarch64-darwin only).
         rosetta = true;
+        # 8 build jobs (maxJobs = cores) on the default 6GiB thrash/OOM on heavy
+        # aarch64 builds (GTK, Zig). This Mac has 24GiB and virby is on-demand,
+        # so give it more headroom (~1.25GiB/job).
+        memory = "10GiB";
       };
     };
   };
