@@ -33,8 +33,61 @@ let
         doCheck = false;
       });
 
+      # gdal 3.13.1: test_zarr_read_simple_sharding writes the Zarr
+      # tile-presence cache (.gmac) via the netCDF driver, so it always fails
+      # in minimal builds (useNetCDF = false), breaking the vtk -> opencv ->
+      # howdy chain. Overridden on gdal (not gdalMinimal) because vtk derives
+      # its own minimal gdal via gdal.override, bypassing the gdalMinimal
+      # attr; overrideAttrs composes through that .override. Fixed upstream
+      # in nixpkgs a846cde4 (PR #540826); drop this once the pin includes it.
+      gdal = uPrev.gdal.overrideAttrs (old: {
+        disabledTests = (old.disabledTests or [ ]) ++ [ "test_zarr_read_simple_sharding" ];
+      });
+
+      # pdal 2.9.3 doesn't compile against gdal 3.13 (GetMetadata now returns
+      # CSLConstList; invalid conversion in Raster.cpp), breaking
+      # vtkPackages.pdal -> vtk -> opencv -> howdy. Apply PDAL's upstream
+      # "build fix with GDAL master" (PDAL/PDAL#4929, in pdal >= 2.10).
+      # Drop once the pin ships pdal 2.10.x (nixpkgs master already does).
+      pdal = uPrev.pdal.overrideAttrs (old: {
+        patches = (old.patches or [ ]) ++ [
+          (uPrev.fetchpatch {
+            url = "https://github.com/PDAL/PDAL/commit/eb7220a2447c5b3d208d7ef0a76c61a17a5b21da.patch";
+            hash = "sha256-WJ7PeCkSl+S+qURa1X3Z6D6LiPpvIXWmEap4XcYq9bk=";
+          })
+        ];
+      });
+
+      # vtk 9.5.2 hits the same gdal 3.13 CSLConstList break in its GDAL
+      # reader modules. Apply VTK's upstream "Fix GDAL const conversion
+      # issue" (2026-05-29, post-9.5.2). Drop with the pdal/gdal overrides
+      # above once the pin's vtk/gdal generation is coherent again.
+      vtk = uPrev.vtk.overrideAttrs (old: {
+        patches = (old.patches or [ ]) ++ [
+          (uPrev.fetchpatch {
+            url = "https://github.com/Kitware/VTK/commit/2395603fdddc40c29efc64c632ae98225ca2a58e.patch";
+            hash = "sha256-Gcnt1JXWPkhfNLhtk9SXYqx/0cLkjO4xiRfR8YiaY8I=";
+          })
+        ];
+      });
+
       pythonPackagesExtensions = uPrev.pythonPackagesExtensions ++ [
         (pyFinal: pyPrev: {
+          # face_recognition_models 0.3.0 imports pkg_resources, which no
+          # longer exists in the python 3.14 env (setuptools >= 81), breaking
+          # face-recognition's import (and with it howdy). Mirror nixpkgs
+          # PR #541758 (issue #541849): apply the upstream commit replacing
+          # pkg_resources with importlib.resources. Drop once the pin
+          # includes that PR.
+          face-recognition-models = pyPrev.face-recognition-models.overridePythonAttrs (old: {
+            patches = (old.patches or [ ]) ++ [
+              (uPrev.fetchpatch {
+                url = "https://github.com/ageitgey/face_recognition_models/commit/c142485d6f34c633d67c5e7ccbbc0baf7a1d695f.patch";
+                hash = "sha256-3ylcgXuTFlsg3Rgv6Pk1gKw//z2Uq+UxEeOFtD4xqpk=";
+              })
+            ];
+          });
+
           # torch 2.12.0 wheels declare "setuptools<82" but nixpkgs ships
           # setuptools 82.0.1, so pythonRuntimeDepsCheckHook rejects the wheel.
           # Relax the bound. Remove once torch-bin does this upstream.
