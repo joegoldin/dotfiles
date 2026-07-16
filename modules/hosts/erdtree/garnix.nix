@@ -474,6 +474,16 @@ in
           handle @webhook {
             reverse_proxy 127.0.0.1:8321
           }
+          # Public-key endpoints: /api/keys/<owner>/<repo>/repo-key.public and
+          # /api/keys/<owner>/<repo>/actions/<action>/key.public. These backend
+          # routes carry no auth by design — the authentik-provision helper and
+          # provisioned guests fetch them unauthenticated to encrypt secrets to
+          # the repo key. Bypass the Authentik gate (public keys only: they can
+          # encrypt but not decrypt, and expose no private data).
+          @publickeys path /api/keys/*
+          handle @publickeys {
+            reverse_proxy 127.0.0.1:8321
+          }
           handle /oauth2/* {
             reverse_proxy 127.0.0.1:4180
           }
