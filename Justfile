@@ -679,11 +679,19 @@ update-pkgs *names:
 update-all: flake-update update-pkgs update-python-packages build
     @echo "✅  Update sweep built. Review the diff, then: just switch"
 
-# Garbage-collect old generations and store paths
+# Garbage-collect old generations and store paths.
+# nh clean can't delete the root-owned system profile without elevation and
+# silently skips it (leaving old generations pinned), so prune system
+# generations explicitly with sudo first, then let nh clean the user profiles
+# + gcroots, then sweep every now-unreferenced path from the store.
 [unix]
 nix-gc:
-    @echo "🧹  Garbage collecting nix..."
-    @nh clean all --keep-since 7d --keep 3
+    @echo "🧹  Pruning root-owned system generations (needs sudo, keeps last 5)…"
+    sudo nix-env -p /nix/var/nix/profiles/system --delete-generations +5
+    @echo "🧹  Cleaning user profiles + gcroots…"
+    nh clean all --keep-since 7d --keep 3
+    @echo "🧹  Sweeping unreferenced store paths…"
+    nix store gc
     @echo "✅  Garbage collected!"
 
 # ── Private helpers ────────────────────────────────────────────────────────
