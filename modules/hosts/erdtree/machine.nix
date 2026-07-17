@@ -40,6 +40,10 @@ in
         tailscale = {
           enable = true;
           useRoutingFeatures = "server";
+          # Advertise the garnix microVM guest subnet so tailnet users can SSH
+          # straight to a deployed server's internal IP (10.111.0.0/24). The
+          # route must be approved once in the tailnet admin console.
+          extraUpFlags = [ "--advertise-routes=10.111.0.0/24" ];
         };
       };
 
