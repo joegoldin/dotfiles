@@ -924,11 +924,11 @@
     "dotfiles-assets": {
       "flake": false,
       "locked": {
-        "lastModified": 1783974970,
-        "narHash": "sha256-xvxAzfvGHvsL+5MflnZhI9vFATqzX9p8Wj58Ki53ojs=",
+        "lastModified": 1784277757,
+        "narHash": "sha256-DRB2pFpPDBFx0j+cUkapIP9cbo4lodZWHiLuSf7YDas=",
         "owner": "joegoldin",
         "repo": "dotfiles-assets",
-        "rev": "168562d3b3b5142146bd8e67ce83b046b3da5b7d",
+        "rev": "b025055b87cb7138fc3f58943ece8a522be576d6",
         "type": "github"
       },
       "original": {
