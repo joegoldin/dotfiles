@@ -93,6 +93,9 @@ in
         "${inputs.garnix-ci}/nix/modules/dev-mode.nix"
         "${inputs.garnix-ci}/nix/modules/fluent-bit.nix"
         "${inputs.garnix-ci}/nix/modules/monitoring-client.nix"
+        # Runs repo `actions` locally in a bubblewrap sandbox (self-host has no
+        # separate runner fleet); the backend SSHes to action-runner@127.0.0.1.
+        "${inputs.garnix-ci}/nix/modules/action-runner.nix"
         # Option stubs that self-hosted.nix normally provides in place of the
         # excluded linux-common.nix (which declares these). Types copied verbatim
         # from nix/modules/self-hosted.nix; defaults null/false are correct
@@ -149,11 +152,15 @@ in
           symlink = false;
           owner = "garnix";
           group = "garnix";
-          # The hosting SSH private key is used by the backend (garnix user) as
-          # an ssh identity to deploy into guest microVMs; OpenSSH refuses a
-          # private key that is group-readable when the caller owns it, so this
-          # one must be 0400 (not the blanket 0440 the other garnix secrets use).
-          mode = if name == "garnix_server_ssh_hosting" then "0400" else "0440";
+          # SSH private keys the backend (garnix user) uses as an ssh identity —
+          # into guest microVMs (hosting key) and into the local action-runner
+          # user (action-runner key). OpenSSH refuses a private key that is
+          # group-readable when the caller owns it, so these must be 0400 (not
+          # the blanket 0440 the other garnix secrets use).
+          mode =
+            if name == "garnix_server_ssh_hosting" || name == "garnix_action_runner_ssh"
+            then "0400"
+            else "0440";
         })
         garnixSecrets)
       // {
@@ -281,6 +288,10 @@ in
         # deployed server's DNAT'd port (garnix.yaml sshExpose) and the ProxyJump
         # into the guest subnet.
         sshHost = domains.erdtreeSshDomain;
+        # Repo `actions` run on the local action-runner user (garnix.actionRunner
+        # below): the backend `nix copy`s the closure to action-runner@127.0.0.1
+        # and executes it in a bwrap sandbox there.
+        actionHost = "127.0.0.1";
         # Monitoring page scrape targets (node-exporter on loopback; garnix's own
         # Prometheus defaults to 127.0.0.1:<metricsPort>).
         nodeExporterUrl = "http://127.0.0.1:9100/metrics";
@@ -408,6 +419,22 @@ in
       # The daemon's ExecStartPre derives the guest pubkey from the
       # agenix-installed hosting key; order it after secrets exist.
       systemd.services.garnix-provisionerd = {
+        after = [ "agenix.service" ];
+        wants = [ "agenix.service" ];
+      };
+
+      # ── Action runner ───────────────────────────────────────────────────────
+      # Repo `actions` execute here, isolated in a bubblewrap sandbox. The
+      # backend connects as action-runner@127.0.0.1 with the
+      # garnix_action_runner_ssh key; sshPrivateKeyPath makes the runner
+      # authorize exactly that key's pubkey (derived at boot).
+      garnix.actionRunner = {
+        enable = true;
+        sshPrivateKeyPath = "/run/secrets/garnix_action_runner_ssh";
+      };
+      # The authorized-key derivation reads the agenix-installed private key;
+      # order it after secrets exist.
+      systemd.services.garnix-action-runner-authorized-key = {
         after = [ "agenix.service" ];
         wants = [ "agenix.service" ];
       };
