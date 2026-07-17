@@ -167,14 +167,16 @@ build-to-siofra local="":
     nh os switch . -H siofra --target-host "$SSH_USER@$SIOFRA_DOMAIN" "${BUILD_HOST_ARGS[@]}" --elevation-strategy passwordless --accept-flake-config
     echo "✅  Rebuilt siofra!"
 
-# Rebuild melina (home-automation box) in place over ssh (defaults to its LAN IP)
+# Rebuild melina (home-automation box) in place over ssh (defaults to its LAN
+# IP; sshd listens on 222 — :22 on the tailnet is Tailscale SSH)
 [unix]
-build-to-melina host="192.168.0.236":
+build-to-melina host="192.168.0.236" port="222":
     #!/usr/bin/env bash
     set -euo pipefail
     echo "🔨  Rebuilding NixOS on melina 🏡..."
     SSH_USER=$(just _secret-domain sshUser)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    export NIX_SSHOPTS="-p {{ port }}"
     nh os switch . -H melina --target-host "$SSH_USER@{{ host }}" --elevation-strategy passwordless --accept-flake-config
     echo "✅  Rebuilt melina!"
 

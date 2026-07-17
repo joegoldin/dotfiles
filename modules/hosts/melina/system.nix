@@ -29,8 +29,11 @@ _: {
         wget
       ];
 
+      # Key-based sshd on :222 — :22 is left to Tailscale SSH on the tailnet
+      # (machine.nix) and to the initrd unlock sshd on the LAN during boot.
       services.openssh = {
         enable = true;
+        ports = [ 222 ];
         settings = {
           PermitRootLogin = "no";
           PasswordAuthentication = false;

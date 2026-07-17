@@ -50,6 +50,11 @@ in
       services.tailscale = {
         enable = true;
         useRoutingFeatures = "client";
+        # Tailscale SSH answers :22 on the tailnet (auth via tailnet ACLs, not
+        # sshd); regular key-based sshd listens on :222 (system.nix). Applied
+        # via `tailscale set` on every start, so it survives the manual
+        # `tailscale up` login.
+        extraSetFlags = [ "--ssh" ];
       };
 
       programs.ssh.startAgent = true;
@@ -65,7 +70,8 @@ in
       # initrd, on :22 sharing the booted system's host key (deploy-melina seeds
       # the same key into both, so known_hosts doesn't churn). On every boot the
       # box halts here until you `ssh root@192.168.0.236` (LAN only — the initrd
-      # has no tailscale) and enter the passphrase. After boot, `ssh joe@…` works.
+      # has no tailscale) and enter the passphrase. After boot, `ssh melina`
+      # works over the tailnet (Tailscale SSH) or `ssh -p 222 joe@…` on the LAN.
       boot.initrd = {
         systemd = {
           enable = true;
