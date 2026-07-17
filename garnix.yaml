@@ -13,3 +13,7 @@
 builds:
   include:
     - "nixosConfigurations.*"
+
+# Rebuild fixed-output derivations ignoring the cache so lying hashes surface;
+# unfetchable sources (dead mirrors, bot-walled CDNs) warn instead of failing.
+fodChecks: true
