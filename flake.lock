@@ -63,11 +63,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784003671,
-        "narHash": "sha256-uqKUwzraAvpuLL+eEYJDTm2k7o5MEC/x9pPPIKWTQ6I=",
+        "lastModified": 1784266977,
+        "narHash": "sha256-+yn0w2NQKt8lmoE3pztK7X4hUygcB1Ol+/iyvyeNe8s=",
         "owner": "joegoldin",
         "repo": "agent-skills",
-        "rev": "7f0e41196c502b90a76ec1d37be1078c4031e175",
+        "rev": "e32db90b3fdb1611c45e6a33e881bc9612b336bc",
         "type": "github"
       },
       "original": {
