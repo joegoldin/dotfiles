@@ -106,10 +106,12 @@ in
       };
 
       # Disk-pressure safety net: if free space runs low mid-build, let nix
-      # auto-GC instead of filling the disk (independent of the daily job).
+      # auto-GC instead of filling the disk (independent of the daily job). On
+      # the 931 GB disk this keeps ~500-550 GiB free, i.e. GC kicks in once
+      # usage climbs past ~380 GiB.
       nix.settings = {
-        min-free = 20 * 1024 * 1024 * 1024; # start GC when < 20 GiB free
-        max-free = 60 * 1024 * 1024 * 1024; # free until 60 GiB available
+        min-free = 500 * 1024 * 1024 * 1024; # start GC when < 500 GiB free
+        max-free = 550 * 1024 * 1024 * 1024; # free until 550 GiB available
       };
     };
 }
