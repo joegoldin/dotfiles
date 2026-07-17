@@ -61,6 +61,13 @@ in
         write = true;
         keys = [ (import "${inputs.dotfiles-secrets}/garnix.nix").builderSshPubKey ];
       };
+      # Remote builds push locally-built (unsigned) input closures from erdtree;
+      # the daemon only accepts unsigned paths from trusted users, so without
+      # this every erdtree-built dep fails with "cannot add path ... because it
+      # lacks a signature by a trusted key". Cache-substituted inputs never hit
+      # this (they carry cache.nixos.org's signature). Trusting nix-ssh trusts
+      # exactly the holder of the garnix builder key above (erdtree's daemon).
+      nix.settings.trusted-users = [ "nix-ssh" ];
     };
   };
 }
