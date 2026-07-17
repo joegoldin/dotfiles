@@ -47,6 +47,10 @@ in
         "s3-cache-secret-access-key" = "garnix-s3-secret-access-key.age";
         "s3-cache-private-access-key-id" = "garnix-s3-private-access-key-id.age";
         "s3-cache-private-secret-access-key" = "garnix-s3-private-secret-access-key.age";
+        "s3-artifacts-public-access-key-id" = "garnix-s3-artifacts-public-access-key-id.age";
+        "s3-artifacts-public-secret-access-key" = "garnix-s3-artifacts-public-secret-access-key.age";
+        "s3-artifacts-private-access-key-id" = "garnix-s3-artifacts-private-access-key-id.age";
+        "s3-artifacts-private-secret-access-key" = "garnix-s3-artifacts-private-secret-access-key.age";
         # Gitea forge integration: bot API token + webhook HMAC secret. The
         # backend reads /run/secrets/gitea-token + /run/secrets/gitea-webhook-secret.
         "gitea-token" = "garnix-gitea-token.age";
@@ -276,6 +280,15 @@ in
           privateBucket = garnixData.b2.privateBucket;
           host = garnixData.b2.endpoint;
           region = garnixData.b2.region;
+        };
+        # Build artifacts (garnix.yaml `artifacts:`): two dedicated B2 buckets,
+        # routed public/private by the same repo-publicity rules as the cache.
+        # Host/region reuse the s3Cache values; key pairs come from the four
+        # s3-artifacts-* agenix secrets above.
+        s3Artifacts = {
+          publicBucket = garnixData.b2.artifactsPublicBucket;
+          privateBucket = garnixData.b2.artifactsPrivateBucket;
+          publicBaseUrl = garnixData.b2.artifactsPublicBaseUrl;
         };
         # Phase 2 microVM hosting: branch deployments become local microVMs
         # (LocalProvisioner talks to garnix-provisionerd over this socket) at
@@ -531,6 +544,13 @@ in
           # route; bypass the Authentik gate.
           @badges path /api/badges/*
           handle @badges {
+            reverse_proxy 127.0.0.1:8321
+          }
+          # Artifact downloads: scripts fetch with garnix access tokens, so they must
+          # bypass the Authentik gate; the backend enforces session-or-token auth and
+          # repo access itself (public artifacts are anonymous by design).
+          @artifacts path /api/artifacts/*
+          handle @artifacts {
             reverse_proxy 127.0.0.1:8321
           }
           handle /oauth2/* {
