@@ -126,7 +126,7 @@
     # self-hosted garnix CI (fork with self-hosting patches). No `follows` —
     # the fork's pinned nixpkgs builds its Haskell/Node packages reproducibly.
     garnix-ci = {
-      url = "github:joegoldin/garnix-ci/self-hosting";
+      url = "github:joegoldin/garnix-ci-selfhosted";
     };
 
     # ── Nix utilities ──────────────────────────────────────────────────────
