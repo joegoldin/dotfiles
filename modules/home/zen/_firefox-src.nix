@@ -9,6 +9,6 @@
 # whenever zen updates; the zen module (default.nix) swaps in this source when
 # `version` matches the base the current nightly targets.
 {
-  version = "152.0.5";
-  sha512 = "sha512-bPLcfyimo0MPKGbfTKNQY8ut8jTIKjT6ZR4C2QnldB5QzZhv7xvZfUhrUSRMtjmysQNRRog0e/f5T9FtJkzE8g==";
+  version = "152.0.6";
+  sha512 = "sha512-xNh3g31wB/thHDjUnZtt07xMXJypALVOci4UDOfs0JJPabXO3H+MH+YC5+/h1xWbAZ3ieZnikjXNYxghuxPmsA==";
 }
