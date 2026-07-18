@@ -18,6 +18,19 @@ let
         'contains $channels $NIX_PATH || set --global --export --append NIX_PATH $channels' \
         'test -e $channels; and not contains $channels $NIX_PATH; and set --global --export --append NIX_PATH $channels'
   '';
+
+  # grc.fish echoes "You need to install grc!" to stdout whenever `grc` isn't on
+  # PATH — unguarded, so it fires on NON-interactive shells too (e.g. `ssh host
+  # 'cat'`), which corrupts scp/sftp/rsync streams. Guard the warning so it only
+  # prints in interactive shells.
+  grcSrc = pkgs.runCommand "grc.fish-src" { } ''
+    cp -r ${pkgs.fishPlugins.grc.src} $out
+    chmod -R +w $out
+    substituteInPlace $out/conf.d/grc.fish \
+      --replace-fail \
+        "echo 'You need to install grc!'" \
+        "status is-interactive; and echo 'You need to install grc!'"
+  '';
 in
 {
   plugins = with pkgs.fishPlugins; [
@@ -57,8 +70,8 @@ in
     } # PatrickF1/fzf.fish
     {
       name = "grc";
-      inherit (grc) src;
-    } # garabik/grc/grc.fish
+      src = grcSrc;
+    } # garabik/grc/grc.fish (warning guarded to interactive shells)
     {
       name = "nix.fish";
       src = nixFishSrc;
