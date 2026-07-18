@@ -300,6 +300,13 @@ in
         # <pkg>.<branch>.<repo>.<owner>.<hostingDomain>. provisionServerPool
         # keeps the pool pre-warmed (self-host default: one i2x4 guest).
         hostingDomain = domains.garnixAppsDomain;
+        # Extra wildcard base domains for hosted servers (vanity/custom domains):
+        # servers can be reached at <name>.<domain>. Each needs a manual wildcard
+        # *.<domain> -> erdtree DNS record (grey cloud) — Caddy on-demand + the
+        # backend handle certs + routing. hostingPublicIp feeds the Servers-page
+        # (i) menu's A-record instructions for bare custom domains.
+        extraHostingDomains = domains.garnixExtraHostingDomains;
+        hostingPublicIp = domains.garnixHostingPublicIp;
         provisionerSocket = "/run/garnix-provisioner/provisioner.sock";
         provisionServerPool = true;
         # External SSH host the Servers page uses to build the ssh command for a
