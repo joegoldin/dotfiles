@@ -20,8 +20,8 @@
         postPatch = ''
           substituteInPlace flake.nix \
             --replace-fail "sha256-TukDFPYFaGI+WE63hQuBc3d307761tMCi9+oco6sImU=" \
-                           "sha256-b2evfi+TQJOriv687BE3TUDI24+RAPtmIPJBVUAdgxk=" \
-            --replace-fail "26.707.30751" "26.707.31428"
+                           "sha256-xgK3kJYGqI3M5ZbZGlRCjcO1MFo/Ee+MMGDZ/tw6E5Y=" \
+            --replace-fail "26.707.30751" "26.715.31925"
         '';
       };
       # Re-instantiate the patched flake; its only inputs are nixpkgs and
