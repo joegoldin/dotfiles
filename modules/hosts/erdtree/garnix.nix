@@ -246,10 +246,15 @@ in
         cachePublicKey = garnixData.cachePublicKey;
         enableNginx = false;
         journaldMaxUse = "10G";
-        # Half the box (20 threads): garnix schedules at most this many
-        # concurrent package builds; the nix-daemon cgroup caps below bound the
-        # actual CPU/RAM they can consume.
+        # nix `max-jobs` for local derivation builds; the nix-daemon cgroup caps
+        # below bound the actual CPU/RAM they can consume.
         maxLocalJobs = 8;
+        # How many garnix builds eval+run at once. Every build still fans out and
+        # shows pending immediately; the rest queue behind this cap (round-robin
+        # fair by repo owner) and flip to running as slots free. Keeps a big
+        # multi-commit push from spawning dozens of guests and drowning the
+        # fluent-bit log pipeline. 16 of erdtree's 32 threads.
+        maxConcurrentBuilds = 16;
         # Authenticate sandboxed evals/builds to attic (and the garnix cache)
         # so substitution works inside the bubblewrap sandbox — the sandbox
         # can't read the host nix.conf's netrc path unless it's bound in and
