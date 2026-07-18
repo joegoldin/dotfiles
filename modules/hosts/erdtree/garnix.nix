@@ -428,6 +428,10 @@ in
         # so guest builds need no network fetch.
         nixpkgsFlake = "path:${inputs.nixpkgs}";
         microvmFlake = "path:${inputs.microvm-nix}";
+        # Guests push their CPU/RAM samples here (bridge NAT -> public garnix
+        # API, same path guests already use for /api/keys/*). The @stats Caddy
+        # bypass below lets the unauthenticated POST through the Authentik gate.
+        statsReportUrl = "https://${domains.garnixDomain}/api/hosts/stats";
       };
       # The daemon's ExecStartPre derives the guest pubkey from the
       # agenix-installed hosting key; order it after secrets exist.
@@ -551,6 +555,14 @@ in
           # repo access itself (public artifacts are anonymous by design).
           @artifacts path /api/artifacts/*
           handle @artifacts {
+            reverse_proxy 127.0.0.1:8321
+          }
+          # Per-server resource stats: deployed microVM guests POST their
+          # CPU/RAM samples here unauthenticated (like the heartbeat / public-key
+          # routes), so bypass the Authentik gate. The backend just records the
+          # sample and drops any that don't map to a live server.
+          @stats path /api/hosts/stats
+          handle @stats {
             reverse_proxy 127.0.0.1:8321
           }
           handle /oauth2/* {
