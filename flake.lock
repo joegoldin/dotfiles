@@ -63,11 +63,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784370495,
-        "narHash": "sha256-AloKO3+7Un7breRRD+5aHZuK35ApuT7meKHZLV9ja0s=",
+        "lastModified": 1784424722,
+        "narHash": "sha256-Ux/tZZhH27NFAB4jNiIq4ix9NISwUoJ6Bl6FxJ0B2bQ=",
         "owner": "joegoldin",
         "repo": "agent-skills",
-        "rev": "559189ac4299136355d95ee77f474d48f7c7532c",
+        "rev": "6fe57189ae6e804dc4949472a9f326397d791346",
         "type": "github"
       },
       "original": {
@@ -1602,11 +1602,11 @@
         "treetop": "treetop"
       },
       "locked": {
-        "lastModified": 1784417742,
-        "narHash": "sha256-wdA7p5hpI/SsP/TG4IZypCRiCG3BODStbmySKODwehQ=",
+        "lastModified": 1784424722,
+        "narHash": "sha256-zpH0lpYxEqfiLzczb2+ieB4YdQ/1OKZ29oDggC+cS9c=",
         "owner": "joegoldin",
         "repo": "garnix-ci-selfhosted",
-        "rev": "6a391ad691fbab96ad3800dc52e229715e768b00",
+        "rev": "f3ac9587404207486afa52c29a1c2d5af87d8f14",
         "type": "github"
       },
       "original": {
