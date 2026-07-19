@@ -132,6 +132,7 @@ in
             NSAutomaticPeriodSubstitutionEnabled = false; # disable auto period substitution
             NSAutomaticQuoteSubstitutionEnabled = false; # disable auto quote substitution
             NSAutomaticSpellingCorrectionEnabled = false; # disable auto spelling correction
+            NSAutomaticWindowAnimationsEnabled = false; # disable window open/close animations
             NSNavPanelExpandedStateForSaveMode = true; # expand save panel by default
             NSNavPanelExpandedStateForSaveMode2 = true;
           };
