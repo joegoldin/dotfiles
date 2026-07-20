@@ -4,7 +4,7 @@
 # built-in fallback paths). Design: docs/plans/2026-07-10-garnix-self-hosting-design.md
 { inputs, ... }:
 let
-  dotfiles-secrets = inputs.dotfiles-secrets;
+  inherit (inputs) dotfiles-secrets;
 in
 {
   den.aspects.erdtree.nixos =
@@ -301,7 +301,7 @@ in
         modulesOrg = "joegoldin";
         opensearchUrl = "http://[::1]:9200/_msearch";
         cacheUrl = "https://${domains.garnixCacheDomain}";
-        cachePublicKey = garnixData.cachePublicKey;
+        inherit (garnixData) cachePublicKey;
         enableNginx = false;
         journaldMaxUse = "10G";
         # nix `max-jobs` for local derivation builds; the nix-daemon cgroup caps
