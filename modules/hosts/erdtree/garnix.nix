@@ -371,6 +371,15 @@ in
         # deployed server's DNAT'd port (garnix.yaml sshExpose) and the ProxyJump
         # into the guest subnet.
         sshHost = domains.erdtreeSshDomain;
+        # Proxy-provenance marker file (M3): Caddy injects its contents as
+        # X-Garnix-Proxy-Auth after forward_auth; the backend requires a match
+        # before trusting X-Auth-Request-* headers.
+        proxySharedSecretFile = "/run/secrets/garnix_proxy_shared_secret";
+        # Dedicated terminal-signing CA (H3) — split from the hosting key.
+        terminalCaKeyPath = "/run/secrets/garnix_terminal_ca";
+        # Terminal cert source-address pin (H2): the host's own address on the
+        # guest bridge (garnix.provisioner.hostAddress = 10.111.0.1/24).
+        terminalSourceAddress = "10.111.0.1/32";
         # Repo `actions` run on the local action-runner user (garnix.actionRunner
         # below): the backend `nix copy`s the closure to action-runner@127.0.0.1
         # and executes it in a bwrap sandbox there.
@@ -623,6 +632,7 @@ in
           request_header -X-Auth-Request-User
           request_header -X-Auth-Request-Email
           request_header -X-Auth-Request-Groups
+          request_header -X-Garnix-Proxy-Auth
           @webhook path /api/events/github/* /api/events/gitea /api/events/gitea/*
           handle @webhook {
             reverse_proxy 127.0.0.1:8321
@@ -655,10 +665,11 @@ in
           # CPU/RAM samples here unauthenticated (like the heartbeat / public-key
           # routes), so bypass the Authentik gate. The backend just records the
           # sample and drops any that don't map to a live server.
-          @stats path /api/hosts/stats
-          handle @stats {
-            reverse_proxy 127.0.0.1:8321
+          @stats {
+            path /api/hosts/stats
+            remote_ip 10.111.0.0/24
           }
+          reverse_proxy @stats 127.0.0.1:8321
           handle /oauth2/* {
             reverse_proxy 127.0.0.1:4180
           }
@@ -690,7 +701,15 @@ in
               }
             }
             @api path /api/*
-            reverse_proxy @api 127.0.0.1:8321
+            reverse_proxy @api 127.0.0.1:8321 {
+              # Proxy-provenance marker: proves this request traversed the
+              # forward_auth gate (a loopback source alone is not provenance —
+              # any local process can hit :8321). {file.*} is read per-request
+              # by the caddy user (group garnix-proxy-auth); trailing newline
+              # is trimmed; a missing file sends an empty value, which the
+              # backend rejects (fails closed).
+              header_up X-Garnix-Proxy-Auth {file./run/secrets/garnix_proxy_shared_secret}
+            }
             reverse_proxy 127.0.0.1:3000
           }
         '';
@@ -699,6 +718,7 @@ in
           request_header -X-Auth-Request-User
           request_header -X-Auth-Request-Email
           request_header -X-Auth-Request-Groups
+          request_header -X-Garnix-Proxy-Auth
           # Nix queries the substituter root (/nix-cache-info, /<hash>.narinfo); the
           # backend serves the cache under /api/cache/. Rewrite so ONLY the cache
           # surface is reachable here (login/API paths become /api/cache/... -> 404).
