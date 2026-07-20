@@ -618,7 +618,15 @@ in
       # domains sit 2 or 4 labels below the apps domain and Caddy site
       # wildcards only match one label, so a catch-all HTTPS site (gated by
       # the ask endpoint) handles them instead of a *.apps.<domain> block.
+      # L7 rate limiting needs the (non-standard) mholt/caddy-ratelimit module;
+      # stock nixpkgs caddy does not ship it, so build caddy with the plugin.
+      services.caddy.package = pkgs.caddy.withPlugins {
+        plugins = [ "github.com/mholt/caddy-ratelimit@v0.1.0" ];
+        hash = "sha256-eET4cfn1OGyl8rtq8/dO95eM+hvjLPi9IyyWz6vT5QQ=";
+      };
       services.caddy.globalConfig = ''
+        # Non-standard directive (mholt/caddy-ratelimit): must be ordered.
+        order rate_limit before basic_auth
         on_demand_tls {
           ask http://127.0.0.1:8321/api/hosts/on-demand-check
         }
@@ -648,6 +656,13 @@ in
           request_header -X-Auth-Request-Email
           request_header -X-Auth-Request-Groups
           request_header -X-Garnix-Proxy-Auth
+          rate_limit {
+            zone garnix_app {
+              key {client_ip}
+              events 600
+              window 1m
+            }
+          }
           @webhook path /api/events/github/* /api/events/gitea /api/events/gitea/*
           handle @webhook {
             reverse_proxy 127.0.0.1:8321
