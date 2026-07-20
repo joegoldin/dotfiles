@@ -31,6 +31,18 @@ in
       jovian.devices.steamdeck.enableVendorDrivers = true;
       jovian.hardware.has.amd.gpu = true;
 
+      # Jovian vendors gamescope 3.16.24 by swapping the src on nixos-26.05's
+      # gamescope 3.16.23, whose shaders-path.patch predates that release's
+      # source reorg — the patch no longer applies. Take gamescope from
+      # unstable instead: same 3.16.24 Valve tag Jovian pins, with coherent
+      # patches and deps, cached upstream. mkAfter so this overlay lands
+      # after Jovian's. Drop once nixos-26.05's gamescope reaches 3.16.24.
+      nixpkgs.overlays = lib.mkAfter [
+        (final: _prev: {
+          inherit (final.unstable) gamescope gamescope-wsi;
+        })
+      ];
+
       # Steam + gamescope session (SDDM handles session switching, not autoStart)
       jovian.steam = {
         enable = true;
