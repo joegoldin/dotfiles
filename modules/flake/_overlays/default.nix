@@ -33,35 +33,18 @@ let
         doCheck = false;
       });
 
-      # gdal 3.13.1: test_zarr_read_simple_sharding writes the Zarr
-      # tile-presence cache (.gmac) via the netCDF driver, so it always fails
-      # in minimal builds (useNetCDF = false), breaking the vtk -> opencv ->
-      # howdy chain. Overridden on gdal (not gdalMinimal) because vtk derives
-      # its own minimal gdal via gdal.override, bypassing the gdalMinimal
-      # attr; overrideAttrs composes through that .override. Fixed upstream
-      # in nixpkgs a846cde4 (PR #540826); drop this once the pin includes it.
-      gdal = uPrev.gdal.overrideAttrs (old: {
-        disabledTests = (old.disabledTests or [ ]) ++ [ "test_zarr_read_simple_sharding" ];
-      });
+      # gdal 3.13 test_zarr_read_simple_sharding + pdal 2.9.x-vs-gdal-3.13
+      # overrides removed: the pin now ships gdal 3.13.1 (nixpkgs disables that
+      # test itself under !useNetCDF, PR #540826) and pdal 2.10.2 (carries
+      # PDAL/PDAL#4929 in-source). Re-applying the old pdal patch aborted with
+      # "reversed (or previously applied) patch detected", breaking the
+      # vtkPackages.pdal -> vtk -> opencv -> howdy chain.
 
-      # pdal 2.9.3 doesn't compile against gdal 3.13 (GetMetadata now returns
-      # CSLConstList; invalid conversion in Raster.cpp), breaking
-      # vtkPackages.pdal -> vtk -> opencv -> howdy. Apply PDAL's upstream
-      # "build fix with GDAL master" (PDAL/PDAL#4929, in pdal >= 2.10).
-      # Drop once the pin ships pdal 2.10.x (nixpkgs master already does).
-      pdal = uPrev.pdal.overrideAttrs (old: {
-        patches = (old.patches or [ ]) ++ [
-          (uPrev.fetchpatch {
-            url = "https://github.com/PDAL/PDAL/commit/eb7220a2447c5b3d208d7ef0a76c61a17a5b21da.patch";
-            hash = "sha256-WJ7PeCkSl+S+qURa1X3Z6D6LiPpvIXWmEap4XcYq9bk=";
-          })
-        ];
-      });
-
-      # vtk 9.5.2 hits the same gdal 3.13 CSLConstList break in its GDAL
-      # reader modules. Apply VTK's upstream "Fix GDAL const conversion
-      # issue" (2026-05-29, post-9.5.2). Drop with the pdal/gdal overrides
-      # above once the pin's vtk/gdal generation is coherent again.
+      # vtk 9.5.2 still hits a gdal 3.13 CSLConstList break in its GDAL reader
+      # modules, and nixpkgs ships 9.5.2 unpatched against gdal 3.13.1. Apply
+      # VTK's upstream "Fix GDAL const conversion issue" (2026-05-29,
+      # post-9.5.2). Drop once the pin bumps vtk past 9.5.2 (>= 9.6 carries the
+      # fix) or nixpkgs backports it.
       vtk = uPrev.vtk.overrideAttrs (old: {
         patches = (old.patches or [ ]) ++ [
           (uPrev.fetchpatch {
