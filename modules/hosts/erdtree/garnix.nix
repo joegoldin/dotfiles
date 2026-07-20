@@ -8,7 +8,12 @@ let
 in
 {
   den.aspects.erdtree.nixos =
-    { config, lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       domains = import "${dotfiles-secrets}/domains.nix";
       garnixData = import "${dotfiles-secrets}/garnix.nix";
@@ -25,8 +30,8 @@ in
       # /docs/images, /docs/favicon.ico so they never collide with the
       # frontend's own /_next/* handler). Refresh via the dotfiles-assets input.
       docsRoot = "${inputs.dotfiles-assets}/garnix-docs";
-      # agenix file -> /run/secrets/<name>. Everything owned by garnix:garnix 0440
-      # except noted; postgres/systemd read via root LoadCredential.
+      # agenix file -> /run/secrets/<name>. The backend owns these; scoped
+      # group/mode exceptions are assigned in age.secrets below.
       garnixSecrets = {
         "database-password" = "garnix-database-password.age";
         "database-monitoring-pgpass" = "garnix-database-monitoring-pgpass.age";
@@ -55,6 +60,16 @@ in
         # backend reads /run/secrets/gitea-token + /run/secrets/gitea-webhook-secret.
         "gitea-token" = "garnix-gitea-token.age";
         "gitea-webhook-secret" = "garnix-gitea-webhook-secret.age";
+        # Proxy-provenance marker (M3): injected by Caddy as X-Garnix-Proxy-Auth
+        # on gated backend requests; validated by the backend before trusting
+        # X-Auth-Request-*. Group garnix-proxy-auth so the caddy user can read
+        # it at request time ({file.*} placeholder).
+        "garnix_proxy_shared_secret" = "garnix-proxy-shared-secret.age";
+        # Dedicated web-terminal CA (H3). Private key 0400 (ssh-keygen refuses
+        # group-readable keys); guests trust the public key as
+        # TrustedUserCAKeys instead of the hosting key.
+        "garnix_terminal_ca" = "garnix-terminal-ca.age";
+        "garnix_terminal_ca_pub" = "garnix-terminal-ca-pub.age";
       };
       # Self-minted CA + cert for postgres TLS (verify-full against dbFqdn).
       # Generated at runtime into /var/lib/garnix-db-certs, NOT the nix store
@@ -106,18 +121,26 @@ in
         # (dev-mode.nix only sets ipv4/ipv6Address when devMode.enable, which is off).
         ({ lib, ... }: {
           options.garnix = {
-            killRogueNixProcesses = lib.mkOption { type = lib.types.bool; default = false; };
+            killRogueNixProcesses = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+            };
             ipv4 = lib.mkOption {
               default = null;
-              type = lib.types.nullOr (lib.types.submodule {
-                options = {
-                  address = lib.mkOption { type = lib.types.str; };
-                  gateway = lib.mkOption { type = lib.types.str; };
-                  iface = lib.mkOption { type = lib.types.str; };
-                };
-              });
+              type = lib.types.nullOr (
+                lib.types.submodule {
+                  options = {
+                    address = lib.mkOption { type = lib.types.str; };
+                    gateway = lib.mkOption { type = lib.types.str; };
+                    iface = lib.mkOption { type = lib.types.str; };
+                  };
+                }
+              );
             };
-            ipv6Address = lib.mkOption { type = lib.types.nullOr lib.types.str; default = null; };
+            ipv6Address = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+            };
           };
         })
       ];
@@ -135,10 +158,11 @@ in
         # changes upstream. Mirrors the fork's own installPhase-patch overlay.
         (final: prev: {
           opensearch = prev.opensearch.overrideAttrs (old: {
-            installPhase = builtins.replaceStrings
-              [ "cp -R bin config lib modules plugins agent $out" ]
-              [ "cp -R bin config lib modules plugins $out" ]
-              old.installPhase;
+            installPhase =
+              builtins.replaceStrings
+                [ "cp -R bin config lib modules plugins agent $out" ]
+                [ "cp -R bin config lib modules plugins $out" ]
+                old.installPhase;
           });
         })
       ];
@@ -149,40 +173,69 @@ in
       # excluded monitoring.nix); keep it OFF so that option is never demanded.
       garnix.monitoring-client.enable = false;
 
-      age.secrets = (lib.mapAttrs'
-        (name: file: lib.nameValuePair "garnix-${name}" {
-          file = "${dotfiles-secrets}/${file}";
-          path = "/run/secrets/${name}";
-          symlink = false;
-          owner = "garnix";
-          group = "garnix";
-          # SSH private keys the backend (garnix user) uses as an ssh identity —
-          # into guest microVMs (hosting key) and into the local action-runner
-          # user (action-runner key). OpenSSH refuses a private key that is
-          # group-readable when the caller owns it, so these must be 0400 (not
-          # the blanket 0440 the other garnix secrets use).
-          mode =
-            if name == "garnix_server_ssh_hosting" || name == "garnix_action_runner_ssh"
-            then "0400"
-            else "0440";
-        })
-        garnixSecrets)
-      // {
-        # oauth2-proxy env file (OAUTH2_PROXY_CLIENT_SECRET + cookie secret);
-        # read by systemd as root via EnvironmentFile, so default agenix
-        # root:root 0400 is correct. Declared here (not as a sibling
-        # `age.secrets.* = …`) because `age.secrets` is already a non-literal
-        # `//`-merge, and Nix can't merge a nested path into that.
-        garnix-oauth2-proxy-env.file = "${dotfiles-secrets}/garnix-oauth2-proxy-env.age";
-        # garnix builds substitute from attic: the sandbox binds the combined
-        # netrc (attic + garnix cache, declared in attic-cache.nix), which must
-        # be readable by the garnix service user — agenix defaults to
-        # root:root 0400. Declared here for the same `//`-merge reason.
-        attic-netrc = {
-          mode = "0440";
-          group = "garnix";
+      age.secrets =
+        (lib.mapAttrs' (
+          name: file:
+          lib.nameValuePair "garnix-${name}" {
+            file = "${dotfiles-secrets}/${file}";
+            path = "/run/secrets/${name}";
+            symlink = false;
+            owner = "garnix";
+            # Per-secret groups instead of blanket `garnix` where a non-backend
+            # service needs read access — membership in `garnix` would grant that
+            # service every 0440 backend secret:
+            #  - opensearch-garnix: backend reads as OWNER; fluent-bit gets the
+            #    dedicated garnix-opensearch group (belt-and-braces — its module
+            #    reads via LoadCredential, i.e. as root).
+            #  - garnix_proxy_shared_secret: caddy resolves it per-request via a
+            #    {file.*} placeholder, so the caddy user reads it directly.
+            group =
+              if name == "opensearch-garnix" then
+                "garnix-opensearch"
+              else if name == "garnix_proxy_shared_secret" then
+                "garnix-proxy-auth"
+              else
+                "garnix";
+            # SSH private keys the backend (garnix user) uses as an ssh identity —
+            # into guest microVMs (hosting key), into the local action-runner
+            # user (action-runner key), to remote builders (remote-builder key) —
+            # plus the terminal-signing CA. OpenSSH refuses a private key that is
+            # group-readable when the caller owns it, so these must be 0400 (not
+            # the blanket 0440 the other garnix secrets use).
+            mode =
+              if
+                lib.elem name [
+                  "garnix_server_ssh_hosting"
+                  "garnix_action_runner_ssh"
+                  "garnix_server_remote_builder_ssh"
+                  "garnix_terminal_ca"
+                ]
+              then
+                "0400"
+              else
+                "0440";
+          }
+        ) garnixSecrets)
+        // {
+          # oauth2-proxy env file (OAUTH2_PROXY_CLIENT_SECRET + cookie secret);
+          # read by systemd as root via EnvironmentFile, so default agenix
+          # root:root 0400 is correct. Declared here (not as a sibling
+          # `age.secrets.* = …`) because `age.secrets` is already a non-literal
+          # `//`-merge, and Nix can't merge a nested path into that.
+          garnix-oauth2-proxy-env.file = "${dotfiles-secrets}/garnix-oauth2-proxy-env.age";
+          # garnix builds substitute from attic: the sandbox binds the combined
+          # netrc (attic + garnix cache, declared in attic-cache.nix), which must
+          # be readable by the garnix service user — agenix defaults to
+          # root:root 0400. Declared here for the same `//`-merge reason.
+          attic-netrc = {
+            mode = "0440";
+            group = "garnix";
+          };
         };
-      };
+
+      # Scoped secret-access groups (see age.secrets above).
+      users.groups.garnix-opensearch = { };
+      users.groups.garnix-proxy-auth.members = [ "caddy" ];
 
       networking.hosts."127.0.0.1" = [ dbFqdn ];
 
@@ -191,7 +244,12 @@ in
         devMode.enable = false;
         fluent-bit = {
           enable = true;
-          extraGroups = [ "garnix" ]; # read opensearch password file
+          # Scoped group for the opensearch password ONLY (not `garnix`, which
+          # would grant read on every 0440 backend secret). Strictly the module
+          # reads the password via LoadCredential (service manager, as root),
+          # so no group is needed at all — this is defense-in-depth in case the
+          # module ever switches to a direct read.
+          extraGroups = [ "garnix-opensearch" ];
           opensearch = {
             fqdn = "localhost";
             port = 9200;
@@ -326,7 +384,11 @@ in
       # mode) verifies it without an interactive prompt. keys.farum-azula is the
       # machine's ed25519 host key (also its agenix recipient).
       programs.ssh.knownHosts."farum-azula-builder" = {
-        hostNames = [ "farum-azula-builder" domains.farumAzulaDomain "147.224.12.5" ];
+        hostNames = [
+          "farum-azula-builder"
+          domains.farumAzulaDomain
+          "147.224.12.5"
+        ];
         publicKey = keys.farum-azula;
       };
 
@@ -334,8 +396,18 @@ in
       boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
       nix.settings = {
         extra-platforms = [ "aarch64-linux" ];
-        experimental-features = [ "nix-command" "flakes" "recursive-nix" ];
-        system-features = [ "nixos-test" "benchmark" "big-parallel" "kvm" "recursive-nix" ];
+        experimental-features = [
+          "nix-command"
+          "flakes"
+          "recursive-nix"
+        ];
+        system-features = [
+          "nixos-test"
+          "benchmark"
+          "big-parallel"
+          "kvm"
+          "recursive-nix"
+        ];
         trusted-users = [ "garnix" ];
         # Half the box per derivation: erdtree is a dual E5-2667 v2 = 32
         # threads, so a single build (ghc, rustc, …) may use up to 16. Total
@@ -363,7 +435,11 @@ in
       # DB certs before postgres; secrets before the services that read them.
       systemd.services.postgresql.serviceConfig.ExecStartPre = lib.mkBefore [ "+${mkDbCerts}" ];
       systemd.services.garnixServer = {
-        after = [ "agenix.service" "postgresql.service" "opensearch.service" ];
+        after = [
+          "agenix.service"
+          "postgresql.service"
+          "opensearch.service"
+        ];
         wants = [ "agenix.service" ];
         serviceConfig = {
           MemoryHigh = "48G";
@@ -372,6 +448,10 @@ in
       };
       systemd.services.opensearch.serviceConfig.MemoryHigh = "8G";
       systemd.services.frontend = {
+        after = [ "agenix.service" ];
+        wants = [ "agenix.service" ];
+      };
+      systemd.services.caddy = {
         after = [ "agenix.service" ];
         wants = [ "agenix.service" ];
       };
@@ -392,13 +472,16 @@ in
         clientID = garnixData.authentik.clientId;
         oidcIssuerUrl = garnixData.authentik.issuerUrl;
         redirectURL = "https://${domains.garnixDomain}/oauth2/callback";
-        scope = garnixData.authentik.scope;   # "openid profile email garnix"
+        scope = garnixData.authentik.scope; # "openid profile email garnix"
         reverseProxy = true;
         # Only local Caddy forward_auths to the proxy; trust its X-Forwarded-*
         # headers from loopback only (else oauth2-proxy trusts all source IPs —
         # a spoofing risk the module warns about, and one that would undermine
         # the X-Auth-Request-* header-trust model).
-        trustedProxyIP = [ "127.0.0.1/32" "::1/128" ];
+        trustedProxyIP = [
+          "127.0.0.1/32"
+          "::1/128"
+        ];
         setXauthrequest = true;
         httpAddress = "127.0.0.1:4180";
         email.domains = [ "*" ];
@@ -485,8 +568,7 @@ in
             endpoint = "http://127.0.0.1:8321/api/hosts/traefik";
             pollInterval = "5s";
           };
-          experimental.localPlugins.heartbeatmiddleware.moduleName =
-            "github.com/garnix-io/garnix/heartbeatmiddleware";
+          experimental.localPlugins.heartbeatmiddleware.moduleName = "github.com/garnix-io/garnix/heartbeatmiddleware";
         };
       };
       # Yaegi loads local plugins from <workdir>/plugins-local/src/<moduleName>;
