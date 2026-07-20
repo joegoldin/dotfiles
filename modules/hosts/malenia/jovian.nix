@@ -113,6 +113,16 @@ in
       # Decky Loader
       jovian.decky-loader = {
         enable = true;
+
+        # Jovian pins pnpm_9, which nixpkgs marks insecure (EOL). Upstream
+        # decky-loader builds with current pnpm against the same lockfile,
+        # so swap in pnpm_10 and re-pin the deps hash. Drop once Jovian
+        # moves off pnpm_9.
+        package = (pkgs.decky-loader.override { pnpm_9 = pkgs.pnpm_10; }).overridePythonAttrs (old: {
+          pnpmDeps = old.pnpmDeps.override {
+            hash = "sha256-X1L8JYG5hgYMmfg0aa8XhkRU6/oFrYTPiXDIyq77puE=";
+          };
+        });
         user = username;
         stateDir = "/home/${username}/.local/share/decky";
 
