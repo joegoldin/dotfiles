@@ -45,7 +45,6 @@ let
     steam = "applications:steam.desktop";
     zoom = "applications:Zoom.desktop";
     claude = "applications:claude-desktop.desktop";
-    chatgpt = "applications:chatgpt-desktop.desktop";
     obsidian = "applications:obsidian.desktop";
     slack = "applications:slack.desktop";
   };
@@ -126,7 +125,6 @@ in
           apps.steam
           apps.zoom
           apps.claude
-          apps.chatgpt
           apps.obsidian
           apps.slack
         ];
