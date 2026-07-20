@@ -525,6 +525,21 @@ in
       microvm.host.enable = true;
       garnix.local-provisioner = {
         enable = true;
+        # Dedicated terminal-signing CA (H3): the daemon derives its PUBLIC key
+        # at start and injects it into guests as garnix.guest.terminalCaPublicKey
+        # (TrustedUserCAKeys), so guests no longer trust the hosting key as a
+        # certificate authority.
+        terminalCaPrivateKeyPath = "/run/secrets/garnix_terminal_ca";
+        # Guest egress ACL (H5): block RFC1918 + link-local + CGNAT (default)
+        # AND the aarch64 remote builder farum-azula (public IP, not RFC1918).
+        guestEgressBlocklist = [
+          "10.0.0.0/8"
+          "172.16.0.0/12"
+          "192.168.0.0/16"
+          "169.254.0.0/16"
+          "100.64.0.0/10"
+          "147.224.12.5/32"
+        ];
         # erdtree's uplink (`ip route show default` -> dev eno1); guests NAT
         # out through it.
         uplinkInterface = "eno1";
