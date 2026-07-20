@@ -7,11 +7,11 @@ let
       repo = "StreamController";
       # PR #1 (MiraBox StreamDock device support), rebased onto fork main =
       # upstream beta.15 + the fork's GTK-threading/watcher stability fixes.
-      # Carries the N3 sleep/lock recovery: USB reset + official MOD handshake
-      # clears the firmware's "host gone" latch (frozen display after suspend
-      # or lock; writes ACKed but ignored). See joegoldin/StreamController#1.
-      rev = "c14ead9e32444988460fa119e9cef7b800e9d2b4";
-      hash = "sha256-GgI1cowszEr+n9lvlgYGBfYWWbhONGjo5hzCbNwXXTA=";
+      # Carries the N3 sleep/lock recovery, fast-replug reconciliation, and
+      # stalled HID-write diagnostics for random display freezes. See
+      # joegoldin/StreamController#1.
+      rev = "077cb94474cad040c7a5c3f4a15ca86aa5e6d8b0";
+      hash = "sha256-989ryHQCTOqgd2fwz7tDUZcU8PtEcPx0kqPV2b8TMOQ=";
     };
     nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
     # The upstream nixpkgs derivation builds the Python env from a fixed list,
