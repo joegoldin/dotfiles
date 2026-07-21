@@ -328,6 +328,10 @@ in
         # multi-commit push from spawning dozens of guests and drowning the
         # fluent-bit log pipeline. 16 of erdtree's 32 threads.
         maxConcurrentBuilds = 16;
+        # FOD checks target the aarch64 store directly with `nix --store`, so
+        # they bypass buildMachines.maxJobs. Keep only one direct session on
+        # the small 2-core/12-GiB external builder.
+        maxRemoteFodJobs = 1;
         # Authenticate sandboxed evals/builds to attic (and the garnix cache)
         # so substitution works inside the bubblewrap sandbox — the sandbox
         # can't read the host nix.conf's netrc path unless it's bound in and
@@ -373,6 +377,10 @@ in
         # <pkg>.<branch>.<repo>.<owner>.<hostingDomain>. provisionServerPool
         # keeps the pool pre-warmed (self-host default: one i2x4 guest).
         hostingDomain = domains.garnixAppsDomain;
+        # Full control-plane endpoint written into a guest only after the
+        # backend claims it; never derive this from the untrusted workload
+        # hostingDomain.
+        statsReportUrl = "https://${domains.garnixDomain}/api/hosts/stats";
         # Extra wildcard base domains for hosted servers (vanity/custom domains):
         # servers can be reached at <name>.<domain>. Each needs a manual wildcard
         # *.<domain> -> erdtree DNS record (grey cloud) — Caddy on-demand + the
@@ -562,10 +570,6 @@ in
         # so guest builds need no network fetch.
         nixpkgsFlake = "path:${inputs.nixpkgs}";
         microvmFlake = "path:${inputs.microvm-nix}";
-        # Guests push their CPU/RAM samples here (bridge NAT -> public garnix
-        # API, same path guests already use for /api/keys/*). The @stats Caddy
-        # bypass below lets the unauthenticated POST through the Authentik gate.
-        statsReportUrl = "https://${domains.garnixDomain}/api/hosts/stats";
       };
       # The daemon's ExecStartPre derives the guest pubkey from the
       # agenix-installed hosting key; order it after secrets exist.
