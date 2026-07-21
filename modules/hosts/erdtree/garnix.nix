@@ -89,6 +89,21 @@ in
       '';
     in
     {
+      assertions = [
+        {
+          assertion = lib.hasInfix ''
+            @stats {
+              path /api/hosts/stats
+              remote_ip 10.111.0.0/24
+            }
+            handle @stats {
+              reverse_proxy 127.0.0.1:8321
+            }
+          '' config.services.caddy.virtualHosts.${domains.garnixDomain}.extraConfig;
+          message = "The guest stats route must terminate in a source-gated Caddy handle before Authentik.";
+        }
+      ];
+
       # NOTE (den + specialArgs): `nixosModules.self-hosted` dereferences
       # `flakeInputs` inside its `imports` (for the sops-nix module), which
       # requires flakeInputs via specialArgs — but den assembles specialArgs
@@ -693,13 +708,15 @@ in
           }
           # Per-server resource stats: deployed microVM guests POST their
           # CPU/RAM samples here unauthenticated (like the heartbeat / public-key
-          # routes), so bypass the Authentik gate. The backend just records the
-          # sample and drops any that don't map to a live server.
+          # routes), so bypass the Authentik gate. The backend source-gates this
+          # to the guest subnet and returns 404 when no live server matches.
           @stats {
             path /api/hosts/stats
             remote_ip 10.111.0.0/24
           }
-          reverse_proxy @stats 127.0.0.1:8321
+          handle @stats {
+            reverse_proxy 127.0.0.1:8321
+          }
           handle /oauth2/* {
             reverse_proxy 127.0.0.1:4180
           }
