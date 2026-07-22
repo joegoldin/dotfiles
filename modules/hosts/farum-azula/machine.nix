@@ -5,6 +5,7 @@
 let
   meta = import ../../_lib/meta.nix;
   keys = import "${inputs.dotfiles-secrets}/keys.nix";
+  domains = import "${inputs.dotfiles-secrets}/domains.nix";
   username = meta.username;
 in
 {
@@ -15,6 +16,13 @@ in
       ...
     }:
     {
+      assertions = [
+        {
+          assertion = !(lib.elem 9100 config.networking.firewall.allowedTCPPorts);
+          message = "farum-azula node-exporter must not be globally exposed through allowedTCPPorts";
+        }
+      ];
+
       users.users.root.openssh.authorizedKeys.keys = [
         keys.${username}
       ];
@@ -25,6 +33,40 @@ in
       services.tailscale = {
         enable = true;
         useRoutingFeatures = "server";
+      };
+
+      # Builder metrics for garnix's operator-only Monitoring page. The
+      # exporter must bind beyond loopback so erdtree can scrape it, but 9100
+      # is deliberately absent from allowedTCPPorts: only the authenticated
+      # tailnet and erdtree's stable public /32 may reach it.
+      services.prometheus.exporters.node = {
+        enable = true;
+        listenAddress = "0.0.0.0";
+        port = 9100;
+        enabledCollectors = [ "systemd" ];
+      };
+
+      networking.firewall = {
+        extraCommands = ''
+          iptables -w -C nixos-fw -p tcp -s ${domains.garnixHostingPublicIp}/32 --dport 9100 -j nixos-fw-accept 2>/dev/null \
+            || iptables -w -I nixos-fw 1 -p tcp -s ${domains.garnixHostingPublicIp}/32 --dport 9100 -j nixos-fw-accept
+        '';
+        extraStopCommands = ''
+          iptables -w -D nixos-fw -p tcp -s ${domains.garnixHostingPublicIp}/32 --dport 9100 -j nixos-fw-accept 2>/dev/null \
+            || true
+        '';
+      };
+
+      # Independent service-boundary filtering protects the exporter even if
+      # the host firewall is later broadened. tailscale0 is already a trusted
+      # firewall interface; this CIDR admits every Tailscale IPv4 peer.
+      systemd.services.prometheus-node-exporter.serviceConfig = {
+        IPAddressDeny = "any";
+        IPAddressAllow = [
+          "localhost"
+          "100.64.0.0/10"
+          "${domains.garnixHostingPublicIp}/32"
+        ];
       };
 
       programs.ssh.startAgent = true;

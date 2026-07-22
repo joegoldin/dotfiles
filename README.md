@@ -14,7 +14,7 @@ uses [den](https://github.com/denful/den) as the engine, and wires in
 | `malenia`                             | Steam Deck (Jovian)             | gaming                              |
 | `melina`                              | mini PC (Ryzen 7 5700U)         | Home Assistant + home automation    |
 | `dectus`                               | VPS                             | caddy reverse proxy + fail2ban      |
-| `farum-azula`                      | Oracle Cloud Ampere (aarch64)   | bastion / tailnet entry + Calagopus Wings node |
+| `farum-azula`                      | Oracle Cloud Ampere (aarch64)   | bastion / tailnet entry + Garnix remote builder + Calagopus Wings node |
 | `erdtree`                             | dedicated (2× E5-2670v2, 192 GB) | gaming/HPC — Calagopus Wings node  |
 | `siofra`                              | VPS (16 GB)                     | misc cloud — Calagopus Wings node   |
 | `rennala`                      | VPS                             | attic binary cache server           |

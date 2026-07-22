@@ -332,6 +332,23 @@ in
         # they bypass buildMachines.maxJobs. Keep only one direct session on
         # the small 2-core/12-GiB external builder.
         maxRemoteFodJobs = 1;
+        monitoringBuilders = [
+          {
+            name = "erdtree";
+            url = "http://127.0.0.1:9100/metrics";
+            systems = [
+              "x86_64-linux"
+              "aarch64-linux"
+            ];
+            maxJobs = 8;
+          }
+          {
+            name = "farum-azula";
+            url = "http://${domains.farumAzulaDomain}:9100/metrics";
+            systems = [ "aarch64-linux" ];
+            maxJobs = 1;
+          }
+        ];
         # Authenticate sandboxed evals/builds to attic (and the garnix cache)
         # so substitution works inside the bubblewrap sandbox — the sandbox
         # can't read the host nix.conf's netrc path unless it's bound in and
