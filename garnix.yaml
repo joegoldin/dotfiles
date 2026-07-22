@@ -16,6 +16,7 @@ builds:
   exclude:
     - "nixosConfigurations.scarab"
 
-# Rebuild fixed-output derivations ignoring the cache so lying hashes surface;
-# unfetchable sources (dead mirrors, bot-walled CDNs) warn instead of failing.
+# Prepare each fixed-output derivation's dependencies, then rebuild the original
+# derivation unchanged while ignoring cached outputs. Source, fetch, and builder
+# failures fail the FOD run; only a successful strict rebuild is recorded.
 fodChecks: true
