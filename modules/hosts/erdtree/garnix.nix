@@ -390,6 +390,12 @@ in
         hostingPublicIp = domains.garnixHostingPublicIp;
         provisionerSocket = "/run/garnix-provisioner/provisioner.sock";
         provisionServerPool = true;
+        # The shared guest profile plus a repository activation can exhaust a
+        # 1-GiB VM during the switch (virtio-fs then returns ENOMEM). Keep the
+        # production hosting tier explicit and aligned with garnix-hello.
+        serverPool = {
+          i2x4 = 1;
+        };
         # External SSH host the Servers page uses to build the ssh command for a
         # deployed server's DNAT'd port (garnix.yaml sshExpose) and the ProxyJump
         # into the guest subnet.
