@@ -328,10 +328,6 @@ in
         # multi-commit push from spawning dozens of guests and drowning the
         # fluent-bit log pipeline. 16 of erdtree's 32 threads.
         maxConcurrentBuilds = 16;
-        # FOD checks target the aarch64 store directly with `nix --store`, so
-        # they bypass buildMachines.maxJobs. Keep only one direct session on
-        # the small 2-core/12-GiB external builder.
-        maxRemoteFodJobs = 1;
         monitoringBuilders = [
           {
             name = "erdtree";
@@ -358,6 +354,8 @@ in
         # aarch64 configs (farum-azula, scarab) via qemu — 10-50x faster. The
         # nix-daemon (root) SSHes as nix-ssh with the remote-builder key; the
         # known-hosts entry below lets it verify the host non-interactively.
+        # FOD checks use this same daemon/store path, so maxJobs also caps their
+        # work on the small external builder.
         buildMachines = [
           {
             hostName = "farum-azula-builder";
