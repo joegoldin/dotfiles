@@ -33,7 +33,7 @@
 
           settings = {
             user = {
-              name = "joegoldin";
+              name = "Joe Goldin";
               email = "joe@joegold.in";
             };
 
