@@ -63,11 +63,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784765282,
-        "narHash": "sha256-6hKSZG2LQSaXwR3cA6G7SlcIXNQtjxFD0CkZsYgRq94=",
+        "lastModified": 1784839207,
+        "narHash": "sha256-leF2SnIpKQ+ldioGM/eb2fvZvsh+xnJT/p++aIS29ZE=",
         "owner": "joegoldin",
         "repo": "agent-skills",
-        "rev": "fb64cd03812f6dae19692a8c3b43a173a8df66b0",
+        "rev": "caf8b7e17bd312671c6d8414f710a88ca6295975",
         "type": "github"
       },
       "original": {
@@ -940,11 +940,11 @@
     "dotfiles-secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1784587772,
-        "narHash": "sha256-FSSw+50laC5rMlnSPWpk9rN7kViju51IifTvShSwL34=",
+        "lastModified": 1784839207,
+        "narHash": "sha256-NaNJ/3bvF8ZdFnElUsJkeepQLfMYbrqAbiSakAG2e9s=",
         "owner": "joegoldin",
         "repo": "dotfiles-secrets",
-        "rev": "225eea2d66e4514c7877b86a6643ae29cf88dc56",
+        "rev": "8cb969ea70599cbd2fec98a403de977419bedf27",
         "type": "github"
       },
       "original": {
@@ -1603,11 +1603,11 @@
         "treetop": "treetop"
       },
       "locked": {
-        "lastModified": 1784831605,
-        "narHash": "sha256-y4FBHv3azO/AzjS7/UR6UxQlWBiOu0rKNMxiv7vxRrY=",
+        "lastModified": 1784839207,
+        "narHash": "sha256-4EMYsr9cctMWm0MZXzGpNZu93rqHvip2GsZU0TjOOGQ=",
         "owner": "joegoldin",
         "repo": "garnix-ci-selfhosted",
-        "rev": "68053eb71d188b461bfa676b980250cdb6c1783a",
+        "rev": "83ed29035866616f305914201b0fc637692f50a9",
         "type": "github"
       },
       "original": {
