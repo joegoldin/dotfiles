@@ -418,9 +418,17 @@ in
         hostingPublicIp = domains.garnixHostingPublicIp;
         provisionerSocket = "/run/garnix-provisioner/provisioner.sock";
         provisionServerPool = true;
-        # The shared guest profile plus a repository activation can exhaust a
-        # 1-GiB VM during the switch (virtio-fs then returns ENOMEM). Keep the
-        # production hosting tier explicit and aligned with garnix-hello.
+        # Elastic hosting: guests are provisioned on demand for whatever tier a
+        # deploy requests, bounded by these ceilings. The backend evicts idle
+        # warm VMs and then queues deploys when a budget is hit — it never
+        # silently hangs on an unlisted tier the way the old static pool did.
+        # Reserve-style so the box's gaming/HPC workloads keep headroom. Tune to
+        # erdtree's real RAM/cores (reserve = amount to always leave free).
+        hosting.memoryBudget = { reserveGiB = 80; };
+        hosting.cpuBudget = { reserveCores = 4; };
+        # Optional keep-warm target for fast redeploys, clamped to the budget.
+        # (A 1-GiB i1x1 can ENOMEM during switch-to-configuration, so warm i2x4;
+        # on-demand deploys of any other tier still work within budget.)
         serverPool = {
           i2x4 = 1;
         };
