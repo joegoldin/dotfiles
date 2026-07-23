@@ -193,7 +193,10 @@
     # Ghostty terminal
     ghostty.url = "github:ghostty-org/ghostty";
     # Zed editor (built from source via flake)
-    zed-editor.url = "github:zed-industries/zed";
+    zed-editor = {
+      url = "github:zed-industries/zed";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # Zed nix extension (fork with language injection for script bodies)
     zed-nix-ext = {
       url = "github:joegoldin/zed-extensions-nix";
