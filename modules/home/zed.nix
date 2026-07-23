@@ -18,24 +18,21 @@
       # only landed in nixpkgs-unstable, so use the unstable overlay.
       dotnet = pkgs.unstable.dotnet-sdk_10;
 
-      zedPackageBase = inputs.zed-editor.packages.${pkgs.stdenv.hostPlatform.system}.default;
       # Zed currently pins cargo-about 0.8.2 while inheriting cargo-about's
       # build flags from our newer root Nixpkgs. That package revision predates
-      # the `cli` feature, so remove only the inherited flag from the pinned
-      # native tool until Zed updates the pin.
-      zedPackage = zedPackageBase.overrideAttrs (old: {
-        nativeBuildInputs = map (
-          input:
-          if (input.pname or null) == "cargo-about" && (input.version or null) == "0.8.2" then
-            input.overrideAttrs (_: {
-              buildFeatures = [ ];
-              cargoBuildFeatures = [ ];
-              cargoCheckFeatures = [ ];
-            })
-          else
-            input
-        ) (old.nativeBuildInputs or [ ]);
-      });
+      # the `cli` feature. Build Zed through its overlay with corrected package
+      # inputs so the invalid tool is never evaluated as an IFD; overriding the
+      # already-created Zed derivation is too late for a clean evaluator.
+      zedPkgs = pkgs.extend (
+        _: prev: {
+          cargo-about = prev.cargo-about.overrideAttrs (_: {
+            buildFeatures = [ ];
+            cargoBuildFeatures = [ ];
+            cargoCheckFeatures = [ ];
+          });
+        }
+      );
+      zedPackage = (inputs.zed-editor.overlays.default zedPkgs zedPkgs).zed-editor;
     in
     {
       home.packages = lib.optionals isLinux [ dotnet ];
