@@ -319,6 +319,10 @@ in
         inherit (garnixData) cachePublicKey;
         enableNginx = false;
         journaldMaxUse = "10G";
+        # Legacy cargo-vendor FODs call crates.io's rate-limited API. Keep the
+        # strict rebuild unchanged, but map that exact route to the official
+        # static endpoint through a loopback-only compatibility proxy.
+        fodCratesProxy.enable = true;
         # nix `max-jobs` for local derivation builds; the nix-daemon cgroup caps
         # below bound the actual CPU/RAM they can consume.
         maxLocalJobs = 8;
@@ -354,8 +358,9 @@ in
         # aarch64 configs (farum-azula, scarab) via qemu — 10-50x faster. The
         # nix-daemon (root) SSHes as nix-ssh with the remote-builder key; the
         # known-hosts entry below lets it verify the host non-interactively.
-        # FOD checks use this same daemon/store path, so maxJobs also caps their
-        # work on the small external builder.
+        # Strict FOD verification stays local on erdtree so its daemon-scoped
+        # compatibility transport is applied consistently. Normal aarch64
+        # package builds still use this builder and respect maxJobs.
         buildMachines = [
           {
             hostName = "farum-azula-builder";
