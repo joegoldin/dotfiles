@@ -66,10 +66,10 @@ in
         # it at request time ({file.*} placeholder).
         "garnix_proxy_shared_secret" = "garnix-proxy-shared-secret.age";
         # Dedicated web-terminal CA (H3). Private key 0400 (ssh-keygen refuses
-        # group-readable keys); guests trust the public key as
-        # TrustedUserCAKeys instead of the hosting key.
+        # group-readable keys). The provisioner derives the public half at
+        # runtime (ssh-keygen -y) and injects it into guests as their
+        # TrustedUserCAKeys, so only the private key is installed here.
         "garnix_terminal_ca" = "garnix-terminal-ca.age";
-        "garnix_terminal_ca_pub" = "garnix-terminal-ca-pub.age";
       };
       # Self-minted CA + cert for postgres TLS (verify-full against dbFqdn).
       # Generated at runtime into /var/lib/garnix-db-certs, NOT the nix store
@@ -216,7 +216,10 @@ in
             # user (action-runner key), to remote builders (remote-builder key) —
             # plus the terminal-signing CA. OpenSSH refuses a private key that is
             # group-readable when the caller owns it, so these must be 0400 (not
-            # the blanket 0440 the other garnix secrets use).
+            # the blanket 0440 the other garnix secrets use). repo-secrets-key is
+            # not an SSH key but the instance-wide AGE master key that decrypts
+            # every repo's garnix.yaml secrets — same 0400 for defense-in-depth,
+            # so no future `garnix`-group member can ever read it.
             mode =
               if
                 lib.elem name [
@@ -224,6 +227,7 @@ in
                   "garnix_action_runner_ssh"
                   "garnix_server_remote_builder_ssh"
                   "garnix_terminal_ca"
+                  "repo-secrets-key"
                 ]
               then
                 "0400"
