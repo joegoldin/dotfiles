@@ -32,7 +32,25 @@
           });
         }
       );
-      zedPackage = (inputs.zed-editor.overlays.default zedPkgs zedPkgs).zed-editor;
+      upstreamZedPackage = (inputs.zed-editor.overlays.default zedPkgs zedPkgs).zed-editor;
+      zedLivekit = lib.getDev zedPkgs.livekit-libwebrtc;
+      zedCargoArtifacts = upstreamZedPackage.passthru.craneLib.buildDepsOnly (
+        lib.recursiveUpdate upstreamZedPackage.passthru.commonArgs {
+          env.LK_CUSTOM_WEBRTC = zedLivekit;
+        }
+      );
+      zedPackage = upstreamZedPackage.overrideAttrs (old: {
+        # Zed's flake vendors an older WebRTC 137 package whose PipeWire
+        # capture code no longer compiles against PipeWire 1.6. Use the same
+        # WebRTC major from our root Nixpkgs, which carries the compatibility
+        # fix and is available from the binary cache. Rebuild Crane's separate
+        # dependency derivation with the same override so the vendored package
+        # cannot remain reachable through cargoArtifacts.
+        cargoArtifacts = zedCargoArtifacts;
+        env = old.env // {
+          LK_CUSTOM_WEBRTC = zedLivekit;
+        };
+      });
     in
     {
       home.packages = lib.optionals isLinux [ dotnet ];
