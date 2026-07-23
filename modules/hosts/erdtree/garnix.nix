@@ -70,6 +70,10 @@ in
         # runtime (ssh-keygen -y) and injects it into guests as their
         # TrustedUserCAKeys, so only the private key is installed here.
         "garnix_terminal_ca" = "garnix-terminal-ca.age";
+        # garnix's own Authentik OIDC client secret, as a BARE value (the backend
+        # reads defaultAuthentik.clientSecretFile whole+stripped). Used for
+        # `authentik: default` hosting. Installed at /run/secrets/oidc-client-secret.
+        "oidc-client-secret" = "garnix-oidc-client-secret.age";
       };
       # Self-minted CA + cert for postgres TLS (verify-full against dbFqdn).
       # Generated at runtime into /var/lib/garnix-db-certs, NOT the nix store
@@ -433,6 +437,19 @@ in
         # Terminal cert source-address pin (H2): the host's own address on the
         # guest bridge (garnix.provisioner.hostAddress = 10.111.0.1/24).
         terminalSourceAddress = "10.111.0.1/32";
+        # `authentik: default` hosting: a deployed server can reuse garnix's OWN
+        # Authentik OIDC application (same login + entitlements as garnix itself)
+        # by setting `authentik = "default"` on its garnix.yaml server entry and
+        # importing the garnix-authentik guest module with mode = "default". The
+        # backend drops these creds (client secret read as a bare value) onto the
+        # guest at /var/garnix/keys/default-authentik.env at deploy time. NOTE:
+        # the garnix Authentik provider must allow the guest callback redirect
+        # `https://*.${domains.garnixAppsDomain}/oauth2/callback` (regex URI).
+        defaultAuthentik = {
+          issuerUrl = garnixData.authentik.issuerUrl;
+          clientId = garnixData.authentik.clientId;
+          clientSecretFile = "/run/secrets/oidc-client-secret";
+        };
         # Repo `actions` run on the local action-runner user (garnix.actionRunner
         # below): the backend `nix copy`s the closure to action-runner@127.0.0.1
         # and executes it in a bwrap sandbox there.
