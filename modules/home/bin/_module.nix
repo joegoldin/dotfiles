@@ -501,8 +501,13 @@ let
         ) flags
       );
     in
+    # Absolute path, not bare `getopt`: on darwin that resolves to BSD
+    # /usr/bin/getopt, which ignores -o/-l and echoes them back as positional
+    # args, so every script fell through to its usage text. pkgs.getopt is the
+    # enhanced (Looijaard) getopt util-linux derives from, so both platforms
+    # parse identically.
     ''
-      OPTS=$(getopt -o '${shortOpts}' -l '${longOpts}' -- "$@") || die "Failed to parse options"
+      OPTS=$(${pkgs.getopt}/bin/getopt -o '${shortOpts}' -l '${longOpts}' -- "$@") || die "Failed to parse options"
       eval set -- "$OPTS"
       while true; do
         case "$1" in
