@@ -56,6 +56,11 @@ in
         "s3-artifacts-public-secret-access-key" = "garnix-s3-artifacts-public-secret-access-key.age";
         "s3-artifacts-private-access-key-id" = "garnix-s3-artifacts-private-access-key-id.age";
         "s3-artifacts-private-secret-access-key" = "garnix-s3-artifacts-private-secret-access-key.age";
+        # Server backups (garnix.yaml `servers[].backups:`): one private bucket
+        # with its own single-bucket key pair. Only the backend reads these —
+        # deployed guests never see bucket credentials.
+        "s3-backups-access-key-id" = "garnix-s3-backups-access-key-id.age";
+        "s3-backups-secret-access-key" = "garnix-s3-backups-secret-access-key.age";
         # Gitea forge integration: bot API token + webhook HMAC secret. The
         # backend reads /run/secrets/gitea-token + /run/secrets/gitea-webhook-secret.
         "gitea-token" = "garnix-gitea-token.age";
@@ -399,6 +404,14 @@ in
           publicBucket = garnixData.b2.artifactsPublicBucket;
           privateBucket = garnixData.b2.artifactsPrivateBucket;
           publicBaseUrl = garnixData.b2.artifactsPublicBaseUrl;
+        };
+        # Server backups (garnix.yaml `servers[].backups:`): scheduled tar-over-SSH
+        # snapshots of a deployed guest's paths. Always private — there is no
+        # public bucket and no stable public URL, only presigned downloads.
+        # Host/region reuse the s3Cache values; the key pair comes from the two
+        # s3-backups-* agenix secrets above. Unset => feature off.
+        s3Backups = {
+          bucket = garnixData.b2.serverBackupsBucket;
         };
         # Phase 2 microVM hosting: branch deployments become local microVMs
         # (LocalProvisioner talks to garnix-provisionerd over this socket) at
@@ -763,6 +776,15 @@ in
           # repo access itself (public artifacts are anonymous by design).
           @artifacts path /api/artifacts/*
           handle @artifacts {
+            reverse_proxy 127.0.0.1:8321
+          }
+          # Server-backup downloads: same reason as artifacts — curl fetches with a
+          # garnix access token the proxy knows nothing about. Unlike artifacts,
+          # /api/backups is NEVER anonymous: the backend requires a session user or
+          # an api-scoped token with repo access on every route, and 404-shapes
+          # refusals. Safe to bypass the gate; not safe to skip that backend check.
+          @backups path /api/backups/*
+          handle @backups {
             reverse_proxy 127.0.0.1:8321
           }
           # Per-server resource stats: deployed microVM guests POST their
