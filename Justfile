@@ -701,7 +701,7 @@ nix-gc:
 # Read a value from the dotfiles-secrets input's domains.nix
 [private]
 _secret-domain key:
-    @nix eval --raw --impure --expr '(import "${(builtins.getFlake (toString ./.)).inputs.dotfiles-secrets}/domains.nix").{{ key }}'
+    @NIX_CONFIG="access-tokens = github.com=$(gh auth token)" nix eval --raw --impure --expr '(import "${(builtins.getFlake (toString ./.)).inputs.dotfiles-secrets}/domains.nix").{{ key }}'
 
 # Per-machine build durations, kept local (gitignored). Predictions are
 # per-host and read straight from this file; nothing to sync anywhere.
