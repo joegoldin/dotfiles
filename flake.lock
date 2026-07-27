@@ -1603,11 +1603,11 @@
         "treetop": "treetop"
       },
       "locked": {
-        "lastModified": 1785127713,
-        "narHash": "sha256-/YJ1QSw3sALkzBnLlvZHqLe3HRQNNve47+S1suUZNWo=",
+        "lastModified": 1785131031,
+        "narHash": "sha256-KnDObgQxOq6DCPT2fTPiIZbL1mi8/+Z9MmqCLlszv+4=",
         "owner": "joegoldin",
         "repo": "garnix-ci-selfhosted",
-        "rev": "c5a5283d96ed4f772e8d9d476d8ee82ebd722630",
+        "rev": "9f5d3c9ca862c649a694e671ffe0267b893663b2",
         "type": "github"
       },
       "original": {
