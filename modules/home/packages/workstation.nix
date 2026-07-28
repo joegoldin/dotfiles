@@ -84,6 +84,7 @@
         media = [
           unstable.ffmpeg
           ghostscript
+          unstable.sox
           timg
         ];
 
