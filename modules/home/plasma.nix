@@ -82,14 +82,45 @@ in
         Install.WantedBy = [ "graphical-session.target" ];
       };
 
-      # Force Electron/Chromium apps onto native Wayland so they obey the
-      # kwinrc Wayland.EnablePrimarySelection=false setting below instead of
-      # running through XWayland (which has its own PRIMARY selection that
-      # middle-click pastes from).
-      xdg.configFile."environment.d/10-ozone-wayland.conf".text = ''
-        NIXOS_OZONE_WL=1
-        ELECTRON_OZONE_PLATFORM_HINT=auto
-      '';
+      # Keep the Task Manager alive across an in-session plasmashell restart.
+      #
+      # KWin gates its privileged Wayland interfaces - among them
+      # org_kde_plasma_window_management, which is the *only* source of the
+      # Task Manager's window list - on the connecting client's .desktop file:
+      # it looks the file up, matches that file's Exec= against
+      # /proc/<pid>/exe, and only on a match reads X-KDE-Wayland-Interfaces.
+      #
+      # KWin is long-lived and keeps the XDG_DATA_DIRS it was started with,
+      # whose first entry is a *version-pinned* store path
+      # (/nix/store/<hash>-plasma-workspace-<version>/share). The moment a
+      # rebuild bumps plasma-workspace, that stale entry still wins the lookup
+      # for org.kde.plasmashell.desktop, so KWin compares the old file's Exec=
+      # against a plasmashell running from the new store path, finds no match,
+      # and denies the interface. Every plasmashell restart for the rest of
+      # that session then comes up with a permanently empty Task Manager
+      # ("The PlasmaWindowManagement protocol hasn't activated in time"),
+      # recoverable only by logging out. That is what promotes the unlock
+      # crash in KDE bug 507691 (kde_output_device_v2 going away with the DP
+      # link on monitor wake; fixed upstream in Plasma 6.7.0, not backported)
+      # from a two-second self-healing blip into a dead taskbar all day.
+      #
+      # XDG_DATA_HOME is searched ahead of every XDG_DATA_DIRS entry and is not
+      # version-pinned, so shipping the current generation's copy of the file
+      # here makes even a stale KWin resolve an Exec= that matches the running
+      # binary. The file is NoDisplay=true, so it stays out of app launchers.
+      xdg = {
+        dataFile."applications/org.kde.plasmashell.desktop".source =
+          "${pkgs.kdePackages.plasma-workspace}/share/applications/org.kde.plasmashell.desktop";
+
+        # Force Electron/Chromium apps onto native Wayland so they obey the
+        # kwinrc Wayland.EnablePrimarySelection=false setting below instead of
+        # running through XWayland (which has its own PRIMARY selection that
+        # middle-click pastes from).
+        configFile."environment.d/10-ozone-wayland.conf".text = ''
+          NIXOS_OZONE_WL=1
+          ELECTRON_OZONE_PLATFORM_HINT=auto
+        '';
+      };
 
       # GTK middle-click paste (gtk-enable-primary-paste) defaults to true and is
       # read from ~/.config/gtk-{3,4}.0/settings.ini, which kde-gtk-config owns.
@@ -104,6 +135,18 @@ in
           done
         '';
 
+        # KSycoca is what KWin's .desktop lookup above actually reads, and it is
+        # keyed by a hash of XDG_DATA_DIRS - so a running KWin consults the cache
+        # built for its own (stale) dirs list. KDirWatch would pick the new
+        # dataFile up on its own eventually; rebuilding here makes it effective
+        # immediately, before applyPlasmaManager restarts plasmashell below and
+        # the new instance has to be authorised. Best-effort: when a rebuild is
+        # driven from a TTY or over SSH the ambient XDG_DATA_DIRS won't match the
+        # session's, and this becomes a no-op rather than a failure.
+        rebuildKsycoca = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          run ${pkgs.kdePackages.kservice}/bin/kbuildsycoca6 --noincremental || true
+        '';
+
         # Apply plasma-manager's panel/desktop scripts on `nixos-rebuild` instead of
         # only at the next login. plasma-manager wires run_all.sh to a login autostart,
         # so a rebuild alone leaves the running session on the old panels. run_all.sh
@@ -111,7 +154,7 @@ in
         # and the panels script restarts plasmashell when it re-applies. We run it only
         # when a live Plasma session is reachable on the bus; otherwise it's a no-op
         # and the normal login autostart applies the changes.
-        applyPlasmaManager = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        applyPlasmaManager = lib.hm.dag.entryAfter [ "writeBoundary" "rebuildKsycoca" ] ''
           export XDG_RUNTIME_DIR="''${XDG_RUNTIME_DIR:-/run/user/$(${pkgs.coreutils}/bin/id -u)}"
           export DBUS_SESSION_BUS_ADDRESS="''${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus}"
           export PATH="${
