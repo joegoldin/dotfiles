@@ -321,10 +321,7 @@ from `${inputs.dotfiles-secrets}/...`.
 **New flake input**: add to `flake.nix`, then reference it only inside
 the one aspect that owns it.
 
-**Update inputs & packages**: `just flake-update` bumps `flake.lock` and,
-when `zen-src` moves the Firefox base, auto-refreshes the Zen source-hash pin
-(`modules/home/zen/_firefox-src.nix`) so the build can't die on a fixed-output
-hash mismatch — the zen aspect overrides the FF `src` with it. `just
+**Update inputs & packages**: `just flake-update` bumps `flake.lock`. `just
 update-pkgs [names]` bumps the custom `modules/flake/_pkgs` via `nix-update`
 (forks/hardware libs stay pinned; the auto list lives in the recipe). `just
 update-python-packages` bumps the custom PyPI set
@@ -365,10 +362,8 @@ separate repo (`github.com/joegoldin/scarab`), not here.
   `mkDefault` a list, any plain definition replaces it instead of
   merging; that is why the account base is plain and scalars like
   `home.username` are `mkDefault`.
-- Updates are deliberate: flake.lock is the near-only pin (documented
-  exceptions: one in flake.nix, and `modules/home/zen/_firefox-src.nix` —
-  the Zen/Firefox base source hash, which `just flake-update` auto-refreshes
-  when zen-src bumps the FF base). `just flake-update` moves everything;
+- Updates are deliberate: flake.lock is the near-only pin (one documented
+  exception, in flake.nix). `just flake-update` moves everything;
   verify with a closure diff (`nvd diff`) against the previous generation
   before switching.
 - darwin from linux evaluates only until agent-skills needs an

@@ -28,7 +28,16 @@ in
       }) containerCfg.containers;
 
       # Zen Space Routing rules, seeded declaratively via the
-      # zen.space-routing.managed-routes pref (read by ZenSpaceRoutingManager).
+      # zen.space-routing.managed-routes pref (read by ZenSpaceRoutingManager, a
+      # custom component in the zen-src fork). This is a DIFFERENT mechanism from
+      # zen-browser-flake's own `profiles.<name>.spaces` / `.spaceRouting.routes`
+      # / `.pins` options, which upsert entries directly into the real
+      # zen-sessions.jsonlz4 / zen-space-routing.jsonlz4 state files via
+      # activation-time jq scripts — that's how upstream/vanilla Zen actually
+      # persists spaces, and our fork's pref-seeding predates/bypasses it.
+      # Deliberately NOT adopted here: switching would change the underlying
+      # mechanism (and interacts with ZenManagedSpaces in ways we haven't
+      # verified), so we keep writing the raw prefs below exactly as before.
       # Each former Containerise `{ host, container }` rule becomes a route that
       # sends the host to the Space named after that container; because every Space
       # carries its own default container, this preserves the old cookie-jar
@@ -58,43 +67,55 @@ in
       ) containerCfg.rules;
 
       inherit (pkgs.stdenv.hostPlatform) isDarwin;
+
+      # Zen Browser (Firefox fork) with tree-style tabs, built from source via
+      # buildMozillaMach. The `zen-src` input tracks that fork's dev branch,
+      # which also pins the Firefox base source it patches.
+      zenBrowser = inputs.zen-src.packages.${pkgs.stdenv.hostPlatform.system}.zen-browser-unwrapped;
     in
     {
-      programs.firefox = {
+      # 0xc000022070/zen-browser-flake's home-manager module: same
+      # mkFirefoxModule.nix machinery as programs.firefox (profiles, policies,
+      # containers, search, extensions keep the same shapes), plus Zen-specific
+      # extras (sine mods, declarative spaces/pins, keyboard shortcuts, …) that
+      # we deliberately do NOT opt into below — see the notes next to
+      # `configPath`/`icon`/`darwin.packageMode` and the report this port shipped
+      # with. `homeModules.beta` (== `.default`) is just a factory functor here;
+      # its "beta" variant naming only leaks into inert defaults we override
+      # (icon) or never touch (setAsDefaultBrowser, package.nix's own prebuilt
+      # `sources.json` packages — both bypassed by `unwrappedPackage` below).
+      imports = [ inputs.zen-browser-flake.homeModules.beta ];
+
+      programs.zen-browser = {
         enable = true;
-        # Zen Browser (Firefox fork), built from source from the joegoldin fork
-        # (incl. the tree-style-tabs feature, PR #6) via buildMozillaMach; see the
-        # `zen-src` flake input. We wrap the *unwrapped* package with nixpkgs' own
-        # wrapFirefox so that home-manager's `package.override { extraPolicies }`
-        # (mkFirefoxModule.nix) actually threads our policies into policies.json.
-        package =
-          let
-            zenUnwrapped = inputs.zen-src.packages.${pkgs.stdenv.hostPlatform.system}.zen-browser-unwrapped;
-            # Firefox base version the current nightly targets.
-            ffVersion = (builtins.fromJSON (builtins.readFile "${inputs.zen-src}/surfer.json")).version.version;
-            # Locally maintained source-hash pin (see _firefox-src.nix). zen-src's
-            # own hash can lag when upstream bumps the FF base, failing the build
-            # with a fixed-output hash mismatch; when our pin matches the base the
-            # nightly targets, swap in the correct source. `just flake-update`
-            # refreshes the pin whenever zen updates, so a mismatch here just means
-            # "run just flake-update" — we fall back to zen-src's own source then.
-            ffPin = import ./_firefox-src.nix;
-            zenBrowser =
-              if ffPin.version == ffVersion then
-                zenUnwrapped.overrideAttrs (_: {
-                  src = pkgs.fetchurl {
-                    url = "mirror://mozilla/firefox/releases/${ffVersion}/source/firefox-${ffVersion}.source.tar.xz";
-                    hash = ffPin.sha512;
-                  };
-                })
-              else
-                zenUnwrapped;
-          in
-          pkgs.wrapFirefox zenBrowser { };
+        # Bring our own source build instead of the flake's prebuilt
+        # beta/twilight/twilight-official variants: when this is set, the
+        # module wraps it with wrapFirefox itself (nixpkgs.wrapFirefox is no
+        # longer called directly here) and its own sources.json is never
+        # touched.
+        unwrappedPackage = zenBrowser;
+        # The module's `icon` default is derived from the variant name
+        # ("zen-browser" for beta, "zen-${name}" otherwise) — neither matches
+        # our build's actual icon file, which nixpkgs' wrapFirefox names after
+        # `browser.binaryName` ("zen", set in nix/package.nix of the zen-src
+        # fork). The module also asserts `icon == null` on Darwin (only Linux
+        # is supported there), so this must stay unset on macOS.
+        icon = if isDarwin then null else "zen";
+        # Preserve the current cross-platform behavior: wrapFirefox always runs
+        # (policies, extraPrefs, etc. get baked into the wrapped app), rather
+        # than the module's own default of installing the untouched, unwrapped
+        # .app on Darwin ("signed" mode) and delivering policies via
+        # `targets.darwin.defaults` instead. Keeping "wrapped" here is what
+        # makes the 1Password re-signing activation script below still make
+        # sense: it re-signs a wrapped (and therefore already-unsigned) copy.
+        darwin.packageMode = "wrapped";
         # Zen's real profile root: ~/.zen on Linux, ~/Library/Application Support/zen
         # on macOS (source: surfer.json appId="zen" + MOZ_LEGACY_PROFILES=1). Not
-        # ~/.mozilla/firefox. profiles.Default lands in <configPath>/Default/ on
-        # Linux but <configPath>/Profiles/Default/ on macOS (home-manager's
+        # ~/.mozilla/firefox, and NOT the module's own Linux default of
+        # ~/.config/zen (that default targets the flake's own repackaged
+        # variants, which don't share our fork's legacy-profile layout).
+        # profiles.Default lands in <configPath>/Default/ on Linux but
+        # <configPath>/Profiles/Default/ on macOS (home-manager's
         # mkFirefoxModule nests profiles under Profiles/ on darwin).
         configPath = if isDarwin then "Library/Application Support/zen" else ".zen";
         # Refer to https://mozilla.github.io/policy-templates or `about:policies#documentation` in firefox

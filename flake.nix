@@ -30,14 +30,30 @@
     # Also see the 'unstable-packages' overlay at 'overlays/default.nix'.
     nixpkgs-darwin.url = "github:nixos/nixpkgs/nixpkgs-26.05-darwin";
 
-    # Zen built from source via buildMozillaMach. Points at the fork's `nightly`
-    # branch ("dev as if all my open PRs were merged"), rebuilt by the
-    # nightly-integration GitHub Action (dev + every conflict-free PR). Pinned
-    # in flake.lock; bump with `nix flake update zen-src` when you want the
-    # latest nightly. Intentionally pins its OWN nixpkgs (matched to the fork's
-    # Firefox version) rather than following ours, so a system nixpkgs bump can't
-    # drift the Firefox base out from under buildMozillaMach's patches.
-    zen-src.url = "github:joegoldin/zen-browser-desktop/nightly";
+    # Zen built from source via buildMozillaMach. Points at the fork's `dev`,
+    # which is now the product branch: upstream Zen plus the tree-style-tabs
+    # work that upstream declined, merged in rather than staged on a generated
+    # branch. (This used to track `nightly`, rebuilt by a GitHub Action; that
+    # branch is gone and dev carries the same content.) Pinned in flake.lock;
+    # bump with `nix flake update zen-src`. Intentionally pins its OWN nixpkgs
+    # (matched to the fork's Firefox version) rather than following ours, so a
+    # system nixpkgs bump can't drift the Firefox base out from under
+    # buildMozillaMach's patches.
+    zen-src.url = "github:joegoldin/zen-browser-desktop/dev";
+
+    # Community-maintained home-manager module for Zen Browser (profiles,
+    # policies, containers, search, sine mods, … via the same
+    # mkFirefoxModule.nix machinery home-manager's own programs.firefox uses).
+    # We bring our own Zen build via programs.zen-browser.unwrappedPackage
+    # (see zen-src above) instead of the flake's prebuilt beta/twilight
+    # variants, so this is only along for its option surface + activation
+    # scripts. Both follows avoid a second nixpkgs/home-manager closure for
+    # what is otherwise a thin module layer.
+    zen-browser-flake = {
+      url = "github:0xc000022070/zen-browser-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
 
     # ClearURLs built from the fork's `patched` branch (upstream master + PR
     # #514 fixing the padded-hash-fragment bug that breaks Claude/OpenAI magic

@@ -609,38 +609,15 @@ lint:
     @nix --extra-experimental-features 'nix-command flakes' fmt
     @echo "✅  Nix config linted!"
 
-# Update every flake input (the lock is the only pin). If zen-src changed and it
-# now targets a different Firefox base, refresh the local FF source-hash pin
-# (modules/home/zen/_firefox-src.nix) so the build can't die on a stale hash.
+# Update every flake input (the lock is the only pin).
 [unix]
 flake-update:
     #!/usr/bin/env bash
     set -euo pipefail
     nixflags=(--extra-experimental-features 'nix-command flakes')
     echo "🔄  Updating flake..."
-    before=$(jq -r '.nodes."zen-src".locked.rev // ""' flake.lock 2>/dev/null || echo "")
     nix "${nixflags[@]}" flake update --option access-tokens "github.com=$(gh auth token 2>/dev/null || echo '')"
-    after=$(jq -r '.nodes."zen-src".locked.rev // ""' flake.lock 2>/dev/null || echo "")
     echo "✅  Flake updated!"
-    if [[ "$before" != "$after" ]]; then
-      echo "🦊  zen-src changed; checking Firefox base…"
-      ffVer=$(nix "${nixflags[@]}" eval --raw --impure \
-        --expr '(builtins.fromJSON (builtins.readFile "${(builtins.getFlake (toString ./.)).inputs.zen-src}/surfer.json")).version.version')
-      pinVer=$(nix "${nixflags[@]}" eval --raw --impure \
-        --expr '(import ./modules/home/zen/_firefox-src.nix).version' 2>/dev/null || echo "")
-      if [[ "$ffVer" != "$pinVer" ]]; then
-        echo "🦊  Firefox base ${pinVer:-none} → $ffVer; refreshing source-hash pin…"
-        url="https://archive.mozilla.org/pub/firefox/releases/$ffVer/source/firefox-$ffVer.source.tar.xz"
-        hash=$(nix "${nixflags[@]}" store prefetch-file --hash-type sha512 --json "$url" | jq -r .hash)
-        sed -i \
-          -e "s|version = \".*\";|version = \"$ffVer\";|" \
-          -e "s|sha512 = \".*\";|sha512 = \"$hash\";|" \
-          modules/home/zen/_firefox-src.nix
-        echo "✅  Pinned Firefox $ffVer source hash."
-      else
-        echo "✅  Firefox base unchanged ($ffVer); pin already current."
-      fi
-    fi
 
 # Bump custom flake packages (modules/flake/_pkgs) to latest upstream + refresh
 # hashes via nix-update. No args = the curated AUTO list; pass names to target
