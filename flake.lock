@@ -4015,11 +4015,11 @@
         "nixpkgs-newer": "nixpkgs-newer"
       },
       "locked": {
-        "lastModified": 1785286723,
-        "narHash": "sha256-GWFNKoOPr2cr58i4PI/S0G2ZdK6I8SJzhMrRglu/h0o=",
+        "lastModified": 1785308183,
+        "narHash": "sha256-xW6bY9gswjZnoVX8OnEJf/eJmwiCK1WtcFhQ03u5Uac=",
         "owner": "joegoldin",
         "repo": "zen-browser-desktop",
-        "rev": "f306adc8eb197969388527ea05512761a4e35be5",
+        "rev": "80ca88dad541c69b3643b0576a78605a455ee569",
         "type": "github"
       },
       "original": {
