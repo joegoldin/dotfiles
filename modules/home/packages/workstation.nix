@@ -84,7 +84,9 @@
         media = [
           unstable.ffmpeg
           ghostscript
-          unstable.sox
+          # lowPrio so audiomemo wins the bin/rec collision (its flake symlinks
+          # rec -> audiomemo); sox's play/soxi/sox are unaffected.
+          (lib.lowPrio unstable.sox)
           timg
         ];
 
