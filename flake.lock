@@ -1603,11 +1603,11 @@
         "treetop": "treetop"
       },
       "locked": {
-        "lastModified": 1785191310,
-        "narHash": "sha256-tD/QPcAmTs00BK7JDtUo5WR6IRJDBf93TfBHQ4tK+94=",
+        "lastModified": 1785285595,
+        "narHash": "sha256-ISDmw6Kd5KhWujbL5pDqSz7ZCYJqvE0Rla6fpt6Xvyw=",
         "owner": "joegoldin",
         "repo": "garnix-ci-selfhosted",
-        "rev": "af01fedec7123a06e99a15da3ae81719f96e39d1",
+        "rev": "04670aa58c7478582468063fcfe634829c8af1af",
         "type": "github"
       },
       "original": {
@@ -2734,6 +2734,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-newer": {
+      "locked": {
+        "lastModified": 1784783405,
+        "narHash": "sha256-4IHyyLgLBdKefkljdKod4IMn023pQiDXAWJA187cmdY=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "7525d999cd850b9a488817abc89c75dc733acf17",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "7525d999cd850b9a488817abc89c75dc733acf17",
+        "type": "github"
+      }
+    },
     "nixpkgs-python": {
       "inputs": {
         "flake-compat": "flake-compat_11",
@@ -3289,6 +3305,7 @@
         "virby": "virby",
         "zed-editor": "zed-editor",
         "zed-nix-ext": "zed-nix-ext",
+        "zen-browser-flake": "zen-browser-flake",
         "zen-src": "zen-src"
       }
     },
@@ -3969,21 +3986,45 @@
         "type": "github"
       }
     },
-    "zen-src": {
+    "zen-browser-flake": {
       "inputs": {
-        "nixpkgs": "nixpkgs_16"
+        "home-manager": [
+          "home-manager"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
       },
       "locked": {
-        "lastModified": 1784367209,
-        "narHash": "sha256-xLQW2+wff1Erl02wggFfL5g+2idAkaJtFh3vdrgQwCc=",
+        "lastModified": 1785224333,
+        "narHash": "sha256-8DNJUVM10ktK02V9ZIV064CH+fuPF272VCAZBn6arig=",
+        "owner": "0xc000022070",
+        "repo": "zen-browser-flake",
+        "rev": "5f1a4be4d280e1ae06d61a75775a234b1714da3f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "0xc000022070",
+        "repo": "zen-browser-flake",
+        "type": "github"
+      }
+    },
+    "zen-src": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_16",
+        "nixpkgs-newer": "nixpkgs-newer"
+      },
+      "locked": {
+        "lastModified": 1785286723,
+        "narHash": "sha256-GWFNKoOPr2cr58i4PI/S0G2ZdK6I8SJzhMrRglu/h0o=",
         "owner": "joegoldin",
         "repo": "zen-browser-desktop",
-        "rev": "5059e7bcc80a05a636ea3bdbbec40b03181caab1",
+        "rev": "f306adc8eb197969388527ea05512761a4e35be5",
         "type": "github"
       },
       "original": {
         "owner": "joegoldin",
-        "ref": "nightly",
+        "ref": "dev",
         "repo": "zen-browser-desktop",
         "type": "github"
       }
