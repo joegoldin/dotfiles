@@ -1822,6 +1822,26 @@
         "type": "github"
       }
     },
+    "ha-compose": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1785339076,
+        "narHash": "sha256-osaH36e40mfJHjO0Sbt2+ew/93jjQryt4x3FplxqPMI=",
+        "ref": "refs/heads/main",
+        "rev": "54af2c4c5b6ccd85f6ce97571945a184f481a57a",
+        "revCount": 28,
+        "type": "git",
+        "url": "ssh://git@github.com/joegoldin/ha-compose"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/joegoldin/ha-compose"
+      }
+    },
     "haumea": {
       "inputs": {
         "nixpkgs": [
@@ -3278,6 +3298,7 @@
         "garnix-ci": "garnix-ci",
         "ghostty": "ghostty_2",
         "git-hooks": "git-hooks_3",
+        "ha-compose": "ha-compose",
         "home-manager": "home-manager_3",
         "homebrew-bundle": "homebrew-bundle",
         "homebrew-cask": "homebrew-cask",

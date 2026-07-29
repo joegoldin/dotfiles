@@ -126,6 +126,18 @@
       url = "github:joegoldin/crawler";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Home Assistant custom integration: composes a virtual device from entities
+    # you already have (an action bound to a power-meter state source).
+    # Bind-mounted into melina's HA container by containers.nix.
+    #
+    # git+ssh, not the `github:` shorthand the other inputs use: that resolves
+    # through api.github.com, which 404s on private repos here (the configured
+    # access-token doesn't reach them — `crawler` only works because it is
+    # already pinned and in the store). ssh uses the same key as `git push`.
+    ha-compose = {
+      url = "git+ssh://git@github.com/joegoldin/ha-compose";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # ── Server services ────────────────────────────────────────────────────
     # binary cache server

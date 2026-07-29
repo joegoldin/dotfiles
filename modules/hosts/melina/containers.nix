@@ -26,6 +26,11 @@
             environment.TZ = "America/Los_Angeles";
             volumes = [
               "/var/lib/homeassistant:/config"
+              # ha-compose, mounted read-only straight from the store rather than
+              # installed via HACS, so an update can't silently overwrite it. The
+              # store path changes on every bump, which restarts the container —
+              # that's the intended reload.
+              "${inputs.ha-compose}/custom_components/ha_compose:/config/custom_components/ha_compose:ro"
               "/run/dbus:/run/dbus:ro"
             ];
             extraOptions = [
