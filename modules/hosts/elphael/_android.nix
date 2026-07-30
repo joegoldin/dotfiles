@@ -7,7 +7,7 @@ let
         "35"
         "36"
       ];
-      buildToolsVersions = [ "35.0.0" ];
+      buildToolsVersions = [ "36.0.0" ];
       includeEmulator = true;
       includeSystemImages = true;
       systemImageTypes = [ "google_apis_playstore" ];
@@ -17,7 +17,7 @@ let
 in
 {
   home.packages = [
-    unstable.androidStudioPackages.dev
+    (unstable.androidStudioPackages.dev.withSdk androidSdk)
     androidSdk
     unstable.android-tools
   ];
