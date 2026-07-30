@@ -32,6 +32,7 @@ in
         })
         adwaita-icon-theme
         unstable.cockatrice
+        unstable.rusty-path-of-building
         # wowup-cf  # disabled: upstream download fails with TLS handshake error
         unstable.vintagestory
       ];
