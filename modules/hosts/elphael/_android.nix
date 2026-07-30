@@ -17,7 +17,7 @@ let
 in
 {
   home.packages = [
-    (unstable.android-studio.withSdk androidSdk)
+    (unstable.androidStudioPackages.dev.withSdk androidSdk)
     androidSdk
     unstable.android-tools
   ];
