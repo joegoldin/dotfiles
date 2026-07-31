@@ -47,6 +47,21 @@ in
         ];
       };
 
+      # mDNS so `melina.local` resolves from other hosts on the LAN (HA's UI,
+      # etc.) — melina's static IP means the router never offers it as a DHCP
+      # hostname, and without a responder nothing answers mDNS queries even
+      # though 5353/udp is open (see containers.nix). Same publish-only
+      # pattern as scarab/net.nix.
+      services.avahi = {
+        enable = true;
+        openFirewall = true;
+        publish = {
+          enable = true;
+          addresses = true;
+          workstation = true;
+        };
+      };
+
       services.tailscale = {
         enable = true;
         useRoutingFeatures = "client";

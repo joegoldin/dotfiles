@@ -52,6 +52,17 @@ in
       };
 
       services = {
+        # mDNS so `volcano-manor.local` resolves from other hosts on the LAN.
+        avahi = {
+          enable = true;
+          openFirewall = true;
+          publish = {
+            enable = true;
+            addresses = true;
+            workstation = true;
+          };
+        };
+
         displayManager = {
           sddm.enable = true;
           autoLogin = {
