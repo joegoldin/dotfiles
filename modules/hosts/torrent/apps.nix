@@ -36,6 +36,7 @@
         AppleDeveloper = 640199958;
         DavinciResolve = 571213070;
         Infuse = 1136220934;
+        Dongled = 6465788521;
       };
     };
   };
