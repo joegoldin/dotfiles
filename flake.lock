@@ -1829,11 +1829,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785389050,
-        "narHash": "sha256-j2L3YtB03BtldWojyK3sn+I6k59msaiZykaIH3IlVVg=",
+        "lastModified": 1785566859,
+        "narHash": "sha256-Upq3FOqXADsRQiguQ5HLA1YHmkCgBJOgnI+bOtdaIvs=",
         "ref": "refs/heads/main",
-        "rev": "965f700d88b63a07b1819e90520325fffb1f2db5",
-        "revCount": 34,
+        "rev": "f36990960818232bc3c111959f8d9f39ee2b0f89",
+        "revCount": 43,
         "type": "git",
         "url": "ssh://git@github.com/joegoldin/ha-compose"
       },
