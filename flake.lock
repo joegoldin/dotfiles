@@ -4036,11 +4036,11 @@
         "nixpkgs-newer": "nixpkgs-newer"
       },
       "locked": {
-        "lastModified": 1785308183,
-        "narHash": "sha256-xW6bY9gswjZnoVX8OnEJf/eJmwiCK1WtcFhQ03u5Uac=",
+        "lastModified": 1785563788,
+        "narHash": "sha256-2nnJHE4T0gnHK8XtVVLASyUfrzgSZNp/ocpiM/TXfuw=",
         "owner": "joegoldin",
         "repo": "zen-browser-desktop",
-        "rev": "80ca88dad541c69b3643b0576a78605a455ee569",
+        "rev": "6877fafcd0a3700059082e53dbcb1ef12bc99e2a",
         "type": "github"
       },
       "original": {
