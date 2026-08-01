@@ -10,8 +10,7 @@
       # Pinned by-id, never /dev/ttyUSB0: the bare name renumbers on reboot or
       # when a second USB-serial device appears — and a second one is planned
       # (a Thread/OpenThread stick), so ttyUSB0 would become ambiguous.
-      zigbeeDongle =
-        "/dev/serial/by-id/usb-SONOFF_SONOFF_Dongle_Plus_MG24_1eda3ba1c0f5ef118b9697a29ed47d52-if00-port0";
+      zigbeeDongle = "/dev/serial/by-id/usb-SONOFF_SONOFF_Dongle_Plus_MG24_1eda3ba1c0f5ef118b9697a29ed47d52-if00-port0";
     in
     {
       # Data dir HA bind-mounts (restored from the Ubuntu backup). Container procs
@@ -86,6 +85,18 @@
         allowedUDPPorts = [
           5353 # mDNS (local device discovery)
           1900 # SSDP (UPnP/DLNA discovery)
+        ];
+        # HomeKit pairing (HAP) needs its TCP port reachable, not just mDNS —
+        # discovery worked without this but pairing failed with "unable to add
+        # accessory". HA's HomeKit Bridge integration assigns each bridge a port
+        # starting at 21063 and increments per bridge; accessory-mode entities
+        # (cameras, locks, TVs, etc. that can't be bridged) each get their own
+        # bridge too, so this is a range with headroom rather than exact ports.
+        allowedTCPPortRanges = [
+          {
+            from = 21063;
+            to = 21099;
+          }
         ];
       };
     };
