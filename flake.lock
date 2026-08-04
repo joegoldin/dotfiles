@@ -1829,11 +1829,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785614959,
-        "narHash": "sha256-CU/xF46SD7wIPV11OTuqEoH1GvVtJ8VQOzvdXZClstk=",
+        "lastModified": 1785861615,
+        "narHash": "sha256-PJRYPA6n9i+A4Z4eUwQ3+KXnMbF8ZB6hxmhV7dETYo8=",
         "ref": "refs/heads/main",
-        "rev": "47629176324d13ba8843f633da4da849e45b4656",
-        "revCount": 49,
+        "rev": "eaf571a0197c97c2ff0320179dde2d956ba98a08",
+        "revCount": 50,
         "type": "git",
         "url": "ssh://git@github.com/joegoldin/ha-compose"
       },
@@ -4036,11 +4036,11 @@
         "nixpkgs-newer": "nixpkgs-newer"
       },
       "locked": {
-        "lastModified": 1785563788,
-        "narHash": "sha256-2nnJHE4T0gnHK8XtVVLASyUfrzgSZNp/ocpiM/TXfuw=",
+        "lastModified": 1785783622,
+        "narHash": "sha256-NZ/x+MUBD92RPLVxRke3WWjOGcmN3Ez44gXXEHRoZpo=",
         "owner": "joegoldin",
         "repo": "zen-browser-desktop",
-        "rev": "6877fafcd0a3700059082e53dbcb1ef12bc99e2a",
+        "rev": "f2159b0c5496fede10392ef26101cf59a94ab425",
         "type": "github"
       },
       "original": {
