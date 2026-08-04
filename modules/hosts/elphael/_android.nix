@@ -4,10 +4,13 @@ let
   androidSdk =
     (unstable.androidenv.composeAndroidPackages {
       platformVersions = [
-        "35"
         "36"
+        "37"
       ];
-      buildToolsVersions = [ "36.0.0" ];
+      buildToolsVersions = [
+        "36.0.0"
+        "37.0.0"
+      ];
       includeEmulator = true;
       includeSystemImages = true;
       systemImageTypes = [ "google_apis_playstore" ];
