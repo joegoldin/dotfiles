@@ -25,8 +25,6 @@ in
       nix.settings.max-jobs = 3;
       nix.settings.cores = 6;
 
-      # TODO: Add litra-autotoggle as a service to systemd
-
       # ssh with 1password
       environment.plasma6.excludePackages = with pkgs.kdePackages; [
         discover

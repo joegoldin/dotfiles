@@ -9,16 +9,6 @@ in
   den.aspects.elphael.nixos =
     { lib, pkgs, ... }:
     let
-      litra-rules = pkgs.writeTextFile {
-        name = "99-litra.rules";
-        text = ''
-          SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c900", GROUP="video", MODE="0660"
-          SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c901", GROUP="video", MODE="0660"
-          SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="b901", GROUP="video", MODE="0660"
-          SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c903", GROUP="video", MODE="0660"
-        '';
-        destination = "/etc/udev/rules.d/99-litra.rules";
-      };
       streamcontroller-rules = pkgs.writeTextFile {
         name = "99-streamcontroller-osplugin.rules";
         text = ''
@@ -130,7 +120,7 @@ in
       services.resolved.enable = true;
 
       services.udev.packages = [
-        litra-rules
+        # Litra hidraw rules ship with pkgs.litra; see ./litra.nix.
         streamcontroller-rules
         (import ../../system/_streamcontroller.nix { inherit pkgs; }).package
         vial-rules

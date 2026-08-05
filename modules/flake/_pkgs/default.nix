@@ -68,6 +68,10 @@ pkgs: {
     '';
   };
 
+  litra = pkgs.callPackage ./litra.nix { };
+
+  litra-autotoggle = pkgs.callPackage ./litra-autotoggle.nix { };
+
   lotion = pkgs.callPackage ./lotion { };
 
   mkWindowsApp = pkgs.callPackage ./mkwindowsapp { };

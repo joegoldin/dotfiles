@@ -19,8 +19,6 @@ let
       gcc15
       glibc
       unstable.jdk25_headless
-      # cargoModule.packages.litra
-      # cargoModule.packages.litra-autotoggle
       libgcc
       reptyr
       rocmPackages.rocm-smi
