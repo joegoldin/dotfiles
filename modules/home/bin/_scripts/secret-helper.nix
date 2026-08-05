@@ -1,7 +1,8 @@
+{ pkgs }:
 {
   name = "secret-helper";
-  desc = "Manage agenix secrets (add/edit/remove/decrypt/rekey/list)";
-  usage = "secret-helper <command> [name]";
+  desc = "Manage agenix secrets, and age-encrypt any file with the same identity";
+  usage = "secret-helper <command> [args]";
   examples = [
     {
       cmd = "secret-helper add my_api_key";
@@ -11,8 +12,27 @@
       cmd = "secret-helper rekey";
       desc = "Re-encrypt all secrets after key changes";
     }
+    {
+      cmd = "secret-helper encrypt-file .env";
+      desc = "Encrypt any file on disk to .env.age";
+    }
+    {
+      cmd = "secret-helper decrypt-file .env.age .env";
+      desc = "Decrypt any .age file back";
+    }
   ];
   hostOnly = true;
+  # age does the arbitrary-file work; agenix only knows about $SECRETS_DIR.
+  # openssh gives us ssh-keygen -y to turn the identity into a recipient.
+  runtimeInputs = [
+    pkgs.age
+    pkgs.openssh
+  ];
+  # The identity is a real private key on disk for the duration of the command,
+  # so remove it on every exit path rather than only on success.
+  beforeExit = ''
+    rm -f "''${IDENTITY_KEYFILE:-}" "''${RECIPIENT_FILE:-}" 2>/dev/null || true
+  '';
   bash = ''
     set -euo pipefail
 
@@ -39,9 +59,9 @@
     source "$SECRETS_DIR/identity.sh"
 
     usage() {
-      echo "Usage: secret-helper <command> <secret-name>"
+      echo "Usage: secret-helper <command> [args]"
       echo ""
-      echo "Commands:"
+      echo "Managed secrets (live in \$SECRETS_DIR, tracked in secrets.nix):"
       echo "  add    <name>   Create a new secret (adds to secrets.nix + encrypts)"
       echo "  edit   <name>   Edit an existing secret"
       echo "  remove <name>   Remove a secret (deletes .age file + removes from secrets.nix)"
@@ -49,10 +69,20 @@
       echo "  rekey           Re-encrypt all secrets (after changing keys in secrets.nix)"
       echo "  list            List all secrets"
       echo ""
+      echo "Loose files (anywhere on disk, not tracked in secrets.nix):"
+      echo "  encrypt-file <in> [out]   Encrypt any file (default out: <in>.age)"
+      echo "  decrypt-file <in> [out]   Decrypt any .age file (default out: stdout)"
+      echo "  recipient                 Print the age recipient for your identity"
+      echo ""
+      echo "Both groups authenticate with the same identity from"
+      echo "\$SECRETS_DIR/identity.sh, so a 1Password-backed key works for both."
+      echo ""
       echo "Examples:"
       echo "  $0 add my_api_key"
       echo "  $0 edit atuin_key"
       echo "  $0 remove old_secret"
+      echo "  $0 encrypt-file ~/work/repo/scripts/.env"
+      echo "  $0 decrypt-file ~/work/repo/scripts/.env.age ~/work/repo/scripts/.env"
       exit 1
     }
 
@@ -63,12 +93,26 @@
       echo "''${name}.age"
     }
 
-    identity_args() {
-      local keyfile
-      keyfile=$(mktemp)
-      trap "rm -f '$keyfile'" EXIT
-      eval "$IDENTITY_CMD" > "$keyfile"
-      echo "$keyfile"
+    # Materialise the private key to a 0600 temp file and record the path so the
+    # exit trap can remove it even if age/agenix fails partway.
+    #
+    # These set globals rather than echoing the path: a caller writing
+    # `f=$(mk_identity_file)` would run the body in a subshell, the parent's
+    # global would stay empty, and the trap would clean up nothing — leaving the
+    # private key in /tmp for the rest of the boot.
+    mk_identity_file() {
+      IDENTITY_KEYFILE=$(mktemp)
+      chmod 600 "$IDENTITY_KEYFILE"
+      eval "$IDENTITY_CMD" > "$IDENTITY_KEYFILE"
+    }
+
+    # age accepts an SSH public key as a recipient, so the identity is the only
+    # thing needed to encrypt as well as decrypt — no separate recipient list,
+    # and anything encrypted this way opens on any machine that can reach the
+    # same 1Password item.
+    mk_recipient_file() {
+      RECIPIENT_FILE=$(mktemp)
+      ssh-keygen -y -f "$IDENTITY_KEYFILE" > "$RECIPIENT_FILE"
     }
 
     cmd_list() {
@@ -160,6 +204,58 @@
       echo "Decrypted $name -> $output"
     }
 
+    # --- Loose files -------------------------------------------------------
+    # agenix resolves paths against the secrets.nix in its working directory,
+    # so it cannot touch a file sitting in some unrelated repo. These call age
+    # directly with the same identity, which keeps one auth path (1Password)
+    # for both kinds of secret.
+
+    cmd_encrypt_file() {
+      local input="$1"
+      local output="''${2:-$1.age}"
+
+      [ -f "$input" ] || { echo "Error: $input does not exist"; exit 1; }
+      if [ -e "$output" ]; then
+        read -rp "$output exists. Overwrite? [y/N] " confirm
+        [[ "$confirm" == [yY] ]] || { echo "Cancelled"; exit 0; }
+      fi
+
+      mk_identity_file
+      mk_recipient_file
+      age -R "$RECIPIENT_FILE" -o "$output" "$input"
+
+      echo "Encrypted $input -> $output"
+      echo "The plaintext is untouched; remove it yourself if you meant to replace it."
+    }
+
+    cmd_decrypt_file() {
+      local input="$1"
+      local output="''${2:-}"
+
+      [ -f "$input" ] || { echo "Error: $input does not exist"; exit 1; }
+
+      mk_identity_file
+
+      if [ -n "$output" ]; then
+        if [ -e "$output" ]; then
+          read -rp "$output exists. Overwrite? [y/N] " confirm
+          [[ "$confirm" == [yY] ]] || { echo "Cancelled"; exit 0; }
+        fi
+        # Create at 0600 before age writes, so the plaintext is never briefly
+        # world-readable.
+        ( umask 077; : > "$output" )
+        age -d -i "$IDENTITY_KEYFILE" -o "$output" "$input"
+        echo "Decrypted $input -> $output"
+      else
+        age -d -i "$IDENTITY_KEYFILE" "$input"
+      fi
+    }
+
+    cmd_recipient() {
+      mk_identity_file
+      ssh-keygen -y -f "$IDENTITY_KEYFILE"
+    }
+
     cmd_rekey() {
       local keyfile
       keyfile=$(mktemp)
@@ -189,6 +285,17 @@
       decrypt)
         [[ $# -lt 3 ]] && usage
         cmd_decrypt "$2" "$3"
+        ;;
+      encrypt-file)
+        [[ $# -lt 2 ]] && usage
+        cmd_encrypt_file "$2" "''${3:-}"
+        ;;
+      decrypt-file)
+        [[ $# -lt 2 ]] && usage
+        cmd_decrypt_file "$2" "''${3:-}"
+        ;;
+      recipient)
+        cmd_recipient
         ;;
       rekey)
         cmd_rekey
