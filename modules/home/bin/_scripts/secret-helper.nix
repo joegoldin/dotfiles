@@ -72,6 +72,7 @@
       echo "Loose files (anywhere on disk, not tracked in secrets.nix):"
       echo "  encrypt-file <in> [out]   Encrypt any file (default out: <in>.age)"
       echo "  decrypt-file <in> [out]   Decrypt any .age file (default out: stdout)"
+      echo "  dotenv <in> [fish]        Print a KEY=VALUE .age as shell assignments"
       echo "  recipient                 Print the age recipient for your identity"
       echo ""
       echo "Both groups authenticate with the same identity from"
@@ -83,6 +84,8 @@
       echo "  $0 remove old_secret"
       echo "  $0 encrypt-file ~/work/repo/scripts/.env"
       echo "  $0 decrypt-file ~/work/repo/scripts/.env.age ~/work/repo/scripts/.env"
+      echo "  eval \"\$($0 dotenv creds.age)\"      # load into bash/zsh"
+      echo "  secret-env creds.age                 # load into fish, no eval"
       exit 1
     }
 
@@ -256,6 +259,73 @@
       ssh-keygen -y -f "$IDENTITY_KEYFILE"
     }
 
+    # Decrypt a KEY=VALUE file and print it as shell assignments, for eval.
+    #
+    # A subcommand cannot export into the calling shell — a child process cannot
+    # touch its parent's environment — so the caller still wraps this in eval.
+    # What does move in here is everything that was fiddly: skipping comments and
+    # blanks, ignoring junk lines, stripping quotes the file already had,
+    # re-quoting values so spaces and $ survive, and emitting fish syntax, which
+    # has no `export VAR=value` at all. Use the secret-env fish function to skip
+    # the eval entirely.
+    cmd_dotenv() {
+      local input="$1"
+      local style="''${2:-posix}"
+
+      [ -f "$input" ] || { echo "Error: $input does not exist" >&2; exit 1; }
+
+      mk_identity_file
+
+      age -d -i "$IDENTITY_KEYFILE" "$input" | while IFS= read -r line || [ -n "$line" ]; do
+        # Trim CR (files that have been through Windows) and leading space.
+        line="''${line%$'\r'}"
+        line="''${line#"''${line%%[![:space:]]*}"}"
+
+        case "$line" in
+          "" | "#"*) continue ;;
+        esac
+
+        # Tolerate a leading `export ` so an already-sourceable file works.
+        case "$line" in
+          "export "*) line="''${line#export }" ;;
+        esac
+
+        case "$line" in
+          *=*) ;;
+          *) continue ;;
+        esac
+
+        local key value
+        key="''${line%%=*}"
+        value="''${line#*=}"
+
+        # Only real shell identifiers, so a malformed file cannot inject code.
+        case "$key" in
+          [A-Za-z_]*) ;;
+          *) continue ;;
+        esac
+        case "$key" in
+          *[!A-Za-z0-9_]*) continue ;;
+        esac
+
+        # Drop one layer of quoting the file supplied; we re-quote below.
+        case "$value" in
+          "\""*"\"") value="''${value#\"}"; value="''${value%\"}" ;;
+          "'"*"'") value="''${value#\'}"; value="''${value%\'}" ;;
+        esac
+
+        # Escape what both sh and fish treat specially inside double quotes.
+        local escaped
+        escaped=$(printf '%s' "$value" | sed 's/[\\"$`]/\\&/g')
+
+        if [ "$style" = "fish" ]; then
+          printf 'set -gx %s "%s"\n' "$key" "$escaped"
+        else
+          printf 'export %s="%s"\n' "$key" "$escaped"
+        fi
+      done
+    }
+
     cmd_rekey() {
       local keyfile
       keyfile=$(mktemp)
@@ -293,6 +363,10 @@
       decrypt-file)
         [[ $# -lt 2 ]] && usage
         cmd_decrypt_file "$2" "''${3:-}"
+        ;;
+      dotenv)
+        [[ $# -lt 2 ]] && usage
+        cmd_dotenv "$2" "''${3:-posix}"
         ;;
       recipient)
         cmd_recipient
