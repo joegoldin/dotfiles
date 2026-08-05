@@ -5,32 +5,21 @@
   den.aspects.elphael.nixos =
     { lib, pkgs, ... }:
     let
-      # The Facecam's capture node. /dev/videoN is handed out in probe order
-      # and moves when USB devices are re-enumerated, so name the by-id
-      # symlink instead; litra-autotoggle resolves it at startup (see the
-      # patch on the package) and watches /dev for that node's events.
-      facecam = "/dev/v4l/by-id/usb-Elgato_Elgato_Facecam_FW36L1A07812-video-index0";
+      # litra-autotoggle resolves the by-id symlink at startup (see the patch
+      # on the package) and watches /dev for that node's events.
+      facecam = import ./_facecam.nix { inherit lib pkgs; };
 
       # Only the video device is pinned. With no device filter, every attached
       # Litra follows the camera (currently the Glow and the Beam LX front
       # light; add `back = true;` to also drive the Beam LX's backlight).
       configFile = (pkgs.formats.yaml { }).generate "litra-autotoggle.yml" {
-        video_device = facecam;
+        video_device = facecam.path;
         # Apps open and close the node a few times while starting a call, and
         # something on this box probes every /dev/video* node ~2x a second.
         # 1500ms is the upstream default and rides out both.
         delay = 1500;
       };
 
-      # The watched node name is resolved once, at startup, so re-run the
-      # daemon whenever the camera is (re)plugged and lands on a new index.
-      facecamRules = pkgs.writeTextFile {
-        name = "99-litra-autotoggle-facecam.rules";
-        text = ''
-          ACTION=="add", SUBSYSTEM=="video4linux", ATTR{index}=="0", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0078", RUN+="${pkgs.systemd}/bin/systemctl --no-block restart litra-autotoggle.service"
-        '';
-        destination = "/etc/udev/rules.d/99-litra-autotoggle-facecam.rules";
-      };
     in
     {
       environment.systemPackages = [ pkgs.litra ];
@@ -39,7 +28,7 @@
         # 99-litra.rules from upstream: GROUP="video" on the Litra hidraw
         # nodes, so both the CLI and the daemon work without root.
         pkgs.litra
-        facecamRules
+        (facecam.restartOnReplug "litra-autotoggle.service")
       ];
 
       systemd.services.litra-autotoggle = {
@@ -51,16 +40,9 @@
         serviceConfig = {
           Type = "simple";
 
-          # The by-id symlink only exists once udev has processed the camera.
-          # If it never turns up, start anyway — the udev rule above restarts
-          # the unit when the camera does appear.
-          ExecStartPre = pkgs.writeShellScript "wait-for-facecam" ''
-            for _ in $(seq 30); do
-              [ -e ${lib.escapeShellArg facecam} ] && exit 0
-              sleep 1
-            done
-            echo "warning: ${facecam} never appeared" >&2
-          '';
+          # If the camera never turns up, start anyway — the udev rule above
+          # restarts the unit when it does appear.
+          ExecStartPre = facecam.waitForDevice;
           ExecStart = "${lib.getExe pkgs.litra-autotoggle} --config-file ${configFile}";
           Restart = "always";
           RestartSec = 5;

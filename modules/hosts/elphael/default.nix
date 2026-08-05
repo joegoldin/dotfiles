@@ -111,6 +111,14 @@ in
         mode = "0400";
         owner = meta.username;
       };
+      # Home Assistant long-lived access token. Owned by the user for CLI use;
+      # led-signs-autotoggle (a DynamicUser) gets it via LoadCredential=, which
+      # PID 1 reads as root — see ./led-signs.nix.
+      age.secrets.homeassistant_api_key = {
+        file = "${inputs.dotfiles-secrets}/homeassistant_api_key.age";
+        mode = "0400";
+        owner = meta.username;
+      };
     };
   };
 }
