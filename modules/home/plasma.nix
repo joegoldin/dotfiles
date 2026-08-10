@@ -521,8 +521,8 @@ in
           # Window decoration buttons
           "kwinrc"."org.kde.kdecoration2"."ButtonsOnLeft" = "MSFB";
           "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "IAX";
-          # Overview effect: include minimized windows in the grid
-          "kwinrc"."Effect-overview"."IgnoreMinimized" = false;
+          # Overview effect: leave minimized windows out of the grid
+          "kwinrc"."Effect-overview"."IgnoreMinimized" = true;
           # New windows open on the screen under the cursor, so launching an app
           # from a given monitor's taskbar opens it on that monitor.
           "kwinrc"."Windows"."ActiveMouseScreen" = true;
