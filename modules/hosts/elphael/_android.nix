@@ -4,8 +4,8 @@ let
   androidSdk =
     (unstable.androidenv.composeAndroidPackages {
       platformVersions = [
-        "36"
-        "37"
+        "36.1"
+        "37.1"
       ];
       buildToolsVersions = [
         "36.0.0"
@@ -14,7 +14,10 @@ let
       includeEmulator = true;
       includeSystemImages = true;
       systemImageTypes = [ "google_apis_playstore" ];
-      abiVersions = [ "x86_64" ];
+      abiVersions = [
+        "x86_64"
+        "arm64-v8a"
+      ];
       includeNDK = true;
     }).androidsdk;
 
