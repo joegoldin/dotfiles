@@ -87,11 +87,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1780479329,
-        "narHash": "sha256-+NDxDI04PuqYnQhw4v+DDeX5RXCC0BzM96oi/sGgJ/c=",
+        "lastModified": 1786484084,
+        "narHash": "sha256-TXMTsZ/+JmT79nnUz6udYzYsWAOVOUjkaNaXFpJh8zE=",
         "owner": "joegoldin",
         "repo": "agent-skills",
-        "rev": "758cca153e237ac3b5c8ce2581e98fdb7d042dd2",
+        "rev": "45fef519d7c8ec4ac8393e99f14a37ccbbdfe4c3",
         "type": "github"
       },
       "original": {
@@ -130,11 +130,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779322322,
-        "narHash": "sha256-XBoZhuBZYvlrlinuYL1FSxM1pGcvlsi+AvECYk65kBg=",
+        "lastModified": 1783622948,
+        "narHash": "sha256-V+jDE+lm/yWBQ+7/b4ms/uMmnKxaTZF++iv4FbqxIc0=",
         "owner": "joegoldin",
         "repo": "antigravity-cli-nix",
-        "rev": "b470e523fb7e18782c088e71d3a3e848b6c96d80",
+        "rev": "7275089162f5c093d993e5b7cf1a9108b616ae80",
         "type": "github"
       },
       "original": {
@@ -433,11 +433,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1780616004,
-        "narHash": "sha256-AopI8vfMXwcYvBcBRoDpHvugSbHKQYiMwNfEXBuVg20=",
+        "lastModified": 1786511862,
+        "narHash": "sha256-pINSOqlVvlCy7p4iRolkQpDWzhGNg0PVbQEPS5ZjHGk=",
         "owner": "joegoldin",
         "repo": "claude-container",
-        "rev": "6312a52caeaaa9a7814efe815ec2cac287d7a529",
+        "rev": "7cb0864535e6d4d519ced2a74bf964719105be32",
         "type": "github"
       },
       "original": {
@@ -500,11 +500,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1780431659,
-        "narHash": "sha256-fgk0UFAFd9xahz2kKE6kQLuna7+PbVKdkz5NoPt1CB8=",
+        "lastModified": 1786483859,
+        "narHash": "sha256-xvW4vZW0AAlGeExhi7xdcekE/Zu18zFpsFTeCOtbwec=",
         "owner": "joegoldin",
         "repo": "claude-nix",
-        "rev": "9bed5b4bb895f6a76f93535c57fb3c69e40e7bd7",
+        "rev": "bbf3fe68cbfd9f7196df92aaa305d0c5d749c758",
         "type": "github"
       },
       "original": {
@@ -560,17 +560,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1776975237,
-        "narHash": "sha256-KNW6UkvbpZ6DtPU1nEAc123/UpQ836NB0bbufAgS2Cs=",
-        "ref": "refs/heads/main",
-        "rev": "2651cceed18d318d546a2d89dc87b4ac8e7556c7",
-        "revCount": 2,
-        "type": "git",
-        "url": "ssh://git@github.com/joegoldin/codex-nix.git"
+        "lastModified": 1783664711,
+        "narHash": "sha256-BLFCULC/0OnIJnCZ74KD0aNCwi3/bsOtTKBZMTvBMFo=",
+        "owner": "joegoldin",
+        "repo": "codex-nix",
+        "rev": "b7ba57f107b688e9b79501b340026d07ef7667be",
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "ssh://git@github.com/joegoldin/codex-nix.git"
+        "owner": "joegoldin",
+        "repo": "codex-nix",
+        "type": "github"
       }
     },
     "comment": {
