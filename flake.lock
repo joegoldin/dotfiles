@@ -4008,11 +4008,11 @@
         "nixpkgs-newer": "nixpkgs-newer"
       },
       "locked": {
-        "lastModified": 1785952127,
-        "narHash": "sha256-Obbe05/e+XXqhILxcvQBXnl7Tp+F+QvUGgaRpLDAKhY=",
+        "lastModified": 1786528030,
+        "narHash": "sha256-ysO0CLlpql2r8wNinWOKIDOZlimNBs+CzcyoXCs2tGM=",
         "owner": "joegoldin",
         "repo": "zen-browser-desktop",
-        "rev": "3182e7097ad7c4b326cb7fded4690b4b7f8b2bf9",
+        "rev": "bd89b5477ee4877945d5d3022db048da83ec4401",
         "type": "github"
       },
       "original": {
