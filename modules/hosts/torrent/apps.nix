@@ -36,7 +36,13 @@
         AppleDeveloper = 640199958;
         DavinciResolve = 571213070;
         Infuse = 1136220934;
-        Dongled = 6465788521;
+        # Dongled (6465788521) is deliberately absent: it is an iPhone/iPad-only
+        # app (minimum iOS 17.0, no Mac in its supportedDevices), so the Mac App
+        # Store never serves it and `mas info 6465788521` cannot even resolve the
+        # id — brew bundle failed the whole activation on it. Entries here need
+        # either kind = mac-software or a Mac among supportedDevices; check with
+        # `curl -s "https://itunes.apple.com/lookup?id=<id>&country=us"` before
+        # adding one. Install Dongled on the iPad from the App Store instead.
       };
     };
   };
