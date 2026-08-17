@@ -194,7 +194,7 @@
             lst = "eza -lath";
 
             awsswitch = "export AWS_PROFILE=(aws configure list-profiles | fzf)";
-            awslogin = "aws sso login";
+            awslogin = "aws login";
 
             k = "kubectl";
             lzd = "lazydocker";
