@@ -1,10 +1,21 @@
 # Custom packages, that can be defined similarly to ones from nixpkgs
 # You can build them using 'nix build .#example'
 pkgs: {
-  aws-cli = pkgs.writeShellScriptBin "aws" ''
-    unset PYTHONPATH
-    exec ${pkgs.unstable.awscli2}/bin/aws "$@"
-  '';
+  # `aws`, shadowing awscli2 on PATH to re-run `aws login` on an expired
+  # console session. Kept in a real .sh file (rather than an inline string or a
+  # fish function) so it stays shellcheck-able and applies to every shell,
+  # script and agent tool call - see the header comment in ./aws-cli.sh.
+  aws-cli = pkgs.writeShellScriptBin "aws" (
+    builtins.replaceStrings
+      [ "@awscli@" "@coreutils@" "@gawk@" "@gnused@" ]
+      [
+        "${pkgs.unstable.awscli2}"
+        "${pkgs.coreutils}"
+        "${pkgs.gawk}"
+        "${pkgs.gnused}"
+      ]
+      (builtins.readFile ./aws-cli.sh)
+  );
 
   blip-caption = pkgs.callPackage ./blip-caption.nix { };
 
