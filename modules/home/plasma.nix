@@ -82,6 +82,62 @@ in
         Install.WantedBy = [ "graphical-session.target" ];
       };
 
+      # plasmashell Wayland-death watchdog.
+      #
+      # Unlocking the session churns the outputs: powerdevil blanks every screen
+      # 20s into a lock (TurnOffDisplayIdleTimeoutWhenLockedSec below) and powers
+      # them back on at unlock, and the DisplayLink/evdi virtual outputs are torn
+      # down and re-created along with them. KWin destroys and re-advertises its
+      # kde_output_device_v2 globals in that churn, and plasmashell loses the
+      # race - it binds a global id that has already gone away, which is a fatal
+      # Wayland protocol error and kwin drops the connection:
+      #   plasmashell: wl_registry#80: error 0: global kde_output_device_v2 (278) is unavailable
+      #   kwin_wayland_wrapper: error in client communication (pid ...)
+      # Every occurrence in the journal lands within a minute of an unlock.
+      #
+      # Usually plasmashell then exits 255 and systemd restarts it on its own.
+      # Sometimes it does not exit: it keeps running with a dead Wayland
+      # connection, so there are no panels and no desktop, yet the process is
+      # alive and its event loop still answers D-Bus. systemd sees a healthy
+      # service and the D-Bus watchdog above still gets its Peer.Ping replies, so
+      # nothing acts and the shell has to be cleared by hand with
+      # `killall -9 plasmashell`. This watchdog closes that gap.
+      #
+      # The protocol error is fatal and unambiguous, so match it directly in the
+      # unit's journal instead of probing. SIGKILL rather than a normal restart:
+      # a shell in this state ignores SIGTERM and would burn the unit's full 40s
+      # TimeoutStopSec first. Restart=on-failure brings it straight back.
+      systemd.user.services.plasmashell-wayland-watchdog = {
+        Unit = {
+          Description = "Restart plasmashell when kwin drops its Wayland connection (output-global race)";
+          PartOf = [ "graphical-session.target" ];
+          After = [ "graphical-session.target" ];
+        };
+        Service = {
+          Type = "simple";
+          Restart = "always";
+          RestartSec = 10;
+          ExecStart = pkgs.writeShellScript "plasmashell-wayland-watchdog" ''
+            set -u
+            ${pkgs.systemd}/bin/journalctl --user -u plasma-plasmashell.service \
+              --follow --lines 0 --output cat |
+              while IFS= read -r line; do
+                case "$line" in
+                  *"wl_registry#"*": error "* | *"wl_display@"*": error "* | *"wl_display#"*": error "*)
+                    echo "plasmashell lost its Wayland connection ($line); killing so systemd restarts it"
+                    ${pkgs.systemd}/bin/systemctl --user kill -s KILL plasma-plasmashell.service || true
+                    # plasma-plasmashell allows 3 starts per minute. Back off past
+                    # that window so a burst of errors cannot trip the start limit
+                    # and leave the session with no shell at all.
+                    ${pkgs.coreutils}/bin/sleep 60
+                    ;;
+                esac
+              done
+          '';
+        };
+        Install.WantedBy = [ "graphical-session.target" ];
+      };
+
       # Keep the Task Manager alive across an in-session plasmashell restart.
       #
       # KWin gates its privileged Wayland interfaces - among them
