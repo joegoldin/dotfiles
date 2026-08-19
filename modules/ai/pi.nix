@@ -221,6 +221,11 @@ in
         # reach it, and a key sitting in the environment is a provider you did
         # not choose.
         environment = {
+          # Not a settings key. Separate from enableInstallTelemetry, and
+          # pointless here either way: the version is whatever the flake
+          # pinned, so a newer one upstream is not something pi can act on.
+          PI_SKIP_VERSION_CHECK.value = "1";
+
           OPENROUTER_API_KEY.file = ageKey "openrouter_api_key";
           # Standard Compute: one key, one model id, their router picks the
           # model per request. Referenced by name from the provider entry
@@ -249,6 +254,23 @@ in
         # through to the classifier.
         autoMode = {
           enable = true;
+
+          # Without this, pi-permission-system resolves what it can and puts
+          # everything else to a dialog, so the classifier is never asked and
+          # rules like "read-only git commands" go unread. Observed as a prompt
+          # for `git status --short --branch`, which the allow list names.
+          # Registering on its authorizer chain makes the classifier the link
+          # that runs for exactly the asks the deterministic engine could not
+          # settle.
+          delegateToPermissionSystem = true;
+
+          # Classification runs per unresolved ask, so it wants a fast cheap
+          # model rather than the session's. Null bills at the session model's
+          # rate, which for gpt-5.6-sol:xhigh is a poor trade for a yes/no.
+          model = {
+            provider = "openai-codex";
+            modelId = "gpt-5.4-mini";
+          };
           deterministic.allow = [
             "Bash(ls:*)"
             "Bash(cat:*)"
@@ -357,6 +379,19 @@ in
           defaultProvider = "openai-codex";
           defaultModel = "gpt-5.6-sol";
           defaultThinkingLevel = "xhigh";
+
+          tuiMode = "fullscreen";
+
+          # Off by default anyway, but pinned rather than inherited: a default
+          # is someone else's decision and it can change on an update.
+          enableAnalytics = false;
+          # This one ships on, and it pings on install and on every update.
+          enableInstallTelemetry = false;
+
+          # The startup banner is a wall of store paths on this host, since
+          # every skill, prompt and extension arrives as one. Ctrl+O still
+          # prints it on demand.
+          quietStartup = true;
         };
 
         # pi-background-tasks ships two extensions: the background bash this
