@@ -19,6 +19,7 @@ in
     # build-host and copy the closure over ssh, so the server never builds.
     includes = [
       den.aspects.nix-settings
+      den.aspects.ncro
     ];
 
     nixos = {

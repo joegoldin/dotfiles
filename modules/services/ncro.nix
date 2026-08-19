@@ -1,4 +1,4 @@
-# ncro (github:manic-systems/ncro) in front of erdtree's substituters.
+# ncro (github:manic-systems/ncro): a per-machine cache router.
 #
 # nix asks every substituter about every path and waits out the slow ones in
 # order, which is why a switch can sit for minutes with nothing building: the
@@ -9,6 +9,24 @@
 # It streams NARs straight through rather than storing them, so this adds a
 # routing decision and no second copy of the cache. Only the decisions are
 # persisted, in SQLite.
+#
+# One instance per machine, on loopback, rather than one shared instance behind
+# a hostname. That is not a smaller version of the shared design, it is a
+# different one, and it is better on three counts:
+#
+#   - Nothing is exposed. ncro re-authenticates to attic with this machine's
+#     netrc and returns whatever it gets, so a shared instance reachable
+#     without auth would turn attic's 401 into a 200 for whoever asked.
+#     Measured: attic answers 401 without credentials, garnix and numtide
+#     answer 200. A loopback instance has no such surface and needs no auth
+#     layer, no DNS record and no certificate.
+#   - The credential stays where it already was. Every host that should read
+#     attic already decrypts attic-netrc; none has to trust another host to
+#     hold it on its behalf.
+#   - Latency is measured from the machine that will use the answer. The
+#     fastest cache from a workstation on the LAN is not the fastest from a
+#     laptop on someone else's wifi, and a shared router would average the
+#     two into a decision that suits neither.
 { inputs, ... }:
 let
   dotfiles-secrets = inputs.dotfiles-secrets;
@@ -16,25 +34,13 @@ let
   attic = import "${dotfiles-secrets}/attic.nix";
   garnix = import "${dotfiles-secrets}/garnix.nix";
 
-  # Bound on all interfaces so a Cloudflare tunnel or a caddy vhost can reach
-  # it, because the machine that actually pays the substituter cost is elphael,
-  # not erdtree, and loopback would have kept the benefit on the one box that
-  # needed it least.
-  #
-  # The firewall is deliberately NOT opened for it. cloudflared and caddy both
-  # run here and reach this directly, so nothing has to be public for them to
-  # work, and leaving the port closed means a DNS record pointed straight at
-  # the host does not quietly become a second, unauthenticated way in.
-  #
-  # Whatever fronts this MUST authenticate. ncro holds the netrc for the attic
-  # and garnix caches, so it will answer for both to anyone who can reach it:
-  # exposed without auth it is not a cache proxy, it is a public read endpoint
-  # for two private caches.
-  listenPort = 8899;
-  listenAddress = "0.0.0.0:${toString listenPort}";
+  # Loopback, and the firewall is never opened for it. ncro answers for attic
+  # using this machine's netrc, so anything that can reach it can read a
+  # private cache; keeping it on 127.0.0.1 means nothing can.
+  listenAddress = "127.0.0.1:8899";
 in
 {
-  den.aspects.erdtree.nixos =
+  den.aspects.ncro.nixos =
     {
       config,
       lib,

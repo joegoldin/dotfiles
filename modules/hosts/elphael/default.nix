@@ -11,6 +11,7 @@ in
   den.aspects.elphael = {
     includes = [
       den.aspects.nix-settings
+      den.aspects.ncro
       den.aspects.dynamic-derivations
       # system features
       den.aspects.binary-caches
