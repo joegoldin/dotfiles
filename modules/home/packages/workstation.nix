@@ -8,8 +8,13 @@
 { den, ... }:
 {
   # day-sync's rendered config travels with the workstations (see
-  # ../../ai/day-sync.nix).
-  den.aspects.workstation-packages.includes = [ den.aspects.day-sync ];
+  # ../../ai/day-sync.nix). pi rides here rather than on home-baseline
+  # because it needs the agenix provider keys and (on linux) the bubblewrap
+  # jail, and only the three workstations deploy both.
+  den.aspects.workstation-packages.includes = [
+    den.aspects.day-sync
+    den.aspects.pi
+  ];
 
   den.aspects.workstation-packages.homeManager =
     {
