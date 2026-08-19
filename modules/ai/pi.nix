@@ -35,6 +35,11 @@ in
       # identical means all four agents switch on and off together.
       enabled = pkgs ? llm-agents;
 
+      # pi-nix's own package set, reached through agent-skills rather than
+      # added as a second input, so there is one place that decides which
+      # pi-nix this machine runs.
+      piPkgs = inputs.agent-skills.inputs.pi-nix.packages.${pkgs.stdenv.hostPlatform.system};
+
       # jail.nix is bubblewrap, so linux only. pi-nix throws outright rather
       # than degrading if the flag is set on darwin, and torrent gets this
       # aspect.
@@ -171,6 +176,30 @@ in
       programs.pi.coding-agent = lib.mkIf enabled {
         enable = true;
 
+        # agent-skills picks the curated set and hands it over with mkDefault.
+        # This is that list minus @gotgenes/pi-permission-system, which cannot
+        # run beside auto mode: both gate `tool_call`, pi returns on the first
+        # extension that blocks, and the permission system loads first, so
+        # every ask its deterministic engine cannot settle went to a dialog and
+        # the classifier was never asked. pi-nix throws on the combination now
+        # rather than letting it be discovered a second time.
+        #
+        # What goes with it: session approvals, its permission review log, and
+        # its prefix-allow rules. The replacement classifies every
+        # side-effecting call instead, with a one-token first stage to keep
+        # that affordable, and blocks a hard deny before any model call.
+        extensionPackages = map (n: piPkgs.${n}) [
+          "ext-pi-mcp-adapter"
+          "ext-pi-subagents"
+          "ext-pi-background-tasks"
+          "ext-juicesharp-rpiv-ask-user-question"
+          "ext-juicesharp-rpiv-todo"
+          "ext-narumitw-pi-goal"
+          "ext-narumitw-pi-btw"
+          "ext-pi-cache-optimizer"
+          "ext-heyhuynhgiabuu-pi-pretty"
+        ];
+
         # The statusline options come from agent-statusline's shared schema,
         # which claude-nix mounts under `statusLine` and pi-nix mounts here.
         # Everything else is left alone so both agents render from the same
@@ -233,65 +262,100 @@ in
           STANDARDCOMPUTE_API_KEY.file = ageKey "standardcompute_api_key";
         };
 
-        # The classifier that reads the rules in modules/ai/auto-mode.nix.
+        # The guardrail that reads the rules in modules/ai/auto-mode.nix.
         # agent-skills fans the four lists out to this option but leaves
         # `enable` alone, and it is a plain mkEnableOption, so without this
         # line the rules are declared and never consulted. Claude Code has a
-        # native classifier; pi's is this extension, and this design dropped
-        # plan mode, so it and the jail are most of what stands between the
-        # agent and the working tree.
+        # native classifier; pi's is @czottmann/pi-automode. This design
+        # dropped plan mode, so it and the jail are most of what stands
+        # between the agent and the working tree.
         #
-        # `model` stays null, which classifies with the session's own model.
-        # A fixed cheap model would be cheaper, but it would also pin the
-        # guard to one provider's key, and the whole point of the auth
-        # layering above is that any of the three may be the one that is live.
-        #
-        # The deterministic allow list resolves the hottest read-only commands
-        # without a model call at all. Every entry is already covered by the
-        # natural-language `allow` list, so this buys latency rather than
-        # permission, and a prefix rule can never resolve a compound command:
-        # `git status && rm -rf .` starts with `git status ` and still falls
-        # through to the classifier.
+        # It is on from the first turn rather than after a slash command: the
+        # rendered config sets `enabled` and reaches the extension as
+        # PI_AUTOMODE_SETTINGS_JSON, which outranks both config files, so a
+        # leftover ~/.pi/agent/automode.json cannot quietly turn it off.
         autoMode = {
           enable = true;
 
-          # Without this, pi-permission-system resolves what it can and puts
-          # everything else to a dialog, so the classifier is never asked and
-          # rules like "read-only git commands" go unread. Observed as a prompt
-          # for `git status --short --branch`, which the allow list names.
-          # Registering on its authorizer chain makes the classifier the link
-          # that runs for exactly the asks the deterministic engine could not
-          # settle.
-          delegateToPermissionSystem = true;
+          # A small fast model, not the session's. Classification runs on
+          # every side-effecting tool call, and null bills that at the session
+          # model's rate, which for gpt-5.6-sol:xhigh is a poor trade for a
+          # yes/no. luna is the cheap tier of the same Codex subscription the
+          # session already authenticates against, so this adds no second key
+          # to keep alive.
+          classifierModel = "openai-codex/gpt-5.6-luna";
 
-          # Classification runs per unresolved ask, so it wants a fast cheap
-          # model rather than the session's. Null bills at the session model's
-          # rate, which for gpt-5.6-sol:xhigh is a poor trade for a yes/no.
-          model = {
-            provider = "openai-codex";
-            modelId = "gpt-5.4-mini";
-          };
-          deterministic.allow = [
-            "Bash(ls:*)"
-            "Bash(cat:*)"
-            "Bash(head:*)"
-            "Bash(tail:*)"
-            "Bash(wc:*)"
-            "Bash(stat:*)"
-            "Bash(rg:*)"
-            "Bash(fd:*)"
-            "Bash(jq:*)"
-            "Bash(git status:*)"
-            "Bash(git diff:*)"
-            "Bash(git log:*)"
-            "Bash(git show:*)"
-            "Bash(git rev-parse:*)"
-            "Bash(nix eval:*)"
-            "Bash(nix build:*)"
-            "Bash(nix flake check:*)"
-            "Bash(nix path-info:*)"
+          # Reads inside the working tree resolve with no model call, and
+          # reads outside it are classified rather than waved through. The
+          # working tree is the thing the jail already confines writes to, so
+          # this aligns the two layers: in the sandbox is silent, out of it is
+          # reviewed. Writes to protected in-tree paths (.git, .pi, shell
+          # profiles) are carved back out and still classified.
+          allowInsideWorkingDirectory = true;
+
+          # Secrets the file tools must never open, matched before any
+          # classifier call and against the symlink-resolved path as well as
+          # the one written. These restate hard_deny rules from
+          # auto-mode.nix that a model would otherwise be the only thing
+          # enforcing. bash access to the same paths stays the classifier's
+          # problem; this list governs read/write/edit/grep/find/ls.
+          deniedPaths = [
+            "~/.ssh/*"
+            "/run/agenix/*"
+            "~/.aws/*"
+            "~/.config/op/*"
+            "~/.pi/agent/auth.json"
+            "~/.claude/.credentials.json"
+            "*.env"
           ];
+
+          # The one list where the package's own defaults stay. They are 48
+          # paths whose common property is that writing one causes code to
+          # run later: .git hooks, every shell rc, .envrc, .mcp.json,
+          # .pre-commit-config.yaml, the package-manager rc files, the Gradle
+          # and Maven wrappers. `$defaults` keeps them; the two additions are
+          # this machine's, which a generic list has no way to know about.
+          protectedPaths = [
+            "$defaults"
+            ".claude"
+            ".agents"
+          ];
+
+          # Deterministic, no model call, and unlike the natural-language
+          # lists these cannot be reasoned with.
+          # A bash pattern is matched against the whole command string with
+          # `*` spanning anything, so these catch a credential path wherever
+          # it appears in the line. deniedPaths cannot: it governs the file
+          # tools only, and `cat` is bash. Obfuscation gets past this (a
+          # variable, a glob, base64), so it is a net rather than a boundary
+          # — the boundary is the jail, which binds only the two key files pi
+          # itself needs, and the classifier, which reads the hard_deny rule
+          # in plain words.
+          permissions.deny = [
+            "bash(git push --force*)"
+            "bash(sudo *)"
+            "bash(*/run/agenix/*)"
+            "bash(*/.ssh/id_*)"
+            "bash(*/agent/auth.json*)"
+            "bash(*/.credentials.json*)"
+            "write(*.env)"
+            "edit(*.env)"
+          ];
+
+          # The decision log is the only way to answer "why was that
+          # blocked" after the fact. classifierIo stays off: it would write
+          # the transcript evidence to disk on every classified call.
+          log.enable = true;
         };
+
+        # `nix build`, `nix eval` and `nix flake check` are named in the
+        # allow list in auto-mode.nix, and every repository on this machine is
+        # a flake. Without this the rule is unreachable rather than permissive:
+        # the jail carries no nix, no store beyond pi's own closure, and no
+        # daemon socket. Turning it on binds all three, which also means the
+        # agent can build and then run anything from nixpkgs. That is already
+        # true of a machine with network access and a compiler.
+        jail.nixAccess = true;
 
         # Claude Code notifies from inside the binary; pi does not, which is
         # why pi-nix ships the pi-notify extension and why its jail default
