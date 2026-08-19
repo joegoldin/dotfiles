@@ -68,13 +68,54 @@ in
       # own `models` option is deliberately unused: its prelude installs the
       # file only when absent, so a declared models.json goes stale on the
       # first edit.
+      # Standard Compute is an OpenAI-compatible gateway: one endpoint, one
+      # model id, and a router that picks the actual model per request. Billing
+      # is per account rather than per token, which is why every cost figure is
+      # zero — pi multiplies usage by these, so leaving them out would make the
+      # statusline invent a number.
+      #
+      # `api` is openai-responses because that is what their own integration
+      # guide specifies, and the endpoint table lists /v1/responses alongside
+      # /v1/completions. The key is `$VAR`, not a literal: pi interpolates it
+      # at read time from the environment exported above, so this file stays
+      # safe in the store.
+      standardComputeProvider = {
+        standardcompute = {
+          name = "Standard Compute";
+          baseUrl = "https://api.stdcmpt.com/v1";
+          apiKey = "$STANDARDCOMPUTE_API_KEY";
+          api = "openai-responses";
+          models = [
+            {
+              id = "standardcompute";
+              name = "Standard Compute";
+              reasoning = false;
+              input = [
+                "text"
+                "image"
+              ];
+              cost = {
+                input = 0;
+                output = 0;
+                cacheRead = 0;
+                cacheWrite = 0;
+              };
+              contextWindow = 200000;
+              maxTokens = 8192;
+            }
+          ];
+        };
+      };
+
       modelsJson = pkgs.writeText "pi-models.json" (
         builtins.toJSON {
-          providers = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
-            anthropic.apiKey = "!op read '${piSecrets.anthropicKeyRef}'";
-            openai.apiKey = "!op read '${piSecrets.openaiKeyRef}'";
-            openrouter.apiKey = "!op read '${piSecrets.openrouterKeyRef}'";
-          };
+          providers =
+            standardComputeProvider
+            // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
+              anthropic.apiKey = "!op read '${piSecrets.anthropicKeyRef}'";
+              openai.apiKey = "!op read '${piSecrets.openaiKeyRef}'";
+              openrouter.apiKey = "!op read '${piSecrets.openrouterKeyRef}'";
+            };
         }
       );
     in
@@ -124,6 +165,10 @@ in
           ANTHROPIC_API_KEY.file = ageKey "anthropic_api_key";
           OPENAI_API_KEY.file = ageKey "openai_api_key";
           OPENROUTER_API_KEY.file = ageKey "openrouter_api_key";
+          # Standard Compute: one key, one model id, their router picks the
+          # model per request. Referenced by name from the provider entry
+          # below rather than inlined, so the key stays out of the store.
+          STANDARDCOMPUTE_API_KEY.file = ageKey "standardcompute_api_key";
         };
 
         # The classifier that reads the rules in modules/ai/auto-mode.nix.

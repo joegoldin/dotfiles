@@ -1081,11 +1081,11 @@
     "dotfiles-secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1787102445,
-        "narHash": "sha256-C691uH2+DHgxDzMygkXPrX9bLJy4s6zwZeF3zVieTZw=",
+        "lastModified": 1787119683,
+        "narHash": "sha256-cLBZUdntFkl0IUZHJjPf6busBpryk0liahYkAWYmHw4=",
         "owner": "joegoldin",
         "repo": "dotfiles-secrets",
-        "rev": "cd9bc3806faf3f0958a1afed895c72e414b34c98",
+        "rev": "9968f17dbc9a5e220c7c9961efcb4bb767e84aa1",
         "type": "github"
       },
       "original": {
