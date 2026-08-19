@@ -121,6 +121,49 @@ in
           OPENROUTER_API_KEY.file = ageKey "openrouter_api_key";
         };
 
+        # The classifier that reads the rules in modules/ai/auto-mode.nix.
+        # agent-skills fans the four lists out to this option but leaves
+        # `enable` alone, and it is a plain mkEnableOption, so without this
+        # line the rules are declared and never consulted. Claude Code has a
+        # native classifier; pi's is this extension, and this design dropped
+        # plan mode, so it and the jail are most of what stands between the
+        # agent and the working tree.
+        #
+        # `model` stays null, which classifies with the session's own model.
+        # A fixed cheap model would be cheaper, but it would also pin the
+        # guard to one provider's key, and the whole point of the auth
+        # layering above is that any of the three may be the one that is live.
+        #
+        # The deterministic allow list resolves the hottest read-only commands
+        # without a model call at all. Every entry is already covered by the
+        # natural-language `allow` list, so this buys latency rather than
+        # permission, and a prefix rule can never resolve a compound command:
+        # `git status && rm -rf .` starts with `git status ` and still falls
+        # through to the classifier.
+        autoMode = {
+          enable = true;
+          deterministic.allow = [
+            "Bash(ls:*)"
+            "Bash(cat:*)"
+            "Bash(head:*)"
+            "Bash(tail:*)"
+            "Bash(wc:*)"
+            "Bash(stat:*)"
+            "Bash(rg:*)"
+            "Bash(fd:*)"
+            "Bash(jq:*)"
+            "Bash(git status:*)"
+            "Bash(git diff:*)"
+            "Bash(git log:*)"
+            "Bash(git show:*)"
+            "Bash(git rev-parse:*)"
+            "Bash(nix eval:*)"
+            "Bash(nix build:*)"
+            "Bash(nix flake check:*)"
+            "Bash(nix path-info:*)"
+          ];
+        };
+
         jail.enable = jailed;
 
         # The jail wraps pi-nix's launch wrapper, not just the pi binary, so

@@ -16,6 +16,7 @@
       den.aspects.antigravity
       den.aspects.codex
       den.aspects.mcp
+      den.aspects.auto-mode
       den.aspects.notify
       den.aspects.bin
       den.aspects.audiomemo
