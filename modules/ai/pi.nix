@@ -325,17 +325,27 @@ in
             "*.env"
           ];
 
-          # The one list where the package's own defaults stay. They are 48
-          # paths whose common property is that writing one causes code to
-          # run later: .git hooks, every shell rc, .envrc, .mcp.json,
-          # .pre-commit-config.yaml, the package-manager rc files, the Gradle
-          # and Maven wrappers. `$defaults` keeps them; the two additions are
-          # this machine's, which a generic list has no way to know about.
-          protectedPaths = [
-            "$defaults"
-            ".claude"
-            ".agents"
-          ];
+          # No protectedPaths. The package ships 48 by default, all of them
+          # files where a write causes code to run later, and they are dropped
+          # deliberately rather than overlooked.
+          #
+          # The hard_deny list already names that class in words the classifier
+          # reads — cron, systemd user timers, git hooks, .envrc, shell
+          # profiles — so the gate was a second copy of a rule that already
+          # exists. What goes with it is the long tail the prose does not name:
+          # .mcp.json, .pnpmfile.cjs, the Gradle and Maven wrappers, the
+          # pre-commit and lefthook configs. Those now rest on the classifier
+          # recognising a config edit as a persistence mechanism, which is a
+          # real bet rather than a free one.
+          #
+          # The trade is deliberate: fewer moving parts, one place where policy
+          # lives, and no deterministic list to drift out of date. Revisit if a
+          # write to one of those files ever gets through.
+          #
+          # `[ ]` here is a value, not an omission. The extension keeps its
+          # built-ins for any section it never sees, so leaving the option
+          # unset would restore all 48 rather than clear them.
+          protectedPaths = [ ];
 
           # Deterministic, no model call, and unlike the natural-language
           # lists these cannot be reasoned with.
@@ -348,8 +358,6 @@ in
           # itself needs, and the classifier, which reads the hard_deny rule
           # in plain words.
           permissions.deny = [
-            "bash(git push --force*)"
-            "bash(sudo *)"
             "bash(*/run/agenix/*)"
             "bash(*/.ssh/id_*)"
             "bash(*/agent/auth.json*)"
