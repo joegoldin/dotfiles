@@ -16,9 +16,22 @@ let
   attic = import "${dotfiles-secrets}/attic.nix";
   garnix = import "${dotfiles-secrets}/garnix.nix";
 
-  # Loopback only. This is a routing optimisation for erdtree's own builds, not
-  # a service other machines consume, and an open cache proxy is an open proxy.
-  listenAddress = "127.0.0.1:8899";
+  # Bound on all interfaces so a Cloudflare tunnel or a caddy vhost can reach
+  # it, because the machine that actually pays the substituter cost is elphael,
+  # not erdtree, and loopback would have kept the benefit on the one box that
+  # needed it least.
+  #
+  # The firewall is deliberately NOT opened for it. cloudflared and caddy both
+  # run here and reach this directly, so nothing has to be public for them to
+  # work, and leaving the port closed means a DNS record pointed straight at
+  # the host does not quietly become a second, unauthenticated way in.
+  #
+  # Whatever fronts this MUST authenticate. ncro holds the netrc for the attic
+  # and garnix caches, so it will answer for both to anyone who can reach it:
+  # exposed without auth it is not a cache proxy, it is a public read endpoint
+  # for two private caches.
+  listenPort = 8899;
+  listenAddress = "0.0.0.0:${toString listenPort}";
 in
 {
   den.aspects.erdtree.nixos =
