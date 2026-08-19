@@ -180,6 +180,13 @@
       url = "github:nix-community/lanzaboote";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # nix cache route optimizer: measures upstream latency and routes each
+    # request to whichever cache answers fastest, instead of nix querying every
+    # substituter in order and waiting out the slow ones.
+    ncro = {
+      url = "github:manic-systems/ncro";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # declarative flatpak management
     nix-flatpak.url = "github:gmodena/nix-flatpak";
     # pre-built nix-index database

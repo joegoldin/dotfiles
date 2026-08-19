@@ -1081,11 +1081,11 @@
     "dotfiles-secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1787119683,
-        "narHash": "sha256-cLBZUdntFkl0IUZHJjPf6busBpryk0liahYkAWYmHw4=",
+        "lastModified": 1787178303,
+        "narHash": "sha256-GDIYs7crlnKy2Y+5tbsOp8aBTO/vEGckl8c6QM+OjLo=",
         "owner": "joegoldin",
         "repo": "dotfiles-secrets",
-        "rev": "9968f17dbc9a5e220c7c9961efcb4bb767e84aa1",
+        "rev": "9b67ea5cdbc2b4ee4073755ae76ad2e41c9a9095",
         "type": "github"
       },
       "original": {
@@ -2403,6 +2403,26 @@
         "type": "github"
       }
     },
+    "ncro": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1786701834,
+        "narHash": "sha256-Ixz0rc6rnDEgNG6Cw2LJRdKxGjMbdy9bC9ncjAU+SmA=",
+        "owner": "manic-systems",
+        "repo": "ncro",
+        "rev": "3cc83303cc859901eb4330e9c4319b61f6ba1ffc",
+        "type": "github"
+      },
+      "original": {
+        "owner": "manic-systems",
+        "repo": "ncro",
+        "type": "github"
+      }
+    },
     "nix": {
       "inputs": {
         "flake-compat": [
@@ -3539,6 +3559,7 @@
         "llm-agents": "llm-agents",
         "mcps": "mcps",
         "microvm-nix": "microvm-nix",
+        "ncro": "ncro",
         "nix-attic-infra": "nix-attic-infra",
         "nix-darwin": "nix-darwin_2",
         "nix-flatpak": "nix-flatpak",
