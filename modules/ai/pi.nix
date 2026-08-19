@@ -437,7 +437,20 @@ in
         # nothing uses. Style and notifier path both default per platform,
         # notify-send on linux and terminal-notifier on darwin, resolved to an
         # absolute store path so they survive inside the jail.
-        notifications.enable = true;
+        notifications = {
+          enable = true;
+
+          # A notification is worth an interrupt only when the session cannot
+          # continue without the user: a permission prompt, or the turn ending
+          # and control coming back. `long_running_tool` is neither. It reports
+          # progress on work that is proceeding fine, and at a 30 s threshold on
+          # a machine whose common tools are nix builds and flake checks it
+          # fires on most of them, which trains the notification to be ignored.
+          events = [
+            "needs_input"
+            "settled"
+          ];
+        };
 
         # Peer messaging between separately launched pi instances, which is
         # pi's missing ListAgents/SendMessage. Local unix socket, no relay, no
