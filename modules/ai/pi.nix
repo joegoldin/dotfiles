@@ -173,6 +173,24 @@ in
         # absolute store path so they survive inside the jail.
         notifications.enable = true;
 
+        # Peer messaging between separately launched pi instances, which is
+        # pi's missing ListAgents/SendMessage. Local unix socket, no relay, no
+        # daemon, no network. There is no phone or cross-machine story here and
+        # there is not meant to be: the package that offered one was rejected
+        # on its security model, and the addendum records what that cost.
+        #
+        # inboundTrigger stays at the module default ("replies"): the broker
+        # authenticates nobody, so an unsolicited message must not be able to
+        # start a turn. Raising it to "always", which is upstream's own
+        # default, is a deliberate per-host choice rather than a convenience.
+        messaging = {
+          enable = true;
+          askTimeoutSeconds = 300;
+          # ~/.agents/skills already carries the skill library; loading the
+          # extension's bundled copy too would double-register it.
+          installSkill = false;
+        };
+
         jail.enable = jailed;
 
         # The jail wraps pi-nix's launch wrapper, not just the pi binary, so
