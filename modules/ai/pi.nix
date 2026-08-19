@@ -256,6 +256,13 @@ in
           # pinned, so a newer one upstream is not something pi can act on.
           PI_SKIP_VERSION_CHECK.value = "1";
 
+          # Auto mode draws its own status slot unless told not to, and this
+          # setup already has a status line. Suppressed here, the fork
+          # republishes the same tally on the `pi-automode:status` channel and
+          # agent-statusline renders it as its own row, so the numbers are
+          # unchanged and drawn once rather than twice.
+          PI_AUTOMODE_NO_STATUS_SLOT.value = "1";
+
           # `nix` is on the jail's PATH but was unusable without these two.
           # jail.nix does --clearenv, so the daemon socket is bound and yet
           # NIX_REMOTE is unset, which makes every command try the local store
@@ -499,6 +506,20 @@ in
         # so a checkout that carries its own skills is picked up on the session
         # started inside it and nowhere else.
         foreignSkills.enable = true;
+
+        # Prompt stash, chord keybindings and session shortcuts, first-party
+        # rather than the two published packages it replaces: supi-extras and
+        # input-shortcuts overlap heavily, each is missing half of what the
+        # other has, and both draw a footer this setup already owns.
+        #
+        # The chord prefix is ctrl+s. pi binds that key only in overlay scopes
+        # (app.session.toggleSort, app.models.save), never in the editor, and
+        # its TUI runs raw mode, so the terminal's XOFF meaning does not apply.
+        #
+        # clipboardCommand is left at its default: wl-copy on linux, reached
+        # through jail.nix's host channel rather than a bound compositor
+        # socket, so a headless session still starts.
+        extras.enable = true;
 
         # Peer messaging between separately launched pi instances, which is
         # pi's missing ListAgents/SendMessage. Local unix socket, no relay, no
