@@ -46,6 +46,18 @@ in
       lib,
       ...
     }:
+    let
+      # The host that SERVES this cache must not route to it. Reaching
+      # https://<garnix cache> from erdtree resolves its own public name, leaves
+      # the box, and comes back through the proxy to a backend on its loopback:
+      # a full internet round trip to reach a local service, on the upstream
+      # marked as the closest one.
+      #
+      # Derived from the caddy vhost rather than declared a second time, so the
+      # machine that stops serving the cache stops excluding it in the same
+      # edit.
+      servesGarnixCache = config.services.caddy.virtualHosts ? "${domains.garnixCacheDomain}";
+    in
     {
       imports = [ inputs.ncro.nixosModules.ncro ];
 
@@ -76,28 +88,31 @@ in
           #
           # ncro still measures latency and can prefer a faster upstream; these
           # are the tiebreak, not a strict order.
-          upstreams = [
-            {
-              url = "https://${domains.garnixCacheDomain}";
-              priority = 0;
-              public_key = garnix.cachePublicKey;
-            }
-            {
-              url = "https://${domains.atticDomain}/${attic.cacheName}";
-              priority = 10;
-              public_key = attic.publicKey;
-            }
-            {
-              url = "https://cache.nixos.org";
-              priority = 20;
-              public_key = "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=";
-            }
-            {
-              url = "https://cache.numtide.com";
-              priority = 30;
-              public_key = "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=";
-            }
-          ];
+          upstreams =
+            lib.optionals (!servesGarnixCache) [
+              {
+                url = "https://${domains.garnixCacheDomain}";
+                priority = 0;
+                public_key = garnix.cachePublicKey;
+              }
+            ]
+            ++ [
+              {
+                url = "https://${domains.atticDomain}/${attic.cacheName}";
+                priority = 10;
+                public_key = attic.publicKey;
+              }
+              {
+                url = "https://cache.nixos.org";
+                priority = 20;
+                public_key = "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=";
+              }
+              {
+                url = "https://cache.numtide.com";
+                priority = 30;
+                public_key = "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=";
+              }
+            ];
         };
       };
 
