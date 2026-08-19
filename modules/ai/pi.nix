@@ -164,6 +164,15 @@ in
           ];
         };
 
+        # Claude Code notifies from inside the binary; pi does not, which is
+        # why pi-nix ships the pi-notify extension and why its jail default
+        # already carries the dbus talk permission the notifier needs. Leaving
+        # this off would make that permission the only trace of a feature
+        # nothing uses. Style and notifier path both default per platform,
+        # notify-send on linux and terminal-notifier on darwin, resolved to an
+        # absolute store path so they survive inside the jail.
+        notifications.enable = true;
+
         jail.enable = jailed;
 
         # The jail wraps pi-nix's launch wrapper, not just the pi binary, so
