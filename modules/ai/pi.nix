@@ -177,18 +177,19 @@ in
         enable = true;
 
         # agent-skills picks the curated set and hands it over with mkDefault.
-        # This is that list minus @gotgenes/pi-permission-system, which cannot
-        # run beside auto mode: both gate `tool_call`, pi returns on the first
-        # extension that blocks, and the permission system loads first, so
-        # every ask its deterministic engine cannot settle went to a dialog and
-        # the classifier was never asked. pi-nix throws on the combination now
-        # rather than letting it be discovered a second time.
+        # @gotgenes/pi-permission-system is back on it. It was dropped because
+        # both packages gate `tool_call` and pi returns on the first extension
+        # that blocks, so the permission system answered every ask and the
+        # classifier was never consulted — including for `git status --short
+        # --branch`, which the allow list names.
         #
-        # What goes with it: session approvals, its permission review log, and
-        # its prefix-allow rules. The replacement classifies every
-        # side-effecting call instead, with a one-token first stage to keep
-        # that affordable, and blocks a hard deny before any model call.
+        # Ordering was never the fix. The permission system publishes a chain
+        # seam for exactly this, and pi-nix now builds a fork of pi-automode
+        # that registers on it, so the classifier answers the asks the
+        # deterministic engine cannot settle and the two layers compose.
+        # `autoMode.permissionSystem` below arms it.
         extensionPackages = map (n: piPkgs.${n}) [
+          "ext-gotgenes-pi-permission-system"
           "ext-pi-mcp-adapter"
           "ext-pi-subagents"
           "ext-pi-background-tasks"
@@ -361,6 +362,55 @@ in
           # blocked" after the fact. classifierIo stays off: it would write
           # the transcript evidence to disk on every classified call.
           log.enable = true;
+
+          # The half that arms the chain link. pi-nix renders this whole
+          # attrset to
+          # ~/.pi/agent/extensions/pi-permission-system/config.json and the
+          # launcher installs it on every start, so it replaces the file
+          # rather than merging into it: anything not named here is gone, and
+          # `authorizerChain` is appended by pi-nix.
+          #
+          # The three package defaults are kept as they were on disk.
+          # permissionReviewLog earns its place twice over now: it is the only
+          # record that a decision came from the chain link rather than from a
+          # dialog, which is the difference this arrangement exists to make.
+          permissionSystem.settings = {
+            debugLog = false;
+            permissionReviewLog = true;
+            yoloMode = false;
+
+            # Everything not named here falls back to the package's own `ask`,
+            # which under this arrangement means "hand it to the classifier"
+            # rather than "prompt". That is the intended shape: the permission
+            # system resolves what a flat rule can resolve, auto mode's 63
+            # natural-language rules resolve the rest, and neither one has to
+            # restate the other.
+            #
+            # external_directory is the exception, and it is not a preference.
+            # The chain owner caps a link's `allow` on the `external_directory`
+            # and `path` surfaces and turns it into a `defer`
+            # (src/authority/delegation-envelope.ts), so on those two surfaces
+            # the classifier can refuse but cannot approve, and an approval
+            # falls through to a dialog. Measured, not assumed: reading
+            # /etc/hostname from a session rooted elsewhere raised an
+            # `external_directory` ask, the link answered allow, and the
+            # decision came back
+            # `{"kind":"unavailable"}` under --print.
+            #
+            # These three are the trees this machine's own environment rules
+            # already describe as the whole world: the repositories, the Nix
+            # configuration, and the immutable store every nix command reads.
+            # Naming them here keeps outside-the-tree file access at the same
+            # cost it had when auto mode ran alone. Anything else outside the
+            # working directory still reaches a prompt, which is the right
+            # answer for a path nobody has described.
+            permission.external_directory = {
+              "*" = "ask";
+              "~/Development/*" = "allow";
+              "~/dotfiles/*" = "allow";
+              "/nix/store/*" = "allow";
+            };
+          };
         };
 
         # `nix build`, `nix eval` and `nix flake check` are named in the
