@@ -660,14 +660,51 @@ in
             # `hook` subcommand writes the tool-timing sidecar, so this one is
             # read-write.
             (combinators.try-readwrite (combinators.noescape "~/.cache/agent-statusline"))
+
+            # A project's own toolchain reaches the agent through the daemon,
+            # not through the PATH: /nix/store is bound and the daemon socket
+            # is bound, so `nix develop`, `nix shell` and a devenv.nix all
+            # build and run inside the jail exactly as they do outside.
+            # Verified by running `nix shell nixpkgs#statix -c statix` in the
+            # jail, which fetched, realised and executed with nothing of statix
+            # on the jailed PATH.
+            #
+            # What the tmpfs over $HOME costs is not capability but state, and
+            # these two are the ones that hurt. The eval cache is rebuilt from
+            # scratch every session without this bind, which is a tax on every
+            # nix command the agent runs and buys nothing: it holds derivations
+            # and fetched tarballs, no secrets.
+            (combinators.try-readwrite (combinators.noescape "~/.cache/nix"))
+
+            # direnv's allow-list, deliberately read-only. Bound, a project the
+            # user has already trusted keeps working across sessions; read-only,
+            # the agent cannot add an entry, so it can use the environments the
+            # user approved and cannot approve one for itself. That asymmetry is
+            # the point, and it is why this is not readwrite.
+            (combinators.try-readonly (combinators.noescape "~/.local/share/direnv"))
+
+            # The linters this repository is actually checked with. pi-nix
+            # ships the floor every agent needs; these are the ones a NixOS
+            # configuration repo needs, and they belong here for the same
+            # reason the extension choice does: pi-nix packages capability,
+            # this file holds the opinion.
+            #
+            # Reachable through `nix shell nixpkgs#statix` either way, since the
+            # store and the daemon are both bound. On PATH they are reachable
+            # without a network round trip and without the agent having to know
+            # that trick, which is the difference between a tool it uses and a
+            # tool it reports as missing.
+            (combinators.add-pkg-deps [
+              pkgs.statix
+              pkgs.deadnix
+              pkgs.nixfmt
+              pkgs.shellcheck
+              pkgs.yq-go
+            ])
           ])
         );
       };
 
-      # models.json is read-only from pi's perspective (it reloads on
-      # `/model`; pi writes settings.json and auth.json, not this), so
-      # re-installing it on every activation costs nothing and keeps the
-      # op:// references from drifting.
       # ctrl+backspace deletes the previous word, which is what Claude Code and
       # Codex do in this terminal and what muscle memory expects. pi ships
       # `ctrl+w` and `alt+backspace` for the action and gives ctrl+backspace to
@@ -689,6 +726,10 @@ in
         };
       };
 
+      # models.json is read-only from pi's perspective (it reloads on
+      # `/model`; pi writes settings.json and auth.json, not this), so
+      # re-installing it on every activation costs nothing and keeps the
+      # op:// references from drifting.
       home.activation.piModelsJson = lib.mkIf enabled (
         lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           run mkdir -p ${lib.escapeShellArg "${homeDir}/.pi/agent"}
