@@ -79,6 +79,30 @@ in
       programs.pi.coding-agent = lib.mkIf enabled {
         enable = true;
 
+        # The statusline options come from agent-statusline's shared schema,
+        # which claude-nix mounts under `statusLine` and pi-nix mounts here.
+        # Everything else is left alone so both agents render from the same
+        # defaults and the two lines stay identical by construction rather
+        # than by a duplicated widget list.
+        #
+        # barWidth is the one exception, and the schema asks for it in so many
+        # words: the shared default is 10, tracking the Go binary's
+        # config.Defaults(), and claude-nix pins 8 for itself rather than
+        # moving that default and breaking agent-statusline's Nix/Go drift
+        # check. Its option doc names the consumer that wants the narrower bar
+        # as the place to say so, which is here. An eval check renders both
+        # option sets through the same renderConfig and asserts equality, so
+        # this cannot drift silently.
+        #
+        # Under pi the `cost` widget always shows (the auth is
+        # Codex/OpenRouter, so cost is the primary meter) and usage5h/usage7d
+        # hide themselves for want of anthropic-ratelimit headers. That is
+        # mode-gated inside the Go binary, not a config difference.
+        statusline = {
+          enable = true;
+          barWidth = 8;
+        };
+
         # Auth, layered to match pi's resolution order (auth.json > env >
         # models.json). Nothing here fights the interactive `/login` flows:
         #
