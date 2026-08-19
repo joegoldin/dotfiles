@@ -420,18 +420,40 @@ in
             # decision came back
             # `{"kind":"unavailable"}` under --print.
             #
-            # These three are the trees this machine's own environment rules
-            # already describe as the whole world: the repositories, the Nix
-            # configuration, and the immutable store every nix command reads.
-            # Naming them here keeps outside-the-tree file access at the same
-            # cost it had when auto mode ran alone. Anything else outside the
-            # working directory still reaches a prompt, which is the right
-            # answer for a path nobody has described.
+            # Only the store is named. It is immutable and every nix command
+            # reads it, so a prompt there asks about something that cannot
+            # change. ~/Development and ~/dotfiles were listed here once and
+            # are deliberately not: a session rooted in one repository reaching
+            # into another is exactly the case worth seeing, and the working
+            # directory is already allowed by allowInsideWorkingDirectory.
+            # Anything else outside the working directory still reaches a
+            # prompt, which is the right answer for a path nobody described.
+            #
+            # /etc and /proc are added on jailed hosts only, and the reason is
+            # what bwrap actually leaves there. /etc inside the jail is a
+            # session tmpfs holding three bound files (passwd, group,
+            # hostname); /proc is a fresh mount for a PID namespace of one
+            # process. Asking about them buys nothing, and every diagnostic
+            # that reads /etc/os-release or /proc/loadavg was paying a dialog
+            # for it. On darwin there is no jail, so these are not added and
+            # the real /etc keeps its prompt.
+            #
+            # /proc/*/environ is carved back out, because the jail does NOT
+            # contain it: the process environment holds five agenix keys and
+            # the Codex OAuth token, and `cat /proc/self/environ` would be the
+            # shortest path to all six. It works as an exception because
+            # `evaluateAnyValue` takes the LAST matching rule rather than the
+            # most specific one (src/rule.ts), and Nix renders these keys
+            # sorted, which puts `/proc/*/environ` after `/proc/*` for the same
+            # reason any longer string sorts after its own prefix.
             permission.external_directory = {
               "*" = "ask";
-              "~/Development/*" = "allow";
-              "~/dotfiles/*" = "allow";
               "/nix/store/*" = "allow";
+            }
+            // lib.optionalAttrs jailed {
+              "/etc/*" = "allow";
+              "/proc/*" = "allow";
+              "/proc/*/environ" = "deny";
             };
           };
         };
@@ -646,6 +668,27 @@ in
       # `/model`; pi writes settings.json and auth.json, not this), so
       # re-installing it on every activation costs nothing and keeps the
       # op:// references from drifting.
+      # ctrl+backspace deletes the previous word, which is what Claude Code and
+      # Codex do in this terminal and what muscle memory expects. pi ships
+      # `ctrl+w` and `alt+backspace` for the action and gives ctrl+backspace to
+      # `app.session.deleteNoninvasive` instead, a different scope (the session
+      # list) that the editor never sees.
+      #
+      # A binding REPLACES that action's defaults rather than adding to them, so
+      # the two shipped keys are repeated here on purpose; dropping them would
+      # trade one shortcut for two. pi only ever reads this file
+      # (KeybindingsManager has loadFromFile and reload and no writer), so a
+      # store symlink is safe.
+      home.file.".pi/agent/keybindings.json" = lib.mkIf enabled {
+        text = builtins.toJSON {
+          "tui.editor.deleteWordBackward" = [
+            "ctrl+w"
+            "alt+backspace"
+            "ctrl+backspace"
+          ];
+        };
+      };
+
       home.activation.piModelsJson = lib.mkIf enabled (
         lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           run mkdir -p ${lib.escapeShellArg "${homeDir}/.pi/agent"}
