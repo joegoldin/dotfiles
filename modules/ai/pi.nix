@@ -347,6 +347,21 @@ in
           # unset would restore all 48 rather than clear them.
           protectedPaths = [ ];
 
+          # Jail facts, pi only. The shared list in modules/ai/auto-mode.nix is
+          # fanned out to Claude Code and Codex as well, where none of this is
+          # true; these entries concatenate onto it for this agent alone.
+          #
+          # Without them the classifier reasons about host semantics inside a
+          # container and refuses writes that were already contained, which
+          # costs a model call and a refusal for an action that would have
+          # changed nothing. The point is not to permit more, it is to stop
+          # spending turns guarding a tmpfs.
+          environment = [
+            "pi runs inside a bubblewrap jail. Its root filesystem, /etc, /usr, /var, /boot, /tmp and the home directory are session-local tmpfs: writes there succeed, are visible for the rest of the session, and are discarded when it exits. They never reach the host. Treat a write to one of them as scratch space rather than as a change to the system, and do not refuse it on the grounds that it modifies a system path."
+            "Only four things in the jail outlive the session: the working directory, which is bind-mounted read-write from the host; ~/.pi/agent, likewise; ~/.cache/agent-statusline; and anything written through the Nix daemon, whose socket is bound. /nix/store is a read-only bind, so a direct write there fails. Everything else is discarded, so 'does this persist' is answered by that list and not by the path looking system-owned."
+            "The Nix daemon is the one route out of the jail. `nix build` and `nix flake check` only add store paths and are safe, but a command that activates a configuration -- nixos-rebuild switch, darwin-rebuild switch, `nix profile install`, a systemd unit written through it -- changes the real machine even though it was issued from inside the sandbox. Judge those on what they do to the host, not on the fact that a sandbox issued them."
+          ];
+
           # Deterministic, no model call, and unlike the natural-language
           # lists these cannot be reasoned with.
           # A bash pattern is matched against the whole command string with
@@ -451,6 +466,17 @@ in
             "settled"
           ];
         };
+
+        # Claude Code skills that live in a repository rather than in the
+        # shared library. pi's skill roots are ~/.pi/agent/skills,
+        # ~/.agents/skills, .pi/skills, and .agents/skills up the tree; a
+        # repository's .claude/skills is none of them, and settings.json cannot
+        # add it, because entries in its `skills` array are enable/disable
+        # patterns and a plain path is discarded. The extension answers pi's
+        # resources_discover event with the launch directory's .claude/skills,
+        # so a checkout that carries its own skills is picked up on the session
+        # started inside it and nowhere else.
+        foreignSkills.enable = true;
 
         # Peer messaging between separately launched pi instances, which is
         # pi's missing ListAgents/SendMessage. Local unix socket, no relay, no
