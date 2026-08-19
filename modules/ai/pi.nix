@@ -255,6 +255,21 @@ in
           # pinned, so a newer one upstream is not something pi can act on.
           PI_SKIP_VERSION_CHECK.value = "1";
 
+          # `nix` is on the jail's PATH but was unusable without these two.
+          # jail.nix does --clearenv, so the daemon socket is bound and yet
+          # NIX_REMOTE is unset, which makes every command try the local store
+          # and die on /nix/var/nix/db/big-lock: Permission denied. The host's
+          # nix.conf is outside the bind set too, so nix-command and flakes
+          # read as disabled no matter what the machine is configured for.
+          #
+          # Both were measured from inside: NIX_REMOTE=daemon plus
+          # --extra-experimental-features made an eval succeed where the bare
+          # command failed. Without these the allow rule for `nix build`,
+          # `nix eval` and `nix flake check` is unreachable rather than
+          # permissive, in a repository that is entirely Nix.
+          NIX_REMOTE.value = "daemon";
+          NIX_CONFIG.value = "experimental-features = nix-command flakes";
+
           OPENROUTER_API_KEY.file = ageKey "openrouter_api_key";
           # Standard Compute: one key, one model id, their router picks the
           # model per request. Referenced by name from the provider entry
@@ -444,7 +459,10 @@ in
           defaultModel = "gpt-5.6-sol";
           defaultThinkingLevel = "xhigh";
 
-          tuiMode = "fullscreen";
+          # Regular, not fullscreen: fullscreen does not reflow when the
+          # terminal window is resized, which on a tiling setup is most of the
+          # time. Revisit if upstream fixes the resize handling.
+          tuiMode = "regular";
 
           # Off by default anyway, but pinned rather than inherited: a default
           # is someone else's decision and it can change on an update.
