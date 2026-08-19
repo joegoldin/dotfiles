@@ -104,6 +104,22 @@ in
     # ...
     # });
 
+    # typst (the Haskell library, a pandoc dependency) has a test suite with
+    # one-second wall-clock deadlines. Under a large rebuild it loses that race
+    # against the machine's own build load and fails on TIMEOUT rather than on
+    # anything typst did: 25 of 1033, every one of them "Timed out after 1s",
+    # while ~590 other derivations were compiling alongside it.
+    #
+    # So the result depends on how busy the host is, which makes it a coin flip
+    # rather than a check. Same reasoning as the openldap override above, and
+    # it is a dependency of pandoc rather than something developed here, so its
+    # tests are upstream's to run.
+    haskellPackages = prev.haskellPackages.override {
+      overrides = _hFinal: hPrev: {
+        typst = prev.haskell.lib.compose.dontCheck hPrev.typst;
+      };
+    };
+
     # SunFounder robotics Python libs for the crawler (Robot HAT / PiCrawler).
     # Added to the python package set so they resolve via python3.withPackages.
     pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
