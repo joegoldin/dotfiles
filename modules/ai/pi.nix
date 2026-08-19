@@ -48,6 +48,13 @@ in
       # Nix path literal would copy the plaintext into the store.
       ageKey = name: "/run/agenix/${name}";
 
+      # NOTE: the `!op read` fallback only works with the jail off, which
+      # means torrent, where bubblewrap does not exist anyway. `op` needs the
+      # desktop app's socket and biometric unlock, neither of which is bound
+      # into the jail, and binding them would hand the agent the whole vault.
+      # On the linux workstations agenix is therefore the working key path and
+      # this file is a statement of intent plus a darwin fallback.
+      #
       # Last-resort provider keys, for a machine where agenix has not run.
       # This file holds only the *command* that fetches a key, never a key,
       # so it is safe in the store, but it is installed as a real 0600 file
@@ -91,6 +98,46 @@ in
         };
 
         jail.enable = jailed;
+
+        # The jail wraps pi-nix's launch wrapper, not just the pi binary, so
+        # the `cat /run/agenix/...` in the environment prelude above runs
+        # *inside* bubblewrap and needs the secret files bound. jail.nix binds
+        # only the runtime closure's store paths (/nix/store is not mounted
+        # whole), so nothing on the host is visible unless it is named here.
+        #
+        # This is `mkDefault`, deliberately. pi-nix ships its own permission
+        # set at the same priority, and `types.functionTo (listOf ...)` merges
+        # by applying every definition and concatenating the results, so two
+        # mkDefaults compose into "pi-nix's list, then this one". A plain
+        # definition would be priority 100 and would silently discard pi-nix's
+        # network, mount-cwd, notifications, toolchain and SSH entries instead.
+        # That also keeps pi-nix free to change the generic set without a
+        # dotfiles edit, and it is why gh, openssh and the ~/.ssh paths are
+        # absent below: they already arrive from there.
+        jail.permissions = lib.mkIf jailed (
+          lib.mkDefault (combinators: [
+            # The provider keys from the host modules. try-readonly, not
+            # readwrite: pi only ever cats them, and the -try suffix matters
+            # because activation order means a fresh machine may not have them
+            # yet, where a hard bind of a missing path aborts the launch.
+            (combinators.try-readonly "/run/agenix/anthropic_api_key")
+            (combinators.try-readonly "/run/agenix/openai_api_key")
+            (combinators.try-readonly "/run/agenix/openrouter_api_key")
+
+            # user.name/user.email and the commit-signing config; without it
+            # every commit made in the jail is authored by nobody.
+            (combinators.try-readonly (combinators.noescape "~/.gitconfig"))
+
+            # The `pr` widget shells out to gh, which needs its own config for
+            # the host token. gh itself is already on the jailed PATH.
+            (combinators.try-readonly (combinators.noescape "~/.config/gh"))
+
+            # agent-statusline keeps its git and transcript caches here and the
+            # `hook` subcommand writes the tool-timing sidecar, so this one is
+            # read-write.
+            (combinators.try-readwrite (combinators.noescape "~/.cache/agent-statusline"))
+          ])
+        );
       };
 
       # models.json is read-only from pi's perspective (it reloads on
