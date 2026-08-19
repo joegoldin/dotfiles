@@ -191,6 +191,52 @@ in
           installSkill = false;
         };
 
+        # Dictation. `/voice` spawns `audiomemo record --stream`, draws a VU
+        # meter and the live transcript below the input box, and pastes the
+        # finished text into the editor. The same keypress writes
+        # `{voice:{enabled,mode}}` into ~/.claude/settings.local.json, which is
+        # the file agent-statusline's mic widget already reads, so the
+        # indicator lights under pi and under Claude Code from one
+        # implementation.
+        #
+        # Every decision about devices, backends, formats and secrets stays in
+        # audiomemo, which is why this block is four lines rather than a second
+        # copy of the recording config.
+        voice = {
+          enable = true;
+          # The exact derivation whose closure the jail binds, so ffmpeg is
+          # reachable in there. pkgs.audiomemo comes from the flake's own
+          # overlay, so this is the same build the `record` on PATH is.
+          audiomemo = pkgs.audiomemo;
+
+          # `device` is deliberately left at null. Both hosts already set
+          # `record.device = "mic"` in their audiomemo config, and --stream
+          # implies --no-tui, which suppresses the interactive picker outright
+          # (cmd/record.go: the picker runs only when neither -D nor headless
+          # mode is in play). Naming the alias here would duplicate the host's
+          # device choice in a second file for no robustness: `-D mic` resolves
+          # through the same config.toml that `record.device` lives in, so if
+          # that file is missing both paths fail together.
+
+          # Paths, never values. audiomemo opens each file itself, so no key
+          # reaches the store or pi's process environment, and each path is
+          # bound read-only into the jail. Mistral and HuggingFace are absent
+          # because no such secret exists in dotfiles-secrets; audiomemo reads
+          # an unset variable as an unconfigured backend, which is the right
+          # answer rather than a degraded one.
+          keyFiles = {
+            ELEVENLABS_API_KEY_FILE = ageKey "elevenlabs_api_key";
+            DEEPGRAM_API_KEY_FILE = ageKey "deepgram_api_key";
+            OPENAI_API_KEY_FILE = ageKey "openai_api_key";
+          };
+
+          # The real file, not a store path: audiomemo's home-manager module
+          # installs config.toml as a writable copy because the device TUI
+          # edits it. Without this bind, jail.nix's tmpfs over $HOME hides it,
+          # `record` decides it needs onboarding, and it dies opening /dev/tty.
+          configFile = "${homeDir}/.config/audiomemo/config.toml";
+        };
+
         jail.enable = jailed;
 
         # The jail wraps pi-nix's launch wrapper, not just the pi binary, so
@@ -208,6 +254,14 @@ in
         # That also keeps pi-nix free to change the generic set without a
         # dotfiles edit, and it is why gh, openssh and the ~/.ssh paths are
         # absent below: they already arrive from there.
+        #
+        # The microphone arrives the same way. pi-nix splices
+        # `voice.jailPermissions` into its own default, so the PulseAudio and
+        # PipeWire sockets, the audiomemo closure, config.toml and the three
+        # key files above are all bound already. Adding them here would bind
+        # them twice. `voice.jailPermissions` is exposed for a consumer who
+        # replaces the permission list outright rather than merging into it,
+        # which this file does not do.
         jail.permissions = lib.mkIf jailed (
           lib.mkDefault (combinators: [
             # The provider keys from the host modules. try-readonly, not
