@@ -609,7 +609,43 @@ lint:
     @nix --extra-experimental-features 'nix-command flakes' fmt
     @echo "✅  Nix config linted!"
 
-# Update every flake input (the lock is the only pin).
+# pi is not a flake input, so `flake-update` cannot reach it. pi-nix builds pi
+# from the GitHub source tarball, because its tooling needs the source tree:
+# regenerate-models reads it, the extension checks typecheck against pi's
+# published .d.ts, and bun.nix threads a workspaceRoot through the workspace
+# packages. The version therefore lives in pi-nix's VERSION.json, and
+# `sync-upstream` finds the newest tag itself, prefetches it, and regenerates
+# bun.nix, the npm lockfile and all three hashes.
+#
+# Deliberately does not commit or push. The result changes what pi IS, and the
+# chain after it is pi-nix -> agent-skills -> here, each with its own lock bump.
+#
+# Not idempotent, and that is the trap. `bun install` re-resolves the dependency
+# tree against npm as it is today, so a run on an unchanged pi still rewrites
+# bun.lock and bun.nix with newer transitive pins. If the tag did not move,
+# check `git -C ../Development/pi-nix diff --stat` and revert unless the
+# dependency bump is one you actually want and are willing to rebuild behind.
+#
+# Bump pi to the newest upstream tag (pi is not a flake input).
+[unix]
+update-pi:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    pinix="{{ justfile_directory() }}/../Development/pi-nix"
+    [[ -d "$pinix" ]] || { echo "❌  pi-nix not found at $pinix"; exit 1; }
+    echo "🔄  Syncing pi-nix to the newest upstream pi tag..."
+    before=$(jq -r .rev "$pinix/VERSION.json")
+    (cd "$pinix" && nix run .#sync-upstream)
+    after=$(jq -r .rev "$pinix/VERSION.json")
+    if [[ "$before" == "$after" ]]; then
+      echo "✅  Already on $after"
+    else
+      echo "✅  $before -> $after"
+      echo '    Next: commit and push pi-nix, bump its lock in agent-skills,'
+      echo '    then: just flake-update'
+    fi
+
+# Update every flake input. NOTE: pi is not one of them — see `just update-pi`.
 [unix]
 flake-update:
     #!/usr/bin/env bash
