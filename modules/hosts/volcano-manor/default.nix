@@ -55,6 +55,19 @@ in
         mode = "0400";
         owner = meta.username;
       };
+      # Provider keys for pi (modules/ai/pi.nix). anthropic_api_key above is
+      # shared with other tooling; these two exist only for pi's
+      # environment.<NAME>.file wiring, which cats them at launch.
+      age.secrets.openai_api_key = {
+        file = "${inputs.dotfiles-secrets}/openai_api_key.age";
+        mode = "0400";
+        owner = meta.username;
+      };
+      age.secrets.openrouter_api_key = {
+        file = "${inputs.dotfiles-secrets}/openrouter_api_key.age";
+        mode = "0400";
+        owner = meta.username;
+      };
       age.secrets.umans_api_key = {
         file = "${inputs.dotfiles-secrets}/umans_api_key.age";
         mode = "0400";

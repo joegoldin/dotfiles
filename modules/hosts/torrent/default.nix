@@ -51,6 +51,24 @@ in
         mode = "0400";
         owner = meta.username;
       };
+      # Provider keys for pi (modules/ai/pi.nix). agenix-darwin decrypts to
+      # /run/agenix/<name> exactly as on NixOS, so the home-manager aspect
+      # needs no per-platform path handling.
+      age.secrets.anthropic_api_key = {
+        file = "${inputs.dotfiles-secrets}/anthropic_api_key.age";
+        mode = "0400";
+        owner = meta.username;
+      };
+      age.secrets.openai_api_key = {
+        file = "${inputs.dotfiles-secrets}/openai_api_key.age";
+        mode = "0400";
+        owner = meta.username;
+      };
+      age.secrets.openrouter_api_key = {
+        file = "${inputs.dotfiles-secrets}/openrouter_api_key.age";
+        mode = "0400";
+        owner = meta.username;
+      };
       age.secrets.attic-token = {
         file = "${inputs.dotfiles-secrets}/attic.token.age";
         mode = "0400";
