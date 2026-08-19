@@ -242,6 +242,19 @@ in
           configFile = "${homeDir}/.config/audiomemo/config.toml";
         };
 
+        # pi-background-tasks ships two extensions: the background bash this
+        # host wants, and an Anthropic attribution gate that throws unless the
+        # Anthropic credential is a subscription OAuth token. The keys here are
+        # agenix API keys, so loading both stops pi from starting at all,
+        # including `pi auth check`.
+        #
+        # Naming the entrypoint is narrower than the alternatives: dropping the
+        # package would cost background bash, and moving Anthropic to OAuth
+        # would be letting one extension choose this machine's auth.
+        entrypointOverrides = {
+          pi-background-tasks = [ "./extensions/background-tasks.ts" ];
+        };
+
         jail.enable = jailed;
 
         # The jail wraps pi-nix's launch wrapper, not just the pi binary, so
