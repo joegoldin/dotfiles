@@ -122,6 +122,52 @@ in
     {
       imports = [ inputs.agent-skills.homeManagerModules.pi ];
 
+      # Per-provider launchers. Functions rather than abbreviations, because an
+      # abbreviation expands the moment you type its name, before any argument
+      # exists, so it cannot forward one.
+      #
+      # Each takes an optional model as its first argument and passes the rest
+      # to pi untouched, so `pi-openrouter deepseek/deepseek-r1 --print "hi"`
+      # does what it looks like. With no argument they use the provider's
+      # default.
+      programs.fish.functions = lib.mkIf enabled {
+        pi-codex = {
+          description = "pi on the Codex subscription (default: gpt-5.6-sol:xhigh)";
+          body = ''
+            if set -q argv[1]
+                command pi --model openai-codex/$argv[1] $argv[2..]
+            else
+                command pi --model openai-codex/gpt-5.6-sol:xhigh $argv
+            end
+          '';
+        };
+
+        pi-openrouter = {
+          description = "pi on OpenRouter (first argument is the model)";
+          body = ''
+            if set -q argv[1]
+                command pi --model openrouter/$argv[1] $argv[2..]
+            else
+                echo "pi-openrouter: name a model, e.g. anthropic/claude-sonnet-4" >&2
+                echo "browse them with: pi --list-models openrouter" >&2
+                return 1
+            end
+          '';
+        };
+
+        # One model id; their gateway routes per request, so there is nothing
+        # to choose and an argument here would only be a prompt.
+        pi-standardcompute = {
+          description = "pi on Standard Compute";
+          body = "command pi --model standardcompute/standardcompute $argv";
+        };
+
+        pi-sc = {
+          description = "Alias for pi-standardcompute";
+          body = "pi-standardcompute $argv";
+        };
+      };
+
       programs.pi.coding-agent = lib.mkIf enabled {
         enable = true;
 
@@ -296,6 +342,21 @@ in
           # edits it. Without this bind, jail.nix's tmpfs over $HOME hides it,
           # `record` decides it needs onboarding, and it dies opening /dev/tty.
           configFile = "${homeDir}/.config/audiomemo/config.toml";
+        };
+
+        # The daily driver. Without these pi defaults --provider to google
+        # and pins no model, which is how it wandered into Anthropic on the
+        # first run here.
+        #
+        # Caveat, inherited from upstream and shared with modules/ai/codex.nix:
+        # `settings` is jq-merged into ~/.pi/agent/settings.json on every
+        # launch, so these win over an interactive /model or Ctrl+P choice the
+        # next time pi starts. That is the trade for having the default live in
+        # the flake rather than in a file the agent can rewrite.
+        settings = {
+          defaultProvider = "openai-codex";
+          defaultModel = "gpt-5.6-sol";
+          defaultThinkingLevel = "xhigh";
         };
 
         # pi-background-tasks ships two extensions: the background bash this
