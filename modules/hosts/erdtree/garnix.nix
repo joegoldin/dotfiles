@@ -437,8 +437,12 @@ in
         # silently hangs on an unlisted tier the way the old static pool did.
         # Reserve-style so the box's gaming/HPC workloads keep headroom. Tune to
         # erdtree's real RAM/cores (reserve = amount to always leave free).
-        hosting.memoryBudget = { reserveGiB = 80; };
-        hosting.cpuBudget = { reserveCores = 4; };
+        hosting.memoryBudget = {
+          reserveGiB = 80;
+        };
+        hosting.cpuBudget = {
+          reserveCores = 4;
+        };
         # Optional keep-warm target for fast redeploys, clamped to the budget.
         # (A 1-GiB i1x1 can ENOMEM during switch-to-configuration, so warm i2x4;
         # on-demand deploys of any other tier still work within budget.)
@@ -722,6 +726,13 @@ in
       # Caddy front (Caddy already enabled by wings.nix; 80/443 already open).
       # Webhooks bypass the auth gate (GitHub posts there, HMAC-verified);
       # everything else on the app domain requires an Authentik session.
+      # erdtree serves this cache, so its own ncro must not route to it: going
+      # by public name from here resolves erdtree's address, leaves the box and
+      # comes back through caddy to the backend on loopback below. A full
+      # internet round trip to a local service. The paths are in this machine's
+      # store already, having been built here.
+      nixCacheRouter.excludeUpstreams = [ "https://${domains.garnixCacheDomain}" ];
+
       services.caddy.virtualHosts = {
         # Deployed-server app domains (any depth under apps.<domain>): per-SNI
         # on-demand certs, then straight to Traefik. Unknown SNI never gets a

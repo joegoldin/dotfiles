@@ -46,57 +46,61 @@ in
       lib,
       ...
     }:
-    let
-      # The host that SERVES this cache must not route to it. Reaching
-      # https://<garnix cache> from erdtree resolves its own public name, leaves
-      # the box, and comes back through the proxy to a backend on its loopback:
-      # a full internet round trip to reach a local service, on the upstream
-      # marked as the closest one.
-      #
-      # Derived from the caddy vhost rather than declared a second time, so the
-      # machine that stops serving the cache stops excluding it in the same
-      # edit.
-      servesGarnixCache = config.services.caddy.virtualHosts ? "${domains.garnixCacheDomain}";
-    in
     {
       imports = [ inputs.ncro.nixosModules.ncro ];
 
-      services.ncro = {
-        enable = true;
+      # A host that serves one of these caches must not route to it: reaching
+      # it by public name resolves the host's own address, leaves the box, and
+      # returns through the proxy to a backend on its loopback. That is a full
+      # internet round trip to a local service, on whichever upstream was
+      # marked closest.
+      #
+      # Set by the module that makes the host serve the cache, which is where
+      # the fact actually lives. An earlier version inferred it from
+      # `services.caddy.virtualHosts`, which tied ncro to whatever happened to
+      # be fronting the cache: move it behind cloudflared and the inference
+      # silently returns false, with a wrong answer and no error.
+      options.nixCacheRouter.excludeUpstreams = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ ];
+        description = "Upstream URLs to omit on this host, for a cache it serves itself.";
+        example = lib.literalExpression ''[ "https://cache.example.com" ]'';
+      };
 
-        # The same netrc attic-cache.nix already decrypts. ncro is the one
-        # making the upstream request now, so it needs the credential that
-        # nix used to carry.
-        netrcFile = config.age.secrets.attic-netrc.path;
+      config = {
+        services.ncro = {
+          enable = true;
 
-        settings = {
-          server = {
-            listen = listenAddress;
-            read_timeout = "30s";
-            write_timeout = "30s";
-            # Advertised to nix as this cache's priority. Below both upstreams
-            # so nix prefers the proxy, which is the whole point.
-            cache_priority = 30;
-            want_mass_query = true;
-          };
+          # The same netrc attic-cache.nix already decrypts. ncro is the one
+          # making the upstream request now, so it needs the credential that
+          # nix used to carry.
+          netrcFile = config.age.secrets.attic-netrc.path;
 
-          # Ordered nearest-first. garnix leads because it is this machine's
-          # own CI cache and a hit there is both likeliest and cheapest, attic
-          # follows as the estate-wide store, cache.nixos.org is upstream, and
-          # numtide is last because it holds one project's outputs
-          # (llm-agents) rather than anything general.
-          #
-          # ncro still measures latency and can prefer a faster upstream; these
-          # are the tiebreak, not a strict order.
-          upstreams =
-            lib.optionals (!servesGarnixCache) [
+          settings = {
+            server = {
+              listen = listenAddress;
+              read_timeout = "30s";
+              write_timeout = "30s";
+              # Advertised to nix as this cache's priority. Below both upstreams
+              # so nix prefers the proxy, which is the whole point.
+              cache_priority = 30;
+              want_mass_query = true;
+            };
+
+            # Ordered nearest-first. garnix leads because it is this machine's
+            # own CI cache and a hit there is both likeliest and cheapest, attic
+            # follows as the estate-wide store, cache.nixos.org is upstream, and
+            # numtide is last because it holds one project's outputs
+            # (llm-agents) rather than anything general.
+            #
+            # ncro still measures latency and can prefer a faster upstream; these
+            # are the tiebreak, not a strict order.
+            upstreams = builtins.filter (u: !(lib.elem u.url config.nixCacheRouter.excludeUpstreams)) [
               {
                 url = "https://${domains.garnixCacheDomain}";
                 priority = 0;
                 public_key = garnix.cachePublicKey;
               }
-            ]
-            ++ [
               {
                 url = "https://${domains.atticDomain}/${attic.cacheName}";
                 priority = 10;
@@ -113,18 +117,19 @@ in
                 public_key = "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=";
               }
             ];
+          };
         };
-      };
 
-      # One substituter instead of several, which is the change that matters:
-      # nix stops fanning a query out to every cache and waiting on the
-      # slowest. mkForce because the binary-caches aspect and attic-cache.nix
-      # both contribute entries, and leaving them would put nix back to
-      # querying the same remotes ncro is there to front.
-      #
-      # Trusted keys are not forced: services.ncro.addUpstreamPublicKeys adds
-      # each upstream's key, and a key that is trusted but unused costs
-      # nothing, where a missing one fails the substitution.
-      nix.settings.substituters = lib.mkForce [ "http://${listenAddress}" ];
+        # One substituter instead of several, which is the change that matters:
+        # nix stops fanning a query out to every cache and waiting on the
+        # slowest. mkForce because the binary-caches aspect and attic-cache.nix
+        # both contribute entries, and leaving them would put nix back to
+        # querying the same remotes ncro is there to front.
+        #
+        # Trusted keys are not forced: services.ncro.addUpstreamPublicKeys adds
+        # each upstream's key, and a key that is trusted but unused costs
+        # nothing, where a missing one fails the substitution.
+        nix.settings.substituters = lib.mkForce [ "http://${listenAddress}" ];
+      };
     };
 }
