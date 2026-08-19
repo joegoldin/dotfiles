@@ -48,12 +48,17 @@ in
       # Nix path literal would copy the plaintext into the store.
       ageKey = name: "/run/agenix/${name}";
 
-      # NOTE: the `!op read` fallback only works with the jail off, which
-      # means torrent, where bubblewrap does not exist anyway. `op` needs the
+      # The `!op read` fallback only works with the jail off, which means
+      # torrent, where bubblewrap does not exist anyway. `op` needs the
       # desktop app's socket and biometric unlock, neither of which is bound
       # into the jail, and binding them would hand the agent the whole vault.
-      # On the linux workstations agenix is therefore the working key path and
-      # this file is a statement of intent plus a darwin fallback.
+      #
+      # So it is written on darwin only. It is not inert on linux: an explicit
+      # providers.<name>.apiKey in models.json outranks the agenix environment
+      # variables below, so shipping it there does not add a fallback, it
+      # replaces a working key path with one that cannot succeed. Observed on
+      # the activated system as "Failed to resolve API key for provider
+      # anthropic from shell command: op read ...".
       #
       # Last-resort provider keys, for a machine where agenix has not run.
       # This file holds only the *command* that fetches a key, never a key,
@@ -65,7 +70,7 @@ in
       # first edit.
       modelsJson = pkgs.writeText "pi-models.json" (
         builtins.toJSON {
-          providers = {
+          providers = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
             anthropic.apiKey = "!op read '${piSecrets.anthropicKeyRef}'";
             openai.apiKey = "!op read '${piSecrets.openaiKeyRef}'";
             openrouter.apiKey = "!op read '${piSecrets.openrouterKeyRef}'";
