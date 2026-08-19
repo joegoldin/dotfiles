@@ -403,9 +403,14 @@ in
             # readwrite: pi only ever cats them, and the -try suffix matters
             # because activation order means a fresh machine may not have them
             # yet, where a hard bind of a missing path aborts the launch.
-            (combinators.try-readonly "/run/agenix/anthropic_api_key")
-            (combinators.try-readonly "/run/agenix/openai_api_key")
+            # One bind per key the environment above names. Adding a key
+            # without its bind is a silent failure in the general case and a
+            # loud one here: the prelude's `cat` runs inside bubblewrap, so an
+            # unbound path is simply absent and pi starts with an empty
+            # variable. openai and anthropic are gone from that list, so their
+            # binds go too rather than lingering as permissions for nothing.
             (combinators.try-readonly "/run/agenix/openrouter_api_key")
+            (combinators.try-readonly "/run/agenix/standardcompute_api_key")
 
             # user.name/user.email and the commit-signing config; without it
             # every commit made in the jail is authored by nobody.
