@@ -161,9 +161,20 @@ in
         #      wrapper's process environment.
         #   3. models.json's `!op read` entries (below) are the fallback for
         #      a machine that has not activated agenix yet.
+        # Three providers, three mechanisms, deliberately.
+        #
+        # OpenAI is reached through the Codex subscription and `/login` only,
+        # so no OPENAI_API_KEY appears here. An API key would silently outrank
+        # nothing — auth.json wins — but it would still let a stray `--provider
+        # openai` bill a metered key when the subscription was the point.
+        # Note this is not the same variable as the OPENAI_API_KEY_FILE further
+        # down: that one is audiomemo's transcription key, a different service
+        # on the same vendor, and it stays.
+        #
+        # Anthropic is absent for the same reason: nothing here is meant to
+        # reach it, and a key sitting in the environment is a provider you did
+        # not choose.
         environment = {
-          ANTHROPIC_API_KEY.file = ageKey "anthropic_api_key";
-          OPENAI_API_KEY.file = ageKey "openai_api_key";
           OPENROUTER_API_KEY.file = ageKey "openrouter_api_key";
           # Standard Compute: one key, one model id, their router picks the
           # model per request. Referenced by name from the provider entry
