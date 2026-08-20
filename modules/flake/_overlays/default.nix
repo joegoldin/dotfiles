@@ -104,6 +104,23 @@ in
     # ...
     # });
 
+    # nix-output-monitor 2.2.0 declares the GHC2024 language edition, and the
+    # stable haskellPackages compiles it with ghc-9.6.7, which predates that
+    # edition. It fails in configurePhase with "requires the following
+    # languages which are not supported by ghc-9.6.7: GHC2024", it is not in
+    # any binary cache, so any machine without a working copy already in its
+    # store has to build it and hits the same wall.
+    #
+    # That made it erdtree's problem and not this workstation's: erdtree pulls
+    # nom twice, directly from server-cli.nix and again through nh, and had no
+    # cached copy. A nixpkgs bump did not help, because the compiler pairing is
+    # what is wrong rather than the version.
+    #
+    # unstable builds the same 2.2.0 against ghc-9.10.3, which does support
+    # GHC2024. Taken from there rather than pinned back to 2.1.8, since the
+    # package is fine and only its compiler was wrong.
+    nix-output-monitor = final.unstable.nix-output-monitor;
+
     # typst (the Haskell library, a pandoc dependency) has a test suite with
     # one-second wall-clock deadlines. Under a large rebuild it loses that race
     # against the machine's own build load and fails on TIMEOUT rather than on
