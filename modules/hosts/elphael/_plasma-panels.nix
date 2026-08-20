@@ -78,6 +78,10 @@ let
   #      the task manager must be configured *after* the move.
   #   3. reloadConfig() forces the applet to pick the values up; launchers
   #      written without it are silently dropped by the applet's async init.
+  #   4. `launchers` is a string *list*, so it has to be written as a JS array.
+  #      Passing the comma-joined string instead stores the whole thing as one
+  #      list entry: the applet then has a single unresolvable launcher URL and
+  #      renders one blank-page icon in place of every pin.
   configureTaskbar =
     { screen, launchers }:
     ''
@@ -86,7 +90,7 @@ let
       it.currentConfigGroup = ["General"];
       it.writeConfig("showOnlyCurrentScreen", true);
       it.writeConfig("groupedTaskVisualization", 1);
-      it.writeConfig("launchers", "${lib.concatStringsSep "," launchers}");
+      it.writeConfig("launchers", ${builtins.toJSON launchers});
       it.reloadConfig();
     '';
 
