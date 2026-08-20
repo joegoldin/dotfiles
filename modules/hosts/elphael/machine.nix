@@ -15,6 +15,15 @@ in
     }:
     let
       fonts = import ../../_data/fonts { inherit pkgs lib dotfiles-assets; };
+      displaylinkWedgeWatchdog = pkgs.writeShellApplication {
+        name = "displaylink-wedge-watchdog";
+        runtimeInputs = with pkgs; [
+          coreutils
+          procps
+          systemd
+        ];
+        text = builtins.readFile ./_displaylink-wedge-watchdog.sh;
+      };
     in
     {
       # Cap nix builds: 3 parallel jobs × 6 threads each = 18 max threads. Memory
@@ -186,6 +195,30 @@ in
             "-${pkgs.kmod}/bin/modprobe evdi"
             "${pkgs.systemd}/bin/systemctl start dlm.service"
           ];
+        };
+      };
+
+      # A persistent evdi page-flip wait blocks KWin's render loop and appears as
+      # system-wide I/O pressure. Confirm the exact stuck kernel worker for 60s,
+      # then use the same graceful dlm restart that recovered the live incident.
+      systemd.services.displaylink-wedge-watchdog = {
+        description = "Restart DisplayLink after a persistent DRM page-flip wedge";
+        after = [ "dlm.service" ];
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = lib.getExe displaylinkWedgeWatchdog;
+          TimeoutStartSec = "90s";
+        };
+      };
+
+      systemd.timers.displaylink-wedge-watchdog = {
+        description = "Check for a wedged DisplayLink DRM page flip";
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnBootSec = "2min";
+          OnUnitActiveSec = "15s";
+          AccuracySec = "1s";
+          Unit = "displaylink-wedge-watchdog.service";
         };
       };
 
