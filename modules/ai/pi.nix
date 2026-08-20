@@ -453,12 +453,25 @@ in
             # most specific one (src/rule.ts), and Nix renders these keys
             # sorted, which puts `/proc/*/environ` after `/proc/*` for the same
             # reason any longer string sorts after its own prefix.
+            #
+            # Each directory is named twice, bare and with a trailing `*`,
+            # because those are two different patterns and not a shorthand for
+            # each other. The extension's own schema doc puts it plainly: "the
+            # trailing `*` is greedy and crosses subdirectory boundaries; a
+            # bare `~/.cargo/registry` matches only the directory entry
+            # itself." So `/nix/store/*` covers every path under the store and
+            # nothing else, and `find /nix/store -path ...` -- whose external
+            # directory is the store itself -- fell through to `*` and asked.
+            # Observed as a live prompt, not inferred.
             permission.external_directory = {
               "*" = "ask";
+              "/nix/store" = "allow";
               "/nix/store/*" = "allow";
             }
             // lib.optionalAttrs jailed {
+              "/etc" = "allow";
               "/etc/*" = "allow";
+              "/proc" = "allow";
               "/proc/*" = "allow";
               "/proc/*/environ" = "deny";
             };
@@ -473,6 +486,15 @@ in
         # agent can build and then run anything from nixpkgs. That is already
         # true of a machine with network access and a compiler.
         jail.nixAccess = true;
+
+        # pi-pretty keeps an LMDB frecency database under the agent directory,
+        # and LMDB cannot be shared by two jailed sessions: --unshare-pid makes
+        # both of them pid 2, and its reader table locks the byte at that
+        # offset in lock.mdb, so the second one to start gets EAGAIN and pi
+        # refuses to open a session at all. A tmpfs per session is the fix, and
+        # the price is that file ranking no longer carries over between them.
+        # pi-nix's option doc has the mechanism and the /proc/locks evidence.
+        jail.privateAgentSubdirs = lib.mkIf jailed [ "pi-pretty" ];
 
         # Claude Code notifies from inside the binary; pi does not, which is
         # why pi-nix ships the pi-notify extension and why its jail default
