@@ -725,7 +725,7 @@ in
 
       services.caddy.package = pkgs.caddy.withPlugins {
         plugins = [ "github.com/mholt/caddy-ratelimit@v0.1.0" ];
-        hash = "sha256-eET4cfn1OGyl8rtq8/dO95eM+hvjLPi9IyyWz6vT5QQ=";
+        hash = "sha256-u/cMyier+OMIyNnr8QbodVn+lgK35H82lGn6N8k+g+A=";
       };
       services.caddy.globalConfig = ''
         # Non-standard directive (mholt/caddy-ratelimit): must be ordered.
