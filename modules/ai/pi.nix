@@ -404,6 +404,29 @@ in
           # permissionReviewLog earns its place twice over now: it is the only
           # record that a decision came from the chain link rather than from a
           # dialog, which is the difference this arrangement exists to make.
+          # Hand `external_directory` back to the classifier. The chain owner
+          # caps a link's `allow` on an excluded surface to `defer`, and
+          # upstream excludes both `external_directory` and `path` because on
+          # an ordinary host "outside the working directory" means the whole
+          # filesystem and a judge that can approve anything there has approved
+          # everything.
+          #
+          # A bubblewrap jail is not that host. Outside the working directory
+          # there is nothing but the paths the wrapper bound by name, and the
+          # ones that actually raise these asks -- /etc, /proc, /tmp, /dev --
+          # are session-local mounts discarded when the process exits. Asking a
+          # human about a directory they already chose to bind is not a
+          # security decision, it is a keystroke.
+          #
+          # `path` stays excluded, and that is what makes this safe rather than
+          # merely convenient: it is the cross-cutting gate below, a deny there
+          # cannot be overridden by any per-tool allow, and it is where the
+          # credentials the jail does bind are named.
+          #
+          # jailed-only. On darwin there is no jail, /etc is the real /etc, and
+          # upstream's default is the right one.
+          permissionSystem.delegationExcludedSurfaces = lib.mkIf jailed [ "path" ];
+
           permissionSystem.settings = {
             debugLog = false;
             permissionReviewLog = true;
@@ -436,19 +459,36 @@ in
             # Anything else outside the working directory still reaches a
             # prompt, which is the right answer for a path nobody described.
             #
-            # /etc and /proc are added on jailed hosts only, and the reason is
-            # what bwrap actually leaves there. /etc inside the jail is a
-            # session tmpfs holding three bound files (passwd, group,
-            # hostname); /proc is a fresh mount for a PID namespace of one
-            # process. Asking about them buys nothing, and every diagnostic
-            # that reads /etc/os-release or /proc/loadavg was paying a dialog
-            # for it. On darwin there is no jail, so these are not added and
-            # the real /etc keeps its prompt.
+            # The rest are added on jailed hosts only, and one test decides
+            # which: inside the jail, is this directory either session-local
+            # scratch that the kernel discards at exit, or a path bound for the
+            # agent's own use? /etc is a session tmpfs holding three bound
+            # files (passwd, group, hostname). /proc is a fresh mount for a PID
+            # namespace of one process. /tmp and /dev are `--tmpfs /tmp` and
+            # `--dev /dev`, empty at start and gone at exit. ~/.cache sits in
+            # the `--tmpfs ~` that replaces the whole home directory, with two
+            # real binds inside it that exist because the agent writes them:
+            # the statusline's caches and nix's. Asking about any of these buys
+            # nothing, and every diagnostic reading /etc/os-release, every
+            # `> /dev/null`, and every scratch file in /tmp was paying a dialog
+            # for it.
+            #
+            # /run fails that test and is deliberately absent: /run/agenix holds
+            # the five provider keys. So does the home directory as a whole,
+            # which is why ~/.cache is named and `~` is not -- ~/.config/gh,
+            # ~/.ssh and ~/.pi/agent/auth.json are the real host's files, bound
+            # by name into that tmpfs.
+            #
+            # On darwin there is no jail, so none of these are added and the
+            # real /etc keeps its prompt.
             #
             # /proc/*/environ is carved back out, because the jail does NOT
             # contain it: the process environment holds five agenix keys and
             # the Codex OAuth token, and `cat /proc/self/environ` would be the
-            # shortest path to all six. It works as an exception because
+            # shortest path to all six. It is denied on the `path` surface
+            # below as well, which is the one that actually holds the line;
+            # this entry keeps the /proc allow from reading as broader than it
+            # is. It works as an exception because
             # `evaluateAnyValue` takes the LAST matching rule rather than the
             # most specific one (src/rule.ts), and Nix renders these keys
             # sorted, which puts `/proc/*/environ` after `/proc/*` for the same
@@ -463,17 +503,63 @@ in
             # nothing else, and `find /nix/store -path ...` -- whose external
             # directory is the store itself -- fell through to `*` and asked.
             # Observed as a live prompt, not inferred.
-            permission.external_directory = {
-              "*" = "ask";
-              "/nix/store" = "allow";
-              "/nix/store/*" = "allow";
+            permission = {
+              external_directory = {
+                "*" = "ask";
+                "/nix/store" = "allow";
+                "/nix/store/*" = "allow";
+              }
+              // lib.optionalAttrs jailed {
+                "/etc" = "allow";
+                "/etc/*" = "allow";
+                "/proc" = "allow";
+                "/proc/*" = "allow";
+                "/proc/*/environ" = "deny";
+                "/tmp" = "allow";
+                "/tmp/*" = "allow";
+                "/dev" = "allow";
+                "/dev/*" = "allow";
+                "${homeDir}/.cache" = "allow";
+                "${homeDir}/.cache/*" = "allow";
+              };
             }
+
+            # The `path` surface, which is a different thing from the rules
+            # above and not a second copy of them. It is cross-cutting -- pi's
+            # own file tools, bash path tokens, MCP arguments and extension
+            # tools all pass through it -- and a deny here cannot be overridden
+            # by a per-tool allow. It is also the one surface still inside the
+            # delegation envelope, so the classifier can refuse on it and can
+            # never approve.
+            #
+            # Which is why these three are named here rather than on
+            # external_directory: they are the credential material the jail
+            # deliberately binds, and they are exactly what the narrowed
+            # envelope above must not be able to hand out. Three entries, not a
+            # policy: everything else still reaches the classifier.
+            #
+            #   /run/agenix/*        the five provider keys, bound read-only so
+            #                        the launcher can cat them.
+            #   /proc/*/environ      the same keys again, and the Codex OAuth
+            #                        token, via any process's environment.
+            #   ~/.pi/agent/auth.json  the `/login` tokens, in the one directory
+            #                        that is bound read-write.
+            #
+            # Not airtight, and worth saying so rather than implying otherwise:
+            # `printenv` reads the same variables out of the process it already
+            # runs in, and no path rule reaches that. What these stop is the
+            # file being read, copied, or sent somewhere by a tool call.
+            #
+            # optionalAttrs on the surface itself, not on its contents: on
+            # darwin none of these paths exists and an empty `path` object
+            # would be a surface declared with no rules in it, which reads as a
+            # policy and is not one.
             // lib.optionalAttrs jailed {
-              "/etc" = "allow";
-              "/etc/*" = "allow";
-              "/proc" = "allow";
-              "/proc/*" = "allow";
-              "/proc/*/environ" = "deny";
+              path = {
+                "/run/agenix/*" = "deny";
+                "/proc/*/environ" = "deny";
+                "${homeDir}/.pi/agent/auth.json" = "deny";
+              };
             };
           };
         };
