@@ -263,6 +263,15 @@ in
           # unchanged and drawn once rather than twice.
           PI_AUTOMODE_NO_STATUS_SLOT.value = "1";
 
+          # The same thing again, for pi-cache-optimizer. It writes
+          # `OpenAI cache 77/79·5.40M/5.75M 93.9%` into a slot of its own with
+          # no setting to stop it, so pi-nix patches the call to honour this.
+          # No republication needed, unlike auto mode: the figures are already
+          # on disk in pi-cache-optimizer-stats.json, which is where the `cache`
+          # widget reads them from and why it can draw them in this theme with
+          # this bar rather than in the extension's own format.
+          PI_CACHE_OPTIMIZER_NO_STATUS_SLOT.value = "1";
+
           # `nix` is on the jail's PATH but was unusable without these two.
           # jail.nix does --clearenv, so the daemon socket is bound and yet
           # NIX_REMOTE is unset, which makes every command try the local store
