@@ -130,11 +130,51 @@ build-to-farum-azula local="":
       --elevation-strategy passwordless --accept-flake-config
     echo "✅  Rebuilt farum-azula!"
 
+# Rebuild erdtree with a cache excluded, for when one of ours is unreachable.
+#
+# A dead substituter is worse than a missing one: nix waits out a 15s connect
+# timeout per path and retries, so a rebuild sits in "Building NixOS
+# configuration" for minutes with nothing compiling, and a large closure can
+# take the daemon down with it.
+#
+# The garnix cache is served by caddy ON erdtree, which makes it circular: if
+# caddy is down the cache is down, erdtree stalls reaching its own cache by
+# public name, and the rebuild that would restore caddy stalls too. This builds
+# HERE (no --build-host) against cache.nixos.org and attic only, then pushes the
+# closure.
+#
+# `substituters`, not `extra-substituters`: the point is to replace the list so
+# the dead host is never queried. netrc-file is repeated because replacing the
+# list drops it, and attic answers 401 without it.
+#
+# Once the cache is back, use `build-to-erdtree` again; nothing here needs
+# reverting.
+#
+# Rebuild erdtree from here, skipping the garnix cache (use when it is down)
+[unix]
+build-to-erdtree-skip-cache:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "🔨  Rebuilding erdtree, skipping the garnix cache 🌳..."
+    ERDTREE_DOMAIN=$(just _secret-domain erdtreeSshDomain)
+    SSH_USER=$(just _secret-domain sshUser)
+    ATTIC_DOMAIN=$(just _secret-domain atticDomain)
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')
+    substituters = https://cache.nixos.org https://$ATTIC_DOMAIN/main
+    netrc-file = /run/agenix/attic-netrc"
+    nh os switch . -H erdtree --target-host "$SSH_USER@$ERDTREE_DOMAIN" \
+      --elevation-strategy passwordless --accept-flake-config
+    echo "✅  Rebuilt erdtree!"
+
 # Rebuild erdtree (beefy dedicated gaming/HPC box) in place (pass --local to build here)
 [unix]
 build-to-erdtree local="":
     #!/usr/bin/env bash
     set -euo pipefail
+    # If this stalls with no builder lines and warnings about a cache timing
+    # out, the garnix cache is probably down with caddy on erdtree, and this
+    # recipe cannot route around it: it exports NIX_CONFIG, discarding any
+    # override passed in. See docs/cache-outage-recovery.md.
     echo "🔨  Rebuilding NixOS on erdtree 🌳..."
     ERDTREE_DOMAIN=$(just _secret-domain erdtreeSshDomain)
     SSH_USER=$(just _secret-domain sshUser)
