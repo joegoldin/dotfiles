@@ -64,11 +64,11 @@
         "pi-nix": "pi-nix"
       },
       "locked": {
-        "lastModified": 1787258655,
-        "narHash": "sha256-D2QOhxhucobIOja7jyA+vm7Nwug5HJRN/oyDd/rqf+U=",
+        "lastModified": 1787262073,
+        "narHash": "sha256-jpr7v4NbRJItZS3JklY9sbY7G829v2K3nQ6UIYLSjA4=",
         "owner": "joegoldin",
         "repo": "agent-skills",
-        "rev": "7459108a29a900e130f3708df87e9b8f340ee49a",
+        "rev": "56cff3108d79ef5d81f5d30c9508f5d459698891",
         "type": "github"
       },
       "original": {
@@ -3396,11 +3396,11 @@
         "systems": "systems_5"
       },
       "locked": {
-        "lastModified": 1787258651,
-        "narHash": "sha256-0tZa57f58Ywqgl9WeqdVQwGSVreq2JJ6jUubY8sUYI0=",
+        "lastModified": 1787261975,
+        "narHash": "sha256-YUrnNc6DIZvC57EDvG3+3WiJ8/UPQNmvCPrBxHdiv9Y=",
         "owner": "joegoldin",
         "repo": "pi-nix",
-        "rev": "6b3cc35853bc344ea23ed949cf14442817b1fa5f",
+        "rev": "3a48f24541f506c142023629489a5f39a39a1741",
         "type": "github"
       },
       "original": {
