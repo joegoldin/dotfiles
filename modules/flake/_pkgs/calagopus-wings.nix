@@ -10,15 +10,15 @@
   fetchurl,
 }:
 let
-  version = "1.0.11";
+  version = "1.1.4";
   sources = {
     x86_64-linux = {
       arch = "x86_64";
-      hash = "sha256-TPJGLUSHlzJcxA19isb4Q/wqG7vUDpUU0l9EEv37FXk=";
+      hash = "sha256-WuzhZbHkJlgf37aRJynYaGapsBetNKQYVgWmTBA27Cg=";
     };
     aarch64-linux = {
       arch = "aarch64";
-      hash = "sha256-c9EF8VnadFiUJPggS+OgvCtVS6JWehGhNDVX/Ryhb6s=";
+      hash = "sha256-xaIUN0zTFtp5A2MXxCuQg0irVz25rR1nnqjbbIGQ+8Q=";
     };
   };
   src =
