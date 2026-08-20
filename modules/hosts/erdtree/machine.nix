@@ -56,6 +56,18 @@ in
       virtualisation.docker.enable = true;
       users.extraGroups.docker.members = [ "${username}" ];
 
+      # Both interfaces are created by this file: tailscale above, docker0 by
+      # the line above it. The trust used to be declared in the Calagopus Wings
+      # module, which is gone, and it was never Wings-specific: tailscale0 is
+      # how tailnet users reach services here, including the garnix microVM
+      # subnet this host advertises, and docker0 is how containers reach the
+      # host. Without them the firewall falls back to the ports caddy and sshd
+      # open for themselves, which is 22, 80 and 443 and nothing else.
+      networking.firewall.trustedInterfaces = [
+        "tailscale0"
+        "docker0"
+      ];
+
       # Full-disk encryption: unlock the LUKS root remotely over SSH in the
       # initrd, on :22 sharing the booted system's host key (deploy-erdtree seeds
       # the same key into both, so known_hosts doesn't churn). On every boot the

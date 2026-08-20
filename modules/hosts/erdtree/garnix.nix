@@ -711,6 +711,18 @@ in
       # the ask endpoint) handles them instead of a *.apps.<domain> block.
       # L7 rate limiting needs the (non-standard) mholt/caddy-ratelimit module;
       # stock nixpkgs caddy does not ship it, so build caddy with the plugin.
+      # garnix reaches the world through caddy: the vhosts below are how the
+      # panel, the API and the cache are served at all. This module used to
+      # inherit `enable` from the Wings module that also happened to want
+      # caddy, so removing Wings left caddy configured and switched off, and
+      # the leftover `systemd.services.caddy` block below produced a unit with
+      # no ExecStart. Activation failed with "bad unit file setting", which
+      # names the symptom and not the cause.
+      #
+      # Enabled here now, next to the vhosts that need it, so the dependency
+      # belongs to the module that has it.
+      services.caddy.enable = true;
+
       services.caddy.package = pkgs.caddy.withPlugins {
         plugins = [ "github.com/mholt/caddy-ratelimit@v0.1.0" ];
         hash = "sha256-eET4cfn1OGyl8rtq8/dO95eM+hvjLPi9IyyWz6vT5QQ=";
