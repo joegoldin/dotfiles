@@ -19,6 +19,7 @@ in
       den.aspects.numtide-cache
       den.aspects.howdy
       den.aspects.microvm-host
+      den.aspects.krun
       den.aspects.oomd
       den.aspects.earlyoom
       den.aspects."1password-browsers"
