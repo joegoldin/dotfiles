@@ -33,6 +33,14 @@ in
         ];
         text = builtins.readFile ./_displaylink-suspend-settle.sh;
       };
+      desktopIoLatency = pkgs.writeShellApplication {
+        name = "desktop-io-latency";
+        runtimeInputs = with pkgs; [
+          coreutils
+          util-linux
+        ];
+        text = builtins.readFile ./_desktop-io-latency.sh;
+      };
     in
     {
       # Cap nix builds: 3 parallel jobs × 6 threads each = 18 max threads. Memory
@@ -42,6 +50,53 @@ in
       # link step from taking down the whole 64 GiB box.
       nix.settings.max-jobs = 3;
       nix.settings.cores = 6;
+
+      # Keep a write storm from stalling the desktop. A Steam extraction, a
+      # nix-gc unlink run or the swapfile dd used to hang KWin's main thread for
+      # seconds at a time, with jbd2, dmcrypt_write and every process that
+      # touched the disk parked in D state behind them. On the 9.6-day uptime,
+      # 10 of the 13 KWin hangs landed inside the nix-gc that deleted 21563
+      # store paths, and ncro logged SQLite writes taking up to 47.9s.
+      #
+      # The ratio defaults are a share of RAM, so on 62 GiB they let 12.5 GiB of
+      # dirty pages pile up before writeback is forced and flushing that through
+      # LUKS takes tens of seconds. Bound it in bytes instead: writeback starts
+      # early and the worst-case flush drains in well under a second. Setting
+      # dirty_bytes zeroes dirty_ratio, which is what we want.
+      boot.kernel.sysctl = {
+        "vm.dirty_background_bytes" = 256 * 1024 * 1024;
+        "vm.dirty_bytes" = 1024 * 1024 * 1024;
+      };
+
+      # NVMe defaults to "none", which is the throughput choice but gives the
+      # compositor's small writes no priority over a bulk writer holding 1023
+      # queued requests. mq-deadline costs little here and honours the idle
+      # ioprio set on nix-gc below, which "none" ignores outright.
+      services.udev.extraRules = ''
+        ACTION=="add|change", KERNEL=="nvme[0-9]n[0-9]", ATTR{queue/scheduler}="mq-deadline"
+      '';
+
+      # nix-gc is pure background work with no deadline, so stop it competing
+      # with the session it interrupts; nix-daemon already has the equivalent
+      # memory ceilings. IOSchedulingClass is the knob that bites, and only
+      # because of the mq-deadline switch above - IOWeight stays inert until
+      # something enables bfq or iocost, and is kept for that day.
+      systemd.services.nix-gc.serviceConfig = {
+        IOSchedulingClass = "idle";
+        IOWeight = 10;
+        CPUWeight = 20;
+        Nice = 19;
+      };
+
+      systemd.services.desktop-io-latency = {
+        description = "Protect the desktop session from background I/O storms";
+        wantedBy = [ "multi-user.target" ];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          ExecStart = lib.getExe desktopIoLatency;
+        };
+      };
 
       # ssh with 1password
       environment.plasma6.excludePackages = with pkgs.kdePackages; [
