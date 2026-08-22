@@ -11,8 +11,8 @@
       libkrunSrc = pkgs.fetchFromGitHub {
         owner = "joegoldin";
         repo = "libkrun";
-        rev = "8a8a5f462d0e5c2752c91b91994484109551a952";
-        hash = "sha256-c6p3zXfbvMdjzD/+vElpOcwJM3HTA0FU9CKhtehXJyk=";
+        rev = "0a88a81c78d5823841ff93b6008778ab787b8299";
+        hash = "sha256-95s56vrSeHwEFRrHFijQvvhhU/mzJRQfQ6f0cUuhUGw=";
       };
 
       libkrunCargoDeps = pkgs.rustPlatform.fetchCargoVendor {
@@ -76,8 +76,8 @@
               src = pkgs.fetchFromGitHub {
                 owner = "joegoldin";
                 repo = "crun";
-                rev = "81c14a2b393c0deb6edbee02595f6837f4f718b0";
-                hash = "sha256-N6JprgTvil4JLWVypioinQ7Fv0X7ETJme99seQJ1Sno=";
+                rev = "2fdda5710f8436687c417d4283997818960e0b71";
+                hash = "sha256-AHiN6Rps4awrHNRKH0xAYuUqBAufNrDkseEksOk2f7o=";
                 fetchSubmodules = true;
                 leaveDotGit = true;
                 postFetch = ''
@@ -92,6 +92,10 @@
                   --replace-fail \
                     '"libkrun.so.2", "${libkrunExec}/lib/libkrun.so.1", NULL' \
                     '"${libkrunExec}/lib64/libkrun.so.2", NULL'
+                substituteInPlace src/libcrun/handlers/krun.c \
+                  --replace-fail \
+                    '"libkrun_init.so.0", NULL' \
+                    '"${libkrunExec}/lib64/libkrun_init.so.0", NULL'
               '';
             }
           );
