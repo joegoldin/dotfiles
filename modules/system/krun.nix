@@ -100,10 +100,16 @@
             }
           );
 
-      krunRuntime = pkgs.runCommand "krun-runtime-${crunKrun.version}" { } ''
-        mkdir -p "$out/bin"
-        ln -s ${lib.getExe crunKrun} "$out/bin/krun"
-      '';
+      krunRuntime =
+        pkgs.runCommand "krun-runtime-${crunKrun.version}"
+          {
+            nativeBuildInputs = [ pkgs.makeWrapper ];
+          }
+          ''
+            mkdir -p "$out/bin"
+            makeWrapper ${lib.getExe crunKrun} "$out/bin/krun" \
+              --prefix PATH : ${lib.makeBinPath [ pkgs.passt ]}
+          '';
     in
     {
       assertions = [
