@@ -13,17 +13,21 @@ fail() {
   exit 1
 }
 
-cat >"$tmp/ps" <<'EOF'
+cat >"$tmp/journalctl" <<'EOF'
 #!/bin/sh
 set -eu
-count_file="$TEST_STATE/ps-count"
+count_file="$TEST_STATE/journal-count"
 count=0
 if [ -f "$count_file" ]; then
   read -r count <"$count_file"
 fi
 count=$((count + 1))
 printf '%s\n' "$count" >"$count_file"
-cat "$TEST_STATE/ps-$count"
+if [ -f "$TEST_STATE/journal-$count" ]; then
+  cat "$TEST_STATE/journal-$count"
+else
+  cat "$TEST_STATE/journal-default"
+fi
 EOF
 
 cat >"$tmp/sleep" <<'EOF'
@@ -42,7 +46,7 @@ case "$1" in
 esac
 EOF
 
-chmod +x "$tmp/ps" "$tmp/sleep" "$tmp/systemctl"
+chmod +x "$tmp/journalctl" "$tmp/sleep" "$tmp/systemctl"
 
 run_watchdog() {
   local case_dir=$1
@@ -52,67 +56,80 @@ run_watchdog() {
   TEST_STATE="$case_dir" \
     SYSTEMCTL_IS_ACTIVE_STATUS="$active_status" \
     SYSTEMCTL_RESTART_STATUS="$restart_status" \
-    PS_COMMAND="$tmp/ps" \
+    WINDOW_SECONDS=15 \
+    CONFIRM_SECONDS=15 \
+    MIN_TIMEOUTS=5 \
+    JOURNAL_COMMAND="$tmp/journalctl" \
     SLEEP_COMMAND="$tmp/sleep" \
     SYSTEMCTL_COMMAND="$tmp/systemctl" \
     bash "$watchdog" >"$case_dir/output" 2>&1
 }
 
-matching_worker() {
-  printf '%s\n' "${1:-744956} D drm_atomic_helper_wait_for_flip_done"
+# KWin logs this once per second for the entire duration of a freeze.
+freezing() {
+  local n=${1:-10}
+  for _ in $(seq 1 "$n"); do
+    printf '%s\n' 'Pageflip timed out! This is a bug in the evdi kernel driver'
+  done
 }
 
-case_dir="$tmp/no-match"
-mkdir "$case_dir"
-printf '%s\n' '100 S do_wait' >"$case_dir/ps-1"
-run_watchdog "$case_dir"
-[[ -f "$case_dir/ps-count" && "$(cat "$case_dir/ps-count")" == 1 ]] ||
-  fail 'no-match case did not perform exactly one scan'
-[[ ! -e "$case_dir/sleep-calls" ]] || fail 'no-match case slept'
-[[ ! -e "$case_dir/systemctl-calls" ]] || fail 'no-match case called systemctl'
+quiet() { printf '%s\n' 'kwin_wayland: nothing interesting here'; }
 
-case_dir="$tmp/transient"
-mkdir "$case_dir"
-matching_worker >"$case_dir/ps-1"
-printf '%s\n' '744956 S worker_thread' >"$case_dir/ps-2"
-run_watchdog "$case_dir"
-[[ "$(cat "$case_dir/sleep-calls")" == 60 ]] || fail 'transient case did not use 60-second confirmation'
-[[ ! -e "$case_dir/systemctl-calls" ]] || fail 'transient case called systemctl'
+expect_restart() {
+  local case_dir=$1
+  printf '%s\n' \
+    'is-active --quiet dlm.service' \
+    'restart dlm.service' >"$case_dir/expected-systemctl-calls"
+  cmp "$case_dir/expected-systemctl-calls" "$case_dir/systemctl-calls"
+}
 
-case_dir="$tmp/different-worker"
+case_dir="$tmp/no-timeouts"
 mkdir "$case_dir"
-matching_worker 744956 >"$case_dir/ps-1"
-matching_worker 745100 >"$case_dir/ps-2"
+quiet >"$case_dir/journal-default"
 run_watchdog "$case_dir"
-[[ ! -e "$case_dir/systemctl-calls" ]] || fail 'different-worker case called systemctl'
+[[ "$(cat "$case_dir/journal-count")" == 1 ]] ||
+  fail 'no-timeouts case did not perform exactly one journal scan'
+[[ ! -e "$case_dir/sleep-calls" ]] || fail 'no-timeouts case slept'
+[[ ! -e "$case_dir/systemctl-calls" ]] || fail 'no-timeouts case called systemctl'
 
-case_dir="$tmp/inactive"
+# A couple of stray timeouts are not a freeze; KWin recovers on its own.
+case_dir="$tmp/below-threshold"
 mkdir "$case_dir"
-matching_worker >"$case_dir/ps-1"
-matching_worker >"$case_dir/ps-2"
+freezing 2 >"$case_dir/journal-default"
+run_watchdog "$case_dir"
+[[ ! -e "$case_dir/systemctl-calls" ]] || fail 'below-threshold case called systemctl'
+
+# The short freezes (11-28s) end by themselves before the confirmation elapses.
+case_dir="$tmp/freeze-recovers"
+mkdir "$case_dir"
+freezing 10 >"$case_dir/journal-1"
+quiet >"$case_dir/journal-default"
+run_watchdog "$case_dir"
+[[ "$(cat "$case_dir/sleep-calls")" == 15 ]] ||
+  fail 'freeze-recovers case did not wait one confirmation window'
+[[ ! -e "$case_dir/systemctl-calls" ]] || fail 'freeze-recovers case called systemctl'
+
+# The 5.6min and 15.3min freezes: still logging after the confirmation window.
+case_dir="$tmp/freeze-persists"
+mkdir "$case_dir"
+freezing 15 >"$case_dir/journal-default"
+run_watchdog "$case_dir"
+expect_restart "$case_dir" ||
+  fail 'freeze-persists case did not restart DisplayLink'
+
+case_dir="$tmp/dlm-inactive"
+mkdir "$case_dir"
+freezing 15 >"$case_dir/journal-default"
 run_watchdog "$case_dir" 3
 [[ "$(cat "$case_dir/systemctl-calls")" == 'is-active --quiet dlm.service' ]] ||
-  fail 'inactive case attempted to start or restart DisplayLink'
-
-case_dir="$tmp/persistent"
-mkdir "$case_dir"
-matching_worker >"$case_dir/ps-1"
-matching_worker >"$case_dir/ps-2"
-run_watchdog "$case_dir"
-printf '%s\n' \
-  'is-active --quiet dlm.service' \
-  'restart dlm.service' >"$case_dir/expected-systemctl-calls"
-cmp "$case_dir/expected-systemctl-calls" "$case_dir/systemctl-calls" ||
-  fail 'persistent case did not restart DisplayLink exactly once'
+  fail 'dlm-inactive case attempted to start or restart DisplayLink'
 
 case_dir="$tmp/restart-failure"
 mkdir "$case_dir"
-matching_worker >"$case_dir/ps-1"
-matching_worker >"$case_dir/ps-2"
+freezing 15 >"$case_dir/journal-default"
 if run_watchdog "$case_dir" 0 1; then
   fail 'restart failure returned success'
 fi
-
 grep -q 'restarting dlm.service' "$case_dir/output" ||
   fail 'restart failure was not logged'
 

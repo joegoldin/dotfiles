@@ -539,8 +539,17 @@ in
 
         configFile = {
           # Power management
-          "powerdevilrc"."AC/Display"."TurnOffDisplayIdleTimeoutSec" = 900;
-          "powerdevilrc"."AC/Display"."TurnOffDisplayIdleTimeoutWhenLockedSec" = 20;
+          #
+          # Never DPMS the displays off. The evdi (DisplayLink) driver stops
+          # completing page flips once its output is powered down: all five
+          # desktop freezes on the 9.6-day uptime began 1s after "evdi: (card0)
+          # Notifying display power state: off", and KWin then spun on "Pageflip
+          # timed out! This is a bug in the evdi kernel driver" for 11s, 22s,
+          # 28s, 5.6min and 15.3min with the whole session unresponsive. The same
+          # blanking is what churns the outputs and kills plasmashell (see the
+          # Wayland-death watchdog above), so both problems share this trigger.
+          "powerdevilrc"."AC/Display"."TurnOffDisplayIdleTimeoutSec" = 0;
+          "powerdevilrc"."AC/Display"."TurnOffDisplayIdleTimeoutWhenLockedSec" = 0;
           "powerdevilrc"."AC/SuspendAndShutdown"."AutoSuspendAction" = 0;
           "powerdevilrc"."AC/SuspendAndShutdown"."PowerButtonAction" = 1;
           # Disable Baloo file indexing

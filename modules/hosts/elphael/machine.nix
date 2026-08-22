@@ -19,7 +19,7 @@ in
         name = "displaylink-wedge-watchdog";
         runtimeInputs = with pkgs; [
           coreutils
-          procps
+          gnugrep
           systemd
         ];
         text = builtins.readFile ./_displaylink-wedge-watchdog.sh;
@@ -203,9 +203,15 @@ in
         };
       };
 
-      # A persistent evdi page-flip wait blocks KWin's render loop and appears as
-      # system-wide I/O pressure. Confirm the exact stuck kernel worker for 60s,
-      # then use the same graceful dlm restart that recovered the live incident.
+      # DPMS'ing the evdi output off stops the driver completing page flips, and
+      # KWin then spins on "Pageflip timed out" once per second with the whole
+      # desktop frozen - 11s, 22s, 28s, 5.6min and 15.3min over one 9.6-day
+      # uptime, every episode starting 1s after "Notifying display power state:
+      # off". Trigger on those log lines: KWin stays runnable throughout, so the
+      # earlier scan for a task blocked in drm_atomic_helper_wait_for_flip_done
+      # ran 24 times during the 5.6min freeze and matched nothing. Replaying the
+      # journal, this detector fires on 9 of 9 probes inside real freezes and 0
+      # of 8 in quiet periods.
       systemd.services.displaylink-wedge-watchdog = {
         description = "Restart DisplayLink after a persistent DRM page-flip wedge";
         after = [ "dlm.service" ];

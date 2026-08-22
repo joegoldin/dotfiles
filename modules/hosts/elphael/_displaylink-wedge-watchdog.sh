@@ -1,47 +1,40 @@
 set -euo pipefail
 
-ps_command="${PS_COMMAND:-ps}"
+journal_command="${JOURNAL_COMMAND:-journalctl}"
 sleep_command="${SLEEP_COMMAND:-sleep}"
 systemctl_command="${SYSTEMCTL_COMMAND:-systemctl}"
-flip_wait=drm_atomic_helper_wait_for_flip_done
+window_seconds="${WINDOW_SECONDS:-15}"
+confirm_seconds="${CONFIRM_SECONDS:-15}"
+min_timeouts="${MIN_TIMEOUTS:-5}"
+flip_message='Pageflip timed out'
 
-blocked_pids() {
-  local pid state wchan
-
-  while read -r pid state wchan; do
-    if [[ "$state" == D* && "$wchan" == "$flip_wait" ]]; then
-      printf '%s\n' "$pid"
-    fi
-  done
+# Detect the freeze the way KWin reports it, not by looking for a blocked task.
+# When the evdi output is DPMS'd off the driver stops completing page flips and
+# KWin spins on a timeout once per second - it stays runnable throughout, so the
+# old scan for a task in D state on drm_atomic_helper_wait_for_flip_done ran 24
+# times during a 338s freeze and matched nothing.
+timeouts_in_window() {
+  "$journal_command" --since "-${window_seconds}s" --no-pager --output=cat 2>/dev/null |
+    grep -c "$flip_message" || true
 }
 
-initial_snapshot="$("$ps_command" -eo pid=,state=,wchan:64=)"
-mapfile -t initial_pids < <(blocked_pids <<<"$initial_snapshot")
-(( ${#initial_pids[@]} > 0 )) || exit 0
+initial=$(timeouts_in_window)
+(( initial >= min_timeouts )) || exit 0
 
-printf 'DisplayLink watchdog: DRM flip wait detected in PID(s) %s; confirming for 60 seconds\n' \
-  "$(IFS=,; echo "${initial_pids[*]}")"
-"$sleep_command" 60
+printf 'DisplayLink watchdog: %s KWin pageflip timeouts in %ss; confirming for %ss\n' \
+  "$initial" "$window_seconds" "$confirm_seconds"
+"$sleep_command" "$confirm_seconds"
 
-current_snapshot="$("$ps_command" -eo pid=,state=,wchan:64=)"
-mapfile -t current_pids < <(blocked_pids <<<"$current_snapshot")
-persistent_pid=
-
-for initial_pid in "${initial_pids[@]}"; do
-  for current_pid in "${current_pids[@]}"; do
-    if [[ "$initial_pid" == "$current_pid" ]]; then
-      persistent_pid="$initial_pid"
-      break 2
-    fi
-  done
-done
-
-[[ -n "$persistent_pid" ]] || exit 0
+current=$(timeouts_in_window)
+if (( current < min_timeouts )); then
+  echo 'DisplayLink watchdog: pageflip timeouts stopped on their own; leaving DisplayLink alone'
+  exit 0
+fi
 
 if ! "$systemctl_command" is-active --quiet dlm.service; then
   echo 'DisplayLink watchdog: dlm.service is inactive; leaving it stopped'
   exit 0
 fi
 
-echo "DisplayLink watchdog: PID $persistent_pid remained blocked for 60 seconds; restarting dlm.service"
+echo "DisplayLink watchdog: pageflip timeouts persisted past ${confirm_seconds}s; restarting dlm.service"
 "$systemctl_command" restart dlm.service
