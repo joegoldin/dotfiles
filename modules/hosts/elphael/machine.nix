@@ -24,6 +24,15 @@ in
         ];
         text = builtins.readFile ./_displaylink-wedge-watchdog.sh;
       };
+      displaylinkSuspendSettle = pkgs.writeShellApplication {
+        name = "displaylink-suspend-settle";
+        runtimeInputs = with pkgs; [
+          coreutils
+          gnugrep
+          procps
+        ];
+        text = builtins.readFile ./_displaylink-suspend-settle.sh;
+      };
     in
     {
       # Cap nix builds: 3 parallel jobs × 6 threads each = 18 max threads. Memory
@@ -169,6 +178,11 @@ in
       # prefix ignores failure) for the rare case nothing holds it; its failure no
       # longer aborts the unit, so ExecStop still runs and DisplayLink always
       # returns on resume.
+      #
+      # The teardown is gated behind displaylink-suspend-settle because logind
+      # broadcasts PrepareForSleep to this unit and to KScreenLocker at once: when
+      # the two overlap the greeter crashes in PlasmaQuick and the lock screen is
+      # unusable on resume. See _displaylink-suspend-settle.sh for the mechanism.
       systemd.services.displaylink-suspend = {
         description = "Stop DisplayLink before suspend, restart it after resume";
         before = [ "sleep.target" ];
@@ -178,6 +192,7 @@ in
           Type = "oneshot";
           RemainAfterExit = true;
           ExecStart = [
+            "${lib.getExe displaylinkSuspendSettle}"
             "-${pkgs.systemd}/bin/systemctl stop dlm.service"
             "-${pkgs.kmod}/bin/modprobe -r evdi"
           ];
