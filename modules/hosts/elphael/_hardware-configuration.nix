@@ -53,10 +53,15 @@
     # Data drives managed by data-drives.nix
   };
 
+  # 64 GiB swapfile on the LUKS-backed root, replacing the 8 GiB random-encrypted
+  # partition on nvme1n1p1: that partition ran completely full for hours at a time
+  # with 20-56% of RAM still free, and faulting those pages back in stalled the
+  # desktop. Root is already encrypted, so dropping randomEncryption keeps swap
+  # encrypted at rest. nvme1n1p1 is now unused and free to repartition.
   swapDevices = [
     {
-      device = "/dev/disk/by-partuuid/0a44e123-0bfa-48c5-80c0-7215f00162b1";
-      randomEncryption.enable = true;
+      device = "/swapfile";
+      size = 64 * 1024;
     }
   ];
 
