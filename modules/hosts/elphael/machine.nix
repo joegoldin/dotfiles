@@ -66,6 +66,15 @@ in
       boot.kernel.sysctl = {
         "vm.dirty_background_bytes" = 256 * 1024 * 1024;
         "vm.dirty_bytes" = 1024 * 1024 * 1024;
+
+        # At the default 60 the kernel treats app memory and page cache as
+        # roughly equally evictable, so streaming a game's assets through the
+        # cache pushes idle applications out to swap: measured 4.5 GiB of
+        # anonymous memory on disk against 10.3 GiB resident - 30% of it - while
+        # 40 GiB of never-reused Inactive(file) was retained, on a box sitting at
+        # 23% memory use. Alt-tabbing back then faults it all in and stutters.
+        # Prefer dropping that cache; swap stays as a reserve, not routine.
+        "vm.swappiness" = 10;
       };
 
       # NVMe defaults to "none", which is the throughput choice but gives the
@@ -189,6 +198,16 @@ in
         # Enable flatpak
         flatpak.enable = true;
       };
+
+      # Workaround NixOS 26.05 race: random-encrypted swap mkswap finishes but the
+      # dm-crypt mapper stays at SYSTEMD_READY=0, so the generated .swap unit waits
+      # 90s for its .device dep and fails. Re-trigger udev probing after mkswap.
+      # https://github.com/NixOS/nixpkgs/issues/524389
+      systemd.services."mkswap-dev-disk-byx2dpartuuid-0a44e123x2d0bfax2d48c5x2d80c0x2d7215f00162b1".serviceConfig.ExecStartPost =
+        [
+          "${pkgs.systemd}/bin/udevadm trigger --action=change /dev/mapper/dev-disk-byx2dpartuuid-0a44e123x2d0bfax2d48c5x2d80c0x2d7215f00162b1"
+          "${pkgs.systemd}/bin/udevadm settle"
+        ];
 
       # The Kingston NV3 (SNV3S1000G, DRAM-less SM2268XT2 controller) at PCI
       # 0000:07:00.0 is failing: it intermittently drops off the bus (lsblk shows
