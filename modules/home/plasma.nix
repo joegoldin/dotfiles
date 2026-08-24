@@ -568,7 +568,7 @@ in
           # bookmarks does sync I/O on a 100MB+ Firefox SQLite cache on the UI thread.
           "krunnerrc"."Plugins"."baloosearchEnabled" = false;
           "krunnerrc"."Plugins"."bookmarksEnabled" = false;
-          "kscreenlockerrc"."Daemon"."Timeout" = 10;
+          "kscreenlockerrc"."Daemon"."Timeout" = 20;
           "kwalletrc"."Wallet"."First Use" = false;
           "kwalletrc"."Wallet"."Prompt on Open" = false;
           # Desktops
