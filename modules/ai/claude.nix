@@ -18,6 +18,16 @@
         inputs.agent-skills.homeManagerModules.agent-skills
       ];
 
+      # Skill-owned tool packages (figr, pxd, vibecad, ...) ride into Claude's
+      # own sandbox PATH via programs.claude-nix.plugins' --plugin-dir, which
+      # never touches home.packages — so they're reachable from the agent's
+      # Bash tool but invisible at an interactive prompt. re-shell is meant to
+      # be run by a human at a terminal (it manages job control, Ctrl-C, TTY
+      # state), so it needs to be on the login shell's PATH explicitly.
+      home.packages = lib.mkIf enabled [
+        inputs.agent-skills.packages.${pkgs.system}.re-shell
+      ];
+
       programs.claude-nix = lib.mkIf enabled {
         enable = true;
         package = pkgs.llm-agents.claude-code;
