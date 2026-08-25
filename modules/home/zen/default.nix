@@ -388,6 +388,7 @@ in
             # Zen-specific UI settings (enforced declaratively).
             "zen.view.use-single-toolbar" = false; # Separate toolbar layout
             "zen.view.compact.enable-at-startup" = false; # Don't start in compact mode
+            "zen.view.drag-window-from-content" = false; # Don't drag the window from page content
             "zen.pinned-tab-manager.restore-pinned-tabs-to-pinned-url" = true; # Pinned tabs reopen at pinned URL
             "zen.site-data-panel.show-callout" = false; # Suppress site-data panel callout
 
