@@ -28,6 +28,13 @@
         "luks-bf7e5885-6a8e-447b-bb6d-b682b2991325" = {
           device = "/dev/disk/by-uuid/bf7e5885-6a8e-447b-bb6d-b682b2991325";
           allowDiscards = true;
+          # Every read and write otherwise funnels through the kcryptd
+          # workqueues - one queue per direction for the whole device - so a
+          # bulk writer (a Steam download landing in /home) and the
+          # compositor's page-ins serialize behind the same kworkers. On NVMe
+          # the queueing costs more than it saves; do the crypto inline in the
+          # submitting context instead.
+          bypassWorkqueues = true;
         };
       };
     };

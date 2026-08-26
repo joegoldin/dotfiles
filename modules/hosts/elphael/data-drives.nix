@@ -13,10 +13,14 @@ in
     let
       drives = import "${dotfiles-secrets}/data-drives.nix";
 
-      # Post-boot LUKS unlock via crypttab with keyfile, nofail so boot isn't blocked
+      # Post-boot LUKS unlock via crypttab with keyfile, nofail so boot isn't blocked.
+      # no-{read,write}-workqueue is bypassWorkqueues for crypttab devices: skip
+      # the kcryptd queues and do the crypto in the submitting context, which on
+      # NVMe cuts the latency a bulk writer imposes on everything else sharing
+      # the device.
       mkCryptTab =
         drive:
-        "${drive.luksName} /dev/disk/by-uuid/${drive.uuid} /etc/secrets/luks-data.key nofail,x-systemd.device-timeout=10s,discard";
+        "${drive.luksName} /dev/disk/by-uuid/${drive.uuid} /etc/secrets/luks-data.key nofail,x-systemd.device-timeout=10s,discard,no-read-workqueue,no-write-workqueue";
 
       mkFileSystem = drive: {
         name = drive.mountPoint;
