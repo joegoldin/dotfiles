@@ -156,6 +156,22 @@ in
         };
       };
 
+      # The io.latency on user.slice above only throttles its siblings -
+      # system.slice, home of nix builds and nix-gc. It is blind to a writer
+      # inside user.slice itself, and that is exactly where a Steam download
+      # to /home runs (app.slice, next to the compositor's session.slice
+      # under the same user manager). Give session.slice its own latency
+      # target on the root device so the io controller throttles app.slice
+      # when kwin starts missing it. The user manager already delegates the
+      # io controller, so the target lands on a writable cgroup.
+      systemd.user.units."session.slice" = {
+        overrideStrategy = "asDropin";
+        text = ''
+          [Slice]
+          IODeviceLatencyTargetSec=/dev/mapper/luks-bf7e5885-6a8e-447b-bb6d-b682b2991325 50ms
+        '';
+      };
+
       # ssh with 1password
       environment.plasma6.excludePackages = with pkgs.kdePackages; [
         discover
