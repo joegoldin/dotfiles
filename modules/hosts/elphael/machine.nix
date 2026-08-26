@@ -75,7 +75,56 @@ in
         # 23% memory use. Alt-tabbing back then faults it all in and stutters.
         # Prefer dropping that cache; swap stays as a reserve, not routine.
         "vm.swappiness" = 10;
+
+        # Swap readahead faults in 2^page-cluster pages at a time, which pays
+        # for itself on a seeking queue and not at all here. With zswap in
+        # front (below) the 8 GiB backing partition compresses to well inside
+        # the pool, so nearly every swap-in is a pool hit and the default 3
+        # spends 8 decompressions to satisfy one fault. Fault them in singly.
+        "vm.page-cluster" = 0;
+
+        # kswapd wakes at the low watermark and reclaims up to high; cross min
+        # before it catches up and the allocating thread reclaims for itself,
+        # which is where a burst turns into a visible stall. Both gaps are
+        # managed_pages * this / 10000, and the default 10 leaves 62 MiB of the
+        # Normal zone's 60.9 GiB between low and min - about 30ms of runway
+        # against a nix build allocating at a couple GB/s. zswap widens the
+        # need further, since reclaiming an anonymous page is now a zstd
+        # compression (~1 GB/s on kswapd's single thread) rather than dropping
+        # a clean one. 200 buys 1.22 GiB of runway for 2% of RAM on a box that
+        # idles with 34 GiB free. Past ~500 kswapd just evicts page cache to
+        # hold reserve it never uses.
+        "vm.watermark_scale_factor" = 200;
       };
+
+      # Swap here is an 8 GiB random-encrypted partition, so every swap-in
+      # pays dm-crypt plus NVMe and queues behind whatever dmcrypt_write is
+      # already draining - the same D-state pile-up the dirty_bytes caps above
+      # exist to break. zswap puts a compressed RAM cache in front of it:
+      # reclaimed anonymous pages are zstd'd into a pool capped at 20% of RAM
+      # (12.4 GiB, more than the whole backing partition holds uncompressed),
+      # and faulting one back is a decompression rather than a decrypt-and-
+      # read. Only what the pool evicts ever reaches the disk.
+      #
+      # Unlike zram the pool is not preallocated - it grows on demand and
+      # shrinks again - so RAM the session is not swapping stays available to
+      # it, which matters more at 62 GiB than the extra ratio zram would buy.
+      #
+      # shrinker_enabled is off in this kernel's defconfig
+      # (CONFIG_ZSWAP_SHRINKER_DEFAULT_ON unset). Without it the pool only
+      # writes back once it is full, and a full pool rejects new pages
+      # straight to disk in the middle of reclaim - precisely the stall being
+      # avoided. With it, cold pages drain to the partition in the background
+      # under pressure so the pool keeps headroom for the hot ones.
+      boot.kernelParams = [
+        "zswap.enabled=1"
+        "zswap.shrinker_enabled=1"
+        # Both already match this kernel's build defaults; pinned so an
+        # upstream defconfig change cannot silently retune reclaim. zsmalloc
+        # is the only zpool left as of 6.16, so there is no zpool to set.
+        "zswap.compressor=zstd"
+        "zswap.max_pool_percent=20"
+      ];
 
       # NVMe defaults to "none", which is the throughput choice but gives the
       # compositor's small writes no priority over a bulk writer holding 1023
