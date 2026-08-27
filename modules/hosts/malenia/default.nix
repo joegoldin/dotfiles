@@ -14,6 +14,7 @@ in
       den.aspects.binary-caches
       den.aspects.attic-post-build-hook
       den.aspects.numtide-cache
+      den.aspects.filesystem-tools
       den.aspects.gaming
       # home features (projected onto users via the host-aspects battery)
       den.aspects.bin

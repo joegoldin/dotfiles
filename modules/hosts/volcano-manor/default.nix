@@ -16,6 +16,7 @@ in
       den.aspects.attic-post-build-hook
       den.aspects.numtide-cache
       den.aspects.app-autostart
+      den.aspects.filesystem-tools
       den.aspects.gaming
       den.aspects.howdy
       den.aspects."1password-browsers"

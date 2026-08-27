@@ -423,7 +423,6 @@ in
         mesa-demos # replaces glxinfo
         gparted
         btop-rocm
-        ntfs3g
         pciutils
         usbutils
 

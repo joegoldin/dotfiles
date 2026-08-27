@@ -24,6 +24,7 @@ in
       den.aspects.earlyoom
       den.aspects."1password-browsers"
       den.aspects.app-autostart
+      den.aspects.filesystem-tools
       den.aspects.gaming
       # home features (projected onto users via the host-aspects battery)
       den.aspects.home-baseline
