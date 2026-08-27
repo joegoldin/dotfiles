@@ -210,6 +210,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
+    # tailcat: netcat over Tailscale's data plane (WireGuard + magicsock +
+    # DERP), no control plane or account needed
+    tailcat = {
+      url = "github:tailscale/tailcat";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
 
     # ── ML / GPU compute ────────────────────────────────────────────────────
     # tinygrad with ROCm/CUDA support

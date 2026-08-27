@@ -231,6 +231,11 @@ in
     sem = inputs.sem.packages.${final.stdenv.hostPlatform.system}.default;
   };
 
+  # tailcat (netcat over Tailscale's data plane) available as pkgs.tailcat
+  tailcat-packages = final: _prev: {
+    tailcat = inputs.tailcat.packages.${final.stdenv.hostPlatform.system}.default;
+  };
+
   # claude-container (claude-code wrapper in docker container with sandboxing)
   claude-container-packages = inputs.claude-container.overlays.default;
 

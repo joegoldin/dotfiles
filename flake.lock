@@ -3626,6 +3626,7 @@
         "plasma-manager": "plasma-manager",
         "sem": "sem",
         "systems": "systems_18",
+        "tailcat": "tailcat",
         "tinygrad-nix": "tinygrad-nix",
         "virby": "virby",
         "zed-editor": "zed-editor",
@@ -4081,6 +4082,29 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "tailcat": {
+      "inputs": {
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1787771822,
+        "narHash": "sha256-DqEvt6cA8vfDS2S8cl65i0AHxznCT5nUPu2BDQozFgc=",
+        "owner": "tailscale",
+        "repo": "tailcat",
+        "rev": "0993a1545b0b80d9150d7d73cb7fc471ae9e8dd9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "tailscale",
+        "repo": "tailcat",
         "type": "github"
       }
     },
