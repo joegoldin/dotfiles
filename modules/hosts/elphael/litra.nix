@@ -15,9 +15,11 @@
       configFile = (pkgs.formats.yaml { }).generate "litra-autotoggle.yml" {
         video_device = facecam.path;
         # Apps open and close the node a few times while starting a call, and
-        # something on this box probes every /dev/video* node ~2x a second.
-        # 1500ms is the upstream default and rides out both.
-        delay = 1500;
+        # Zoom (the ~2x-a-second /dev/video* prober, even idle with video off)
+        # holds the node open for over 1500ms when joining a mic-only meeting.
+        # howdy also keeps it open for a couple of seconds on every PAM auth.
+        # 5000ms rides out all of these; real calls light up ~5s late.
+        delay = 5000;
       };
 
     in

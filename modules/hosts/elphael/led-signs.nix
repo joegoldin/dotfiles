@@ -27,7 +27,7 @@ in
 
       # litra-autotoggle's `delay`, so both settle on the same events at the
       # same moment.
-      settleSeconds = "1.5";
+      settleSeconds = "5";
 
       # Snapshot -> one `<service>\t<payload>` line per entity. A light's colour
       # lives under whichever key its `color_mode` names, so the mode picks the
