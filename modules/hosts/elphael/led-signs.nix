@@ -25,10 +25,6 @@ in
         "light.bedroom_mushroom_girl_led_sign"
       ];
 
-      # litra-autotoggle's `delay`, so both settle on the same events at the
-      # same moment.
-      settleSeconds = "5";
-
       # Snapshot -> one `<service>\t<payload>` line per entity. A light's colour
       # lives under whichever key its `color_mode` names, so the mode picks the
       # key rather than guessing. All three signs are brightness-only today.
@@ -65,11 +61,11 @@ in
 
       led-signs-autotoggle = pkgs.writeShellApplication {
         name = "led-signs-autotoggle";
-        runtimeInputs = with pkgs; [
-          coreutils
-          curl
-          inotify-tools
-          jq
+        runtimeInputs = [
+          facecam.watchStreaming
+          pkgs.coreutils
+          pkgs.curl
+          pkgs.jq
         ];
         # No errexit: a failed HTTP call is something to log and carry on from.
         bashOptions = [
@@ -78,8 +74,6 @@ in
         ];
         text = ''
           ha_url=${lib.escapeShellArg domains.homeassistantBaseUrl}
-          facecam=${lib.escapeShellArg facecam.path}
-          settle=${settleSeconds}
           snapshot="$STATE_DIRECTORY/snapshot.json"
           token=$(cat "$CREDENTIALS_DIRECTORY/ha-token")
           signs=(${lib.concatStringsSep " " (map lib.escapeShellArg signs)})
@@ -157,14 +151,13 @@ in
               "$(jq -cn --args '{ entity_id: $ARGS.positional }' "''${signs[@]}")"
           }
 
-          opens=0
-          # Set only while *this* process is the reason the signs are off. A
-          # close whose open we never saw — crash and restart mid-call — must
-          # not turn anything on, so restore is gated on this, not the count.
+          # Set only while *this* process is the reason the signs are off. An
+          # "off" whose "on" we never saw — crash and restart mid-call — must
+          # not turn anything on, so restore is gated on this, not the event.
           suppressed=0
 
           apply_state() {
-            if [ "$opens" -gt 0 ]; then
+            if [ "$1" = on ]; then
               [ "$suppressed" -eq 1 ] && return 0
               echo "camera in use: saving the signs' state and switching them off"
               if ! take_snapshot; then
@@ -192,55 +185,16 @@ in
             fi
           }
 
-          # litra-autotoggle's algorithm: count outstanding opens, act once the
-          # count holds still for $settle. Apps open and close the node several
-          # times while a call starts.
+          # facecam-watch-streaming (see _facecam.nix) emits "on" when the
+          # camera starts streaming and "off" when it stops.
           watch_camera() {
-            local dev event pending=0 rc
-
-            dev=$(readlink -f "$facecam" 2> /dev/null || true)
-            if [ -z "$dev" ] || [ ! -e "$dev" ]; then
-              # udev restarts this unit when the camera turns up.
-              echo "$facecam is absent; nothing to watch"
-              return 0
-            fi
-            echo "watching $dev"
-
-            # inotify only names entries *inside* a watched directory, so watch
-            # the parent. Filtering has to happen in inotifywait, not here:
-            # /dev as a whole carries a few hundred tty/urandom events a
-            # second, which would both burn CPU and mean the $settle read below
-            # never times out. --include matches the full path.
-            while :; do
-              rc=0
-              if [ "$pending" -eq 1 ]; then
-                read -r -t "$settle" event || rc=$?
-              else
-                read -r event || rc=$?
-              fi
-
-              if [ "$rc" -eq 0 ]; then
-                # inotifywait comma-joins names: a close arrives as
-                # "CLOSE_NOWRITE,CLOSE", never bare.
-                case ",$event," in
-                  *,OPEN,*)
-                    opens=$((opens + 1))
-                    pending=1
-                    ;;
-                  *,CLOSE_WRITE,* | *,CLOSE_NOWRITE,*)
-                    if [ "$opens" -gt 0 ]; then opens=$((opens - 1)); fi
-                    pending=1
-                    ;;
-                esac
-              elif [ "$rc" -gt 128 ]; then
-                pending=0
-                apply_state
-              else
-                echo "error: inotifywait on $dev exited" >&2
-                return 1
-              fi
-            done < <(inotifywait --monitor --quiet --event open,close \
-              --include "^$dev\$" --format '%e' "$(dirname "$dev")")
+            local state
+            while read -r state; do
+              apply_state "$state"
+            done < <(facecam-watch-streaming)
+            # The watcher only exits when the camera disappears; put the signs
+            # back if we still owe them a restore.
+            apply_state off
           }
 
           # Record the current state and touch nothing: a crash or restart must
@@ -277,9 +231,10 @@ in
 
           ExecStartPre = facecam.waitForDevice;
           ExecStart = lib.getExe led-signs-autotoggle;
-          # If the camera never turns up the script exits 0 and the unit goes
-          # idle; the udev rule above starts it again on plug. Real failures
-          # (inotifywait dying) exit non-zero and do get restarted.
+          # If the camera never turns up the watcher idles, and if it is
+          # unplugged mid-run the script exits 0; the udev rule above restarts
+          # the unit on plug either way. Real failures exit non-zero and do
+          # get restarted.
           Restart = "on-failure";
           RestartSec = 5;
 

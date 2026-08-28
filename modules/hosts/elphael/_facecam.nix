@@ -15,6 +15,61 @@ rec {
     echo "warning: ${path} never appeared" >&2
   '';
 
+  # Emits an "on" line when the camera starts streaming and an "off" line when
+  # it stops. Device opens are useless as a signal here: Zoom probes every
+  # /dev/video* node twice a second while idle and sometimes holds ours open
+  # without capturing, so the only honest signal is USB traffic — the device's
+  # urbnum counter climbs ~1000/s while frames flow and, measured against live
+  # probing, not at all otherwise. One hot second turns on; three quiet ones
+  # turn off, riding out mid-call renegotiation.
+  watchStreaming = pkgs.writeShellApplication {
+    name = "facecam-watch-streaming";
+    runtimeInputs = [ pkgs.coreutils ];
+    text = ''
+      dev=$(readlink -f ${lib.escapeShellArg path} 2> /dev/null || true)
+      if [ -z "$dev" ] || [ ! -e "$dev" ]; then
+        # Idle rather than exit, so restart-happy consumers do not churn;
+        # udev restarts the consuming unit when the camera turns up.
+        echo "${path} is absent; nothing to watch" >&2
+        exec sleep infinity
+      fi
+
+      # /sys/class/video4linux/videoN/device is the USB interface; its parent
+      # is the device, which carries the urbnum counter.
+      urbnum=$(dirname "$(readlink -f "/sys/class/video4linux/$(basename "$dev")/device")")/urbnum
+      echo "watching $urbnum for $dev" >&2
+
+      state=off
+      quiet=0
+      prev=$(cat "$urbnum")
+      # cat failing means the camera was unplugged: fall out through the exit
+      # below and let udev start us again on plug.
+      while sleep 1 && cur=$(cat "$urbnum" 2> /dev/null); do
+        delta=$((cur - prev))
+        prev=$cur
+        if [ "$delta" -ge 100 ]; then
+          quiet=0
+          if [ "$state" = off ]; then
+            state=on
+            echo on
+          fi
+        elif [ "$state" = on ]; then
+          quiet=$((quiet + 1))
+          if [ "$quiet" -ge 3 ]; then
+            state=off
+            echo off
+          fi
+        fi
+      done
+
+      # Leave consumers in the "camera off" state rather than frozen mid-call.
+      if [ "$state" = on ]; then
+        echo off
+      fi
+      echo "$dev disappeared; exiting" >&2
+    '';
+  };
+
   # Consumers resolve the node name once, at startup, so they need restarting
   # when the camera is replugged and lands on a new index.
   restartOnReplug =
