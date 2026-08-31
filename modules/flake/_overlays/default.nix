@@ -242,6 +242,11 @@ in
   # affinity-nix (Affinity Photo/Designer/Publisher via wine)
   affinity-packages = inputs.affinity-nix.overlays.default;
 
+  # Autodesk Fusion (wine prefix built by nix) available as pkgs.fusion360
+  fusion360-packages = final: _prev: {
+    fusion360 = inputs.fusion-360-flake.packages.${final.stdenv.hostPlatform.system}.fusion360;
+  };
+
   # MCP server packages for declarative MCP configuration
   # The upstream overlay only exports github-mcp-server; we also need mcp-language-server
   # Inlined upstream overlay to avoid deprecated pkgs.system access in mcps.overlays.default

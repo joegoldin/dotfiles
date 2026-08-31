@@ -31,6 +31,10 @@ let
       unstable.darktable
       # unstable.davinci-resolve
       unstable.discord
+      # Autodesk Fusion. The wine prefix and Fusion itself are built by nix
+      # (inputs.fusion-360-flake) and ship in the closure, so this is installed
+      # by `just switch` rather than on first launch.
+      fusion360
       # hyprwhspr
       unstable.jellyfin-desktop
       lotion

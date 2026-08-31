@@ -232,6 +232,20 @@
       url = "github:mrshmllow/affinity-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Autodesk Fusion via wine. Fork of NullString1/fusion-360-flake; the
+    # buildtime branch replaces upstream's wrapper around cryinkfly's shell
+    # installer with a prefix built entirely by nix, so Fusion arrives with the
+    # closure instead of being installed by a 1874-line bash script on first
+    # run. Point this back at main once that branch is merged.
+    # Deliberately does NOT follow our nixpkgs. The prefix is a ~10GB wine
+    # tree built by running Autodesk's installer under a specific wine, and it
+    # is only validated against that wine; making it follow forces a full
+    # rebuild (~1h) against a different wine major on every nixpkgs bump, for
+    # an artifact whose reproducibility is the whole point of building it
+    # ahead of time. The cost is a second nixpkgs in the lock.
+    fusion-360-flake = {
+      url = "github:joegoldin/fusion-360-flake/buildtime";
+    };
     # Ghostty terminal
     ghostty.url = "github:ghostty-org/ghostty";
     # Zed editor (built from source via flake)
