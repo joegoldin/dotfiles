@@ -1831,11 +1831,11 @@
         "nixpkgs": "nixpkgs_6"
       },
       "locked": {
-        "lastModified": 1788155925,
-        "narHash": "sha256-zwn3xKa/cSrcIi4SHF3vVrB+Ua5gxaMJkzDERyG2UWE=",
+        "lastModified": 1788208775,
+        "narHash": "sha256-TxLVln1F2xt0ilGZEHJX7xTx/RcrJkWcwBrtpQEDUuA=",
         "owner": "joegoldin",
         "repo": "fusion-360-flake",
-        "rev": "41e8f306f1e2bddce75aeab4d29ffcc73cd23d19",
+        "rev": "cc2e6121b8610a5f0338e9c32db60e801be770de",
         "type": "github"
       },
       "original": {
