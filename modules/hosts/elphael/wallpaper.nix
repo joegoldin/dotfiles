@@ -19,6 +19,21 @@ in
         "${config.users.users.${username}.home}/Pictures/Wallpaper"
         "${config.users.users.${username}.home}/Pictures/Backgrounds"
       ];
+      # An unreachable screensaver interface counts as unlocked: a rotation that
+      # skips is recoverable, one that can never run again is not.
+      sessionUnlocked = pkgs.writeShellApplication {
+        name = "session-unlocked";
+        runtimeInputs = [ pkgs.systemd ];
+        text = ''
+          state=$(busctl --user call org.freedesktop.ScreenSaver /ScreenSaver \
+            org.freedesktop.ScreenSaver GetActive 2>/dev/null || true)
+
+          if [ "$state" = "b true" ]; then
+            echo "Session is locked; skipping wallpaper rotation"
+            exit 1
+          fi
+        '';
+      };
     in
     {
       systemd.user = {
@@ -32,6 +47,10 @@ in
         };
 
         services = {
+          # Skipped while the session is locked. With every output DPMS'd off,
+          # plasmashell stops answering DBus, so evaluateScript times out and the
+          # run dies after it has already written slices Plasma never adopts. The
+          # hourly timer picks the rotation back up once the session returns.
           "set-wallpaper" = {
             script = ''
               ${scriptPath} ${lib.concatStringsSep " " wallpaperDirs}
@@ -39,6 +58,7 @@ in
             path = [ pkgs.xrandr ];
             serviceConfig = {
               Type = "oneshot";
+              ExecCondition = lib.getExe sessionUnlocked;
             };
           };
 

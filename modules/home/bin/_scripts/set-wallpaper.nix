@@ -34,15 +34,34 @@
 
     def ensure_temp_dir():
         """Ensure temporary directory exists"""
-        if not os.path.exists(TEMP_DIR):
-            os.makedirs(TEMP_DIR)
-        else:
-            # Clean up old files
-            for f in os.listdir(TEMP_DIR):
-                try:
-                    os.remove(os.path.join(TEMP_DIR, f))
-                except OSError:
-                    pass
+        os.makedirs(TEMP_DIR, exist_ok=True)
+
+
+    def discard_slices(paths):
+        """Remove slices this run produced but never handed to Plasma"""
+        for path in paths:
+            try:
+                os.remove(path)
+            except OSError:
+                pass
+
+
+    def prune_stale_slices(keep_prefix):
+        """Drop slices left by earlier runs, now that the new ones are live.
+
+        The wallpaper Plasma is currently drawing is one of these files, so
+        clearing the directory up front leaves the persisted config pointing at
+        a deleted path whenever the run that was meant to replace it fails.
+        Plasma only notices on the next repaint - typically on unlock, where it
+        falls back to the default wallpaper and rebuilds every containment.
+        """
+        for name in os.listdir(TEMP_DIR):
+            if name.startswith(keep_prefix):
+                continue
+            try:
+                os.remove(os.path.join(TEMP_DIR, name))
+            except OSError:
+                pass
 
 
     def find_random_image(folder_paths):
@@ -284,9 +303,19 @@
         # Slice the image for each monitor
         slices = slice_image_for_monitors(resized_img, monitors)
         print("Sliced image")
-        # Set the wallpaper
-        set_kde_wallpaper(slices)
+
+        # Set the wallpaper. Until evaluateScript lands, the previous run's
+        # slices are still the ones on screen, so they have to outlive a failure
+        # here rather than the other way round.
+        try:
+            set_kde_wallpaper(slices)
+        except Exception as e:
+            print(f"Error setting wallpaper: {e}")
+            discard_slices([s["path"] for s in slices])
+            sys.exit(1)
         print("Set wallpaper")
+
+        prune_stale_slices(f"slice_{TIMESTAMP}_")
 
 
     if __name__ == "__main__":
