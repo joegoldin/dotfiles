@@ -11,6 +11,18 @@ let
   goModule = import ../../../home/_go.nix { inherit pkgs lib; };
   appImagePackages = import ../../../home/_appimages.nix { inherit pkgs; };
 
+  # UnityShaderCompiler links against libtinfo.so.6. nixpkgs ships that name as
+  # a symlink to libncursesw.so.6.6, whose SONAME is libncursesw.so.6, so the
+  # FHS env's ldconfig indexes it under that name and the libtinfo.so.6 lookup
+  # misses -- the compiler dies in the loader and Unity aborts waiting for its
+  # IPC connection (error 0x80000008). Ship a copy with a matching SONAME.
+  libtinfo-compat = pkgs.runCommand "libtinfo-compat" { nativeBuildInputs = [ pkgs.patchelf ]; } ''
+    mkdir -p $out/lib
+    cp ${pkgs.ncurses}/lib/libncursesw.so.6 $out/lib/libtinfo.so.6
+    chmod +w $out/lib/libtinfo.so.6
+    patchelf --set-soname libtinfo.so.6 $out/lib/libtinfo.so.6
+  '';
+
   packageGroups = with pkgs; {
     cli = [
       goModule.packages.claude-squad
@@ -47,6 +59,7 @@ let
       (unstable.unityhub.override {
         extraPkgs = ps: [
           ps.sqlite
+          libtinfo-compat
           blip-caption
         ];
       })
