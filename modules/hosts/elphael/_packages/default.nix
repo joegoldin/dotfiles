@@ -49,6 +49,7 @@ let
       fusion360
       # hyprwhspr
       unstable.jellyfin-desktop
+      unstable.kicad
       lotion
       unstable.obsidian
       unstable.parsec-bin
