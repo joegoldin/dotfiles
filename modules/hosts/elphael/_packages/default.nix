@@ -50,9 +50,11 @@ let
       fusion360
       # hyprwhspr
       unstable.jellyfin-desktop
+      unstable.kdePackages.kdenlive
       unstable.kicad
       lotion
       unstable.obsidian
+      unstable.openshot-qt
       unstable.parsec-bin
       qdirstat # graphical disk usage analyzer
       remmina # remote desktop client
