@@ -38,6 +38,7 @@ let
 
     gui = [
       affinity-v3
+      unstable.audacity
       cameractrls-gtk3
       claude-desktop-fhs
       unstable.darktable
