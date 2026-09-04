@@ -1,0 +1,10 @@
+{
+  "name": "tscircuit-cli-env",
+  "version": "0.0.2463",
+  "private": true,
+  "dependencies": {
+    "three": "^0.179.1",
+    "tscircuit": "0.0.2463",
+    "typescript": "^5"
+  }
+}

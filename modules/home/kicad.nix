@@ -34,7 +34,10 @@
 
       callAddon = unstable.kicad.callPackage;
 
-      atopileUnwrapped = unstable.callPackage ./_pkgs/atopile.nix { };
+      # Not a KiCad addon: an alternative front end that renders React-style
+      # circuit source straight to boards, exporting .kicad_pcb for the rest of
+      # this toolchain to pick up.
+      tscircuit = unstable.callPackage ./_pkgs/tscircuit { };
 
       konnect = callAddon ./_kicad/konnect.nix { };
 
@@ -358,19 +361,6 @@
               --prefix PYTHONPATH : ${kicadWithAddons.base}/lib/python${unstable.python3.pythonVersion}/site-packages
           '';
 
-      # `ato` compiles .ato source into KiCad projects, reaching kicad-cli
-      # through kicadcliwrapper, which takes the first one on PATH.
-      atopile = unstable.symlinkJoin {
-        name = "atopile-${atopileUnwrapped.version}";
-        paths = [ atopileUnwrapped ];
-        nativeBuildInputs = [ unstable.makeWrapper ];
-        postBuild = ''
-          for exe in $out/bin/*; do
-            wrapProgram "$exe" --prefix PATH : ${kicad}/bin
-          done
-        '';
-      };
-
       # The addon bundles this binary, but MCP clients need it on PATH, and
       # they launch it with an environment of their own -- so give it the
       # matching kicad-cli rather than trusting whatever PATH it inherits.
@@ -442,10 +432,10 @@
     in
     {
       home.packages = [
-        atopile
         kicad
         kicadPython
         konnectServer
+        tscircuit
         unstable.freerouting
       ];
 
