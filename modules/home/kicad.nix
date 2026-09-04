@@ -376,6 +376,30 @@
         '';
       };
 
+      # What the PCM would have recorded had it installed these itself. Without
+      # it every library shows up in the Installed tab as its directory name at
+      # version 0.0 from repository <unknown>. Pinned, because the version here
+      # is whatever the flake says it is.
+      installedPackages =
+        unstable.runCommand "kicad-installed-packages"
+          {
+            nativeBuildInputs = [ unstable.jq ];
+          }
+          ''
+            jq -s '{
+              packages: [
+                .[] | {
+                  package: .,
+                  current_version: .versions[0].version,
+                  repository_id: "",
+                  repository_name: "nix",
+                  install_timestamp: 0,
+                  pinned: true
+                }
+              ]
+            }' ${thirdParty}/pcm-metadata/*.json > $out
+          '';
+
       # The global tables KiCad would otherwise let the PCM edit. The stock
       # libraries stay in via the nested "KiCad" table entry, exactly as in the
       # file KiCad writes on first run; ours are appended with the PCM_ nickname
@@ -413,6 +437,8 @@
       # Preferences > Manage Symbol Libraries. Project-local tables are
       # untouched and stay editable. The 10.0 in the path and the KICAD10_ in
       # the variable names both follow the kicad major version.
+      home.file.".config/kicad/10.0/installed_packages.json".source = installedPackages;
+
       home.file.".config/kicad/10.0/sym-lib-table".source = libTable {
         kind = "sym-lib-table";
         root = "symbols";

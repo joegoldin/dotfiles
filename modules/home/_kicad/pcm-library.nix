@@ -44,6 +44,12 @@ stdenvNoCC.mkDerivation {
   installPhase = ''
     runHook preInstall
 
+    # PCM lists a package it finds in the 3rdparty tree whether or not it knows
+    # anything about it -- directory name, version "0.0", author "<unknown>".
+    # Keep the manifest so the aspect can hand it the real thing.
+    install -Dm444 pcm/metadata.json \
+      $out/share/kicad/3rdparty/pcm-metadata/${identifier}.json
+
     for kind in symbols footprints 3dmodels; do
       [ -d "pcm/$kind" ] || continue
       mkdir -p $out/share/kicad/3rdparty/$kind
