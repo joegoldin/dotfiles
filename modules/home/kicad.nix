@@ -36,6 +36,11 @@
 
       konnect = callAddon ./_kicad/konnect.nix { };
 
+      freeroutingZip = unstable.fetchurl {
+        url = "https://github.com/freerouting/freerouting/raw/master/integrations/KiCad/kicad-freerouting-2.3.0.zip";
+        hash = "sha256-qzIFRw7Iyc7i36cBhWfv/kz1aa1ir16N2Z1f0j7IgZ4=";
+      };
+
       addons = [
         # AI assistant control of the board over MCP; built from source, since
         # upstream only publishes the PCM zip as a release artifact.
@@ -226,6 +231,18 @@
           homepage = "https://github.com/ozzysv/ViaFence";
           license = lib.licenses.gpl3Only;
         })
+
+        # The autorouter button in the PCB editor. Upstream bundles its own
+        # 2.3.0 jar in the package, so this is independent of the `freerouting`
+        # CLI below; it wants java 25 or newer, which the wrapper supplies.
+        (callAddon ./_kicad/pcm-plugin.nix {
+          pname = "freerouting";
+          version = "2.3.0";
+          pcmZip = freeroutingZip;
+          description = "Freerouting autorouter, driven from the PCB editor";
+          homepage = "https://github.com/freerouting/freerouting";
+          license = lib.licenses.gpl3Only;
+        })
       ];
 
       libraries = [
@@ -279,9 +296,25 @@
         })
       ];
 
+      # Konnect finds a router jar by walking $KICAD10_3RD_PARTY for a file
+      # matching *freerouting*.jar -- there is no setting for the path -- so
+      # put one where that walk reaches it. It is the addon's bundled 2.3.0
+      # rather than the nixpkgs CLI's 2.2.4 because only 2.3.0 answers the MCP
+      # handshake Konnect probes for (27 routing tools instead of none).
+      freeroutingJar =
+        unstable.runCommand "kicad-3rdparty-freerouting"
+          {
+            nativeBuildInputs = [ unstable.unzip ];
+          }
+          ''
+            mkdir -p $out/freerouting
+            unzip -p ${freeroutingZip} plugins/jar/freerouting-2.3.0.jar \
+              > $out/freerouting/freerouting.jar
+          '';
+
       thirdParty = mergeDirs {
         name = "kicad-3rdparty";
-        paths = map (p: "${p}/share/kicad/3rdparty") libraries;
+        paths = map (p: "${p}/share/kicad/3rdparty") libraries ++ [ freeroutingJar ];
       };
 
       kicadWithAddons = unstable.kicad.override {
@@ -299,7 +332,9 @@
         nativeBuildInputs = [ unstable.makeWrapper ];
         postBuild = ''
           for exe in $out/bin/*; do
-            wrapProgram "$exe" --set-default KICAD10_3RD_PARTY ${thirdParty}
+            wrapProgram "$exe" \
+              --set-default KICAD10_3RD_PARTY ${thirdParty} \
+              --prefix PATH : ${lib.makeBinPath [ unstable.jdk25 ]}
           done
         '';
       };
@@ -312,7 +347,15 @@
         paths = [ konnect.konnect ];
         nativeBuildInputs = [ unstable.makeWrapper ];
         postBuild = ''
-          wrapProgram $out/bin/konnect --prefix PATH : ${kicad}/bin
+          wrapProgram $out/bin/konnect \
+            --set-default KICAD10_3RD_PARTY ${thirdParty} \
+            --prefix PATH : ${
+              lib.makeBinPath [
+                kicad
+                unstable.jdk25
+                unstable.freerouting
+              ]
+            }
         '';
       };
 
@@ -345,6 +388,7 @@
       home.packages = [
         kicad
         konnectServer
+        unstable.freerouting
       ];
 
       # Managed tables are read-only, so libraries are added here rather than in
