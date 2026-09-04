@@ -95,6 +95,10 @@ stdenvNoCC.mkDerivation {
     runHook postInstall
   '';
 
+  # The same server binary the addon bundles, for wiring MCP clients up to
+  # `konnect` on PATH instead of a path inside the unpacked addon.
+  passthru = { inherit konnect; };
+
   meta = {
     description = "KiCad addon exposing the board to AI assistants over MCP";
     homepage = "https://github.com/mixelpixx/Konnect";

@@ -34,10 +34,12 @@
 
       callAddon = unstable.kicad.callPackage;
 
+      konnect = callAddon ./_kicad/konnect.nix { };
+
       addons = [
         # AI assistant control of the board over MCP; built from source, since
         # upstream only publishes the PCM zip as a release artifact.
-        (callAddon ./_kicad/konnect.nix { })
+        konnect
 
         # Panelization and fabrication automation. Its symbols and footprints
         # ride along in `libraries` below, where KiCad can actually see them.
@@ -48,7 +50,7 @@
         (callAddon ./_kicad/pcm-plugin.nix {
           pname = "interactive-html-bom";
           version = "2.11.2";
-          zip = unstable.fetchurl {
+          pcmZip = unstable.fetchurl {
             url = "https://github.com/openscopeproject/InteractiveHtmlBom/releases/download/v2.11.2/InteractiveHtmlBom_v2.11.2_pcm.zip";
             hash = "sha256-vIIgewdTJY2kd5xNZQynFaRE0NjUWjpdjQKxHIYpWn8=";
           };
@@ -62,7 +64,7 @@
         (callAddon ./_kicad/pcm-plugin.nix {
           pname = "fabrication-toolkit";
           version = "5.3.1";
-          zip = unstable.fetchurl {
+          pcmZip = unstable.fetchurl {
             url = "https://github.com/bennymeg/Fabrication-Toolkit/releases/download/5.3.1/Fabrication-Toolkit-5.3.1.zip";
             hash = "sha256-gLBVMciHzKTH2AHGYT4/2+F65eyLgC6HptFsO5oPTEU=";
           };
@@ -77,10 +79,43 @@
         (callAddon ./_kicad/pcm-plugin.nix {
           pname = "jlcpcb-tools";
           version = "2026.04.03";
-          zip = unstable.fetchurl {
+          pcmZip = unstable.fetchurl {
             url = "https://github.com/bouni/kicad-jlcpcb-tools/releases/download/2026.04.03/KiCAD-PCM-2026.04.03.zip";
             hash = "sha256-6CLm7MgwLQ+E9dyBKbQQT2QEWqopSbZlOzhMaeWE0oQ=";
           };
+          # Upstream writes settings.json and its parts databases next to its
+          # own source, which is a read-only store path here -- the plugin dies
+          # on PermissionError before its window opens. Point the writes at the
+          # user data dir; the packaged settings.json stays the default.
+          patchScript = ''
+            cat >> plugins/helpers.py <<'PY'
+
+
+            def jlc_data_dir():
+                """Writable home for the settings file and the parts databases."""
+                path = Path(
+                    os.environ.get("XDG_DATA_HOME", os.path.expanduser("~/.local/share"))
+                ) / "kicad-jlcpcb-tools"
+                path.mkdir(parents=True, exist_ok=True)
+                return str(path)
+
+
+            def jlc_settings_file():
+                """Saved settings if there are any, else the packaged defaults."""
+                user = os.path.join(jlc_data_dir(), "settings.json")
+                return user if os.path.isfile(user) else str(PLUGIN_PATH / "settings.json")
+            PY
+
+            substituteInPlace plugins/library.py \
+              --replace-fail 'from .helpers import PLUGIN_PATH,' 'from .helpers import jlc_data_dir, PLUGIN_PATH,' \
+              --replace-fail 'return os.path.join(PLUGIN_PATH, "jlcpcb")' 'return os.path.join(jlc_data_dir(), "jlcpcb")'
+
+            sed -i 's/^    PLUGIN_PATH,$/    jlc_data_dir,\n    jlc_settings_file,\n    PLUGIN_PATH,/' plugins/mainwindow.py
+
+            substituteInPlace plugins/mainwindow.py \
+              --replace-fail 'os.path.join(PLUGIN_PATH, "settings.json"), encoding="utf-8"' 'jlc_settings_file(), encoding="utf-8"' \
+              --replace-fail 'os.path.join(PLUGIN_PATH, "settings.json"), "w", encoding="utf-8"' 'os.path.join(jlc_data_dir(), "settings.json"), "w", encoding="utf-8"'
+          '';
           description = "LCSC part picker, parts database and JLCPCB assembly outputs";
           homepage = "https://github.com/bouni/kicad-jlcpcb-tools";
           license = lib.licenses.mit;
@@ -91,7 +126,7 @@
         (callAddon ./_kicad/pcm-plugin.nix {
           pname = "impart";
           version = "2026.04.07";
-          zip = unstable.fetchurl {
+          pcmZip = unstable.fetchurl {
             url = "https://github.com/Steffen-W/Import-LIB-KiCad-Plugin/releases/download/2026.04.07/Import-LIB-KiCad-Plugin.zip";
             hash = "sha256-MCB/OUDEqXq7tSP0CgHQI3F9SUT6omCcD44OaWMvXvo=";
           };
@@ -104,7 +139,7 @@
         (callAddon ./_kicad/pcm-plugin.nix {
           pname = "kibuzzard";
           version = "1.7.0";
-          zip = unstable.fetchurl {
+          pcmZip = unstable.fetchurl {
             url = "https://github.com/gregdavill/KiBuzzard/releases/download/1.7.0/KiBuzzard-1.7.0-pcm.zip";
             hash = "sha256-dPp6aIUaXnnq2NgQ+6/Ajb+KM7rhDP9jsX6NMX2+4kQ=";
           };
@@ -117,7 +152,7 @@
         (callAddon ./_kicad/pcm-plugin.nix {
           pname = "board2pdf";
           version = "1.9.3";
-          zip = unstable.fetchurl {
+          pcmZip = unstable.fetchurl {
             url = "https://links.dennevi.com/Board2Pdf_v1.9.3.zip";
             hash = "sha256-oaJSyy2wANG40TwnquXII3su2Vfk2vvmHdtJe0VNAkU=";
           };
@@ -130,7 +165,7 @@
         (callAddon ./_kicad/pcm-plugin.nix {
           pname = "replicate-layout";
           version = "5.0.1";
-          zip = unstable.fetchurl {
+          pcmZip = unstable.fetchurl {
             url = "https://github.com/MitjaNemec/ReplicateLayout/releases/download/5.0.1/ReplicateLayout-5.0.1-pcm.zip";
             hash = "sha256-qjA7xnPdTNApJF2lvTCPsoxRoEgf9Nq2hDV02mTjW+w=";
           };
@@ -143,7 +178,7 @@
         (callAddon ./_kicad/pcm-plugin.nix {
           pname = "place-footprints";
           version = "5.0.0";
-          zip = unstable.fetchurl {
+          pcmZip = unstable.fetchurl {
             url = "https://github.com/MitjaNemec/PlaceFootprints/releases/download/5.0.0/PlaceFootprints-5.0.0-pcm.zip";
             hash = "sha256-svnJvUULpqRkRswUDsJYYjLl/+qBEPta3CLPiLo5b18=";
           };
@@ -157,7 +192,7 @@
         (callAddon ./_kicad/pcm-plugin.nix {
           pname = "pcb2blender";
           version = "2.17.1";
-          zip = unstable.fetchurl {
+          pcmZip = unstable.fetchurl {
             url = "https://github.com/30350n/pcb2blender/releases/download/v2.17.1-k9.0-b4.2lts/pcb2blender_exporter_v2-17-1_k9-0.zip";
             hash = "sha256-FgATO6+lX+Qi6DDKAAAwMOKoKOxdxBy893pAWdDxAME=";
           };
@@ -171,7 +206,7 @@
         (callAddon ./_kicad/pcm-plugin.nix {
           pname = "via-stitching";
           version = "2.0.0";
-          zip = unstable.fetchurl {
+          pcmZip = unstable.fetchurl {
             url = "https://github.com/jOaSbA/via-stitching/releases/download/v2.0.0/via-stitching-2.0.0.zip";
             hash = "sha256-EpENHcDEFWLCyS6jp+RB0dYNmaGZxfDPn54MtYWKgLQ=";
           };
@@ -183,7 +218,7 @@
         (callAddon ./_kicad/pcm-plugin.nix {
           pname = "viafence";
           version = "1.0.2";
-          zip = unstable.fetchurl {
+          pcmZip = unstable.fetchurl {
             url = "https://github.com/ozzysv/ViaFence/releases/download/1.0.2/via_fence_1.0.2.zip";
             hash = "sha256-wR2gdFLu3kT2f1xiz4/eh33hSBlukDsDmo+qQdbgjQ4=";
           };
@@ -197,7 +232,7 @@
         (unstable.callPackage ./_kicad/pcm-library.nix {
           pname = "kikit";
           inherit (unstable.kicadAddons.kikit-library) version;
-          zip = "${unstable.kicadAddons.kikit-library}/addon.zip";
+          pcmZip = "${unstable.kicadAddons.kikit-library}/addon.zip";
           identifier = "com.github.yaqwsx.kikit-library";
           description = "Symbols and footprints KiKit places when it annotates a panel";
           homepage = "https://github.com/yaqwsx/KiKit";
@@ -207,7 +242,7 @@
         (unstable.callPackage ./_kicad/pcm-library.nix {
           pname = "espressif";
           version = "3.2.1";
-          zip = unstable.fetchurl {
+          pcmZip = unstable.fetchurl {
             url = "https://github.com/espressif/kicad-libraries/releases/download/3.2.1/espressif-kicad-addon.zip";
             hash = "sha256-klHZOKLyWtFCSVk4KuMZGLIp0bjp3mNNrX+H5BFbFPk=";
           };
@@ -220,7 +255,7 @@
         (unstable.callPackage ./_kicad/pcm-library.nix {
           pname = "arduino";
           version = "4.2.0";
-          zip = unstable.fetchurl {
+          pcmZip = unstable.fetchurl {
             url = "https://github.com/Alarm-Siren/arduino-kicad-library/releases/download/v4.2.0/arduino-kicad-library-4.2.0-pcm.zip";
             hash = "sha256-Pkf0ZNMmtMR1LUoMcluS7FccYdeyDY9tj2VOJjSa/1Y=";
           };
@@ -233,7 +268,7 @@
         (unstable.callPackage ./_kicad/pcm-library.nix {
           pname = "alternate-kicad-library";
           version = "4.0.1";
-          zip = unstable.fetchurl {
+          pcmZip = unstable.fetchurl {
             url = "https://github.com/DawidCislo/Alternate-KiCad-Library/releases/download/v4.0n/com_github_alternate_kicad_library.zip";
             hash = "sha256-5yN7YaiWOE+OVPkI1Zjz49/sg8HL6yqNcp53GzUS/ek=";
           };
@@ -269,6 +304,18 @@
         '';
       };
 
+      # The addon bundles this binary, but MCP clients need it on PATH, and
+      # they launch it with an environment of their own -- so give it the
+      # matching kicad-cli rather than trusting whatever PATH it inherits.
+      konnectServer = unstable.symlinkJoin {
+        name = "konnect-${konnect.konnect.version}";
+        paths = [ konnect.konnect ];
+        nativeBuildInputs = [ unstable.makeWrapper ];
+        postBuild = ''
+          wrapProgram $out/bin/konnect --prefix PATH : ${kicad}/bin
+        '';
+      };
+
       # The global tables KiCad would otherwise let the PCM edit. The stock
       # libraries stay in via the nested "KiCad" table entry, exactly as in the
       # file KiCad writes on first run; ours are appended with the PCM_ nickname
@@ -295,7 +342,10 @@
         '';
     in
     {
-      home.packages = [ kicad ];
+      home.packages = [
+        kicad
+        konnectServer
+      ];
 
       # Managed tables are read-only, so libraries are added here rather than in
       # Preferences > Manage Symbol Libraries. Project-local tables are

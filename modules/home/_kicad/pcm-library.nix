@@ -16,7 +16,7 @@
   pname,
   version,
   # The PCM zip: an upstream release artifact, or one nixpkgs already built.
-  zip,
+  pcmZip,
   # Passed in rather than read out of metadata.json, so the lib-table generator
   # can name the directory without import-from-derivation.
   identifier,
@@ -28,7 +28,7 @@ stdenvNoCC.mkDerivation {
   pname = "kicadlibrary-${pname}";
   inherit version;
 
-  src = zip;
+  src = pcmZip;
 
   nativeBuildInputs = [ unzip ];
 

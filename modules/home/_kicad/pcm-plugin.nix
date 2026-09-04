@@ -8,13 +8,20 @@
 {
   lib,
   stdenvNoCC,
+  unzip,
+  zip,
+  strip-nondeterminism,
   python3,
   addonPath,
 
   pname,
   version,
   # The PCM zip as upstream publishes it.
-  zip,
+  pcmZip,
+  # Shell run against the unpacked zip, for a plugin that has to be fixed up
+  # before it can run from a read-only store path. When null the zip is passed
+  # through byte for byte.
+  patchScript ? null,
   description,
   homepage,
   license,
@@ -23,18 +30,57 @@ stdenvNoCC.mkDerivation {
   pname = "kicadaddon-${pname}";
   inherit version;
 
-  src = zip;
+  src = pcmZip;
 
-  dontUnpack = true;
+  nativeBuildInputs = lib.optionals (patchScript != null) [
+    unzip
+    zip
+    strip-nondeterminism
+  ];
 
-  installPhase = ''
-    runHook preInstall
+  dontUnpack = patchScript == null;
 
-    mkdir $out
-    cp $src $out/${addonPath}
+  unpackPhase = ''
+    runHook preUnpack
 
-    runHook postInstall
+    mkdir pcm
+    unzip -q $src -d pcm
+
+    runHook postUnpack
   '';
+
+  buildPhase = ''
+    runHook preBuild
+
+    ${lib.optionalString (patchScript != null) ''
+      pushd pcm
+      ${patchScript}
+      popd
+    ''}
+
+    runHook postBuild
+  '';
+
+  installPhase =
+    if patchScript == null then
+      ''
+        runHook preInstall
+
+        mkdir $out
+        cp $src $out/${addonPath}
+
+        runHook postInstall
+      ''
+    else
+      ''
+        runHook preInstall
+
+        mkdir $out
+        (cd pcm && zip -rqX $out/${addonPath} .)
+        strip-nondeterminism --type zip $out/${addonPath}
+
+        runHook postInstall
+      '';
 
   meta = {
     inherit description homepage license;
