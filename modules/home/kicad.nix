@@ -339,6 +339,23 @@
         '';
       };
 
+      # `kicad-python` runs headless board scripts -- ExportSpecctraDSN and the
+      # rest of pcbnew -- without hand-assembling PYTHONPATH. pcbnew ships as a
+      # compiled module inside kicad-base rather than as a python package, and
+      # the interpreter has to be the one it was built against.
+      kicadPython =
+        let
+          python = unstable.python3.withPackages (_: kicadWithAddons.pythonPath);
+        in
+        unstable.runCommand "kicad-python-${kicadWithAddons.version}"
+          {
+            nativeBuildInputs = [ unstable.makeWrapper ];
+          }
+          ''
+            makeWrapper ${python}/bin/python3 $out/bin/kicad-python \
+              --prefix PYTHONPATH : ${kicadWithAddons.base}/lib/python${unstable.python3.pythonVersion}/site-packages
+          '';
+
       # The addon bundles this binary, but MCP clients need it on PATH, and
       # they launch it with an environment of their own -- so give it the
       # matching kicad-cli rather than trusting whatever PATH it inherits.
@@ -387,6 +404,7 @@
     {
       home.packages = [
         kicad
+        kicadPython
         konnectServer
         unstable.freerouting
       ];
