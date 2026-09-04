@@ -51,7 +51,6 @@ let
       # hyprwhspr
       unstable.jellyfin-desktop
       unstable.kdePackages.kdenlive
-      unstable.kicad
       lotion
       unstable.obsidian
       unstable.openshot-qt

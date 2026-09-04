@@ -33,6 +33,7 @@ in
       den.aspects.workstation-packages
       den.aspects.linux-workstation-packages
       den.aspects.ghostty
+      den.aspects.kicad
       den.aspects.zed
       den.aspects.default-apps
       den.aspects.mouse-actions
