@@ -23,6 +23,13 @@ let
     patchelf --set-soname libtinfo.so.6 $out/lib/libtinfo.so.6
   '';
 
+  # Keep the editor's COLLADA importer on the libxml2 ABI loaded at startup.
+  unity-libxml-compat = unstable.runCommandCC "unity-libxml-compat" { } ''
+    mkdir -p $out/lib
+    $CC -shared -fPIC -O2 -foptimize-sibling-calls -Wall -Wextra -Werror \
+      -o $out/lib/libunity-libxml-compat.so ${./unity-libxml-compat.c} -ldl
+  '';
+
   packageGroups = with pkgs; {
     cli = [
       goModule.packages.claude-squad
@@ -60,6 +67,16 @@ let
       unstable.slack
       sublime-merge
       (unstable.unityhub.override {
+        buildFHSEnv =
+          args:
+          unstable.buildFHSEnv (
+            args
+            // {
+              profile = (args.profile or "") + ''
+                export LD_PRELOAD="${unity-libxml-compat}/lib/libunity-libxml-compat.so''${LD_PRELOAD:+:$LD_PRELOAD}"
+              '';
+            }
+          );
         extraPkgs = ps: [
           ps.sqlite
           libtinfo-compat
