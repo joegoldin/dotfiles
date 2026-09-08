@@ -26,7 +26,6 @@ in
       den.aspects.app-autostart
       den.aspects.filesystem-tools
       den.aspects.gaming
-      den.aspects.bluetooth
       # home features (projected onto users via the host-aspects battery)
       den.aspects.home-baseline
       den.aspects.plasma
