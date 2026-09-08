@@ -207,7 +207,6 @@ in
             rocmPackages.clr.icd
           ];
         };
-        bluetooth.enable = true;
       };
 
       services = {
