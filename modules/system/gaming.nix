@@ -35,6 +35,7 @@ in
         unstable.rusty-path-of-building
         # wowup-cf  # disabled: upstream download fails with TLS handshake error
         unstable.vintagestory
+        unstable.r2modman
       ];
 
       users.users."${username}".extraGroups = [ "gamemode" ];
