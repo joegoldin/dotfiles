@@ -16,20 +16,25 @@ in
         "credentials=${config.age.secrets.smb-credentials.path}"
         "uid=1000"
         "gid=100"
-        "nofail"
-        "noauto"
         "_netdev"
-        "x-systemd.device-timeout=5s"
-        "x-systemd.mount-timeout=5s"
       ];
 
+      # A plain systemd.mounts entry rather than fileSystems: the fstab
+      # generator cannot set StartLimit*, and without it every access while
+      # the server is unreachable blocks the caller for the full mount
+      # timeout, over and over. With the limit, systemd refuses further
+      # attempts for a minute after two failures and callers get an
+      # immediate error instead of a hung desktop.
       mkMount = share: {
-        name = share.mountPoint;
-        value = {
-          device = "${mountsCfg.serverAddress}/${share.name}";
-          fsType = "cifs";
-          options = smbOpts;
+        what = "${mountsCfg.serverAddress}/${share.name}";
+        where = share.mountPoint;
+        type = "cifs";
+        options = builtins.concatStringsSep "," smbOpts;
+        unitConfig = {
+          StartLimitIntervalSec = "60";
+          StartLimitBurst = "2";
         };
+        mountConfig.TimeoutSec = "5s";
       };
 
       mkAutomount = share: {
@@ -49,7 +54,7 @@ in
         owner = "root";
       };
 
-      fileSystems = builtins.listToAttrs (map mkMount mountsCfg.shares);
+      systemd.mounts = map mkMount mountsCfg.shares;
       systemd.automounts = map mkAutomount mountsCfg.shares;
     };
 }
