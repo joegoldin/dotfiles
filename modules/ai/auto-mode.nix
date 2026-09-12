@@ -11,8 +11,9 @@
 #   environment facts about this machine the classifier should assume
 #
 # They carry more weight under pi than under Claude Code. That design dropped
-# plan mode and its messaging broker authenticates nobody, so these rules plus
-# the bubblewrap jail are close to the whole guard on the working tree.
+# plan mode, runs with no sandbox of its own, and its messaging broker
+# authenticates nobody, so these rules are close to the whole guard on the
+# machine unless the user launched pi inside a sandbox themselves.
 # Anything irreversible or credential-touching belongs in hard_deny, where
 # "the user asked me to" is not an argument.
 #

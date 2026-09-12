@@ -40,11 +40,6 @@ in
       # pi-nix this machine runs.
       piPkgs = inputs.agent-skills.inputs.pi-nix.packages.${pkgs.stdenv.hostPlatform.system};
 
-      # jail.nix is bubblewrap, so linux only. pi-nix throws outright rather
-      # than degrading if the flag is set on darwin, and torrent gets this
-      # aspect.
-      jailed = pkgs.stdenv.hostPlatform.isLinux;
-
       homeDir = config.home.homeDirectory;
 
       # agenix decrypts to /run/agenix/<name> on NixOS and on nix-darwin
@@ -53,12 +48,9 @@ in
       # Nix path literal would copy the plaintext into the store.
       ageKey = name: "/run/agenix/${name}";
 
-      # The `!op read` fallback only works with the jail off, which means
-      # torrent, where bubblewrap does not exist anyway. `op` needs the
-      # desktop app's socket and biometric unlock, neither of which is bound
-      # into the jail, and binding them would hand the agent the whole vault.
-      #
-      # So it is written on darwin only. It is not inert on linux: an explicit
+      # The `!op read` fallback is written on darwin only, where the desktop
+      # app's biometric unlock is the working key path. It is not inert on
+      # linux: an explicit
       # providers.<name>.apiKey in models.json outranks the agenix environment
       # variables below, so shipping it there does not add a fallback, it
       # replaces a working key path with one that cannot succeed. Observed on
@@ -67,9 +59,8 @@ in
       #
       # Last-resort provider keys, for a machine where agenix has not run.
       # This file holds only the *command* that fetches a key, never a key,
-      # so it is safe in the store, but it is installed as a real 0600 file
-      # rather than symlinked, because the jail binds only the runtime
-      # closure and a bare store symlink would dangle inside it. Upstream's
+      # so it is safe in the store. It is installed by the activation step at
+      # the bottom of this file rather than as a store symlink. Upstream's
       # own `models` option is deliberately unused: its prelude installs the
       # file only when absent, so a declared models.json goes stale on the
       # first edit.
@@ -272,21 +263,6 @@ in
           # this bar rather than in the extension's own format.
           PI_CACHE_OPTIMIZER_NO_STATUS_SLOT.value = "1";
 
-          # `nix` is on the jail's PATH but was unusable without these two.
-          # jail.nix does --clearenv, so the daemon socket is bound and yet
-          # NIX_REMOTE is unset, which makes every command try the local store
-          # and die on /nix/var/nix/db/big-lock: Permission denied. The host's
-          # nix.conf is outside the bind set too, so nix-command and flakes
-          # read as disabled no matter what the machine is configured for.
-          #
-          # Both were measured from inside: NIX_REMOTE=daemon plus
-          # --extra-experimental-features made an eval succeed where the bare
-          # command failed. Without these the allow rule for `nix build`,
-          # `nix eval` and `nix flake check` is unreachable rather than
-          # permissive, in a repository that is entirely Nix.
-          NIX_REMOTE.value = "daemon";
-          NIX_CONFIG.value = "experimental-features = nix-command flakes";
-
           OPENROUTER_API_KEY.file = ageKey "openrouter_api_key";
           # Standard Compute: one key, one model id, their router picks the
           # model per request. Referenced by name from the provider entry
@@ -299,8 +275,8 @@ in
         # `enable` alone, and it is a plain mkEnableOption, so without this
         # line the rules are declared and never consulted. Claude Code has a
         # native classifier; pi's is @czottmann/pi-automode. This design
-        # dropped plan mode, so it and the jail are most of what stands
-        # between the agent and the working tree.
+        # dropped plan mode and pi runs unsandboxed, so it is most of what
+        # stands between the agent and the machine.
         #
         # It is on from the first turn rather than after a slash command: the
         # rendered config sets `enabled` and reaches the extension as
@@ -319,10 +295,10 @@ in
 
           # Reads inside the working tree resolve with no model call, and
           # reads outside it are classified rather than waved through. The
-          # working tree is the thing the jail already confines writes to, so
-          # this aligns the two layers: in the sandbox is silent, out of it is
-          # reviewed. Writes to protected in-tree paths (.git, .pi, shell
-          # profiles) are carved back out and still classified.
+          # working tree is the one place the user has already put in front
+          # of the agent; everywhere else is reviewed. Writes to protected
+          # in-tree paths (.git, .pi, shell profiles) are carved back out and
+          # still classified.
           allowInsideWorkingDirectory = true;
 
           # Secrets the file tools must never open, matched before any
@@ -363,21 +339,6 @@ in
           # unset would restore all 48 rather than clear them.
           protectedPaths = [ ];
 
-          # Jail facts, pi only. The shared list in modules/ai/auto-mode.nix is
-          # fanned out to Claude Code and Codex as well, where none of this is
-          # true; these entries concatenate onto it for this agent alone.
-          #
-          # Without them the classifier reasons about host semantics inside a
-          # container and refuses writes that were already contained, which
-          # costs a model call and a refusal for an action that would have
-          # changed nothing. The point is not to permit more, it is to stop
-          # spending turns guarding a tmpfs.
-          environment = [
-            "pi runs inside a bubblewrap jail. Its root filesystem, /etc, /usr, /var, /boot, /tmp and the home directory are session-local tmpfs: writes there succeed, are visible for the rest of the session, and are discarded when it exits. They never reach the host. Treat a write to one of them as scratch space rather than as a change to the system, and do not refuse it on the grounds that it modifies a system path."
-            "Only four things in the jail outlive the session: the working directory, which is bind-mounted read-write from the host; ~/.pi/agent, likewise; ~/.cache/agent-statusline; and anything written through the Nix daemon, whose socket is bound. /nix/store is a read-only bind, so a direct write there fails. Everything else is discarded, so 'does this persist' is answered by that list and not by the path looking system-owned."
-            "The Nix daemon is the one route out of the jail. `nix build` and `nix flake check` only add store paths and are safe, but a command that activates a configuration -- nixos-rebuild switch, darwin-rebuild switch, `nix profile install`, a systemd unit written through it -- changes the real machine even though it was issued from inside the sandbox. Judge those on what they do to the host, not on the fact that a sandbox issued them."
-          ];
-
           # Deterministic, no model call, and unlike the natural-language
           # lists these cannot be reasoned with.
           # A bash pattern is matched against the whole command string with
@@ -385,9 +346,8 @@ in
           # it appears in the line. deniedPaths cannot: it governs the file
           # tools only, and `cat` is bash. Obfuscation gets past this (a
           # variable, a glob, base64), so it is a net rather than a boundary
-          # — the boundary is the jail, which binds only the two key files pi
-          # itself needs, and the classifier, which reads the hard_deny rule
-          # in plain words.
+          # — the boundary is the classifier, which reads the hard_deny rule
+          # in plain words, and whatever sandbox the user launched pi inside.
           permissions.deny = [
             "bash(*/run/agenix/*)"
             "bash(*/.ssh/id_*)"
@@ -413,29 +373,6 @@ in
           # permissionReviewLog earns its place twice over now: it is the only
           # record that a decision came from the chain link rather than from a
           # dialog, which is the difference this arrangement exists to make.
-          # Hand `external_directory` back to the classifier. The chain owner
-          # caps a link's `allow` on an excluded surface to `defer`, and
-          # upstream excludes both `external_directory` and `path` because on
-          # an ordinary host "outside the working directory" means the whole
-          # filesystem and a judge that can approve anything there has approved
-          # everything.
-          #
-          # A bubblewrap jail is not that host. Outside the working directory
-          # there is nothing but the paths the wrapper bound by name, and the
-          # ones that actually raise these asks -- /etc, /proc, /tmp, /dev --
-          # are session-local mounts discarded when the process exits. Asking a
-          # human about a directory they already chose to bind is not a
-          # security decision, it is a keystroke.
-          #
-          # `path` stays excluded, and that is what makes this safe rather than
-          # merely convenient: it is the cross-cutting gate below, a deny there
-          # cannot be overridden by any per-tool allow, and it is where the
-          # credentials the jail does bind are named.
-          #
-          # jailed-only. On darwin there is no jail, /etc is the real /etc, and
-          # upstream's default is the right one.
-          permissionSystem.delegationExcludedSurfaces = lib.mkIf jailed [ "path" ];
-
           permissionSystem.settings = {
             debugLog = false;
             permissionReviewLog = true;
@@ -468,41 +405,6 @@ in
             # Anything else outside the working directory still reaches a
             # prompt, which is the right answer for a path nobody described.
             #
-            # The rest are added on jailed hosts only, and one test decides
-            # which: inside the jail, is this directory either session-local
-            # scratch that the kernel discards at exit, or a path bound for the
-            # agent's own use? /etc is a session tmpfs holding three bound
-            # files (passwd, group, hostname). /proc is a fresh mount for a PID
-            # namespace of one process. /tmp and /dev are `--tmpfs /tmp` and
-            # `--dev /dev`, empty at start and gone at exit. ~/.cache sits in
-            # the `--tmpfs ~` that replaces the whole home directory, with two
-            # real binds inside it that exist because the agent writes them:
-            # the statusline's caches and nix's. Asking about any of these buys
-            # nothing, and every diagnostic reading /etc/os-release, every
-            # `> /dev/null`, and every scratch file in /tmp was paying a dialog
-            # for it.
-            #
-            # /run fails that test and is deliberately absent: /run/agenix holds
-            # the five provider keys. So does the home directory as a whole,
-            # which is why ~/.cache is named and `~` is not -- ~/.config/gh,
-            # ~/.ssh and ~/.pi/agent/auth.json are the real host's files, bound
-            # by name into that tmpfs.
-            #
-            # On darwin there is no jail, so none of these are added and the
-            # real /etc keeps its prompt.
-            #
-            # /proc/*/environ is carved back out, because the jail does NOT
-            # contain it: the process environment holds five agenix keys and
-            # the Codex OAuth token, and `cat /proc/self/environ` would be the
-            # shortest path to all six. It is denied on the `path` surface
-            # below as well, which is the one that actually holds the line;
-            # this entry keeps the /proc allow from reading as broader than it
-            # is. It works as an exception because
-            # `evaluateAnyValue` takes the LAST matching rule rather than the
-            # most specific one (src/rule.ts), and Nix renders these keys
-            # sorted, which puts `/proc/*/environ` after `/proc/*` for the same
-            # reason any longer string sorts after its own prefix.
-            #
             # Each directory is named twice, bare and with a trailing `*`,
             # because those are two different patterns and not a shorthand for
             # each other. The extension's own schema doc puts it plainly: "the
@@ -517,53 +419,31 @@ in
                 "*" = "ask";
                 "/nix/store" = "allow";
                 "/nix/store/*" = "allow";
-              }
-              // lib.optionalAttrs jailed {
-                "/etc" = "allow";
-                "/etc/*" = "allow";
-                "/proc" = "allow";
-                "/proc/*" = "allow";
-                "/proc/*/environ" = "deny";
-                "/tmp" = "allow";
-                "/tmp/*" = "allow";
-                "/dev" = "allow";
-                "/dev/*" = "allow";
-                "${homeDir}/.cache" = "allow";
-                "${homeDir}/.cache/*" = "allow";
               };
-            }
 
-            # The `path` surface, which is a different thing from the rules
-            # above and not a second copy of them. It is cross-cutting -- pi's
-            # own file tools, bash path tokens, MCP arguments and extension
-            # tools all pass through it -- and a deny here cannot be overridden
-            # by a per-tool allow. It is also the one surface still inside the
-            # delegation envelope, so the classifier can refuse on it and can
-            # never approve.
-            #
-            # Which is why these three are named here rather than on
-            # external_directory: they are the credential material the jail
-            # deliberately binds, and they are exactly what the narrowed
-            # envelope above must not be able to hand out. Three entries, not a
-            # policy: everything else still reaches the classifier.
-            #
-            #   /run/agenix/*        the five provider keys, bound read-only so
-            #                        the launcher can cat them.
-            #   /proc/*/environ      the same keys again, and the Codex OAuth
-            #                        token, via any process's environment.
-            #   ~/.pi/agent/auth.json  the `/login` tokens, in the one directory
-            #                        that is bound read-write.
-            #
-            # Not airtight, and worth saying so rather than implying otherwise:
-            # `printenv` reads the same variables out of the process it already
-            # runs in, and no path rule reaches that. What these stop is the
-            # file being read, copied, or sent somewhere by a tool call.
-            #
-            # optionalAttrs on the surface itself, not on its contents: on
-            # darwin none of these paths exists and an empty `path` object
-            # would be a surface declared with no rules in it, which reads as a
-            # policy and is not one.
-            // lib.optionalAttrs jailed {
+              # The `path` surface, which is a different thing from the rules
+              # above and not a second copy of them. It is cross-cutting -- pi's
+              # own file tools, bash path tokens, MCP arguments and extension
+              # tools all pass through it -- and a deny here cannot be overridden
+              # by a per-tool allow. It is also inside the delegation envelope,
+              # so the classifier can refuse on it and can never approve.
+              #
+              # Which is why these three are named here rather than on
+              # external_directory: they are the credential material pi's own
+              # launcher and login flow put on this machine, and with no sandbox
+              # around the process this rule is what keeps a tool call away from
+              # them. Three entries, not a policy: everything else still reaches
+              # the classifier.
+              #
+              #   /run/agenix/*        the provider keys the launcher cats.
+              #   /proc/*/environ      the same keys again, and the Codex OAuth
+              #                        token, via any process's environment.
+              #   ~/.pi/agent/auth.json  the `/login` tokens.
+              #
+              # Not airtight, and worth saying so rather than implying otherwise:
+              # `printenv` reads the same variables out of the process it already
+              # runs in, and no path rule reaches that. What these stop is the
+              # file being read, copied, or sent somewhere by a tool call.
               path = {
                 "/run/agenix/*" = "deny";
                 "/proc/*/environ" = "deny";
@@ -573,31 +453,10 @@ in
           };
         };
 
-        # `nix build`, `nix eval` and `nix flake check` are named in the
-        # allow list in auto-mode.nix, and every repository on this machine is
-        # a flake. Without this the rule is unreachable rather than permissive:
-        # the jail carries no nix, no store beyond pi's own closure, and no
-        # daemon socket. Turning it on binds all three, which also means the
-        # agent can build and then run anything from nixpkgs. That is already
-        # true of a machine with network access and a compiler.
-        jail.nixAccess = true;
-
-        # pi-pretty keeps an LMDB frecency database under the agent directory,
-        # and LMDB cannot be shared by two jailed sessions: --unshare-pid makes
-        # both of them pid 2, and its reader table locks the byte at that
-        # offset in lock.mdb, so the second one to start gets EAGAIN and pi
-        # refuses to open a session at all. A tmpfs per session is the fix, and
-        # the price is that file ranking no longer carries over between them.
-        # pi-nix's option doc has the mechanism and the /proc/locks evidence.
-        jail.privateAgentSubdirs = lib.mkIf jailed [ "pi-pretty" ];
-
         # Claude Code notifies from inside the binary; pi does not, which is
-        # why pi-nix ships the pi-notify extension and why its jail default
-        # already carries the dbus talk permission the notifier needs. Leaving
-        # this off would make that permission the only trace of a feature
-        # nothing uses. Style and notifier path both default per platform,
-        # notify-send on linux and terminal-notifier on darwin, resolved to an
-        # absolute store path so they survive inside the jail.
+        # why pi-nix ships the pi-notify extension. Style and notifier path
+        # both default per platform, notify-send on linux and
+        # terminal-notifier on darwin, resolved to an absolute store path.
         notifications = {
           enable = true;
 
@@ -633,9 +492,7 @@ in
         # (app.session.toggleSort, app.models.save), never in the editor, and
         # its TUI runs raw mode, so the terminal's XOFF meaning does not apply.
         #
-        # clipboardCommand is left at its default: wl-copy on linux, reached
-        # through jail.nix's host channel rather than a bound compositor
-        # socket, so a headless session still starts.
+        # clipboardCommand is left at its default: wl-copy on linux.
         extras.enable = true;
 
         # Peer messaging between separately launched pi instances, which is
@@ -669,9 +526,8 @@ in
         # copy of the recording config.
         voice = {
           enable = true;
-          # The exact derivation whose closure the jail binds, so ffmpeg is
-          # reachable in there. pkgs.audiomemo comes from the flake's own
-          # overlay, so this is the same build the `record` on PATH is.
+          # pkgs.audiomemo comes from the flake's own overlay, so this is the
+          # same build the `record` on PATH is.
           audiomemo = pkgs.audiomemo;
 
           # `device` is deliberately left at null. Both hosts already set
@@ -684,8 +540,8 @@ in
           # that file is missing both paths fail together.
 
           # Paths, never values. audiomemo opens each file itself, so no key
-          # reaches the store or pi's process environment, and each path is
-          # bound read-only into the jail. Mistral and HuggingFace are absent
+          # reaches the store or pi's process environment. Mistral and
+          # HuggingFace are absent
           # because no such secret exists in dotfiles-secrets; audiomemo reads
           # an unset variable as an unconfigured backend, which is the right
           # answer rather than a degraded one.
@@ -694,12 +550,6 @@ in
             DEEPGRAM_API_KEY_FILE = ageKey "deepgram_api_key";
             OPENAI_API_KEY_FILE = ageKey "openai_api_key";
           };
-
-          # The real file, not a store path: audiomemo's home-manager module
-          # installs config.toml as a writable copy because the device TUI
-          # edits it. Without this bind, jail.nix's tmpfs over $HOME hides it,
-          # `record` decides it needs onboarding, and it dies opening /dev/tty.
-          configFile = "${homeDir}/.config/audiomemo/config.toml";
         };
 
         # The daily driver. Without these pi defaults --provider to google
@@ -745,102 +595,6 @@ in
         entrypointOverrides = {
           pi-background-tasks = [ "./extensions/background-tasks.ts" ];
         };
-
-        jail.enable = jailed;
-
-        # The jail wraps pi-nix's launch wrapper, not just the pi binary, so
-        # the `cat /run/agenix/...` in the environment prelude above runs
-        # *inside* bubblewrap and needs the secret files bound. jail.nix binds
-        # only the runtime closure's store paths (/nix/store is not mounted
-        # whole), so nothing on the host is visible unless it is named here.
-        #
-        # This is `mkDefault`, deliberately. pi-nix ships its own permission
-        # set at the same priority, and `types.functionTo (listOf ...)` merges
-        # by applying every definition and concatenating the results, so two
-        # mkDefaults compose into "pi-nix's list, then this one". A plain
-        # definition would be priority 100 and would silently discard pi-nix's
-        # network, mount-cwd, notifications, toolchain and SSH entries instead.
-        # That also keeps pi-nix free to change the generic set without a
-        # dotfiles edit, and it is why gh, openssh and the ~/.ssh paths are
-        # absent below: they already arrive from there.
-        #
-        # The microphone arrives the same way. pi-nix splices
-        # `voice.jailPermissions` into its own default, so the PulseAudio and
-        # PipeWire sockets, the audiomemo closure, config.toml and the three
-        # key files above are all bound already. Adding them here would bind
-        # them twice. `voice.jailPermissions` is exposed for a consumer who
-        # replaces the permission list outright rather than merging into it,
-        # which this file does not do.
-        jail.permissions = lib.mkIf jailed (
-          lib.mkDefault (combinators: [
-            # The provider keys from the host modules. try-readonly, not
-            # readwrite: pi only ever cats them, and the -try suffix matters
-            # because activation order means a fresh machine may not have them
-            # yet, where a hard bind of a missing path aborts the launch.
-            # One bind per key the environment above names. Adding a key
-            # without its bind is a silent failure in the general case and a
-            # loud one here: the prelude's `cat` runs inside bubblewrap, so an
-            # unbound path is simply absent and pi starts with an empty
-            # variable. openai and anthropic are gone from that list, so their
-            # binds go too rather than lingering as permissions for nothing.
-            (combinators.try-readonly "/run/agenix/openrouter_api_key")
-            (combinators.try-readonly "/run/agenix/standardcompute_api_key")
-
-            # user.name/user.email and the commit-signing config; without it
-            # every commit made in the jail is authored by nobody.
-            (combinators.try-readonly (combinators.noescape "~/.gitconfig"))
-
-            # The `pr` widget shells out to gh, which needs its own config for
-            # the host token. gh itself is already on the jailed PATH.
-            (combinators.try-readonly (combinators.noescape "~/.config/gh"))
-
-            # agent-statusline keeps its git and transcript caches here and the
-            # `hook` subcommand writes the tool-timing sidecar, so this one is
-            # read-write.
-            (combinators.try-readwrite (combinators.noescape "~/.cache/agent-statusline"))
-
-            # A project's own toolchain reaches the agent through the daemon,
-            # not through the PATH: /nix/store is bound and the daemon socket
-            # is bound, so `nix develop`, `nix shell` and a devenv.nix all
-            # build and run inside the jail exactly as they do outside.
-            # Verified by running `nix shell nixpkgs#statix -c statix` in the
-            # jail, which fetched, realised and executed with nothing of statix
-            # on the jailed PATH.
-            #
-            # What the tmpfs over $HOME costs is not capability but state, and
-            # these two are the ones that hurt. The eval cache is rebuilt from
-            # scratch every session without this bind, which is a tax on every
-            # nix command the agent runs and buys nothing: it holds derivations
-            # and fetched tarballs, no secrets.
-            (combinators.try-readwrite (combinators.noescape "~/.cache/nix"))
-
-            # direnv's allow-list, deliberately read-only. Bound, a project the
-            # user has already trusted keeps working across sessions; read-only,
-            # the agent cannot add an entry, so it can use the environments the
-            # user approved and cannot approve one for itself. That asymmetry is
-            # the point, and it is why this is not readwrite.
-            (combinators.try-readonly (combinators.noescape "~/.local/share/direnv"))
-
-            # The linters this repository is actually checked with. pi-nix
-            # ships the floor every agent needs; these are the ones a NixOS
-            # configuration repo needs, and they belong here for the same
-            # reason the extension choice does: pi-nix packages capability,
-            # this file holds the opinion.
-            #
-            # Reachable through `nix shell nixpkgs#statix` either way, since the
-            # store and the daemon are both bound. On PATH they are reachable
-            # without a network round trip and without the agent having to know
-            # that trick, which is the difference between a tool it uses and a
-            # tool it reports as missing.
-            (combinators.add-pkg-deps [
-              pkgs.statix
-              pkgs.deadnix
-              pkgs.nixfmt
-              pkgs.shellcheck
-              pkgs.yq-go
-            ])
-          ])
-        );
       };
 
       # ctrl+backspace deletes the previous word, which is what Claude Code and
