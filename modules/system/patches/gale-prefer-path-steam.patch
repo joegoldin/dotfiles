@@ -1,0 +1,32 @@
+On NixOS, steam.sh in the Steam install dir cannot run outside the FHS
+sandbox that the `steam` wrapper on PATH sets up. Prefer the wrapper.
+--- a/src-tauri/src/profile/launch/platform.rs
++++ b/src-tauri/src/profile/launch/platform.rs
+@@ -104,7 +104,12 @@
+     use crate::util::fs::PathExt;
+     use tracing::debug;
+ 
+-    // return Ok(Command::new("/home/keso/.local/share/Steam/steam.sh"));
++    debug!("checking for steam system installation with which");
++
++    if let Ok(path) = which::which("steam") {
++        info!("found steam installation via which: {}", path.display());
++        return Ok(Command::new(path));
++    }
+ 
+     debug!("checking for steam.sh script in steam installation directory");
+ 
+@@ -118,13 +123,6 @@
+         }
+     };
+ 
+-    debug!("checking for steam system installation with which");
+-
+-    if let Ok(path) = which::which("steam") {
+-        info!("found steam installation via which: {}", path.display());
+-        return Ok(Command::new(path));
+-    }
+-
+     let mut flatpak_check = Command::new("flatpak");
+     flatpak_check.args(["info", "com.valvesoftware.Steam"]);
+ 
