@@ -563,7 +563,7 @@ in
         # the flake rather than in a file the agent can rewrite.
         settings = {
           defaultProvider = "openai-codex";
-          defaultModel = "gpt-5.6-sol";
+          defaultModel = "gpt-6-astra";
           defaultThinkingLevel = "xhigh";
 
           # Regular, not fullscreen: fullscreen does not reflow when the
