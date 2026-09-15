@@ -128,12 +128,12 @@ in
       # default.
       programs.fish.functions = lib.mkIf enabled {
         pi-codex = {
-          description = "pi on the Codex subscription (default: gpt-5.6-sol:xhigh)";
+          description = "pi on the Codex subscription (default: gpt-6-astra:medium)";
           body = ''
             if set -q argv[1]
                 command pi --model openai-codex/$argv[1] $argv[2..]
             else
-                command pi --model openai-codex/gpt-5.6-sol:xhigh $argv
+                command pi --model openai-codex/gpt-6-astra:medium $argv
             end
           '';
         };
@@ -528,7 +528,7 @@ in
           enable = true;
           # pkgs.audiomemo comes from the flake's own overlay, so this is the
           # same build the `record` on PATH is.
-          audiomemo = pkgs.audiomemo;
+          inherit (pkgs) audiomemo;
 
           # `device` is deliberately left at null. Both hosts already set
           # `record.device = "mic"` in their audiomemo config, and --stream
@@ -564,7 +564,7 @@ in
         settings = {
           defaultProvider = "openai-codex";
           defaultModel = "gpt-6-astra";
-          defaultThinkingLevel = "xhigh";
+          defaultThinkingLevel = "medium";
 
           # Regular, not fullscreen: fullscreen does not reflow when the
           # terminal window is resized, which on a tiling setup is most of the
