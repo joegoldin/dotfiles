@@ -3514,11 +3514,11 @@
         "systems": "systems_5"
       },
       "locked": {
-        "lastModified": 1789456792,
-        "narHash": "sha256-fd2N2ndkQ9cpBgGfIj4EXCFNYxkSWb9PPkyP3+waicM=",
+        "lastModified": 1789494314,
+        "narHash": "sha256-pkQsW2e+nZv7D+wi5cZw5z98KtmKmsk50S2fS580suw=",
         "owner": "joegoldin",
         "repo": "pi-nix",
-        "rev": "1c7b89dc37f28047f7d034e507c0360d99c99993",
+        "rev": "267b81e293cd6c9401b696866ad035299fec1667",
         "type": "github"
       },
       "original": {
