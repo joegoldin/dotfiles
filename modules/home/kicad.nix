@@ -40,6 +40,7 @@
       tscircuit = unstable.callPackage ./_pkgs/tscircuit { };
 
       konnect = callAddon ./_kicad/konnect.nix { };
+      routingTools = callAddon ./_kicad/routing-tools.nix { };
 
       freeroutingZip = unstable.fetchurl {
         url = "https://github.com/freerouting/freerouting/raw/master/integrations/KiCad/kicad-freerouting-2.3.0.zip";
@@ -50,6 +51,9 @@
         # AI assistant control of the board over MCP; built from source, since
         # upstream only publishes the PCM zip as a release artifact.
         konnect
+
+        # Rust-accelerated routing, differential pairs, fanout and placement.
+        routingTools
 
         # Panelization and fabrication automation. Its symbols and footprints
         # ride along in `libraries` below, where KiCad can actually see them.
@@ -350,7 +354,11 @@
       # the interpreter has to be the one it was built against.
       kicadPython =
         let
-          python = unstable.python3.withPackages (_: kicadWithAddons.pythonPath);
+          # withPackages does not follow propagated inputs of non-Python
+          # derivations such as PCM addons; include the router's explicitly.
+          python = unstable.python3.withPackages (
+            _: kicadWithAddons.pythonPath ++ routingTools.propagatedBuildInputs
+          );
         in
         unstable.runCommand "kicad-python-${kicadWithAddons.version}"
           {
@@ -360,6 +368,46 @@
             makeWrapper ${python}/bin/python3 $out/bin/kicad-python \
               --prefix PYTHONPATH : ${kicadWithAddons.base}/lib/python${unstable.python3.pythonVersion}/site-packages
           '';
+
+      routingToolsCli = unstable.writeShellApplication {
+        name = "kicad-routing-tools";
+        runtimeInputs = [
+          kicadPython
+          kicad
+        ];
+        text = ''
+          case "''${1:---help}" in
+            -h|--help)
+              printf '%s\n' 'Usage: kicad-routing-tools COMMAND [ARGS...]' \
+                'Commands: ${lib.concatStringsSep ", " (lib.attrNames routingTools.cliScripts)}'
+              exit 0
+              ;;
+            ${lib.concatStringsSep "\n" (
+              lib.mapAttrsToList (name: script: ''
+                ${name}) script=${lib.escapeShellArg script} ;;
+              '') routingTools.cliScripts
+            )}
+            *) printf 'Unknown routing tool: %s\n' "$1" >&2; exit 2 ;;
+          esac
+          shift
+          exec kicad-python "${routingTools}/share/kicad-routing-tools/$script" "$@"
+        '';
+        derivationArgs = {
+          postCheck = ''
+            export PYTHONDONTWRITEBYTECODE=1
+            for root in \
+              ${routingTools}/share/kicad-routing-tools \
+              ${kicadWithAddons.stockDataPath}/scripting/plugins/com_github_drandyhaas_kicadroutingtools; do
+              ${kicadPython}/bin/kicad-python ${./_kicad/routing-tools-test.py} \
+                "$root" ${routingTools.version}
+            done
+            $out/bin/kicad-routing-tools --help
+            ${lib.concatMapStringsSep "\n" (name: ''
+              $out/bin/kicad-routing-tools ${name} --help > /dev/null
+            '') (lib.attrNames routingTools.cliScripts)}
+          '';
+        };
+      };
 
       # The addon bundles this binary, but MCP clients need it on PATH, and
       # they launch it with an environment of their own -- so give it the
@@ -434,6 +482,7 @@
       home.packages = [
         kicad
         kicadPython
+        routingToolsCli
         konnectServer
         tscircuit
         unstable.freerouting
