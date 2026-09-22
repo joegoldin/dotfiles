@@ -486,6 +486,7 @@
         konnectServer
         tscircuit
         unstable.freerouting
+        unstable.ngspice
       ];
 
       # Managed tables are read-only, so libraries are added here rather than in

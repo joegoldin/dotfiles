@@ -31,3 +31,9 @@ docs/
 scarab-sd.img
 scarab_host_ed25519
 scarab_host_ed25519.pub
+
+# pi
+.pi
+
+# temp
+nohup.out
