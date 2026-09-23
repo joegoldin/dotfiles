@@ -69,11 +69,6 @@ in
         mode = "0400";
         owner = meta.username;
       };
-      age.secrets.standardcompute_api_key = {
-        file = "${inputs.dotfiles-secrets}/standardcompute_api_key.age";
-        mode = "0400";
-        owner = meta.username;
-      };
       age.secrets.attic-token = {
         file = "${inputs.dotfiles-secrets}/attic.token.age";
         mode = "0400";
