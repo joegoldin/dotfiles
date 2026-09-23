@@ -7,13 +7,13 @@
 }:
 stdenv.mkDerivation rec {
   pname = "git-hunk";
-  version = "0.16.0";
+  version = "0.18.1";
 
   src = fetchFromGitHub {
     owner = "shhac";
     repo = "git-hunk";
     tag = "v${version}";
-    hash = "sha256-5FkKJglEKBy41itSYohtcXn5+Fbh8Fk9Vsmh5UGxkAk=";
+    hash = "sha256-BKIVP8Iz7e9UYj+GTHv8IG4KkjH4mRnoJwRRZsGbYZE=";
   };
 
   nativeBuildInputs = [ zig ];

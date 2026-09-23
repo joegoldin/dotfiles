@@ -5,13 +5,13 @@
 }:
 stdenvNoCC.mkDerivation {
   pname = "plasma-applet-resources-monitor";
-  version = "3.2.1";
+  version = "3.5.0";
 
   src = fetchFromGitHub {
     owner = "orblazer";
     repo = "plasma-applet-resources-monitor";
-    rev = "v3.2.1";
-    hash = "sha256-uP1TjH7vFIB9DO9SJXOLsQGQ7CRjGNuPY8c4vszIHmk=";
+    rev = "v3.5.0";
+    hash = "sha256-86XT+qKGnaVxucDd4anBRaJXvD1li7Hv66bfaqJV7Z0=";
   };
 
   dontConfigure = true;

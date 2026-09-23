@@ -675,7 +675,8 @@ update-pi:
     [[ -d "$pinix" ]] || { echo "❌  pi-nix not found at $pinix"; exit 1; }
     echo "🔄  Syncing pi-nix to the newest upstream pi tag..."
     before=$(jq -r .rev "$pinix/VERSION.json")
-    (cd "$pinix" && nix run .#sync-upstream)
+    # pi's build rejects model data generated for an older release.
+    (cd "$pinix" && nix run .#sync-upstream && nix run .#regenerate-models)
     after=$(jq -r .rev "$pinix/VERSION.json")
     if [[ "$before" == "$after" ]]; then
       echo "✅  Already on $after"

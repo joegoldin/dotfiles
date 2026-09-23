@@ -9,12 +9,12 @@ let
   pythonPackages = rec {
     fal-client = pythonBase.pkgs.buildPythonPackage {
       pname = "fal-client";
-      version = "0.7.0";
+      version = "1.0.3";
       format = "pyproject";
 
       src = pkgs.fetchurl {
-        url = "https://files.pythonhosted.org/packages/source/f/fal_client/fal_client-0.7.0.tar.gz";
-        sha256 = "sha256-m/As/FasiVcVnoqVnvCMV+VhjOrCz/VS9yBDNjuSpy8=";
+        url = "https://files.pythonhosted.org/packages/source/f/fal_client/fal_client-1.0.3.tar.gz";
+        sha256 = "sha256-8PCSDq6HGQDk7+oYZb4o1KYHp3nUPUelOoSY0s6Wkc0=";
       };
 
       nativeBuildInputs = with pythonBase.pkgs; [
@@ -24,8 +24,12 @@ let
       ];
       # Dependencies
       propagatedBuildInputs = with pythonBase.pkgs; [
+        aiofiles
+        asyncstdlib
         httpx
         httpx-sse
+        msgpack
+        websockets
       ];
 
       # Disable tests - enable if you have specific test dependencies
