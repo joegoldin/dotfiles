@@ -103,12 +103,15 @@
       # Get SHA256 hash
       SHA256=""
       if command -v nix-prefetch-url >/dev/null 2>&1; then
+        # A failed fetch must fall through to the alternate URL and the skip
+        # below, not trip set -e: wheel-only packages (mlx) have no sdist, so
+        # both URLs 404.
         # Try primary URL
-        SHA256=$(nix-prefetch-url --quiet "$PKG_URL" 2>/dev/null)
+        SHA256=$(nix-prefetch-url --quiet "$PKG_URL" 2>/dev/null) || true
 
         # If that fails, try alternate URL
         if [ -z "$SHA256" ]; then
-          SHA256=$(nix-prefetch-url --quiet "$ALT_PKG_URL" 2>/dev/null)
+          SHA256=$(nix-prefetch-url --quiet "$ALT_PKG_URL" 2>/dev/null) || true
           if [ -n "$SHA256" ]; then
             PKG_URL="$ALT_PKG_URL"
           fi
