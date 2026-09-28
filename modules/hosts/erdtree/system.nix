@@ -70,7 +70,10 @@ in
 
       systemd.services.nix-store-maintenance = {
         description = "Daily nix GC: 14-day generation retention + ~250 GiB store cap";
-        path = [ pkgs.nix pkgs.coreutils ];
+        path = [
+          pkgs.nix
+          pkgs.coreutils
+        ];
         serviceConfig = {
           Type = "oneshot";
           # Low priority so it never fights an active build for IO/CPU.
