@@ -249,6 +249,12 @@
     # ahead of time. The cost is a second nixpkgs in the lock.
     fusion-360-flake = {
       url = "github:joegoldin/fusion-360-flake/buildtime";
+      # erosanix's lock pins edolstra/flake-compat 4b228711, a commit GitHub
+      # no longer has, so fetching it 404s. A URL different from erosanix's
+      # own is what forces a re-lock; NixOS/flake-compat is the repo's current
+      # home. flake-compat is only erosanix's non-flake shim and doesn't reach
+      # the Fusion prefix.
+      inputs.erosanix.inputs.flake-compat.url = "github:NixOS/flake-compat";
     };
     # Ghostty terminal
     ghostty.url = "github:ghostty-org/ghostty";
