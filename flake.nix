@@ -189,6 +189,10 @@
     };
     # declarative flatpak management
     nix-flatpak.url = "github:gmodena/nix-flatpak";
+    # game-streaming client. nix-stable only moves after CI publishes to
+    # nix.unom.io, and nixpkgs is deliberately not followed: that changes every
+    # store path and misses the cache.
+    punktfunk.url = "git+https://git.unom.io/unom/punktfunk?ref=nix-stable";
     # pre-built nix-index database
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
