@@ -98,12 +98,12 @@ let
 
     deepgram-sdk = pythonBase.pkgs.buildPythonPackage {
       pname = "deepgram-sdk";
-      version = "4.7.0";
+      version = "7.11.0";
       format = "pyproject";
 
       src = pkgs.fetchurl {
-        url = "https://files.pythonhosted.org/packages/source/d/deepgram_sdk/deepgram_sdk-4.7.0.tar.gz";
-        sha256 = "sha256-43E5bYg11El4LfRyw71QH2ytQbPJJfZncZM/8/xLGhM=";
+        url = "https://files.pythonhosted.org/packages/source/d/deepgram_sdk/deepgram_sdk-7.11.0.tar.gz";
+        sha256 = "sha256-1ZoWKsK0GmXlkjsOGQ3MPkcKXpeRNE/S95ECLkCINzQ=";
       };
 
       nativeBuildInputs = with pythonBase.pkgs; [
@@ -138,12 +138,12 @@ let
 
     lmstudio = pythonBase.pkgs.buildPythonPackage {
       pname = "lmstudio";
-      version = "1.4.1";
+      version = "1.5.0";
       format = "pyproject";
 
       src = pkgs.fetchurl {
-        url = "https://files.pythonhosted.org/packages/source/l/lmstudio/lmstudio-1.4.1.tar.gz";
-        sha256 = "sha256-UzoCgAZxH0OqgRjePLmjIlkBqz2m6KgUG7S74VQ4zMA=";
+        url = "https://files.pythonhosted.org/packages/source/l/lmstudio/lmstudio-1.5.0.tar.gz";
+        sha256 = "sha256-RYw0/h+Up9zFIdQia0zugrivfqPajECzG72sVY2adNQ=";
       };
 
       nativeBuildInputs = with pythonBase.pkgs; [
@@ -193,12 +193,12 @@ let
 
     synchronicity = pythonBase.pkgs.buildPythonPackage {
       pname = "synchronicity";
-      version = "0.11.1";
+      version = "0.12.5";
       format = "pyproject";
 
       src = pkgs.fetchurl {
-        url = "https://files.pythonhosted.org/packages/source/s/synchronicity/synchronicity-0.11.1.tar.gz";
-        sha256 = "sha256-NijfmrNL176JtykQQRSEHGJhLF1exDt29LeyQxhewag=";
+        url = "https://files.pythonhosted.org/packages/source/s/synchronicity/synchronicity-0.12.5.tar.gz";
+        sha256 = "sha256-lNlrHYVpjjBWuWp5O4wJSa9lhOSn2Hf6vetThe/iMKo=";
       };
 
       nativeBuildInputs = with pythonBase.pkgs; [
@@ -221,12 +221,12 @@ let
 
     modal = pythonBase.pkgs.buildPythonPackage {
       pname = "modal";
-      version = "1.3.5";
+      version = "1.5.5";
       format = "wheel";
 
       src = pkgs.fetchurl {
-        url = "https://files.pythonhosted.org/packages/10/39/aa5c773a4dddef833f1c846bb4204b442588b99a1d15ab7818157e66b32c/modal-1.3.5-py3-none-any.whl";
-        sha256 = "sha256-Z+XTY1wsNV1js+MPkBLdK8nDjVdHNJM1x7qdpl7cocs=";
+        url = "https://files.pythonhosted.org/packages/source/m/modal/modal-1.5.5.tar.gz";
+        sha256 = "sha256-MN82PtGJjMPZGgn/P5XDirBD9rYpQBGwEIUxLGoKx3c=";
       };
 
       propagatedBuildInputs =
@@ -267,12 +267,12 @@ let
 
     scrapy-playwright = pythonBase.pkgs.buildPythonPackage {
       pname = "scrapy-playwright";
-      version = "0.0.46";
+      version = "0.0.48";
       format = "pyproject";
 
       src = pkgs.fetchurl {
-        url = "https://files.pythonhosted.org/packages/source/s/scrapy_playwright/scrapy_playwright-0.0.46.tar.gz";
-        sha256 = "sha256-Lv4xFVsru9E/sBHzwYnCGm80QJx/e5WIgXgFCc4Uprs=";
+        url = "https://files.pythonhosted.org/packages/source/s/scrapy_playwright/scrapy_playwright-0.0.48.tar.gz";
+        sha256 = "sha256-Ymd5qovKzWHuvD4h42LGLLta518WiiVIhfH3ypto2dI=";
       };
 
       nativeBuildInputs = with pythonBase.pkgs; [
@@ -298,12 +298,12 @@ let
 
     scrapfly-sdk = pythonBase.pkgs.buildPythonPackage {
       pname = "scrapfly-sdk";
-      version = "0.8.23";
+      version = "0.12.0";
       format = "setuptools";
 
       src = pkgs.fetchurl {
-        url = "https://files.pythonhosted.org/packages/source/s/scrapfly_sdk/scrapfly_sdk-0.8.23.tar.gz";
-        sha256 = "sha256-Jmj3qCvzprJAvi8eQJDPFA10GB3le7RlQ3GVVPvtVa4=";
+        url = "https://files.pythonhosted.org/packages/source/s/scrapfly_sdk/scrapfly_sdk-0.12.0.tar.gz";
+        sha256 = "sha256-x7NtZh5Fx4+W0oUWe7EhHES9/N/B8JnjGC2xZndBgMs=";
       };
 
       # Dependencies
