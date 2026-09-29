@@ -40,12 +40,12 @@ let
     zen = "applications:zen.desktop";
     ghostty = "applications:com.mitchellh.ghostty.desktop";
     zed = "applications:dev.zed.Zed-Nightly.desktop";
-    parsec = "applications:parsecd.desktop";
+    punktfunk = "applications:io.unom.Punktfunk.desktop";
     discord = "applications:discord.desktop";
     steam = "applications:steam.desktop";
     zoom = "applications:Zoom.desktop";
     claude = "applications:claude-desktop.desktop";
-    obsidian = "applications:obsidian.desktop";
+    obsidian = "applications:md.obsidian.Obsidian.desktop";
     slack = "applications:slack.desktop";
   };
 
@@ -124,7 +124,7 @@ in
           apps.zen
           apps.ghostty
           apps.zed
-          apps.parsec
+          apps.punktfunk
           apps.discord
           apps.steam
           apps.zoom
