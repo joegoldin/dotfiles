@@ -113,12 +113,9 @@ let
       ];
       # Dependencies
       propagatedBuildInputs = with pythonBase.pkgs; [
-        aenum
-        aiofiles
-        aiohttp
-        dataclasses-json
-        deprecation
         httpx
+        pydantic
+        pydantic-core
         typing-extensions
         websockets
       ];
@@ -225,8 +222,8 @@ let
       format = "wheel";
 
       src = pkgs.fetchurl {
-        url = "https://files.pythonhosted.org/packages/source/m/modal/modal-1.5.5.tar.gz";
-        sha256 = "sha256-MN82PtGJjMPZGgn/P5XDirBD9rYpQBGwEIUxLGoKx3c=";
+        url = "https://files.pythonhosted.org/packages/04/19/b3dca8baec119126058b12ca620e44022e4d08a091956668bd04180c89a7/modal-1.5.5-py3-none-any.whl";
+        sha256 = "sha256-jRDT7gmBiquhlztzziUhq4lhtjoptbUuP/DSXnp0gI4=";
       };
 
       propagatedBuildInputs =
