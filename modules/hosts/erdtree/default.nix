@@ -20,6 +20,9 @@ in
     includes = [
       den.aspects.nix-settings
       den.aspects.ncro
+      # erdtree is the garnix builder, so it must be able to build the
+      # dynamic derivations that other hosts' closures contain.
+      den.aspects.dynamic-derivations
     ];
 
     nixos = {

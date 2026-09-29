@@ -1,5 +1,9 @@
-{ inputs, ... }:
+{ inputs, den, ... }:
 {
+  # Linux builds Zed from source; the dynamic-derivations aspect puts the
+  # experimental features on every host that does so.
+  den.aspects.zed.includes = [ den.aspects.dynamic-derivations ];
+
   den.aspects.zed.homeManager =
     {
       lib,
