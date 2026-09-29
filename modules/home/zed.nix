@@ -36,6 +36,10 @@
       zedLivekit = lib.getDev zedPkgs.livekit-libwebrtc;
       zedCargoArtifacts = upstreamZedPackage.passthru.craneLib.buildDepsOnly (
         lib.recursiveUpdate upstreamZedPackage.passthru.commonArgs {
+          # Upstream's dummy source copies its patched `scratch` crate (a local
+          # dependency of cxx-build) into the stub tree; crane's default dummy
+          # stubs it out, and cxx-build then fails on the missing scratch::path.
+          dummySrc = upstreamZedPackage.passthru.cargoArtifacts.src;
           env.LK_CUSTOM_WEBRTC = zedLivekit;
         }
       );
