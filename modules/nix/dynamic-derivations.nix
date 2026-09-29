@@ -26,4 +26,11 @@
       "recursive-nix"
     ];
   };
+
+  # drowse derivations require the recursive-nix system feature, which the
+  # system-features list NixOS defines omits. List definitions merge, so
+  # this adds to that list.
+  den.aspects.dynamic-derivations.nixos = {
+    nix.settings.system-features = [ "recursive-nix" ];
+  };
 }
