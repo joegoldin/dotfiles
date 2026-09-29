@@ -39,7 +39,8 @@
       upstreamZedPackage = (inputs.zed-editor.overlays.default zedPkgs zedPkgs).zed-editor;
       zedLivekit = lib.getDev zedPkgs.livekit-libwebrtc;
       zedCargoArtifacts = upstreamZedPackage.passthru.craneLib.buildDepsOnly (
-        lib.recursiveUpdate upstreamZedPackage.passthru.commonArgs {
+        # crane warns when `src` accompanies `dummySrc` (it's ignored anyway).
+        lib.recursiveUpdate (removeAttrs upstreamZedPackage.passthru.commonArgs [ "src" ]) {
           # Upstream's dummy source copies its patched `scratch` crate (a local
           # dependency of cxx-build) into the stub tree; crane's default dummy
           # stubs it out, and cxx-build then fails on the missing scratch::path.

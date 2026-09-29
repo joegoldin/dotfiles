@@ -25,7 +25,7 @@
       # be run by a human at a terminal (it manages job control, Ctrl-C, TTY
       # state), so it needs to be on the login shell's PATH explicitly.
       home.packages = lib.mkIf enabled [
-        inputs.agent-skills.packages.${pkgs.system}.re-shell
+        inputs.agent-skills.packages.${pkgs.stdenv.hostPlatform.system}.re-shell
       ];
 
       programs.claude-nix = lib.mkIf enabled {

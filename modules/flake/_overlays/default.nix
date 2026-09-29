@@ -224,7 +224,10 @@ in
   };
 
   # audiomemo (recording + transcription CLI)
-  audiomemo-packages = inputs.audiomemo.overlays.default;
+  # Inlined upstream overlay to avoid deprecated final.system access in audiomemo.overlays.default
+  audiomemo-packages = final: _prev: {
+    inherit (inputs.audiomemo.packages.${final.stdenv.hostPlatform.system}) audiomemo;
+  };
 
   # sem (semantic, entity-level version control CLI) available as pkgs.sem
   sem-packages = final: _prev: {
@@ -237,7 +240,10 @@ in
   };
 
   # claude-container (claude-code wrapper in docker container with sandboxing)
-  claude-container-packages = inputs.claude-container.overlays.default;
+  # Inlined upstream overlay to avoid deprecated prev.system access in claude-container.overlays.default
+  claude-container-packages = final: _prev: {
+    inherit (inputs.claude-container.packages.${final.stdenv.hostPlatform.system}) claude-container;
+  };
 
   # affinity-nix (Affinity Photo/Designer/Publisher via wine)
   affinity-packages = inputs.affinity-nix.overlays.default;

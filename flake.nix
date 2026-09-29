@@ -192,7 +192,13 @@
     # game-streaming client. nix-stable only moves after CI publishes to
     # nix.unom.io, and nixpkgs is deliberately not followed: that changes every
     # store path and misses the cache.
-    punktfunk.url = "git+https://git.unom.io/unom/punktfunk?ref=nix-stable";
+    punktfunk = {
+      url = "git+https://git.unom.io/unom/punktfunk?ref=nix-stable";
+      # Its pinned rust-overlay trips the stdenv.isLinux/isDarwin deprecation
+      # warnings. Overriding it leaves the client's store path (and so the
+      # cache hit) unchanged.
+      inputs.rust-overlay.url = "github:oxalica/rust-overlay";
+    };
     # pre-built nix-index database
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
