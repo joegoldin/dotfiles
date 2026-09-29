@@ -12,7 +12,6 @@ in
     {
       config,
       lib,
-      pkgs,
       ...
     }:
     let
@@ -43,10 +42,6 @@ in
           automatic = lib.mkDefault true;
           options = lib.mkDefault "--delete-older-than 7d";
         };
-
-        extraOptions = lib.optionalString (
-          config.nix.package == pkgs.nixVersions.stable
-        ) "experimental-features = nix-command flakes";
 
         registry = lib.mapAttrs (_: flake: { inherit flake; }) registryInputs;
         nixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") registryInputs;
