@@ -37,29 +37,17 @@
         }
       );
       upstreamZedPackage = (inputs.zed-editor.overlays.default zedPkgs zedPkgs).zed-editor;
-      zedLivekit = lib.getDev zedPkgs.livekit-libwebrtc;
-      zedCargoArtifacts = upstreamZedPackage.passthru.craneLib.buildDepsOnly (
-        # crane warns when `src` accompanies `dummySrc` (it's ignored anyway).
-        lib.recursiveUpdate (removeAttrs upstreamZedPackage.passthru.commonArgs [ "src" ]) {
-          # Upstream's dummy source copies its patched `scratch` crate (a local
-          # dependency of cxx-build) into the stub tree; crane's default dummy
-          # stubs it out, and cxx-build then fails on the missing scratch::path.
-          dummySrc = upstreamZedPackage.passthru.cargoArtifacts.src;
-          env.LK_CUSTOM_WEBRTC = zedLivekit;
-        }
-      );
-      zedPackage = upstreamZedPackage.overrideAttrs (old: {
+      # Built per crate through drowse; see ./_zed/package.nix.
+      zedPackage = zedPkgs.callPackage ./_zed/package.nix {
+        drowse = inputs.drowse.lib.${pkgs.stdenv.hostPlatform.system};
+        zedSource = inputs.zed-editor;
+        inherit upstreamZedPackage;
         # Zed's flake vendors an older WebRTC 137 package whose PipeWire
         # capture code no longer compiles against PipeWire 1.6. Use the same
         # WebRTC major from our root Nixpkgs, which carries the compatibility
-        # fix and is available from the binary cache. Rebuild Crane's separate
-        # dependency derivation with the same override so the vendored package
-        # cannot remain reachable through cargoArtifacts.
-        cargoArtifacts = zedCargoArtifacts;
-        env = old.env // {
-          LK_CUSTOM_WEBRTC = zedLivekit;
-        };
-      });
+        # fix and is available from the binary cache.
+        livekit = lib.getDev zedPkgs.livekit-libwebrtc;
+      };
     in
     {
       home.packages = lib.optionals isLinux [ dotnet ];
