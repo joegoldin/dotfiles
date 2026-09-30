@@ -116,20 +116,30 @@ in
                 priority = 30;
                 public_key = "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=";
               }
+              # punktfunk's CI cache, for the same one-project reason as numtide.
+              # punktfunk-client adds it as an extra-substituter, which ncro
+              # forces off below, so it has to be reachable through ncro instead.
+              {
+                url = "https://nix.unom.io";
+                priority = 40;
+                public_key = "punktfunk-cache-1:yhOJmHxzg6tzXpxSFzlYn6Pc6r0jHprsWqt8MZC654o=";
+              }
             ];
           };
         };
 
         # One substituter instead of several, which is the change that matters:
         # nix stops fanning a query out to every cache and waiting on the
-        # slowest. mkForce because the binary-caches aspect and attic-cache.nix
-        # both contribute entries, and leaving them would put nix back to
-        # querying the same remotes ncro is there to front.
+        # slowest. mkForce on both lists because the binary-caches,
+        # numtide-cache and punktfunk-client aspects and attic-cache.nix all
+        # contribute extra-substituters, and nix appends those to substituters;
+        # forcing only substituters left nix querying every remote ncro fronts.
         #
         # Trusted keys are not forced: services.ncro.addUpstreamPublicKeys adds
         # each upstream's key, and a key that is trusted but unused costs
         # nothing, where a missing one fails the substitution.
         nix.settings.substituters = lib.mkForce [ "http://${listenAddress}" ];
+        nix.settings.extra-substituters = lib.mkForce [ ];
       };
     };
 }
