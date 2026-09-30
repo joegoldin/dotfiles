@@ -676,7 +676,7 @@ update-pi:
     echo "🔄  Syncing pi-nix to the newest upstream pi tag..."
     before=$(jq -r .rev "$pinix/VERSION.json")
     # pi's build rejects model data generated for an older release.
-    (cd "$pinix" && nix run .#sync-upstream && nix run .#regenerate-models)
+    (cd "$pinix" && nix run .#sync && nix run .#regenerate-models)
     after=$(jq -r .rev "$pinix/VERSION.json")
     if [[ "$before" == "$after" ]]; then
       echo "✅  Already on $after"
