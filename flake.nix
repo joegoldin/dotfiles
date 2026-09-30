@@ -356,7 +356,6 @@
   nixConfig = {
     extra-trusted-public-keys = "";
     extra-substituters = "";
-    experimental-features = "nix-command flakes";
   };
 
   # The dendritic entry point: everything else lives in modules/.
