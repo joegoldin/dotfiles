@@ -121,6 +121,11 @@ in
     # package is fine and only its compiler was wrong.
     nix-output-monitor = final.unstable.nix-output-monitor;
 
+    # nixfmt 1.5.0 declares GHC2024 too and fails on stable the same way, which
+    # breaks every host that installs it from stable (erdtree via
+    # server-cli.nix). Same fix, for the same reason.
+    nixfmt = final.unstable.nixfmt;
+
     # typst (the Haskell library, a pandoc dependency) has a test suite with
     # one-second wall-clock deadlines. Under a large rebuild it loses that race
     # against the machine's own build load and fails on TIMEOUT rather than on
