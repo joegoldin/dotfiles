@@ -13,6 +13,7 @@
   # jail, and only the three workstations deploy both.
   den.aspects.workstation-packages.includes = [
     den.aspects.day-sync
+    den.aspects.jujutsu
     den.aspects.pi
   ];
 
