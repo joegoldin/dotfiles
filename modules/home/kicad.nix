@@ -34,11 +34,6 @@
 
       callAddon = unstable.kicad.callPackage;
 
-      # Not a KiCad addon: an alternative front end that renders React-style
-      # circuit source straight to boards, exporting .kicad_pcb for the rest of
-      # this toolchain to pick up.
-      tscircuit = unstable.callPackage ./_pkgs/tscircuit { };
-
       konnect = callAddon ./_kicad/konnect.nix { };
       routingTools = callAddon ./_kicad/routing-tools.nix { };
 
@@ -484,7 +479,6 @@
         kicadPython
         routingToolsCli
         konnectServer
-        tscircuit
         unstable.freerouting
         unstable.ngspice
       ];
