@@ -240,8 +240,16 @@ in
   };
 
   # tailcat (netcat over Tailscale's data plane) available as pkgs.tailcat
+  #
+  # TestProbeStrangerSSH runs a real DERP/magicsock handshake against a 30s
+  # deadline. On siofra (4 cores, building ~500 derivations alongside it) the
+  # handshake never landed in time and the test failed after 158s, taking the
+  # whole system build down. It's a timing failure, not a tailcat bug; the rest
+  # of the suite still runs.
   tailcat-packages = final: _prev: {
-    tailcat = inputs.tailcat.packages.${final.stdenv.hostPlatform.system}.default;
+    tailcat = inputs.tailcat.packages.${final.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
+      checkFlags = (old.checkFlags or [ ]) ++ [ "-skip=^TestProbeStrangerSSH$" ];
+    });
   };
 
   # claude-container (claude-code wrapper in docker container with sandboxing)
