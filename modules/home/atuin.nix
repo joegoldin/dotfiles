@@ -1,16 +1,38 @@
-# Atuin shell history, synced against the self-hosted server. Its own aspect
-# (not part of fish) because it also integrates with bash and owns the agenix
-# key wiring; rides on the joe user aspect like fish does.
+# Atuin shell history, synced against the self-hosted server, plus Atuin AI
+# (`?` on an empty prompt) against the self-hosted AI server on siofra
+# (modules/hosts/siofra/atuin-ai.nix). Its own aspect (not part of fish)
+# because it also integrates with bash and owns the agenix key wiring; rides on
+# the joe user aspect like fish does.
 { inputs, ... }:
 let
   domains = import "${inputs.dotfiles-secrets}/domains.nix";
 in
 {
   den.aspects.atuin.homeManager =
-    { lib, ... }:
+    { lib, pkgs, ... }:
+    let
+      # The AI server rejects requests without its bearer token. atuin reads
+      # any setting from ATUIN_<SECTION>__<KEY>, so inject ai.api_token from
+      # agenix at launch rather than writing it into the store-backed
+      # config.toml. Hosts without the secret just get 401s from `?`.
+      atuinWithAiToken = pkgs.symlinkJoin {
+        # home-manager gates options on .version and runs lib.getExe on it.
+        pname = "atuin";
+        inherit (pkgs.unstable.atuin) version;
+        meta.mainProgram = "atuin";
+        paths = [ pkgs.unstable.atuin ];
+        buildInputs = [ pkgs.makeWrapper ];
+        postBuild = ''
+          wrapProgram $out/bin/atuin \
+            --run 'if [ -r /run/agenix/atuin_ai_api_token ]; then export ATUIN_AI__API_TOKEN="$(cat /run/agenix/atuin_ai_api_token)"; fi'
+        '';
+      };
+    in
     {
       programs.atuin = {
         enable = true;
+        # unstable for self-hosted AI support (ai.endpoint_protocol, 18.20+).
+        package = atuinWithAiToken;
         enableFishIntegration = true;
         enableBashIntegration = true;
         settings = {
@@ -25,6 +47,13 @@ in
           accept_with_backspace = true;
           accept_past_line_start = true;
           command_chaining = true;
+          ai = {
+            enabled = true;
+            endpoint = "https://${domains.atuinAiDomain}";
+            # "auto" would infer this from a non-Hub address too; explicit so a
+            # misconfigured endpoint never falls back to the Hub login flow.
+            endpoint_protocol = "oss";
+          };
         };
       };
 

@@ -1,7 +1,6 @@
 # Minimal fish configuration for microVM guests. Imports into `common-guest.nix`.
 #
 # Deliberately excludes:
-#   - fish-ai (needs ANTHROPIC_API_KEY via agenix, not available in guest)
 #   - atuin (needs sync server / host keys)
 #   - host-specific init (npm-global PATH; irrelevant in a VM)
 # Includes:

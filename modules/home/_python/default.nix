@@ -43,7 +43,6 @@ let
       isort
       llm
       llm-anthropic
-      llm-cmd
       llm-deepseek
       llm-gemini
       llm-grok

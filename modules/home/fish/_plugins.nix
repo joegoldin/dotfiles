@@ -1,4 +1,4 @@
-{ pkgs, fishAiSrc, ... }:
+{ pkgs, ... }:
 let
   # Upstream nix.fish appends ~/.nix-defexpr/channels to $NIX_PATH unconditionally,
   # which produces a warning on every nix invocation when channels are disabled.
@@ -43,10 +43,6 @@ in
         rev = "8f01915193ea6ad3b3339f70554732bc392a6465";
         sha256 = "0v348ysx0xrdh09shvly50mlmdlmx7bjgd4476p6wj2cvbxdfiyb";
       };
-    }
-    {
-      name = "fish-ai";
-      src = fishAiSrc;
     }
     {
       name = "z";

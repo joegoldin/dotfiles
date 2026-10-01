@@ -83,6 +83,13 @@ in
         mode = "0400";
         owner = meta.username;
       };
+      # Bearer token for the self-hosted Atuin AI server (siofra); the atuin
+      # wrapper in modules/home/atuin.nix exports it as ai.api_token.
+      age.secrets.atuin_ai_api_token = {
+        file = "${inputs.dotfiles-secrets}/atuin_ai_api_token.age";
+        mode = "0400";
+        owner = meta.username;
+      };
       age.secrets.deepgram_api_key = {
         file = "${inputs.dotfiles-secrets}/deepgram_api_key.age";
         mode = "0400";

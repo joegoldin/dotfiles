@@ -56,6 +56,13 @@ in
         mode = "0400";
         owner = meta.username;
       };
+      # Bearer token for the self-hosted Atuin AI server (siofra); the atuin
+      # wrapper in modules/home/atuin.nix exports it as ai.api_token.
+      age.secrets.atuin_ai_api_token = {
+        file = "${inputs.dotfiles-secrets}/atuin_ai_api_token.age";
+        mode = "0400";
+        owner = meta.username;
+      };
       # Provider keys for pi (modules/ai/pi.nix). anthropic_api_key above is
       # shared with other tooling; these two exist only for pi's
       # environment.<NAME>.file wiring, which cats them at launch.
