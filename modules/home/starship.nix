@@ -88,11 +88,10 @@ _: {
           # always detached) shows the change id and bookmarks instead.
           custom.vcs = {
             when = "jj-starship detect";
-            shell = [
-              "jj-starship"
-              "--no-jj-prefix"
-              "--no-git-prefix"
-            ];
+            # Drop only the leading "on "; the --no-*-prefix flags would also
+            # drop the jj/git symbol.
+            command = "jj-starship | sed 's/^on //'";
+            shell = [ "sh" ];
             format = "\\[$output\\]";
           };
 
