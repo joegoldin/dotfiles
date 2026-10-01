@@ -500,8 +500,8 @@ in
       #      signature (ad-hoc and unsigned are both rejected, verified
       #      empirically). The nix store is immutable and builds can't reach the
       #      keychain, so the zenSignedApp activation below maintains a signed
-      #      copy at ~/Applications/Zen.app: copy out of the store, patch the
-      #      wrapper to exec the local binary (so the *running process* carries
+      #      copy at ~/Applications/Zen.app: copy out of the store, replace the
+      #      wrapper script with the real binary (so the *running process* carries
       #      the signature), codesign with the Apple Development identity, and
       #      re-do all of that automatically whenever the Zen store path changes.
       #      One-time: 1Password → Settings → Browser → "Add Browser" →
@@ -526,18 +526,32 @@ in
           zenIdentity="Apple Development: Joseph Goldin (W65UYY2D42)"
           if [ -L "$zenSrcLink" ]; then
             zenStore=$(/usr/bin/readlink "$zenSrcLink")
-            if [ ! -d "$zenDst" ] || [ ! -e "$zenMarker" ] || [ "$(/bin/cat "$zenMarker")" != "$zenStore" ]; then
+            # The suffix tags the copy's layout, so copies made before the
+            # wrapper was dropped get rebuilt even when the store path is unchanged.
+            zenStamp="$zenStore unwrapped"
+            if [ ! -d "$zenDst" ] || [ ! -e "$zenMarker" ] || [ "$(/bin/cat "$zenMarker")" != "$zenStamp" ]; then
               if /usr/bin/security find-identity -v -p codesigning | /usr/bin/grep -qF "$zenIdentity"; then
                 verboseEcho "zen: re-signing $zenDst from $zenStore"
                 run /bin/rm -rf "$zenDst"
                 run /bin/cp -RL "$zenStore" "$zenDst"
                 run /bin/chmod -R u+w "$zenDst"
-                # Exec the local signed binary, not the unsigned store one; the
-                # running process must carry the signature for 1Password.
-                run /usr/bin/sed -i "" 's|exec "/nix/store/[^"]*/\.zen-old"|exec "$(/usr/bin/dirname "$0")/.zen-old"|' \
-                  "$zenDst/Contents/MacOS/zen"
+                # Replace wrapFirefox's shell wrapper with the binary it execs, and
+                # carry its env over via LSEnvironment (LD_LIBRARY_PATH and PATH
+                # are inert here). Behind the wrapper the running process is the
+                # dot-named .zen-old, which codesign signs with an empty identifier
+                # and no bound Info.plist; SoundSource then can't tie Zen's audio
+                # to the app. Unwrapped, the running process is the bundle's own
+                # main executable, signed as org.nixos.zen, which 1Password needs
+                # to carry the signature too.
+                run /bin/mv -f "$zenDst/Contents/MacOS/.zen-old" "$zenDst/Contents/MacOS/zen"
+                for zenEnv in MOZ_APP_LAUNCHER=zen MOZ_LEGACY_PROFILES=1 MOZ_ALLOW_DOWNGRADE=1; do
+                  run /usr/bin/plutil -replace "LSEnvironment.''${zenEnv%%=*}" -string "''${zenEnv#*=}" \
+                    "$zenDst/Contents/Info.plist"
+                done
                 run /usr/bin/codesign --force --deep --sign "$zenIdentity" "$zenDst"
-                run --quiet /bin/sh -c "printf '%s' '$zenStore' > '$zenMarker'"
+                # LaunchServices caches LSEnvironment per bundle.
+                run /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$zenDst"
+                run --quiet /bin/sh -c "printf '%s' '$zenStamp' > '$zenMarker'"
               else
                 echo "zen: codesign identity '$zenIdentity' not in keychain; skipping signed copy" >&2
               fi
