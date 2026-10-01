@@ -9,7 +9,12 @@ let
 in
 {
   den.aspects.atuin.homeManager =
-    { lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       # The AI server rejects requests without its bearer token. atuin reads
       # any setting from ATUIN_<SECTION>__<KEY>, so inject ai.api_token from
@@ -71,6 +76,18 @@ in
           fi
           ln -sfn "$AGENIX_KEY" "$TARGET"
         fi
+      '';
+
+      # Atuin AI's /model writes the chosen model back into config.toml, which
+      # fails on a read-only store symlink. Install a real copy instead; each
+      # switch overwrites on-disk edits with the in-tree settings.
+      xdg.configFile."atuin/config.toml".enable = lib.mkForce false;
+      home.activation.atuinConfig = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+        mkdir -p ${config.xdg.configHome}/atuin
+        rm -f ${config.xdg.configHome}/atuin/config.toml
+        install -m644 ${
+          (pkgs.formats.toml { }).generate "atuin-config" config.programs.atuin.settings
+        } ${config.xdg.configHome}/atuin/config.toml
       '';
     };
 }
