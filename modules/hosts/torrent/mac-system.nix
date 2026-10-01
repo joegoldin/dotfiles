@@ -51,7 +51,7 @@ in
             wvous-br-corner = 1;
 
             # Fully declarative dock layout (replaces the old lporg justfile
-            # recipes). Captured from the live dock on 2026-07-06.
+            # recipes). Captured from the live dock on 2026-09-30.
             # NOTE: Zen is pinned via the signed copy that the zenSignedApp home
             # activation maintains (modules/home/_hm/zen); a stable path that
             # survives rebuilds and carries the real code signature 1Password
@@ -71,18 +71,14 @@ in
               "/Applications/Roon.app"
               "/System/Applications/Photos.app"
               "/System/Applications/VoiceMemos.app"
-              "/Applications/DaVinci Resolve.app"
               "/Applications/Zed.app"
               "/Applications/Ghostty.app"
               "/Applications/Android Studio.app"
               "/Applications/Xcode-beta.app"
               "/Applications/Xcode-beta.app/Contents/Applications/DeviceHub.app"
-              "/Applications/Proxyman.app"
-              "/System/Applications/iPhone Mirroring.app"
               "/Applications/Claude.app"
-              "/Applications/Sublime Text.app"
-              "/Applications/Sublime Merge.app"
               "/Applications/OrbStack.app"
+              "/Applications/Punktfunk.app"
               "/Applications/Parsec.app"
               "/System/Applications/Preview.app"
               "/System/Applications/System Settings.app"
