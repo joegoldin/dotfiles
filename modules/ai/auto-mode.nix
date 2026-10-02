@@ -32,7 +32,7 @@
           "The login shell is fish, not bash. Do not assume bash syntax works at an interactive prompt: `export VAR=value`, `VAR=value cmd`, `&>`, and process substitution are all bash-only. Scripts should declare their own interpreter rather than relying on the ambient shell."
           "Secrets managed by agenix or sops-nix decrypt at activation to /run/agenix or /run/secrets, readable by the user. Nix modules refer to those runtime paths as strings. The plaintext must never be copied elsewhere, echoed into the conversation, or committed."
           "`nix build`, `nix eval`, `nix flake check`, `nix flake show`, `nix path-info`, and `nix-instantiate` have no effect beyond filling the Nix store and using the network. Treat them as read-only. The store itself is immutable, so a command that tries to write into /nix/store fails harmlessly rather than damaging anything."
-          "Long-running processes belong in a zmx session rather than a bare background job, because the harness's own process tree does not outlive the task."
+          "Long-running processes belong in a persistent terminal session (zmx, tmux, or similar) rather than a bare background job, because the harness's own process tree does not outlive the task."
           "More than one agent may be working on this machine at the same time, in different git worktrees and different repositories. A global mutation — `git config --global`, a package installed outside the flake, a process killed by name, a store garbage collection — lands in someone else's session as well as this one."
         ];
 
@@ -47,11 +47,11 @@
           "Push a feature branch to origin, and open, update, or comment on pull requests in repositories the user owns, using the gh CLI. With jj this is `jj git push -b <bookmark>`, and stacked PRs go through `stakk submit` with explicit marks."
           "Re-push a feature branch this session created, or one the user named as their own, after rewriting its commits — `jj git push -b <bookmark>` after a squash or rebase, or `git push --force-with-lease` on that branch. This is how a pull request is updated after review. It does not cover a default branch, or a branch someone else pushes to."
           "Push commits straight to the default branch (main or master) of a repository the user owns personally — one whose remote is under the user's own GitHub account, or a local repository with no remote. This is their normal workflow. It does not apply once the user has asked in this session for a branch, a pull request, or review, and it never covers a force-push or history rewrite."
-          "Query build and check status from GitHub and from the user's self-hosted garnix instance."
+          "Query build and check status from GitHub and from the CI systems the repository uses."
           "Create, edit, and delete files inside the session's working directory and inside the scratchpad directory the harness provides."
           "Start and stop local development servers and other processes that bind only to localhost, and read their logs."
           "Read system state without changing it: `systemctl status`, `systemctl list-units`, journalctl, ss, ps, df, free, uname, and `nix-store --query`."
-          "Read the user's own Obsidian vault, calendar, and Notion workspace through the CLIs configured for them (obsidian, gws, day-sync)."
+          "Read the user's own notes, calendar, documents, and task trackers through the CLIs and integrations already configured for them."
         ];
 
         soft_deny = [
@@ -85,7 +85,7 @@
           "Escalating privilege: sudo, doas, su, pkexec, or writing into a systemd unit or launchd plist that would run as root."
           "Changing the host system outside the user's home directory: writing to /etc, /var, /boot, /usr, or /nix/store where those are the real system directories, or activating a configuration that does so, including a rebuild whose only purpose is to place the file. This rule is about the host changing, not about how the path looks. Where an agent runs sandboxed and those directories are session-local scratch that is discarded on exit, a write that cannot outlive the session is not this rule; a change reaching the host through a bound daemon socket or a bind-mounted directory still is."
           "Adding or repointing a git remote to a host the user did not name in this session."
-          "Sending repository contents, transcripts, environment variables, or file listings to any host other than GitHub, the user's own garnix instance, the model provider serving this session, and services the user explicitly named."
+          "Sending repository contents, transcripts, environment variables, or file listings to any host other than GitHub, the repository's own CI, the model provider serving this session, and services the user explicitly named."
           "Deleting or rewriting history on a remote default branch, or deleting a remote branch this session did not create."
           "Disabling or uninstalling security tooling: the 1Password agent, SSH host-key checking (`StrictHostKeyChecking=no`, `UserKnownHostsFile=/dev/null`), gitleaks, or the sandbox wrappers."
           "Destroying data that has neither a git copy nor a Nix copy: a notes vault, ~/Pictures, ~/Documents, a database file, a mounted network share, or any disk-level operation (`dd`, `mkfs`, `parted`, `wipefs`, `zpool destroy`) against a real device."
