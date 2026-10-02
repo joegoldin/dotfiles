@@ -623,6 +623,12 @@
         };
         Service = {
           ExecStart = "${mouseActionsTray}/bin/mouse-actions-tray";
+          # The session's QT_PLUGIN_PATH points at the running Plasma's Qt build.
+          # After a switch that bumps Qt, PySide6's newer Qt refuses those
+          # plugins, aborts with no platform plugin, and crash-loops (each core
+          # dump spawns a drkonqi unit that times out and fails activation).
+          # PySide6's own qtbase ships the wayland/xcb platform plugins.
+          UnsetEnvironment = [ "QT_PLUGIN_PATH" ];
           Restart = "on-failure";
           RestartSec = 3;
         };
