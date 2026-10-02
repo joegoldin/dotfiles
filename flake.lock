@@ -65,11 +65,11 @@
         "uv2nix": "uv2nix"
       },
       "locked": {
-        "lastModified": 1790869718,
-        "narHash": "sha256-R5uo2ZVN7b6XzN2YIX/NoMmuKN9Q3Tb3Xjsked3GBBc=",
+        "lastModified": 1790927873,
+        "narHash": "sha256-MDeqj7GiXshjqr/YhwXc01RBL/xomJ8K/qH49RW0kXY=",
         "owner": "joegoldin",
         "repo": "agent-skills",
-        "rev": "c9fb17991e37e3f09ac64550a23b39616110e232",
+        "rev": "5db5a452b30a3567279f5113081877fe9419170e",
         "type": "github"
       },
       "original": {
@@ -1927,11 +1927,11 @@
         "treetop": "treetop"
       },
       "locked": {
-        "lastModified": 1785340198,
-        "narHash": "sha256-UxO6ckxqdc2X1+hIIzJQCggHX+6Pxz7ec926v/n3m1Y=",
+        "lastModified": 1790925934,
+        "narHash": "sha256-1uqigIEkQtub2gCdiSoCX+8kVLZk2BBhmZPQgxprjTc=",
         "owner": "joegoldin",
         "repo": "garnix-ci-selfhosted",
-        "rev": "abd0984ffe53dbbaed7286cfc0873fb6e99902b8",
+        "rev": "8a73ec4ffbcb7ee9e6cdad101196be8d7ffafc54",
         "type": "github"
       },
       "original": {
@@ -3546,11 +3546,11 @@
         "nixpkgs-x86_64-darwin": "nixpkgs-x86_64-darwin"
       },
       "locked": {
-        "lastModified": 1790834181,
-        "narHash": "sha256-nUAg2vqjTwbGRYTtn/lkhk1zZTH9G0r4wjt4MBdXirM=",
+        "lastModified": 1790926753,
+        "narHash": "sha256-oMJX/ZJ4mBUMYRDppH6teKQ204BOY7ZMwYJViLvUn3o=",
         "owner": "joegoldin",
         "repo": "pi-nix",
-        "rev": "d04062677c26ae831e3679f68abefafbeac31da8",
+        "rev": "293b17b3450589ac453584b64ef75311941602c4",
         "type": "github"
       },
       "original": {
