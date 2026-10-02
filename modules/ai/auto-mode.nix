@@ -49,6 +49,7 @@
           "Run read-only git commands: status, log, diff, show, blame, branch, remote -v, stash list, worktree list, rev-parse, describe, ls-files."
           "Create git commits, create and switch local branches, stage and unstage hunks, and create git worktrees under the repository's own worktree location."
           "Push a feature branch to origin, and open, update, or comment on pull requests in repositories the user owns, using the gh CLI."
+          "Push commits straight to the default branch (main or master) of a repository the user owns personally — under github.com/joegoldin, or a local repository with no remote. This is their normal workflow. It does not apply once the user has asked in this session for a branch, a pull request, or review, and it never covers a force-push or history rewrite."
           "Query build and check status from GitHub and from the user's self-hosted garnix instance."
           "Create, edit, and delete files inside the session's working directory and inside the scratchpad directory the harness provides."
           "Start and stop local development servers and other processes that bind only to localhost, and read their logs."
@@ -58,7 +59,7 @@
 
         soft_deny = [
           "Force-pushing, or any push that rewrites history that already exists on a remote — `git push --force`, `--force-with-lease`, or a push after an amend or rebase of pushed commits."
-          "Pushing to, or merging into, the default branch (main or master) of any repository. Feature branches and pull requests are the normal path."
+          "Pushing to, or merging into, the default branch (main or master) of a repository the user does not own personally — an organization's, an employer's, or someone else's. Feature branches and pull requests are the normal path there."
           "Discarding uncommitted work: `git reset --hard`, `git clean -fdx`, `git checkout -- .`, `git stash drop`, or removing a worktree that still has unsaved changes."
           "Activating a new system or home configuration on this machine: `nixos-rebuild switch`, `nixos-rebuild boot`, `darwin-rebuild switch`, `home-manager switch`. Building the same configuration is allowed; switching the running system is the user's call."
           "Deploying to one of the other hosts at all — `nixos-rebuild --target-host`, `--build-host`, or an ssh command that rebuilds or activates on erdtree, siofra, melina, rennala, farum-azula, scarab, malenia, or volcano-manor. Those machines are serving something while you work."
