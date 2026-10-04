@@ -40,7 +40,7 @@ let
     zen = "applications:zen.desktop";
     ghostty = "applications:com.mitchellh.ghostty.desktop";
     zed = "applications:dev.zed.Zed-Nightly.desktop";
-    punktfunk = "applications:io.unom.Punktfunk.desktop";
+    punktfunk = "applications:punktfunk-office-pc.desktop";
     discord = "applications:discord.desktop";
     steam = "applications:steam.desktop";
     zoom = "applications:Zoom.desktop";
@@ -110,6 +110,24 @@ let
     };
 in
 {
+  # Pinned punktfunk launcher: streams straight to the office PC without the
+  # host-list window (`launch --exec` becomes the punktfunk-session renderer).
+  # Every punktfunk window, stream included, has app_id io.unom.Punktfunk, which
+  # the task manager would otherwise attribute to the stock
+  # io.unom.Punktfunk.desktop, leaving this pin unhighlighted while streaming.
+  # StartupWMClass is checked before the desktop-file name, so it claims them.
+  xdg.desktopEntries.punktfunk-office-pc = {
+    name = "OFFICE-PC";
+    comment = "Stream from the office PC";
+    exec = "punktfunk launch 81956d77-21ba-4320-abb8-ff32e193858b --exec";
+    icon = "io.unom.Punktfunk";
+    categories = [
+      "Game"
+      "Network"
+    ];
+    settings.StartupWMClass = "io.unom.Punktfunk";
+  };
+
   programs.plasma.panels = [
     # Primary monitor (DP-2, screen 0): the full taskbar.
     {
@@ -124,9 +142,9 @@ in
           apps.zen
           apps.ghostty
           apps.zed
-          apps.punktfunk
           apps.discord
           apps.steam
+          apps.punktfunk
           apps.zoom
           apps.claude
           apps.obsidian
