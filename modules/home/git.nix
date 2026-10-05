@@ -31,6 +31,40 @@
           enable = true;
           lfs.enable = true;
 
+          # ~/.config/git/ignore; jj reads it too. Only files this machine
+          # and its tools create belong here; project outputs go in each
+          # repo's .gitignore. jj's watchman trigger (./jujutsu.nix)
+          # snapshots files the moment they appear, before a repo's own
+          # .gitignore may exist, so secrets are ignored globally.
+          ignores = [
+            # Secrets; the templates beside them are meant to be committed.
+            ".env"
+            ".env.*"
+            "!.env.example"
+            "!.env.sample"
+            "!.env.template"
+            "*.pem"
+
+            # OS litter: macOS metadata, KDE folder settings, Linux trash on
+            # removable drives.
+            ".DS_Store"
+            "._*"
+            ".directory"
+            ".Trash-*"
+
+            # Per-machine environments: nix-direnv's cache, devenv state,
+            # and `nix build` links at the repo root.
+            ".direnv/"
+            ".devenv*"
+            "devenv.local.nix"
+            "/result"
+            "/result-*"
+
+            # Claude Code's personal, unshared project files.
+            "**/.claude/settings.local.json"
+            "CLAUDE.local.md"
+          ];
+
           settings = {
             user = {
               name = "Joe Goldin";
