@@ -43,9 +43,19 @@
           # _jj-stacks.toml targets jj 0.43+; stable still ships 0.41.
           package = pkgs.unstable.jujutsu;
 
-          settings.user = {
-            name = "Joe Goldin";
-            email = "joe@joegold.in";
+          settings = {
+            user = {
+              name = "Joe Goldin";
+              email = "joe@joegold.in";
+            };
+
+            # Watchman (from workstation-packages) snapshots the working copy
+            # on every file change, not just when a jj command runs, so the
+            # op log can restore edits made between commands.
+            fsmonitor = {
+              backend = "watchman";
+              watchman.register-snapshot-trigger = true;
+            };
           };
         };
 
