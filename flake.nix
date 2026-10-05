@@ -315,6 +315,11 @@
     agent-skills = {
       url = "github:joegoldin/agent-skills";
       inputs.nixpkgs.follows = "nixpkgs";
+      # pi runs on Bun, and the stable channel's Bun 1.3 cannot load
+      # extensions that import subpath exports such as `typebox/compile`
+      # (pi-subagents fails with "Cannot access 'registerExtension' before
+      # initialization"). Unstable carries Bun 1.4.
+      inputs.pi-nix.inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
     # ── Homebrew (macOS) ───────────────────────────────────────────────────

@@ -3540,8 +3540,7 @@
         "flake-parts": "flake-parts_4",
         "jail-nix": "jail-nix",
         "nixpkgs": [
-          "agent-skills",
-          "nixpkgs"
+          "nixpkgs-unstable"
         ],
         "nixpkgs-x86_64-darwin": "nixpkgs-x86_64-darwin"
       },
