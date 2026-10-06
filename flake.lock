@@ -65,11 +65,11 @@
         "uv2nix": "uv2nix"
       },
       "locked": {
-        "lastModified": 1791304861,
-        "narHash": "sha256-m/gKvVVb4nyEoelw2qhQojaYdJpyRl719ZNPJnN98n4=",
+        "lastModified": 1791307052,
+        "narHash": "sha256-Xsn4IkQqa5ZMXSgi3QqigkJsNXJkjvTVOu3HhlFb69w=",
         "owner": "joegoldin",
         "repo": "agent-skills",
-        "rev": "f9aa63969bc163a9f3f525757bde67f2efc25c81",
+        "rev": "68176d0421903f2ac27d58d63d67c58bf03fcd4f",
         "type": "github"
       },
       "original": {
