@@ -65,11 +65,11 @@
         "uv2nix": "uv2nix"
       },
       "locked": {
-        "lastModified": 1791310496,
-        "narHash": "sha256-TN2FMyQ6VWIAtl0GiRvEq6SXcRHBOHjQEoSCiaLd+4A=",
+        "lastModified": 1791310926,
+        "narHash": "sha256-cAWG4zHZBDg9zzY8HdtgU4dsHB/hzOWAJzs8MCIaGTo=",
         "owner": "joegoldin",
         "repo": "agent-skills",
-        "rev": "b93800567d51da50086dfe43bf390e482b3f3cd4",
+        "rev": "35bf358f37804937ed27bbab15c08110e3b3dd2b",
         "type": "github"
       },
       "original": {
@@ -3545,11 +3545,11 @@
         "nixpkgs-x86_64-darwin": "nixpkgs-x86_64-darwin"
       },
       "locked": {
-        "lastModified": 1791308656,
-        "narHash": "sha256-+gjGFSdRi5dyfXyP8q3ZUSomnFRXid0R6f+8N4SjNdM=",
+        "lastModified": 1791310919,
+        "narHash": "sha256-bcFbiuPcMP9tM0l1NHfLnPMpZar5w9eoBIqdIzaQUQU=",
         "owner": "joegoldin",
         "repo": "pi-nix",
-        "rev": "8e8595f0d9eed5d2aacc6c95a38c28f6f5124b3b",
+        "rev": "55ef4c3eb6bfc6796ad05896ebd04013139b94a8",
         "type": "github"
       },
       "original": {
