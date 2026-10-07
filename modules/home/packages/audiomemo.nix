@@ -12,7 +12,14 @@
         onboard_version = 1;
         record.output_dir = "~/Recordings";
         transcribe = {
-          default_backend = "elevenlabs";
+          default_backend = "auto";
+          nemo = {
+            model = "parakeet-tdt";
+            live_model = "nemotron-en";
+            diar_model = "nemotron-3-diarization";
+            device = "auto";
+            diarize = true;
+          };
           elevenlabs = {
             api_key_file = "/run/agenix/elevenlabs_api_key";
             model = "scribe_v2";
