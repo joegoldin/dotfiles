@@ -240,11 +240,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791344892,
-        "narHash": "sha256-qq3eBWteXC6PZuDrrnSo7pmFBbqDF7ws1nyu+NWk1fc=",
+        "lastModified": 1791409166,
+        "narHash": "sha256-H4vrkdE5r40EzHftAZFoly0XdXjwSHhbCFvDGs4rRo4=",
         "owner": "joegoldin",
         "repo": "audiomemo",
-        "rev": "70e3a7c4f571083d1546513396f7b78b4fe0d4ff",
+        "rev": "ee59bac316ce1765486134f9f9a8010caa4cec77",
         "type": "github"
       },
       "original": {
