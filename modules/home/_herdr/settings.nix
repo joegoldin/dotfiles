@@ -9,6 +9,10 @@ in
   {
     path = "${config.xdg.configHome}/herdr/config.toml";
     settings = {
+      ui = {
+        status_indicators = "symbols";
+        toast.delivery = "terminal";
+      };
       # Ghostty's Gruvbox Dark Hard, not Herdr's softer built-in background.
       theme = {
         name = "gruvbox";

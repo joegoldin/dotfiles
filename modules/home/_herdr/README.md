@@ -38,8 +38,12 @@ Source anchors at the pinned release:
 - [Terminal-library imports](https://github.com/herdrdev/herdr/blob/v0.9.3/vendor/libghostty-vt/src/build/GhosttyZig.zig#L107)
 - [Remote behavior](https://herdr.dev/docs/persistence-remote/)
 
-Activation merges the managed theme and shortcut defaults into Herdr's config,
-preserving unrelated settings, comments, history preferences, and occupied keys.
+Activation merges the managed theme, indicators, toast delivery, and shortcut defaults
+into Herdr's config, preserving unrelated settings, comments, history preferences,
+and occupied keys. Agent states use distinct symbols rather than color dots.
+Background popups are delivered through the terminal (including Ghostty), so desktop
+banners depend on the terminal's OS notification permissions and Focus settings.
+Sound preferences are unchanged.
 It links Nix-built plugins through Herdr's mutable registry without replacing
 user-installed entries. Gruvbox uses Ghostty's Dark Hard background and selection
 colors rather than Herdr's softer built-in background. To disable the two allowed background downloads later,

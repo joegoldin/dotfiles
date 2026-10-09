@@ -31,6 +31,21 @@ class ConfigureTests(unittest.TestCase):
         self.assertEqual(parsed["theme"]["custom"]["red"], "#ff0000")
         self.assertEqual(parsed["theme"]["custom"]["panel_bg"], "#1d2021")
 
+    def test_indicator_and_toast_preferences_preserve_other_ui_and_sound_settings(self):
+        self.path.write_text(
+            '[ui]\nstatus_indicators = "dots"\n'
+            '[ui.toast]\ndelivery = "off"\ndelay_seconds = 10\n'
+            '[sound]\nenabled = false\n'
+        )
+        configure.configure(self.path, {
+            "ui": {"status_indicators": "symbols", "toast": {"delivery": "terminal"}},
+        })
+        parsed = tomlkit.parse(self.path.read_text())
+        self.assertEqual(parsed["ui"]["status_indicators"], "symbols")
+        self.assertEqual(parsed["ui"]["toast"]["delivery"], "terminal")
+        self.assertEqual(parsed["ui"]["toast"]["delay_seconds"], 10)
+        self.assertFalse(parsed["sound"]["enabled"])
+
     def test_does_not_claim_user_shortcuts_or_duplicate_actions(self):
         self.path.write_text(
             '[[keys.command]]\nkey = "prefix+N"\ncommand = "custom"\n'
