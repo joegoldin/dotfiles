@@ -213,6 +213,16 @@
     # Herdr's own pins supply its Rust and Zig toolchains. Review background
     # networking before a version bump; see modules/home/_herdr/README.md.
     herdr.url = "github:herdrdev/herdr/v0.9.3";
+    memex.url = "github:nicosuave/memex/v0.27.1";
+    ttt.url = "github:eugenioenko/ttt/v1.7.1";
+    herdr-auto-title = {
+      url = "github:kryptamine/herdr-auto-title/v0.13.0";
+      flake = false;
+    };
+    herdr-navigator = {
+      url = "github:thanhdat77/herdr-navigator/v0.3.6";
+      flake = false;
+    };
 
     # ── Development tools ──────────────────────────────────────────────────
     devenv.url = "github:cachix/devenv";

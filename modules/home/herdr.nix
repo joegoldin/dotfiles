@@ -1,16 +1,19 @@
 # One local session server per user; remote clients reach it through SSH.
-{ inputs, ... }:
+{ inputs, den, ... }:
 let
   meta = import ../_lib/meta.nix;
 in
 {
   perSystem =
-    { system, ... }:
+    { system, pkgs, ... }:
     {
-      packages.herdr = inputs.herdr.packages.${system}.default;
+      packages = (import ./_herdr/packages.nix { inherit inputs pkgs; }) // {
+        herdr = inputs.herdr.packages.${system}.default;
+      };
     };
 
   den.aspects.herdr = {
+    includes = [ den.aspects.herdr-addons ];
     # Start at boot and retain sessions after the last SSH logout.
     provides.to-hosts.nixos.users.users.${meta.username}.linger = true;
 
@@ -47,8 +50,7 @@ in
       {
         home.packages = [ package ];
 
-        # Keep upstream settings: update checks and detection downloads are
-        # allowed; pane-history persistence remains the user's choice.
+        # Release checks and agent-detection downloads retain upstream defaults.
         systemd.user.services.herdr = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
           Unit.Description = "Herdr persistent terminal sessions";
           Service = {
