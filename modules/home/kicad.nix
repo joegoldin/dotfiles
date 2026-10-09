@@ -324,6 +324,11 @@
       kicadWithAddons = unstable.kicad.override {
         inherit addons;
         symlinkJoin = mergeDirs;
+        # Keep the stock 3D models as .step. nixpkgs otherwise ships them as
+        # .stpZ and rewrites only its own footprints to match, so boards that
+        # reference the standard .step paths (as every non-Nix KiCad install
+        # does) show no models. Costs several GB of uncompressed models.
+        compressStep = false;
       };
 
       # KiCad resolves ${KICAD10_3RD_PARTY} inside lib tables and inside the
