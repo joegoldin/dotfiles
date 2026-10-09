@@ -210,6 +210,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Herdr's own pins supply its Rust and Zig toolchains. Review background
+    # networking before a version bump; see modules/home/_herdr/README.md.
+    herdr.url = "github:herdrdev/herdr/v0.9.3";
+
     # ── Development tools ──────────────────────────────────────────────────
     devenv.url = "github:cachix/devenv";
     nixpkgs-python.url = "github:cachix/nixpkgs-python";
