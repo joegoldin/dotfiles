@@ -63,6 +63,27 @@ class ConfigureTests(unittest.TestCase):
         configure.configure(self.path, bindings)
         self.assertEqual(before, self.path.stat().st_mtime_ns)
 
+    def test_navigation_aliases_preserve_other_keys_and_plugin_commands(self):
+        self.path.write_text(
+            '[keys]\nprefix = "ctrl+a"\nnext_tab = "prefix+n"\n'
+            '[[keys.command]]\nkey = "prefix+N"\ncommand = "navigator"\n'
+        )
+        bindings = {"keys": {
+            "next_tab": ["ctrl+tab", "prefix+n"],
+            "previous_tab": ["ctrl+shift+tab", "prefix+p"],
+            "focus_pane_left": ["ctrl+alt+left", "prefix+h"],
+            "previous_workspace": "ctrl+alt+shift+tab",
+        }}
+        configure.configure(self.path, bindings)
+        keys = tomlkit.parse(self.path.read_text())["keys"]
+        for name, value in bindings["keys"].items():
+            self.assertEqual(keys[name], value)
+        self.assertEqual(keys["prefix"], "ctrl+a")
+        self.assertEqual(keys["command"][0]["command"], "navigator")
+        before = self.path.stat().st_mtime_ns
+        configure.configure(self.path, bindings)
+        self.assertEqual(before, self.path.stat().st_mtime_ns)
+
     def test_new_config_is_private_and_does_not_set_history(self):
         configure.configure(self.path, {"theme": {"name": "gruvbox"}})
         self.assertEqual(self.path.stat().st_mode & 0o777, 0o600)

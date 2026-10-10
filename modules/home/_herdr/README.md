@@ -39,8 +39,9 @@ Source anchors at the pinned release:
 - [Remote behavior](https://herdr.dev/docs/persistence-remote/)
 
 Activation merges the managed theme, indicators, toast delivery, and shortcut defaults
-into Herdr's config, preserving unrelated settings, comments, history preferences,
-and occupied keys. Agent states use distinct symbols rather than color dots.
+into Herdr's config, preserving unrelated settings, comments, and history preferences.
+Plugin shortcuts leave occupied keys alone; the navigation bindings below are managed.
+Agent states use distinct symbols rather than color dots.
 Background popups are delivered through the terminal (including Ghostty), so desktop
 banners depend on the terminal's OS notification permissions and Focus settings.
 Sound preferences are unchanged.
@@ -57,6 +58,19 @@ manifest_check = false
 
 These switches do not disable explicit update/plugin-install/remote-bootstrap
 commands. They are not a network sandbox.
+
+## Navigation shortcuts
+
+| Action | Direct shortcut | Prefix fallback (`Ctrl+B`, then…) |
+|---|---|---|
+| Next / previous tab | `Ctrl+Tab` / `Ctrl+Shift+Tab` | `n` / `p` |
+| Focus adjacent pane | `Ctrl+Alt+Arrow` | `h` / `j` / `k` / `l` |
+| Previous / next workspace | `Ctrl+Alt+Shift+Tab` / `Ctrl+Alt+Tab` | `w` opens the workspace picker |
+
+Ghostty passes the two tab-cycling shortcuts through to terminal applications.
+On macOS, `Cmd+Shift+[` / `Cmd+Shift+]` still cycle Ghostty's own tabs. Other prefix
+shortcuts, including creation, closing, splitting, resizing, and plugin launchers,
+are unchanged.
 
 ## Add-ons and integrations
 
