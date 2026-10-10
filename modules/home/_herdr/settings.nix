@@ -26,13 +26,10 @@ in
       };
       keys = {
         next_tab = [
-          "ctrl+tab"
+          "ctrl+shift+tab"
           "prefix+n"
         ];
-        previous_tab = [
-          "ctrl+shift+tab"
-          "prefix+p"
-        ];
+        previous_tab = "prefix+p";
         focus_pane_left = [
           "ctrl+alt+left"
           "prefix+h"

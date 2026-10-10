@@ -33,8 +33,7 @@ let
     shell-integration-features = "cursor,sudo,title,ssh-env,ssh-terminfo";
     background-opacity = 0.95;
     keybind = [
-      # Let Herdr handle tab cycling; Ghostty tabs still use Cmd+Shift+[ / ].
-      "ctrl+tab=unbind"
+      # Keep Ctrl+Tab for Ghostty; let Herdr receive Ctrl+Shift+Tab.
       "ctrl+shift+tab=unbind"
       "ctrl+shift+c=copy_to_clipboard"
       "ctrl+shift+v=paste_from_clipboard"

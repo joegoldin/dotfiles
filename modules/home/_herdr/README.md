@@ -63,12 +63,13 @@ commands. They are not a network sandbox.
 
 | Action | Direct shortcut | Prefix fallback (`Ctrl+B`, then…) |
 |---|---|---|
-| Next / previous tab | `Ctrl+Tab` / `Ctrl+Shift+Tab` | `n` / `p` |
+| Next Herdr tab | `Ctrl+Shift+Tab` | `n` |
+| Previous Herdr tab | — | `p` |
 | Focus adjacent pane | `Ctrl+Alt+Arrow` | `h` / `j` / `k` / `l` |
 | Previous / next workspace | `Ctrl+Alt+Shift+Tab` / `Ctrl+Alt+Tab` | `w` opens the workspace picker |
 
-Ghostty passes the two tab-cycling shortcuts through to terminal applications.
-On macOS, `Cmd+Shift+[` / `Cmd+Shift+]` still cycle Ghostty's own tabs. Other prefix
+Ghostty keeps `Ctrl+Tab` for its own tabs and passes `Ctrl+Shift+Tab` through to Herdr.
+On macOS, `Cmd+Shift+[` still switches to the previous Ghostty tab. Other prefix
 shortcuts, including creation, closing, splitting, resizing, and plugin launchers,
 are unchanged.
 

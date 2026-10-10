@@ -69,8 +69,8 @@ class ConfigureTests(unittest.TestCase):
             '[[keys.command]]\nkey = "prefix+N"\ncommand = "navigator"\n'
         )
         bindings = {"keys": {
-            "next_tab": ["ctrl+tab", "prefix+n"],
-            "previous_tab": ["ctrl+shift+tab", "prefix+p"],
+            "next_tab": ["ctrl+shift+tab", "prefix+n"],
+            "previous_tab": "prefix+p",
             "focus_pane_left": ["ctrl+alt+left", "prefix+h"],
             "previous_workspace": "ctrl+alt+shift+tab",
         }}
