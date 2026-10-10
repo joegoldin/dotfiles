@@ -33,6 +33,17 @@ let
         doCheck = false;
       });
 
+      # libopenshot: abseil 20260817 headers (pulled in via protobuf) use
+      # std::weak_ordering and need C++20, but libopenshot hardcodes
+      # set(CMAKE_CXX_STANDARD 17), which a -D flag can't override. Remove once
+      # upstream bumps the standard.
+      libopenshot = uPrev.libopenshot.overrideAttrs (old: {
+        postPatch = (old.postPatch or "") + ''
+          substituteInPlace CMakeLists.txt \
+            --replace-fail "set(CMAKE_CXX_STANDARD 17)" "set(CMAKE_CXX_STANDARD 20)"
+        '';
+      });
+
       # gdal 3.13 test_zarr_read_simple_sharding + pdal 2.9.x-vs-gdal-3.13
       # overrides removed: the pin now ships gdal 3.13.1 (nixpkgs disables that
       # test itself under !useNetCDF, PR #540826) and pdal 2.10.2 (carries
