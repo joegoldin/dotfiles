@@ -40,7 +40,8 @@ let
       "ctrl+shift+t=new_tab"
       "ctrl+shift+w=close_surface"
       "ctrl+shift+n=new_window"
-      "shift+enter=text:\\x1b\\r"
+      # Preserve the modifier through Herdr's Kitty keyboard protocol.
+      "shift+enter=unbind"
     ];
   };
 

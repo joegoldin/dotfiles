@@ -46,6 +46,18 @@ class ConfigureTests(unittest.TestCase):
         self.assertEqual(parsed["ui"]["toast"]["delay_seconds"], 10)
         self.assertFalse(parsed["sound"]["enabled"])
 
+    def test_disables_tab_name_prompt_without_changing_workspace_prompt(self):
+        self.path.write_text(
+            '[ui]\nprompt_new_tab_name = true\nprompt_new_workspace_name = true\n'
+        )
+        configure.configure(self.path, {"ui": {"prompt_new_tab_name": False}})
+        parsed = tomlkit.parse(self.path.read_text())
+        self.assertFalse(parsed["ui"]["prompt_new_tab_name"])
+        self.assertTrue(parsed["ui"]["prompt_new_workspace_name"])
+        before = self.path.stat().st_mtime_ns
+        configure.configure(self.path, {"ui": {"prompt_new_tab_name": False}})
+        self.assertEqual(before, self.path.stat().st_mtime_ns)
+
     def test_does_not_claim_user_shortcuts_or_duplicate_actions(self):
         self.path.write_text(
             '[[keys.command]]\nkey = "prefix+N"\ncommand = "custom"\n'

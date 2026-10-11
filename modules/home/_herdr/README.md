@@ -41,7 +41,8 @@ Source anchors at the pinned release:
 Activation merges the managed theme, indicators, toast delivery, and shortcut defaults
 into Herdr's config, preserving unrelated settings, comments, and history preferences.
 Plugin shortcuts leave occupied keys alone; the navigation bindings below are managed.
-Agent states use distinct symbols rather than color dots.
+Agent states use distinct symbols rather than color dots. New tabs open without a
+name prompt; Auto Title supplies their names.
 Background popups are delivered through the terminal (including Ghostty), so desktop
 banners depend on the terminal's OS notification permissions and Focus settings.
 Sound preferences are unchanged.
@@ -69,6 +70,8 @@ commands. They are not a network sandbox.
 | Previous / next workspace | `Ctrl+Alt+Shift+Tab` / `Ctrl+Alt+Tab` | `w` opens the workspace picker |
 
 Ghostty keeps `Ctrl+Tab` for its own tabs and passes `Ctrl+Shift+Tab` through to Herdr.
+Shift+Enter uses Ghostty's native key encoding, preserving the Shift modifier
+through Herdr to Pi rather than turning it into Alt+Enter.
 On macOS, `Cmd+Shift+[` still switches to the previous Ghostty tab. Other prefix
 shortcuts, including creation, closing, splitting, resizing, and plugin launchers,
 are unchanged.

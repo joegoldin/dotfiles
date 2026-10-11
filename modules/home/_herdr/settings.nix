@@ -10,6 +10,7 @@ in
     path = "${config.xdg.configHome}/herdr/config.toml";
     settings = {
       ui = {
+        prompt_new_tab_name = false;
         status_indicators = "symbols";
         toast.delivery = "terminal";
       };
