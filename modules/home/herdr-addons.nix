@@ -12,7 +12,6 @@
       package = inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default;
       addons = inputs.self.packages.${pkgs.stdenv.hostPlatform.system};
       plugins = with addons; [
-        herdr-memex-plugin
         herdr-auto-title-plugin
         herdr-navigator-plugin
         herdr-ttt-plugin
@@ -24,7 +23,6 @@
     in
     {
       home.packages = [
-        addons.memex
         addons.ttt
         addons.herdr-auto-title
         addons.herdr-navigator

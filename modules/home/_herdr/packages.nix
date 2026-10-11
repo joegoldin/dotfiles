@@ -14,21 +14,6 @@ let
     pkgs.openssh
     pkgs.ripgrep
   ];
-  upstreamMemex = inputs.memex.packages.${system}.default;
-  memex = pkgs.symlinkJoin {
-    name = "memex-0.27.1";
-    pname = "memex";
-    version = "0.27.1";
-    paths = [ upstreamMemex ];
-    nativeBuildInputs = [ pkgs.makeWrapper ];
-    # Plugin commands start in the immutable store, not a writable checkout.
-    postBuild = ''
-      rm $out/bin/memex
-      makeWrapper ${upstreamMemex}/bin/memex $out/bin/memex \
-        --run 'export FASTEMBED_CACHE_DIR="''${FASTEMBED_CACHE_DIR:-''${XDG_CACHE_HOME:-$HOME/.cache}/memex/fastembed}"'
-    '';
-    inherit (upstreamMemex) meta;
-  };
   ttt = inputs.ttt.packages.${system}.default.overrideAttrs (_: {
     version = "1.7.1";
     # Upstream uses the commit abbreviation even when built from a release tag.
@@ -81,7 +66,6 @@ let
       cp ${source}/LICENSE $out/LICENSE
       ${install}
     '';
-  memexManifest = manifest inputs.memex;
   titleManifest = manifest inputs.herdr-auto-title;
   navManifest = manifest inputs.herdr-navigator;
   tttManifest = manifest "${inputs.ttt}/herdr-plugin";
@@ -93,35 +77,9 @@ let
   '';
 in
 {
-  inherit memex ttt;
+  inherit ttt;
   herdr-auto-title = autoTitle;
   herdr-navigator = navigator;
-
-  herdr-memex-plugin =
-    plugin "herdr-memex-plugin" inputs.memex
-      (
-        memexManifest
-        // {
-          build = [ ];
-          actions = map (
-            entry: entry // { command = [ "${pkgs.bash}/bin/bash" ] ++ builtins.tail entry.command; }
-          ) memexManifest.actions;
-          startup = map (
-            entry: entry // { command = [ "${pkgs.bash}/bin/bash" ] ++ builtins.tail entry.command; }
-          ) memexManifest.startup;
-        }
-      )
-      ''
-        cp -r ${inputs.memex}/herdr $out/herdr
-        chmod -R u+w $out/herdr
-        substituteInPlace $out/herdr/lib.sh \
-          --replace-fail 'export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:''${PATH:-}"' \
-            'export PATH="${runtimePath}:''${PATH:-}"'
-        substituteInPlace $out/herdr/memex-pane.sh \
-          --replace-fail '#!/usr/bin/env bash' '#!${pkgs.bash}/bin/bash'
-        mkdir -p $out/bin
-        ln -s ${memex}/bin/memex $out/bin/memex
-      '';
 
   herdr-auto-title-plugin = plugin "herdr-auto-title-plugin" inputs.herdr-auto-title (
     titleManifest
