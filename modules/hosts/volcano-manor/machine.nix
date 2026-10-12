@@ -87,9 +87,6 @@ in
 
       };
 
-      # Open RDP port for krdp
-      networking.firewall.allowedTCPPorts = [ 3389 ];
-
       # Rootless Docker
       virtualisation.docker = {
         enable = true;
@@ -125,7 +122,6 @@ in
         kdePackages.gwenview
         kdotool
         kdePackages.konsole
-        kdePackages.krdp
         kdePackages.spectacle
       ];
 

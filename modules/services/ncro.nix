@@ -117,7 +117,7 @@ in
                 public_key = "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=";
               }
               # punktfunk's CI cache, for the same one-project reason as numtide.
-              # punktfunk-client adds it as an extra-substituter, which ncro
+              # the punktfunk aspect adds it as an extra-substituter, which ncro
               # forces off below, so it has to be reachable through ncro instead.
               {
                 url = "https://nix.unom.io";
@@ -131,7 +131,7 @@ in
         # One substituter instead of several, which is the change that matters:
         # nix stops fanning a query out to every cache and waiting on the
         # slowest. mkForce on both lists because the binary-caches,
-        # numtide-cache and punktfunk-client aspects and attic-cache.nix all
+        # numtide-cache and punktfunk aspects and attic-cache.nix all
         # contribute extra-substituters, and nix appends those to substituters;
         # forcing only substituters left nix querying every remote ncro fronts.
         #

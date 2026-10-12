@@ -99,7 +99,6 @@ in
             pkgs.writeShellApplication {
               name = "kde-authorize-steam";
               text = ''
-                flatpak permission-set kde-authorized remote-desktop org.kde.krdpserver yes
                 flatpak permission-set kde-authorized remote-desktop "" yes
               '';
             }
