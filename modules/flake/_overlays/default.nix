@@ -137,6 +137,14 @@ in
     # server-cli.nix). Same fix, for the same reason.
     nixfmt = final.unstable.nixfmt;
 
+    # msitools 0.106 against stable's libgsf 1.14.59 segfaults in
+    # msi_save_string_table whenever it writes an MSI, so its own test suite
+    # fails (exit 139) and affinity-nix, which unpacks the Affinity installer
+    # with it, cannot build. The same msitools against libgsf 1.14.58 passes;
+    # unstable is still on .58 and its build is cached. Only a build tool for
+    # affinity, so mixing in unstable's closure costs nothing at runtime.
+    msitools = final.unstable.msitools;
+
     # typst (the Haskell library, a pandoc dependency) has a test suite with
     # one-second wall-clock deadlines. Under a large rebuild it loses that race
     # against the machine's own build load and fails on TIMEOUT rather than on
