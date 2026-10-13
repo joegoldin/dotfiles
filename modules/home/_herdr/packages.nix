@@ -41,22 +41,6 @@ let
       mainProgram = "herdr-auto-title";
     };
   };
-  navigator = pkgs.rustPlatform.buildRustPackage {
-    pname = "herdr-navigator";
-    version = "0.3.6";
-    src = inputs.herdr-navigator;
-    cargoLock.lockFile = "${inputs.herdr-navigator}/Cargo.lock";
-    # These test fixtures compare canonical paths; /tmp is a symlink on Darwin.
-    postPatch = lib.optionalString pkgs.stdenv.hostPlatform.isDarwin ''
-      substituteInPlace src/app.rs src/sources.rs \
-        --replace-fail '"/tmp"' '"/private/tmp"'
-    '';
-    meta = {
-      description = "Fuzzy workspace and pane navigator for Herdr";
-      license = lib.licenses.mit;
-      mainProgram = "herdr-navigator";
-    };
-  };
   manifest = source: builtins.fromTOML (builtins.readFile "${source}/herdr-plugin.toml");
   plugin =
     name: source: settings: install:
@@ -67,7 +51,6 @@ let
       ${install}
     '';
   titleManifest = manifest inputs.herdr-auto-title;
-  navManifest = manifest inputs.herdr-navigator;
   tttManifest = manifest "${inputs.ttt}/herdr-plugin";
   tttLauncher = pkgs.writeShellScript "ttt-herdr-open-worktree" ''
     export PATH="${runtimePath}:$PATH"
@@ -79,7 +62,6 @@ in
 {
   inherit ttt;
   herdr-auto-title = autoTitle;
-  herdr-navigator = navigator;
 
   herdr-auto-title-plugin = plugin "herdr-auto-title-plugin" inputs.herdr-auto-title (
     titleManifest
@@ -100,19 +82,6 @@ in
           ];
         }
       ) titleManifest.actions;
-    }
-  ) "";
-
-  herdr-navigator-plugin = plugin "herdr-navigator-plugin" inputs.herdr-navigator (
-    navManifest
-    // {
-      build = [ ];
-      actions = map (
-        entry: entry // { command = [ "${navigator}/bin/herdr-navigator" ] ++ builtins.tail entry.command; }
-      ) navManifest.actions;
-      panes = map (
-        entry: entry // { command = [ "${navigator}/bin/herdr-navigator" ] ++ builtins.tail entry.command; }
-      ) navManifest.panes;
     }
   ) "";
 

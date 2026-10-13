@@ -218,10 +218,6 @@
       url = "github:kryptamine/herdr-auto-title/v0.13.0";
       flake = false;
     };
-    herdr-navigator = {
-      url = "github:thanhdat77/herdr-navigator/v0.3.6";
-      flake = false;
-    };
 
     # ── Development tools ──────────────────────────────────────────────────
     devenv.url = "github:cachix/devenv";

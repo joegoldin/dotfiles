@@ -23,7 +23,7 @@ source review, not a full dependency audit or a guarantee against vulnerabilitie
 | Session state and logs | Stored locally; may include paths, process information, agent session references, and, if enabled, terminal output. The managed server uses umask 0077. This does not retroactively change permissions on existing files. |
 | Client/API access | Owner-only Unix sockets (0600), not a public TCP listener. Processes running as the same user can control panes/read output; Herdr is not a security boundary against those processes or agents. |
 | Remote attach | Uses OpenSSH and the user's SSH authentication. Terminal content and explicitly pasted clipboard images can travel to the selected machine/client. If a compatible remote binary is missing, interactive bootstrap can offer to download/install one; decline that offer on Nix-managed hosts and deploy through Nix instead. |
-| Plugins and agents | Can execute commands and access the network as the user. The included `herdr-addons` aspect registers the three pinned plugins below. The privacy of programs run inside panes is separate from Herdr's own networking. |
+| Plugins and agents | Can execute commands and access the network as the user. The included `herdr-addons` aspect registers the two pinned plugins below. The privacy of programs run inside panes is separate from Herdr's own networking. |
 
 Source anchors at the pinned release:
 
@@ -68,7 +68,7 @@ own tab and window actions on `Ctrl+Shift+Alt`.
 | Action | Linux | macOS | Prefix fallback (`Ctrl+B`, then…) | Ghostty's own |
 |---|---|---|---|---|
 | New tab | `Ctrl+Shift+T` | `Cmd+T` | `c` | `Ctrl+Shift+Alt+T` |
-| New workspace (Ghostty: window) | `Ctrl+Shift+N` | `Cmd+N` | — | `Ctrl+Shift+Alt+N` |
+| New workspace (Ghostty: window) | `Ctrl+Shift+N` | `Cmd+N` | `N` | `Ctrl+Shift+Alt+N` |
 | Close pane (Ghostty: surface) | `Ctrl+Shift+W` | `Cmd+W` | `x` | `Ctrl+Shift+Alt+W` |
 | Split right / down | `Ctrl+Shift+O` / `E` | `Cmd+D` / `Cmd+Shift+D` | `v` / `-` | `Ctrl+Shift+Alt+O` / `E` |
 | Next / previous tab | `Ctrl+Tab` / `Ctrl+Shift+Tab` | same | `n` / `p` | `Ctrl+Shift+Alt+Right` / `Left` |
@@ -76,8 +76,8 @@ own tab and window actions on `Ctrl+Shift+Alt`.
 | Focus adjacent pane | `Ctrl+Alt+Arrow` | same | `h` / `j` / `k` / `l` | — |
 | Previous / next workspace | `Ctrl+Alt+Shift+Tab` / `Ctrl+Alt+Tab` | same | `w` opens the workspace picker | — |
 
-Herdr's default `prefix+shift+n` for a new workspace is left to Navigator's
-`prefix+N`, the same chord. Ghostty's `Ctrl+Alt+Arrow` split navigation is
+Herdr's Goto picker (`prefix+g`) jumps to any agent or terminal across workspaces.
+Ghostty's `Ctrl+Alt+Arrow` split navigation is
 unbound so pane focus reaches Herdr.
 Shift+Enter uses Ghostty's native key encoding, preserving the Shift modifier
 through Herdr to Pi rather than turning it into Alt+Enter.
@@ -93,7 +93,6 @@ Herdr release as the server, and hooks merge with the existing runtime hooks.
 | Component | Version | Behavior reviewed |
 | --- | --- | --- |
 | Auto Title (`kryptamine/herdr-auto-title`) | 0.13.0 | Reads Herdr's Unix socket, local Git metadata and Claude transcripts. No application HTTP/telemetry path found. First startup overwrites existing pane labels, including manually set ones; subsequent manual renames are protected. Restart launches a detached instance that may survive a server stop. |
-| Herdr Navigator | 0.3.6 | Local workspace/process/project discovery and explicit SSH/command actions. Release checks use GitHub tag queries; left enabled. Custom quick actions run as the user. |
 | TTT and Herdr plugin | 1.7.1 (plugin manifest 0.1.1) | Built through upstream's Nix flake. No application analytics uploader found. Explicit plugin installs, Git operations, PR access and configured language servers can use the network. Its unauthenticated loopback command listener is opt-in (`--listen`); the managed launcher does not enable it. |
 
 Plugin install-time download/build scripts are removed from the packaged manifests;
@@ -101,22 +100,19 @@ binaries and runtime tools are Nix store references. Updates go through Nix rath
 than in-app installers. This is a targeted application-source review, not a
 complete dependency audit or network sandbox.
 
-Default shortcuts (existing assignments win): `prefix+N` opens Navigator,
-`prefix+E` opens TTT, and `prefix+R` restarts Auto Title.
+Default shortcuts (existing assignments win): `prefix+E` opens TTT, and `prefix+R` restarts Auto Title.
 Plugin startup hooks run at server startup, not when linking a plugin into an
 already-running server. Use the Auto Title restart action to start it without
 ending existing panes.
 
 ## Validation
 
-All three add-on packages and plugin manifests built on aarch64-darwin. Auto Title's
-full Go suite and Navigator's 94 tests passed. Navigator's Darwin-only fixture
-patch uses `/private/tmp` where upstream assumes `/tmp` is canonical; no tests
-are skipped. TTT retains upstream's package-scoped checks, not its full internal
+Both add-on packages and plugin manifests built on aarch64-darwin. Auto Title's
+full Go suite passed. TTT retains upstream's package-scoped checks, not its full internal
 suite.
 
 Isolated runtime checks passed for registration, Auto Title restart, live
-Navigator/TTT panes, and Claude/Codex session hooks over a mock Unix socket.
+TTT panes, and Claude/Codex session hooks over a mock Unix socket.
 The wiring smoke test disabled downloads only in its temporary configuration.
 The Pi asset is release-matched; an interactive Pi integration test remains pending.
 Seven local configuration-merge/supervisor tests passed. All ten Linux host add-on

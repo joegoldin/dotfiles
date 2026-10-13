@@ -2247,23 +2247,6 @@
         "type": "github"
       }
     },
-    "herdr-navigator": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1786469879,
-        "narHash": "sha256-+xtBu4m2YenFH+W3Sv7atDvcsgChS5mKXgVgKomM768=",
-        "owner": "thanhdat77",
-        "repo": "herdr-navigator",
-        "rev": "e12a97c5d9ddcd76ba18c985909ffeb4827afa6a",
-        "type": "github"
-      },
-      "original": {
-        "owner": "thanhdat77",
-        "ref": "v0.3.6",
-        "repo": "herdr-navigator",
-        "type": "github"
-      }
-    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -3895,7 +3878,6 @@
         "ha-compose": "ha-compose",
         "herdr": "herdr",
         "herdr-auto-title": "herdr-auto-title",
-        "herdr-navigator": "herdr-navigator",
         "home-manager": "home-manager_2",
         "homebrew-bundle": "homebrew-bundle",
         "homebrew-cask": "homebrew-cask",

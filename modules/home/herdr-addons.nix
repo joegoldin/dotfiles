@@ -13,7 +13,6 @@
       addons = inputs.self.packages.${pkgs.stdenv.hostPlatform.system};
       plugins = with addons; [
         herdr-auto-title-plugin
-        herdr-navigator-plugin
         herdr-ttt-plugin
       ];
       python = pkgs.python3.withPackages (ps: [ ps.tomlkit ]);
@@ -25,7 +24,6 @@
       home.packages = [
         addons.ttt
         addons.herdr-auto-title
-        addons.herdr-navigator
       ];
 
       # Merge only owned settings; in particular, never change pane history.
