@@ -37,10 +37,15 @@ let
       # std::weak_ordering and need C++20, but libopenshot hardcodes
       # set(CMAKE_CXX_STANDARD 17), which a -D flag can't override. Remove once
       # upstream bumps the standard.
+      #
+      # C++20 also brings in std::lerp, which makes the effects' unqualified
+      # calls to their own file-local lerp ambiguous; rename the local ones.
       libopenshot = uPrev.libopenshot.overrideAttrs (old: {
         postPatch = (old.postPatch or "") + ''
           substituteInPlace CMakeLists.txt \
             --replace-fail "set(CMAKE_CXX_STANDARD 17)" "set(CMAKE_CXX_STANDARD 20)"
+          sed -i 's/\blerp(/local_lerp(/g' \
+            src/effects/{AnalogTape,DenoiseImage,FilmGrain}.cpp
         '';
       });
 
