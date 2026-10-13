@@ -71,7 +71,7 @@ in
       # Zen Browser (Firefox fork) with tree-style tabs, built from source via
       # buildMozillaMach. The `zen-src` input tracks that fork's dev branch,
       # which also pins the Firefox base source it patches.
-      zenBrowser = inputs.zen-src.packages.${pkgs.stdenv.hostPlatform.system}.zen-browser-unwrapped;
+      zenBrowser = inputs.zen-src.packages.${pkgs.stdenv.hostPlatform.system}.zen-bonsai-browser-unwrapped;
     in
     {
       # 0xc000022070/zen-browser-flake's home-manager module: same
