@@ -33,10 +33,10 @@ in
           "cmd+t"
           "prefix+c"
         ];
+        # Herdr's default prefix+shift+n is left to the navigator's prefix+N.
         new_workspace = [
           "ctrl+shift+n"
           "cmd+n"
-          "prefix+shift+n"
         ];
         # A pane, not the tab, so one chord cannot take down a tab of agents.
         close_pane = [
