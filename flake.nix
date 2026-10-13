@@ -212,7 +212,7 @@
 
     # Herdr's own pins supply its Rust and Zig toolchains. Review background
     # networking before a version bump; see modules/home/_herdr/README.md.
-    herdr.url = "github:herdrdev/herdr/v0.9.3";
+    herdr.url = "github:herdrdev/herdr/v0.9.4";
     ttt.url = "github:eugenioenko/ttt/v1.7.1";
     herdr-auto-title = {
       url = "github:kryptamine/herdr-auto-title/v0.13.0";

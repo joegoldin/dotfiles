@@ -1,6 +1,6 @@
 # Herdr
 
-Herdr v0.9.3 is pinned in `flake.lock` and built from source through its upstream
+Herdr v0.9.4 is pinned in `flake.lock` and built from source through its upstream
 flake. `modules/home/herdr.nix` installs the client and a user-owned background
 server wherever the `joe` aspect is used, including lean servers. It opens no
 firewall ports. Linux uses a systemd user service with lingering; macOS uses a
@@ -10,7 +10,7 @@ and forwards stop signals. It does not patch the Herdr binary.
 
 ## Privacy review
 
-Reviewed the v0.9.3 application networking, configuration, persistence, logging,
+Reviewed the v0.9.4 application networking, configuration, persistence, logging,
 local IPC, remote bootstrap, and terminal-library build paths. This is a targeted
 source review, not a full dependency audit or a guarantee against vulnerabilities.
 
@@ -27,15 +27,15 @@ source review, not a full dependency audit or a guarantee against vulnerabilitie
 
 Source anchors at the pinned release:
 
-- [Update defaults](https://github.com/herdrdev/herdr/blob/v0.9.3/src/config/model.rs#L31-L47)
-- [Startup checks](https://github.com/herdrdev/herdr/blob/v0.9.3/src/app/mod.rs#L537-L557)
-- [Periodic check guards](https://github.com/herdrdev/herdr/blob/v0.9.3/src/app/runtime.rs#L97-L133)
-- [Release HTTP requests](https://github.com/herdrdev/herdr/blob/v0.9.3/src/update.rs#L336-L360)
-- [Detection-rule HTTP requests](https://github.com/herdrdev/herdr/blob/v0.9.3/src/detect/manifest_update.rs#L509-L559)
-- [Local persistence](https://github.com/herdrdev/herdr/blob/v0.9.3/src/persist/io.rs#L10-L73)
-- [Local logging](https://github.com/herdrdev/herdr/blob/v0.9.3/src/logging.rs#L1-L31)
-- [Socket permissions](https://github.com/herdrdev/herdr/blob/v0.9.3/src/server/socket_paths.rs#L11-L12)
-- [Terminal-library imports](https://github.com/herdrdev/herdr/blob/v0.9.3/vendor/libghostty-vt/src/build/GhosttyZig.zig#L107)
+- [Update defaults](https://github.com/herdrdev/herdr/blob/v0.9.4/src/config/model.rs#L31-L47)
+- [Startup checks](https://github.com/herdrdev/herdr/blob/v0.9.4/src/app/mod.rs#L581-L606)
+- [Periodic check guards](https://github.com/herdrdev/herdr/blob/v0.9.4/src/app/runtime.rs#L97-L141)
+- [Release HTTP requests](https://github.com/herdrdev/herdr/blob/v0.9.4/src/update.rs#L336-L360)
+- [Detection-rule HTTP requests](https://github.com/herdrdev/herdr/blob/v0.9.4/src/detect/manifest_update.rs#L509-L559)
+- [Local persistence](https://github.com/herdrdev/herdr/blob/v0.9.4/src/persist/io.rs#L11-L79)
+- [Local logging](https://github.com/herdrdev/herdr/blob/v0.9.4/src/logging.rs#L1-L31)
+- [Socket permissions](https://github.com/herdrdev/herdr/blob/v0.9.4/src/server/socket_paths.rs#L11-L12)
+- [Terminal-library imports](https://github.com/herdrdev/herdr/blob/v0.9.4/vendor/libghostty-vt/src/build/GhosttyZig.zig#L107)
 - [Remote behavior](https://herdr.dev/docs/persistence-remote/)
 
 Activation merges the managed theme, indicators, toast delivery, and shortcut defaults
@@ -62,19 +62,26 @@ commands. They are not a network sandbox.
 
 ## Navigation shortcuts
 
-| Action | Direct shortcut | Prefix fallback (`Ctrl+B`, then…) |
-|---|---|---|
-| Next Herdr tab | `Ctrl+Shift+Tab` | `n` |
-| Previous Herdr tab | — | `p` |
-| Focus adjacent pane | `Ctrl+Alt+Arrow` | `h` / `j` / `k` / `l` |
-| Previous / next workspace | `Ctrl+Alt+Shift+Tab` / `Ctrl+Alt+Tab` | `w` opens the workspace picker |
+The usual tab and window chords drive Herdr; Ghostty unbinds them and keeps its
+own tab and window actions on `Ctrl+Shift+Alt`.
 
-Ghostty keeps `Ctrl+Tab` for its own tabs and passes `Ctrl+Shift+Tab` through to Herdr.
+| Action | Linux | macOS | Prefix fallback (`Ctrl+B`, then…) | Ghostty's own |
+|---|---|---|---|---|
+| New tab | `Ctrl+Shift+T` | `Cmd+T` | `c` | `Ctrl+Shift+Alt+T` |
+| New workspace (Ghostty: window) | `Ctrl+Shift+N` | `Cmd+N` | — | `Ctrl+Shift+Alt+N` |
+| Close pane (Ghostty: surface) | `Ctrl+Shift+W` | `Cmd+W` | `x` | `Ctrl+Shift+Alt+W` |
+| Split right / down | `Ctrl+Shift+O` / `E` | `Cmd+D` / `Cmd+Shift+D` | `v` / `-` | `Ctrl+Shift+Alt+O` / `E` |
+| Next / previous tab | `Ctrl+Tab` / `Ctrl+Shift+Tab` | same | `n` / `p` | `Ctrl+Shift+Alt+Right` / `Left` |
+| Go to tab N | `Alt+1..9` | `Cmd+1..9` | `1..9` | `Ctrl+Shift+Alt+1..9` |
+| Focus adjacent pane | `Ctrl+Alt+Arrow` | same | `h` / `j` / `k` / `l` | — |
+| Previous / next workspace | `Ctrl+Alt+Shift+Tab` / `Ctrl+Alt+Tab` | same | `w` opens the workspace picker | — |
+
+Herdr's default `prefix+shift+n` for a new workspace is left to Navigator's
+`prefix+N`, the same chord. Ghostty's `Ctrl+Alt+Arrow` split navigation is
+unbound so pane focus reaches Herdr.
 Shift+Enter uses Ghostty's native key encoding, preserving the Shift modifier
 through Herdr to Pi rather than turning it into Alt+Enter.
-On macOS, `Cmd+Shift+[` still switches to the previous Ghostty tab. Other prefix
-shortcuts, including creation, closing, splitting, resizing, and plugin launchers,
-are unchanged.
+Resizing and plugin launchers keep their prefix shortcuts.
 
 ## Add-ons and integrations
 
