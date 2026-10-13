@@ -10,6 +10,8 @@ in
     {
       system.stateVersion = 5;
 
+      services.openssh.enable = true;
+
       nixpkgs = {
         hostPlatform = lib.mkDefault "aarch64-darwin";
         overlays = [ inputs.brew-nix.overlays.default ];
