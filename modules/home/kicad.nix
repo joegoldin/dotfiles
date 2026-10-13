@@ -134,10 +134,10 @@
         # vendor library downloads into your own symbol and footprint libs.
         (callAddon ./_kicad/pcm-plugin.nix {
           pname = "impart";
-          version = "2026.04.07";
+          version = "2026.10.12";
           pcmZip = unstable.fetchurl {
-            url = "https://github.com/Steffen-W/Import-LIB-KiCad-Plugin/releases/download/2026.04.07/Import-LIB-KiCad-Plugin.zip";
-            hash = "sha256-MCB/OUDEqXq7tSP0CgHQI3F9SUT6omCcD44OaWMvXvo=";
+            url = "https://github.com/Steffen-W/Import-LIB-KiCad-Plugin/releases/download/2026.10.12/Import-LIB-KiCad-Plugin.zip";
+            hash = "sha256-g+vNhqDJjvaCk+1mRt5RJYIbg7zcgP+g7j9crNAzBts=";
           };
           description = "Importer for SnapEDA, Ultra Librarian and EasyEDA library downloads";
           homepage = "https://github.com/Steffen-W/Import-LIB-KiCad-Plugin";
