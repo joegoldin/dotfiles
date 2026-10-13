@@ -26,11 +26,47 @@ in
         };
       };
       keys = {
+        # Linux ctrl+shift and macOS cmd chords; Ghostty unbinds them and keeps
+        # its own tab and window actions on ctrl+shift+alt.
+        new_tab = [
+          "ctrl+shift+t"
+          "cmd+t"
+          "prefix+c"
+        ];
+        new_workspace = [
+          "ctrl+shift+n"
+          "cmd+n"
+          "prefix+shift+n"
+        ];
+        # A pane, not the tab, so one chord cannot take down a tab of agents.
+        close_pane = [
+          "ctrl+shift+w"
+          "cmd+w"
+          "prefix+x"
+        ];
+        split_vertical = [
+          "ctrl+shift+o"
+          "cmd+d"
+          "prefix+v"
+        ];
+        split_horizontal = [
+          "ctrl+shift+e"
+          "cmd+shift+d"
+          "prefix+minus"
+        ];
         next_tab = [
-          "ctrl+shift+tab"
+          "ctrl+tab"
           "prefix+n"
         ];
-        previous_tab = "prefix+p";
+        previous_tab = [
+          "ctrl+shift+tab"
+          "prefix+p"
+        ];
+        switch_tab = [
+          "alt+1..9"
+          "cmd+1..9"
+          "prefix+1..9"
+        ];
         focus_pane_left = [
           "ctrl+alt+left"
           "prefix+h"

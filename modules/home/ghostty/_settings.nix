@@ -32,17 +32,55 @@ let
     shell-integration = "fish";
     shell-integration-features = "cursor,sudo,title,ssh-env,ssh-terminfo";
     background-opacity = 0.95;
+    # The usual tab/window chords (Linux ctrl+shift, macOS cmd) belong to Herdr;
+    # Ghostty's own tabs and windows move to ctrl+shift+alt on both platforms.
+    # Herdr asks for the Kitty keyboard protocol, so unbound chords reach it
+    # with every modifier intact. One list serves both platforms: unbinding a
+    # chord the platform never bound is a no-op.
     keybind = [
-      # Keep Ctrl+Tab for Ghostty; let Herdr receive Ctrl+Shift+Tab.
-      "ctrl+shift+tab=unbind"
       "ctrl+shift+c=copy_to_clipboard"
       "ctrl+shift+v=paste_from_clipboard"
-      "ctrl+shift+t=new_tab"
-      "ctrl+shift+w=close_surface"
-      "ctrl+shift+n=new_window"
+      "ctrl+shift+alt+t=new_tab"
+      "ctrl+shift+alt+n=new_window"
+      "ctrl+shift+alt+w=close_surface"
+      "ctrl+shift+alt+o=new_split:right"
+      "ctrl+shift+alt+e=new_split:down"
+      "ctrl+shift+alt+arrow_right=next_tab"
+      "ctrl+shift+alt+arrow_left=previous_tab"
+      "ctrl+shift+t=unbind"
+      "ctrl+shift+n=unbind"
+      "ctrl+shift+w=unbind"
+      "ctrl+shift+o=unbind"
+      "ctrl+shift+e=unbind"
+      "super+t=unbind"
+      "super+n=unbind"
+      "super+w=unbind"
+      "super+d=unbind"
+      "super+shift+d=unbind"
+      "ctrl+tab=unbind"
+      "ctrl+shift+tab=unbind"
+      # Ghostty's goto_split defaults would swallow Herdr's pane focus.
+      "ctrl+alt+arrow_left=unbind"
+      "ctrl+alt+arrow_down=unbind"
+      "ctrl+alt+arrow_up=unbind"
+      "ctrl+alt+arrow_right=unbind"
       # Preserve the modifier through Herdr's Kitty keyboard protocol.
       "shift+enter=unbind"
-    ];
+    ]
+    # Ghostty binds digits under both the character and the physical key.
+    ++ lib.concatMap (
+      n:
+      let
+        i = toString n;
+      in
+      [
+        "ctrl+shift+alt+digit_${i}=goto_tab:${i}"
+        "alt+${i}=unbind"
+        "alt+digit_${i}=unbind"
+        "super+${i}=unbind"
+        "super+digit_${i}=unbind"
+      ]
+    ) (lib.range 1 9);
   };
 
   toGhosttyConfig =
