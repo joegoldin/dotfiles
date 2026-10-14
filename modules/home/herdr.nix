@@ -50,6 +50,13 @@ in
       {
         home.packages = [ package ];
 
+        # The package ships no completions; generate them from the binary.
+        xdg.configFile."fish/completions/herdr.fish".source =
+          pkgs.runCommand "herdr-fish-completions" { }
+            ''
+              HOME=$TMPDIR ${package}/bin/herdr completion fish > $out
+            '';
+
         # Release checks and agent-detection downloads retain upstream defaults.
         systemd.user.services.herdr = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
           Unit.Description = "Herdr persistent terminal sessions";
