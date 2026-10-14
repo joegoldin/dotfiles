@@ -27,6 +27,21 @@ in
           ]
           [ "$topic" ]
         ];
+        # Where on the first line, what on the second. $tab_number is the
+        # auto-title fork's: Herdr's `tab` is the whole label, number and all,
+        # and the pane label is the title without it.
+        sidebar.agents.rows = [
+          [
+            "state_icon"
+            "machine"
+            "workspace"
+            "$tab_number"
+          ]
+          [
+            "agent"
+            "pane"
+          ]
+        ];
         # The tab carries the session name, so the window switcher does too.
         window_title = "{hostname}: {tab}";
         show_agent_labels_on_pane_borders = true;
