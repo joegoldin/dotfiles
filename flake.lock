@@ -2249,11 +2249,11 @@
     "herdr-auto-title": {
       "flake": false,
       "locked": {
-        "lastModified": 1792003564,
-        "narHash": "sha256-1ajF9KrUpPDFuMrCQisTxB75vkh99MLaHLHDaH135nU=",
+        "lastModified": 1792004007,
+        "narHash": "sha256-HYIajw2KUebiq3Mrr4aZTTIEvestfI3SVRY0ijGJs3Q=",
         "owner": "joegoldin",
         "repo": "herdr-auto-title",
-        "rev": "63495f571cc9ca3bc4b18ed1e214d8c098aa49c8",
+        "rev": "99faf1990b8865f5dc147587a9472afa44061b67",
         "type": "github"
       },
       "original": {

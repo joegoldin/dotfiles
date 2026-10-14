@@ -15,6 +15,7 @@ in
         toast.delivery = "terminal";
         # $vcs from the auto-title fork in place of the built-in branch, which
         # reads only git and so is empty in a jj repo.
+        # $topic, what the active tab is doing, comes from the same plugin.
         sidebar.spaces.rows = [
           [
             "state_icon"
@@ -24,7 +25,13 @@ in
             "$vcs"
             "git_status"
           ]
+          [ "$topic" ]
         ];
+        # The tab carries the session name, so the window switcher does too.
+        window_title = "{hostname}: {tab}";
+        show_agent_labels_on_pane_borders = true;
+        # Says which machine's herdr is attached.
+        tab_bar_right = [ { type = "hostname"; } ];
       };
       # Ghostty's Gruvbox Dark Hard, not Herdr's softer built-in background.
       theme = {
