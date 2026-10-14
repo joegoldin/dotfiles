@@ -60,10 +60,23 @@ in
             # is permanent so it always trips, while a momentarily-busy shell
             # recovers within a poll or two and never does - keeping false
             # restarts at zero.
+            # Stand down while the session is locked. powerdevil blanks every
+            # screen 20s into a lock and the DisplayLink outputs go with them, so
+            # a locked shell can stop answering without being wedged, and a
+            # restart started then cannot finish: it times out, is SIGKILLed,
+            # and each attempt that does come up with the secondary screens
+            # missing moves their panels onto screen 0 and saves that.
+            locked() {
+              session=$(${pkgs.systemd}/bin/loginctl show-user "$UID" -p Display --value 2>/dev/null)
+              [ -n "$session" ] &&
+                [ "$(${pkgs.systemd}/bin/loginctl show-session "$session" -p LockedHint --value 2>/dev/null)" = yes ]
+            }
             fails=0
             while :; do
               ${pkgs.coreutils}/bin/sleep 10
-              if ping; then
+              if locked; then
+                fails=0
+              elif ping; then
                 fails=0
               else
                 fails=$(( fails + 1 ))
