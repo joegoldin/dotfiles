@@ -217,8 +217,9 @@
     # Phone UI for herdr agents (elphael), built from source. Upstream pins
     # its own nixpkgs and bun on purpose.
     collie.url = "github:AltanS/collie";
+    # Fork: session name first, and jj repos named like the prompt (main~1).
     herdr-auto-title = {
-      url = "github:kryptamine/herdr-auto-title/v0.13.0";
+      url = "github:joegoldin/herdr-auto-title/jj-titles";
       flake = false;
     };
 

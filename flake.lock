@@ -2249,16 +2249,16 @@
     "herdr-auto-title": {
       "flake": false,
       "locked": {
-        "lastModified": 1791133949,
-        "narHash": "sha256-K/Pzekm5Jcv9AWNYBzFsFivPvK2DR04n5fOP1k93SUY=",
-        "owner": "kryptamine",
+        "lastModified": 1792002544,
+        "narHash": "sha256-2TdjOG3Y9GMyX+3Jk9R9FK+MG7kNkSAOenTbeOuADCg=",
+        "owner": "joegoldin",
         "repo": "herdr-auto-title",
-        "rev": "0cf776db9a9450f1b190b4f3d787674c7a9d3ddb",
+        "rev": "84ce89d4a9da48290bf80ec3e0082f21fe70ab74",
         "type": "github"
       },
       "original": {
-        "owner": "kryptamine",
-        "ref": "v0.13.0",
+        "owner": "joegoldin",
+        "ref": "jj-titles",
         "repo": "herdr-auto-title",
         "type": "github"
       }

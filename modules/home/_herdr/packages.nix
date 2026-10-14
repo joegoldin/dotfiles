@@ -26,10 +26,18 @@ let
   });
   autoTitle = pkgs.buildGoModule {
     pname = "herdr-auto-title";
-    version = "0.13.0";
+    version = "0.13.2";
     src = inputs.herdr-auto-title;
     vendorHash = "sha256-QxFp1b7pf7bn3Hh0hyaj8ke5Z61N+WwjhHt3pFiapTs=";
     subPackages = [ "cmd/herdr-auto-title" ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    # The fork labels jj repositories through the prompt's own tool.
+    postInstall = ''
+      wrapProgram $out/bin/herdr-auto-title \
+        --prefix PATH : ${
+          lib.makeBinPath [ inputs.nixpkgs-unstable.legacyPackages.${system}.jj-starship ]
+        }
+    '';
     checkPhase = ''
       runHook preCheck
       go test ./...
