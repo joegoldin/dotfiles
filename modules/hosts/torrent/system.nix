@@ -48,6 +48,7 @@ in
       environment.systemPackages = with pkgs; [
         git
         jdk
+        mosh
         nh
         nixos-rebuild-ng
         tailcat # every other host gets this via _core-packages.nix (nixos-only)

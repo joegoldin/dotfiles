@@ -46,6 +46,10 @@
         inputs.nix-index-database.nixosModules.default
       ];
       programs.nix-index-database.comma.enable = true;
+      # mosh client + mosh-server on every box; sessions bootstrap over the
+      # existing key-only sshd, then switch to UDP 60000-61000, which
+      # openFirewall (default true) opens.
+      programs.mosh.enable = true;
     };
     homeManager.home.stateVersion = lib.mkDefault "24.11";
   };
