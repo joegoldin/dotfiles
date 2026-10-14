@@ -214,6 +214,9 @@
     # networking before a version bump; see modules/home/_herdr/README.md.
     herdr.url = "github:herdrdev/herdr/v0.9.4";
     ttt.url = "github:eugenioenko/ttt/v1.7.1";
+    # Phone UI for herdr agents (elphael), built from source. Upstream pins
+    # its own nixpkgs and bun on purpose.
+    collie.url = "github:AltanS/collie";
     herdr-auto-title = {
       url = "github:kryptamine/herdr-auto-title/v0.13.0";
       flake = false;
