@@ -13,6 +13,18 @@ in
         prompt_new_tab_name = false;
         status_indicators = "symbols";
         toast.delivery = "terminal";
+        # $vcs from the auto-title fork in place of the built-in branch, which
+        # reads only git and so is empty in a jj repo.
+        sidebar.spaces.rows = [
+          [
+            "state_icon"
+            "workspace"
+          ]
+          [
+            "$vcs"
+            "git_status"
+          ]
+        ];
       };
       # Ghostty's Gruvbox Dark Hard, not Herdr's softer built-in background.
       theme = {
