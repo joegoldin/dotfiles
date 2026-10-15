@@ -104,11 +104,12 @@ in
         cp ${collie}/lib/collie/LICENSE $out/LICENSE
       '';
       # local-cli appends the recording's path as the last argument and reads
-      # the transcript from stdout; -o /dev/stdout also skips audiomemo's
-      # sidecar file.
+      # the transcript from stdout. That stdout is a socket, which
+      # `-o /dev/stdout` cannot open, so the transcript is printed as usual;
+      # its sidecar lands in Collie's temp dir and is deleted with it.
       transcribe = pkgs.writeShellScript "collie-transcribe" ''
         exec ${config.programs.audiomemo.package}/bin/audiomemo transcribe \
-          -b nemo --diarize=false -o /dev/stdout "$@"
+          -b nemo --diarize=false "$@"
       '';
     in
     {
