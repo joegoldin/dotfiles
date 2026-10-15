@@ -32,6 +32,7 @@ in
           XDG_CONFIG_HOME = config.xdg.configHome;
           XDG_STATE_HOME = config.xdg.stateHome;
           PATH = lib.concatStringsSep ":" [
+            "/run/wrappers/bin"
             "${config.home.profileDirectory}/bin"
             "/etc/profiles/per-user/${config.home.username}/bin"
             "/run/current-system/sw/bin"
