@@ -17,7 +17,7 @@
       ];
       python = pkgs.python3.withPackages (ps: [ ps.tomlkit ]);
       settings = pkgs.writeText "herdr-settings.json" (
-        builtins.toJSON (import ./_herdr/settings.nix { inherit config; })
+        builtins.toJSON (import ./_herdr/settings.nix { inherit config pkgs; })
       );
     in
     {

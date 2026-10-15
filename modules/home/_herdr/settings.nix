@@ -1,4 +1,4 @@
-{ config }:
+{ config, pkgs }:
 let
   pluginBinding = key: command: description: {
     inherit key command description;
@@ -9,6 +9,9 @@ in
   {
     path = "${config.xdg.configHome}/herdr/config.toml";
     settings = {
+      # Login shell stays zsh on darwin (not in users.knownUsers), so $SHELL
+      # cannot be trusted to select fish.
+      terminal.default_shell = "${pkgs.fish}/bin/fish";
       ui = {
         prompt_new_tab_name = false;
         status_indicators = "symbols";
