@@ -155,7 +155,10 @@ in
         "org.kde.plasma.kicker"
         taskbar
         "org.kde.plasma.marginsseparator"
-        "org.kde.netspeedWidget"
+        {
+          name = "org.kde.netspeedWidget";
+          config.General.swapDownUp = true;
+        }
         "org.kde.plasma.systemmonitor.cpucore"
         "org.kde.plasma.systemmonitor.memory"
         "org.kde.plasma.marginsseparator"
