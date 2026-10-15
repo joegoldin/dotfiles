@@ -25,6 +25,7 @@ in
       den.aspects."1password-browsers"
       den.aspects.app-autostart
       den.aspects.filesystem-tools
+      den.aspects.nix-ld-graphics
       den.aspects.gaming
       den.aspects.punktfunk-client
       den.aspects.punktfunk-host-tailnet
