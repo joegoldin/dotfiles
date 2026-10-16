@@ -3,7 +3,25 @@
   # Flatpak packages (installed via nix-flatpak)
   services.flatpak = {
     enable = true;
-    packages = [ "com.bambulab.BambuStudio" ];
+    # Setting remotes replaces nix-flatpak's default, so flathub is restated.
+    # GeForce NOW isn't on flathub; NVIDIA ships it from its own repo.
+    remotes = [
+      {
+        name = "flathub";
+        location = "https://dl.flathub.org/repo/flathub.flatpakrepo";
+      }
+      {
+        name = "GeForceNOW";
+        location = "https://international.download.nvidia.com/GFNLinux/flatpak/geforcenow.flatpakrepo";
+      }
+    ];
+    packages = [
+      "com.bambulab.BambuStudio"
+      {
+        appId = "com.nvidia.geforcenow";
+        origin = "GeForceNOW";
+      }
+    ];
     update.onActivation = true;
     overrides."com.bambulab.BambuStudio".Environment.GTK_THEME = "Adwaita:dark";
   };
