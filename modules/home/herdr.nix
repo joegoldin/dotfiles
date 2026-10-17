@@ -71,17 +71,23 @@ in
           Install.WantedBy = [ "default.target" ];
         };
 
+        # Store paths live behind a stable link so the plist never changes:
+        # activation boots out a changed agent, which kills every pane,
+        # including one running the rebuild. New builds apply on restart.
+        xdg.dataFile."herdr/launchd-server" = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
+          source = pkgs.writeShellScript "herdr-launchd-server" ''
+            ${lib.concatLines (
+              lib.mapAttrsToList (name: value: "export ${name}=${lib.escapeShellArg value}") environment
+            )}
+            exec ${pkgs.python3}/bin/python3 ${./_herdr/launchd.py} ${package}/bin/herdr server
+          '';
+        };
+
         launchd.agents.herdr = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
           enable = true;
           config = {
-            ProgramArguments = [
-              "${pkgs.python3}/bin/python3"
-              "${./_herdr/launchd.py}"
-              "${package}/bin/herdr"
-              "server"
-            ];
+            ProgramArguments = [ "${config.xdg.dataHome}/herdr/launchd-server" ];
             WorkingDirectory = config.home.homeDirectory;
-            EnvironmentVariables = environment;
             KeepAlive = {
               SuccessfulExit = false;
             };

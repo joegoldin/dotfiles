@@ -171,16 +171,19 @@ systemctl --user stop herdr
 systemctl --user start herdr
 ```
 
-macOS service status:
+macOS service status and restart:
 
 ```fish
 launchctl print gui/(id -u)/org.nix-community.home.herdr
+launchctl kickstart -k gui/(id -u)/org.nix-community.home.herdr
 ```
 
 Stopping or restarting a server ends its pane processes. Session restore is not
-process survival. Updating a managed service may restart it during activation;
-finish or move important work before rebuilding. macOS LaunchAgents start at
-user login, not before login at machine boot.
+process survival. Updating the Linux service may restart it during activation;
+finish or move important work before rebuilding. The macOS LaunchAgent starts a
+stable launcher path, so activation leaves the running server alone and a new
+Herdr build takes effect at the next restart. macOS LaunchAgents start at user
+login, not before login at machine boot.
 
 Before bumping the pinned release, repeat the networking/configuration review.
 The current policy allows update checks and rule downloads, not arbitrary new
