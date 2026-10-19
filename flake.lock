@@ -59,17 +59,19 @@
         "nixpkgs": [
           "nixpkgs"
         ],
+        "nixpkgs-vfkit": "nixpkgs-vfkit",
         "pi-nix": "pi-nix",
         "pyproject-build-systems": "pyproject-build-systems",
         "pyproject-nix": "pyproject-nix",
-        "uv2nix": "uv2nix"
+        "uv2nix": "uv2nix",
+        "vfkit-src": "vfkit-src"
       },
       "locked": {
-        "lastModified": 1791576956,
-        "narHash": "sha256-cL6QPUhdhTCVlmABLG854u0zWEljVeRZRuBQjQVyW/A=",
+        "lastModified": 1791941004,
+        "narHash": "sha256-11JBuuJ82Znmb9OGc+L8vxvVPBUDHJVW+SlyQBT6K3s=",
         "owner": "joegoldin",
         "repo": "agent-skills",
-        "rev": "9367d2b51376997a12366f0ba8136826b16aaafd",
+        "rev": "42e02e2cce8a8f1e5e59ee850d137c20f48f1f85",
         "type": "github"
       },
       "original": {
@@ -3331,6 +3333,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-vfkit": {
+      "locked": {
+        "lastModified": 1791487292,
+        "narHash": "sha256-tqM7xDEsaeK1p6VvRygeZ9LkQRpUUkbRT02BHv6hnTM=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "8edc0c72e3a38faf5434e40d1f19431125fe4b30",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs-x86_64-darwin": {
       "locked": {
         "lastModified": 1790614890,
@@ -3666,11 +3684,11 @@
         "nixpkgs-x86_64-darwin": "nixpkgs-x86_64-darwin"
       },
       "locked": {
-        "lastModified": 1791751271,
-        "narHash": "sha256-0iHx46B9hk9uOSUVE09AD6SM9pbudEjgmT3CNvlIcdM=",
+        "lastModified": 1791940527,
+        "narHash": "sha256-LtZHPz5xnl/onX6H+VlveT8Q1QVvtZZJMpT9M9pe404=",
         "owner": "joegoldin",
         "repo": "pi-nix",
-        "rev": "7d2602507c27f82ef1b26e01addd874e8cab1f20",
+        "rev": "3a1d2ce1e50e5be5ac1a2cc934e53da8af7d16cb",
         "type": "github"
       },
       "original": {
@@ -4815,6 +4833,23 @@
       "original": {
         "owner": "pyproject-nix",
         "repo": "uv2nix",
+        "type": "github"
+      }
+    },
+    "vfkit-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1791926258,
+        "narHash": "sha256-BAZZ6j8FUjmkO8E/HgSCwifq+C7x6a96TjDkwje7usk=",
+        "owner": "joegoldin",
+        "repo": "vfkit",
+        "rev": "a9c0132256ea8d4e3ffc56b374b256caab3d6981",
+        "type": "github"
+      },
+      "original": {
+        "owner": "joegoldin",
+        "ref": "usb-passthrough",
+        "repo": "vfkit",
         "type": "github"
       }
     },
