@@ -1,25 +1,19 @@
 # modules/system/_sys/gaming.nix
 # Steam, GameMode, Lutris, and gaming performance tools
-{ ... }:
+{ den, ... }:
 let
   meta = import ../_lib/meta.nix;
   username = meta.username;
 in
 {
+  den.aspects.gaming.includes = [ den.aspects.steam ];
+
   den.aspects.gaming.nixos =
     {
       pkgs,
       ...
     }:
     {
-      programs.steam = {
-        enable = true;
-        remotePlay.openFirewall = true;
-        extraPackages = with pkgs; [
-          mangohud
-        ];
-      };
-
       programs.gamemode = {
         enable = true;
         settings.general.inhibit_screensaver = 0;
