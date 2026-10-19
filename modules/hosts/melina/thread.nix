@@ -21,10 +21,21 @@
 
       virtualisation.oci-containers.containers.otbr = {
         image = "openthread/border-router:latest";
+        # The default ("missing") never re-pulls a tag already present, so
+        # :latest froze at the first pull. That image predated
+        # ot-br-posix#3517 and appended its NAT44 iptables rules on every
+        # otbr-agent start without checking for an existing copy; with
+        # --network=host they outlive the container, and 106k stacked copies
+        # starved tailscaled's iptables calls past its start timeout. Docker
+        # has no "newer" policy, so check the registry on every start.
+        pull = "always";
         autoStart = true;
         environment = {
           OT_RCP_DEVICE = "spinel+hdlc+uart://${threadDongle}?uart-baudrate=460800";
           OT_INFRA_IF = "enp1s0"; # LAN backbone interface (see machine.nix)
+          # The default (7, debug) logs every spinel frame — ~400 lines/min of
+          # journal. 5 is notice: state changes and errors only.
+          OT_LOG_LEVEL = "5";
         };
         volumes = [ "/var/lib/otbr:/data" ];
         extraOptions = [
