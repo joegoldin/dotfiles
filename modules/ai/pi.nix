@@ -18,6 +18,12 @@
 
       programs.pi.coding-agent = lib.mkIf enabled {
         enable = true;
+        extensionPackages = [
+          inputs.agent-skills.inputs.pi-nix.packages.${pkgs.stdenv.hostPlatform.system}.ext-pi-mcp-adapter
+        ];
+        # The adapter reads shared .mcp.json and Pi's existing MCP files.
+        # Keep codemode from the shared profile, but only one MCP client.
+        settings.extensions = [ "-builtin:mcp" ];
         environment = {
           OPENROUTER_API_KEY.file = ageKey "openrouter_api_key";
           CEREBRAS_API_KEY = lib.mkIf cerebrasEnabled {
