@@ -18,7 +18,8 @@
 
       programs.pi.coding-agent = lib.mkIf enabled {
         enable = true;
-        extensionPackages = [
+        # Match the shared profile's priority so this adds to its defaults.
+        extensionPackages = lib.mkDefault [
           inputs.agent-skills.inputs.pi-nix.packages.${pkgs.stdenv.hostPlatform.system}.ext-pi-mcp-adapter
         ];
         # The adapter reads shared .mcp.json and Pi's existing MCP files.
