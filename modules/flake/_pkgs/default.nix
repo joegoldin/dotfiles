@@ -91,6 +91,9 @@ pkgs: {
 
   mouse-actions-patched = pkgs.callPackage ./mouse-actions/patched.nix { };
 
+  # From unstable for sherpa-onnx 1.13.8, the exact version upstream pins.
+  nowcaption = pkgs.unstable.callPackage ./nowcaption.nix { };
+
   plasma-applet-netspeed = pkgs.callPackage ./plasma-applets/netspeed.nix { };
   plasma-applet-resources-monitor = pkgs.callPackage ./plasma-applets/resources-monitor.nix { };
 

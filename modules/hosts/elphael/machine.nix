@@ -442,6 +442,9 @@ in
 
         # Keyboard configurator
         vial
+
+        # On-device live captions for desktop audio or the microphone
+        nowcaption
       ];
 
       # Fonts
