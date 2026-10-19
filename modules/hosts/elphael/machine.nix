@@ -184,20 +184,16 @@ in
         LIBRARY_PATH = "${pkgs.glibc}/lib:${pkgs.gcc.cc.lib}/lib";
       };
 
-      systemd = {
-        services = {
-          dlm.wantedBy = [ "multi-user.target" ];
-          nix-daemon.serviceConfig = {
-            MemoryHigh = "32G";
-            MemoryMax = "42G";
-          };
-        };
-
-        # "Most software has the HIP libraries hard-coded. You can work around it on NixOS by using:"
-        tmpfiles.rules = [
-          "L+    /opt/rocm/hip   -    -    -     -    ${pkgs.rocmPackages.clr}"
-        ];
+      systemd.services.dlm.wantedBy = [ "multi-user.target" ];
+      systemd.services.nix-daemon.serviceConfig = {
+        MemoryHigh = "32G";
+        MemoryMax = "42G";
       };
+
+      # "Most software has the HIP libraries hard-coded. You can work around it on NixOS by using:"
+      systemd.tmpfiles.rules = [
+        "L+    /opt/rocm/hip   -    -    -     -    ${pkgs.rocmPackages.clr}"
+      ];
 
       hardware = {
         graphics = {
