@@ -38,6 +38,8 @@ let
     # with every modifier intact. One list serves both platforms: unbinding a
     # chord the platform never bound is a no-op.
     keybind = [
+      # Let terminal apps handle Ctrl+Enter instead of Ghostty's fullscreen toggle.
+      "ctrl+enter=unbind"
       "ctrl+shift+c=copy_to_clipboard"
       "ctrl+shift+v=paste_from_clipboard"
       "ctrl+shift+alt+t=new_tab"
