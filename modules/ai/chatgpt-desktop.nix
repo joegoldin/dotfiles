@@ -1,6 +1,5 @@
 # ChatGPT Desktop (chatgpt-desktop-linux). Linux-only Electron repack of the
-# official macOS app — include this aspect on graphical Linux hosts only;
-# macOS hosts get the official apps via the chatgpt/codex-app Homebrew casks.
+# official macOS app — include this aspect on graphical Linux hosts only.
 { inputs, ... }:
 {
   den.aspects.chatgpt-desktop.homeManager =

@@ -76,7 +76,6 @@ in
               "/Applications/Android Studio.app"
               "/Applications/Xcode-beta.app"
               "/Applications/Xcode-beta.app/Contents/Applications/DeviceHub.app"
-              "/Applications/Claude.app"
               "/Applications/OrbStack.app"
               "/Applications/Punktfunk.app"
               "/Applications/Parsec.app"
