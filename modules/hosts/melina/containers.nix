@@ -29,6 +29,9 @@
           # --network host, --privileged, --security-opt label=disable
           homeassistant = {
             image = "ghcr.io/home-assistant/home-assistant:stable";
+            # The default ("missing") never re-pulls a tag already present, so
+            # :stable would freeze at the first pull (see thread.nix).
+            pull = "always";
             autoStart = true;
             environment.TZ = "America/Los_Angeles";
             volumes = [
@@ -66,6 +69,7 @@
           # `docker run -d --env-file byob-bot.env <image>`
           byob-bot = {
             image = "ghcr.io/joegoldin/byob-discord-bot:latest";
+            pull = "always"; # see homeassistant above
             autoStart = true;
             environmentFiles = [ config.age.secrets.byob-bot-env.path ];
           };

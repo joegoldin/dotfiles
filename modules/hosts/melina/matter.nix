@@ -21,6 +21,9 @@
         # "final" stable Python server for now, since Thread is exactly what
         # thread.nix's OTBR was set up for.
         image = "ghcr.io/matter-js/python-matter-server:stable";
+        # Re-pull on every start; the default never refreshes a tag already
+        # present (see thread.nix).
+        pull = "always";
         autoStart = true;
         volumes = [
           "/var/lib/matter-server:/data"
