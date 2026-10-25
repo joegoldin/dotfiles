@@ -2,10 +2,16 @@
 { inputs, ... }:
 {
   den.aspects.pi.homeManager =
-    { pkgs, lib, ... }:
+    {
+      pkgs,
+      lib,
+      osConfig,
+      ...
+    }:
     let
       enabled = pkgs ? llm-agents;
       ageKey = name: "/run/agenix/${name}";
+      cerebrasEnabled = (osConfig.age.secrets or { }) ? cerebras_api_key;
     in
     {
       imports = [ inputs.agent-skills.homeManagerModules.pi ];
@@ -14,6 +20,9 @@
         enable = true;
         environment = {
           OPENROUTER_API_KEY.file = ageKey "openrouter_api_key";
+          CEREBRAS_API_KEY = lib.mkIf cerebrasEnabled {
+            file = ageKey "cerebras_api_key";
+          };
         };
         voice = {
           enable = true;

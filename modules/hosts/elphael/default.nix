@@ -71,10 +71,15 @@ in
         owner = meta.username;
       };
       # Provider keys for pi (modules/ai/pi.nix). anthropic_api_key above is
-      # shared with other tooling; these two exist only for pi's
+      # shared with other tooling; these exist only for pi's
       # environment.<NAME>.file wiring, which cats them at launch.
       age.secrets.openai_api_key = {
         file = "${inputs.dotfiles-secrets}/openai_api_key.age";
+        mode = "0400";
+        owner = meta.username;
+      };
+      age.secrets.cerebras_api_key = {
+        file = "${inputs.dotfiles-secrets}/cerebras_api_key.age";
         mode = "0400";
         owner = meta.username;
       };
