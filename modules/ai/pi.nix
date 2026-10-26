@@ -10,8 +10,8 @@
     }:
     let
       enabled = pkgs ? llm-agents;
-      ageKey = name: "/run/agenix/${name}";
-      cerebrasEnabled = (osConfig.age.secrets or { }) ? cerebras_api_key;
+      secrets = osConfig.age.secrets or { };
+      ageKey = name: secrets.${name}.path or null;
     in
     {
       imports = [ inputs.agent-skills.homeManagerModules.pi ];
@@ -25,16 +25,14 @@
         # The adapter reads shared .mcp.json and Pi's existing MCP files.
         # Keep codemode from the shared profile, but only one MCP client.
         settings.extensions = [ "-builtin:mcp" ];
-        environment = {
+        environment = lib.filterAttrs (_: key: key.file != null) {
           OPENROUTER_API_KEY.file = ageKey "openrouter_api_key";
-          CEREBRAS_API_KEY = lib.mkIf cerebrasEnabled {
-            file = ageKey "cerebras_api_key";
-          };
+          CEREBRAS_API_KEY.file = ageKey "cerebras_api_key";
         };
         voice = {
           enable = true;
           inherit (pkgs) audiomemo;
-          keyFiles = {
+          keyFiles = lib.filterAttrs (_: path: path != null) {
             ELEVENLABS_API_KEY_FILE = ageKey "elevenlabs_api_key";
             DEEPGRAM_API_KEY_FILE = ageKey "deepgram_api_key";
             OPENAI_API_KEY_FILE = ageKey "openai_api_key";
