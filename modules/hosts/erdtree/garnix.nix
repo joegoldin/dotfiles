@@ -546,8 +546,13 @@ in
         ];
         wants = [ "agenix.service" ];
         serviceConfig = {
-          MemoryHigh = "48G";
-          MemoryMax = "64G";
+          # Reclaim throttling can stall the Haskell runtime indefinitely. Hit
+          # a hard cap instead, kill the whole cgroup, and let Restart recover.
+          MemoryHigh = "infinity";
+          MemoryMax = "128G";
+          MemorySwapMax = 0;
+          OOMPolicy = "kill";
+          Restart = "always";
         };
       };
       systemd.services.opensearch.serviceConfig.MemoryHigh = "8G";
