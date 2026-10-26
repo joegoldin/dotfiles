@@ -5,6 +5,12 @@
     {
       programs.steam = {
         enable = true;
+        package = pkgs.steam.override {
+          # Windows .NET helpers must not resolve the host's Linux SDK.
+          extraProfile = ''
+            unset DOTNET_ROOT DOTNET_ROOT_X64 DOTNET_ROOT_X86 'DOTNET_ROOT(x86)'
+          '';
+        };
         remotePlay.openFirewall = true;
         extraPackages = with pkgs; [
           mangohud
@@ -19,11 +25,20 @@
 
   den.aspects.steam.homeManager =
     { pkgs, ... }:
+    let
+      vortex-nxm = pkgs.writeShellApplication {
+        name = "vortex-nxm";
+        runtimeInputs = [ pkgs.libnotify ];
+        # Reuse the running prefix's namespace: a fresh steam-run isolates Wine IPC.
+        text = ''
+          exec ${pkgs.python3}/bin/python3 ${./_steam/vortex_nxm.py} ${pkgs.util-linux}/bin/nsenter "$@"
+        '';
+      };
+    in
     {
       xdg.desktopEntries.vortex-nxm = {
         name = "Vortex (Nexus Mod Manager)";
-        # Browser launches do not inherit Steam's FHS environment.
-        exec = "${pkgs.steam-run}/bin/steam-run ${pkgs.steamtinkerlaunch}/bin/steamtinkerlaunch vortex u %u";
+        exec = "${vortex-nxm}/bin/vortex-nxm %u";
         terminal = false;
         noDisplay = true;
         mimeType = [

@@ -99,7 +99,7 @@
     # secrets (domains, encrypted age files, etc.); private repo over ssh;
     # bump with `nix flake update dotfiles-secrets`
     dotfiles-secrets = {
-      url = "github:joegoldin/dotfiles-secrets";
+      url = "git+ssh://git@github.com/joegoldin/dotfiles-secrets?ref=main";
       flake = false;
     };
 
@@ -212,7 +212,11 @@
 
     # Herdr's own pins supply its Rust and Zig toolchains. Review background
     # networking before a version bump; see modules/home/_herdr/README.md.
-    herdr.url = "github:herdrdev/herdr/v0.9.4";
+    herdr.url = "github:herdrdev/herdr/2ecf19a92fc3a7fff75b6ce3655ef04f4625ec01";
+    herdtty = {
+      url = "git+ssh://git@github.com/joegoldin/herdtty?ref=main";
+      inputs.herdr.follows = "herdr";
+    };
     ttt.url = "github:eugenioenko/ttt/v1.7.1";
     # Phone UI for herdr agents (elphael), built from source. Upstream pins
     # its own nixpkgs and bun on purpose.

@@ -4,9 +4,9 @@
 # Multi-monitor layout. Plasma screen numbering on this box (from
 # `qdbus org.kde.plasmashell /PlasmaShell evaluateScript 'screenGeometry(i)'`):
 #   0  2560x1440  DP-2     primary    -> full taskbar
-#   1  1920x1080  DP-3     landscape  -> taskbar: files, zen, ghostty
-#   2  1080x1920  DP-1     vertical   -> taskbar: files, ghostty, discord, slack
-#   3  1920x1080  DVI-I-1  landscape  -> taskbar: files, zen, ghostty
+#   1  1920x1080  DP-3     landscape  -> taskbar: files, zen, herdtty, herdtty terminal
+#   2  1080x1920  DP-1     vertical   -> taskbar: files, herdtty, herdtty terminal, discord, slack
+#   3  1920x1080  DVI-I-1  landscape  -> taskbar: files, zen, herdtty, herdtty terminal
 #   4  1024x600   DVI-I-2  Elgato prompter, deliberately NO panel
 #
 # The Elgato is identified as the smallest-resolution display (no monitor
@@ -38,7 +38,8 @@ let
     # (Other apps below aren't defaults for any role, so they aren't rewritten.)
     files = "file://${pkgs.kdePackages.dolphin}/share/applications/org.kde.dolphin.desktop";
     zen = "applications:zen.desktop";
-    ghostty = "applications:com.mitchellh.ghostty.desktop";
+    herdtty = "applications:dev.herdtty.desktop";
+    herdttyTerminal = "applications:dev.herdtty.terminal.desktop";
     zed = "applications:dev.zed.Zed-Nightly.desktop";
     punktfunk = "applications:punktfunk-office-pc.desktop";
     discord = "applications:discord.desktop";
@@ -140,7 +141,8 @@ in
         launchers = [
           apps.files
           apps.zen
-          apps.ghostty
+          apps.herdtty
+          apps.herdttyTerminal
           apps.zed
           apps.discord
           apps.steam
@@ -215,7 +217,8 @@ in
       launchers = [
         apps.files
         apps.zen
-        apps.ghostty
+        apps.herdtty
+        apps.herdttyTerminal
       ];
     })
     # Vertical monitor.
@@ -223,7 +226,8 @@ in
       screen = 2;
       launchers = [
         apps.files
-        apps.ghostty
+        apps.herdtty
+        apps.herdttyTerminal
         apps.discord
         apps.slack
       ];
@@ -233,7 +237,8 @@ in
       launchers = [
         apps.files
         apps.zen
-        apps.ghostty
+        apps.herdtty
+        apps.herdttyTerminal
       ];
     })
   ];

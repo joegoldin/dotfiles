@@ -258,6 +258,8 @@ in
     inherit (inputs.audiomemo.packages.${final.stdenv.hostPlatform.system}) audiomemo;
   };
 
+  herdtty-packages = import ./herdtty.nix { inherit inputs; };
+
   # sem (semantic, entity-level version control CLI) available as pkgs.sem
   sem-packages = final: _prev: {
     sem = inputs.sem.packages.${final.stdenv.hostPlatform.system}.default;

@@ -2,13 +2,15 @@
 { inputs, den, ... }:
 let
   meta = import ../_lib/meta.nix;
+  packageOverlay = import ../flake/_overlays/herdtty.nix { inherit inputs; };
 in
 {
   perSystem =
-    { system, pkgs, ... }:
+    { pkgs, ... }:
     {
       packages = (import ./_herdr/packages.nix { inherit inputs pkgs; }) // {
-        herdr = inputs.herdr.packages.${system}.default;
+        # Flake perSystem.pkgs does not inherit the hosts' overlay registry.
+        inherit (pkgs.extend packageOverlay) herdr;
       };
     };
 
@@ -25,7 +27,7 @@ in
         ...
       }:
       let
-        package = inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default;
+        package = pkgs.herdr;
         environment = {
           HOME = config.home.homeDirectory;
           SHELL = "${pkgs.fish}/bin/fish";

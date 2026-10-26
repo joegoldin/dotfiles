@@ -1,6 +1,7 @@
 { inputs, ... }:
 let
   inherit (inputs) dotfiles-secrets;
+  signingIdentity = (import "${dotfiles-secrets}/apple-signing.nix").developmentIdentity;
 in
 {
   den.aspects.zen.homeManager =
@@ -71,7 +72,8 @@ in
       # Zen Browser (Firefox fork) with tree-style tabs, built from source via
       # buildMozillaMach. The `zen-src` input tracks that fork's dev branch,
       # which also pins the Firefox base source it patches.
-      zenBrowser = inputs.zen-src.packages.${pkgs.stdenv.hostPlatform.system}.zen-bonsai-browser-unwrapped;
+      zenBrowser =
+        inputs.zen-src.packages.${pkgs.stdenv.hostPlatform.system}.zen-bonsai-browser-unwrapped;
     in
     {
       # 0xc000022070/zen-browser-flake's home-manager module: same
@@ -523,14 +525,14 @@ in
           zenSrcLink="$HOME/Applications/Home Manager Apps/Zen.app"
           zenDst="$HOME/Applications/Zen.app"
           zenMarker="$HOME/Applications/.zen-signed-store-path"
-          zenIdentity="Apple Development: Joseph Goldin (W65UYY2D42)"
+          signingIdentity=${lib.escapeShellArg signingIdentity}
           if [ -L "$zenSrcLink" ]; then
             zenStore=$(/usr/bin/readlink "$zenSrcLink")
             # The suffix tags the copy's layout, so copies made before the
             # wrapper was dropped get rebuilt even when the store path is unchanged.
             zenStamp="$zenStore unwrapped"
             if [ ! -d "$zenDst" ] || [ ! -e "$zenMarker" ] || [ "$(/bin/cat "$zenMarker")" != "$zenStamp" ]; then
-              if /usr/bin/security find-identity -v -p codesigning | /usr/bin/grep -qF "$zenIdentity"; then
+              if /usr/bin/security find-identity -v -p codesigning | /usr/bin/grep -qF "$signingIdentity"; then
                 verboseEcho "zen: re-signing $zenDst from $zenStore"
                 run /bin/rm -rf "$zenDst"
                 run /bin/cp -RL "$zenStore" "$zenDst"
@@ -548,12 +550,12 @@ in
                   run /usr/bin/plutil -replace "LSEnvironment.''${zenEnv%%=*}" -string "''${zenEnv#*=}" \
                     "$zenDst/Contents/Info.plist"
                 done
-                run /usr/bin/codesign --force --deep --sign "$zenIdentity" "$zenDst"
+                run /usr/bin/codesign --force --deep --sign "$signingIdentity" "$zenDst"
                 # LaunchServices caches LSEnvironment per bundle.
                 run /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$zenDst"
                 run --quiet /bin/sh -c "printf '%s' '$zenStamp' > '$zenMarker'"
               else
-                echo "zen: codesign identity '$zenIdentity' not in keychain; skipping signed copy" >&2
+                echo "zen: codesign identity '$signingIdentity' not in keychain; skipping signed copy" >&2
               fi
             fi
             # The Zen trampoline would launch the unsigned store copy; drop it in

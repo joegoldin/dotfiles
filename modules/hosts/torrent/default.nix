@@ -24,6 +24,7 @@ in
       den.aspects.zed
       den.aspects.zen
       den.aspects.workstation-packages
+      den.aspects.herdtty
     ];
 
     darwin = {
