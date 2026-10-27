@@ -18,6 +18,7 @@
 
       programs.pi.coding-agent = lib.mkIf enabled {
         enable = true;
+        minimap.enable = true;
         # Match the shared profile's priority so this adds to its defaults.
         extensionPackages = lib.mkDefault [
           inputs.agent-skills.inputs.pi-nix.packages.${pkgs.stdenv.hostPlatform.system}.ext-pi-mcp-adapter
