@@ -20,8 +20,19 @@ let
     pkgs:
     pkgs.callPackage ./_collie-package.nix {
       src = inputs.collie;
-      # Upstream's pin; nixpkgs' bun is older than Collie's MIN_BUN.
-      inherit (inputs.collie.packages.${pkgs.stdenv.hostPlatform.system}) bun;
+      # Keep upstream's exact Bun archive without importing its separate
+      # bootstrap toolchain; our nixpkgs Bun is older than Collie's MIN_BUN.
+      bun =
+        let
+          upstream = inputs.collie.packages.${pkgs.stdenv.hostPlatform.system}.bun;
+        in
+        pkgs.bun.overrideAttrs (_: {
+          inherit (upstream) version;
+          src = pkgs.fetchurl {
+            inherit (upstream.src) url;
+            hash = upstream.src.outputHash;
+          };
+        });
     };
 in
 {
