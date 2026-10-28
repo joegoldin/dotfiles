@@ -22,14 +22,14 @@ in
     else
       prev.stdenvNoCC.mkDerivation {
         pname = "herdtty";
-        version = "0.1.1";
+        version = "0.2.3";
         src = prev.fetchurl {
-          url = "https://github.com/joegoldin/herdtty/releases/download/v0.1.1/herdtty-macos-universal.zip";
-          hash = "sha256-nrTHrmT7djOEVgMmwTQlFflEyKty5m8cHZMQIg1ZHlA=";
+          url = "https://github.com/joegoldin/herdtty/releases/download/v0.2.3/herdtty-macos-universal.zip";
+          hash = "sha256-wp0akqkRlpQjhEkrElMigmzFC/B7cWWXOnVVSGydGDo=";
         };
         terminalSrc = prev.fetchurl {
-          url = "https://github.com/joegoldin/herdtty/releases/download/v0.1.1/herdtty-terminal-macos-universal.zip";
-          hash = "sha256-ZMtCThI2vnbA9m+4SwssDODlSL1KLtjUQK8mVjZL1ag=";
+          url = "https://github.com/joegoldin/herdtty/releases/download/v0.2.3/herdtty-terminal-macos-universal.zip";
+          hash = "sha256-Z7DcwZD1u+/13lS36B72sVKJpGRDEVfKUKCPtcyxSUo=";
         };
         nativeBuildInputs = [
           prev.unzip
