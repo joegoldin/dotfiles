@@ -36,33 +36,31 @@ _: {
     {
       home = {
         packages = [ pkgs.herdtty ] ++ lib.optional (!isDarwin) terminalLauncher;
-        sessionVariables.TERMINAL =
-          if isDarwin then
-            "${pkgs.herdtty}/bin/herdtty-terminal"
-          else
-            "${terminalLauncher}/bin/herdtty-terminal";
-
         activation.herdttyLocalApps = lib.mkIf isDarwin (
           lib.hm.dag.entryAfter [ "writeBoundary" ] ''
             run ${pkgs.herdtty}/bin/herdtty-build-local
           ''
         );
-        activation.herdttyDefaultTerminal = lib.mkIf isDarwin (
-          lib.hm.dag.entryAfter [ "linkGeneration" "herdttyLocalApps" ] ''
-            run /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister \
-              -f "${config.home.homeDirectory}/Applications/herdtty Terminal.app"
-            run ${pkgs.duti}/bin/duti -s dev.herdtty.terminal public.unix-executable all
-          ''
-        );
       };
 
-      # Includes load after the root file, so keep overrides in the final include.
-      xdg.configFile."herdtty/config".text = shared.toGhosttyConfig {
-        config-file = [
-          sharedConfig
-          "${config.xdg.configHome}/herdtty/bindings"
-        ];
+      xdg = {
+        # +new-window forwards the selected directory even on a cold start.
+        dataFile = lib.mkIf (!isDarwin) {
+          "dbus-1/services/dev.herdtty.terminal.service".text = ''
+            [D-BUS Service]
+            Name=dev.herdtty.terminal
+            Exec=${config.home.profileDirectory}/bin/herdtty --herdr-terminal=true --gtk-single-instance=true --initial-window=false
+          '';
+        };
+
+        # Includes load after the root file, so keep overrides in the final include.
+        configFile."herdtty/config".text = shared.toGhosttyConfig {
+          config-file = [
+            sharedConfig
+            "${config.xdg.configHome}/herdtty/bindings"
+          ];
+        };
+        configFile."herdtty/bindings".text = shared.toGhosttyConfig settings;
       };
-      xdg.configFile."herdtty/bindings".text = shared.toGhosttyConfig settings;
     };
 }

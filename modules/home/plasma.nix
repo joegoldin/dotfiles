@@ -624,10 +624,8 @@ in
           # Hide the Konsole "Run In Konsole" service menu (from the konsole
           # package's konsolerun.desktop); replaced by run-in-ghostty below.
           "kservicemenurc"."Show"."konsolerun" = false;
-          # Hide Ghostty's own "Open Ghostty Here" directory service menu: it is
-          # now redundant with the built-in "Open Terminal Here" (Alt+Shift+F4),
-          # which the TerminalService setting above already points at Ghostty.
-          "kservicemenurc"."Show"."com.mitchellh.ghostty" = false;
+          # KIO keys service-menu visibility by action ID, not desktop filename.
+          "kservicemenurc"."Show"."RunGhosttyDir" = false;
         };
       };
 

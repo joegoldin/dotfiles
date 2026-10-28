@@ -1,0 +1,19 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=inode/directory;
+Actions=OpenInTerminal;OpenInHerdrTerminal;
+X-KDE-Priority=TopLevel
+X-KDE-Protocols=file
+X-KDE-RequiredNumberOfUrls=1
+X-KDE-AuthorizeAction=shell_access
+
+[Desktop Action OpenInTerminal]
+Name=Open in Terminal
+Icon=com.mitchellh.ghostty
+Exec=ghostty +new-window --working-directory=%f
+
+[Desktop Action OpenInHerdrTerminal]
+Name=Open in Herdr Terminal
+Icon=dev.herdtty.terminal
+Exec=herdtty +new-window --class=dev.herdtty.terminal --working-directory=%f

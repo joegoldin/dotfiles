@@ -10,6 +10,8 @@
       ./_plasma-tiling.nix
     ];
 
+    xdg.dataFile."kio/servicemenus/terminal-actions.desktop".source = ./_terminal-actions.desktop;
+
     programs.plasma = {
       # Desktop-specific shortcuts (activity UUIDs)
       shortcuts = {
@@ -20,9 +22,9 @@
       # Desktop-specific hotkeys
       hotkeys.commands = {
         "launch-konsole" = {
-          name = "Launch Herdtty Terminal";
+          name = "Launch Ghostty";
           key = "Meta+Return";
-          command = "herdtty-terminal";
+          command = "ghostty";
         };
         "launch-browser" = {
           name = "Launch Zen";
@@ -33,14 +35,17 @@
 
       # Desktop-specific config
       configFile = {
-        "kdeglobals"."General"."TerminalApplication" = lib.mkForce "herdtty-terminal";
-        "kdeglobals"."General"."TerminalService" = lib.mkForce "dev.herdtty.terminal.desktop";
+        "kdeglobals"."General"."TerminalApplication" = lib.mkForce "ghostty";
+        "kdeglobals"."General"."TerminalService" = lib.mkForce "com.mitchellh.ghostty.desktop";
         "baloofilerc"."General"."dbVersion" = 2;
         "baloofilerc"."General"."exclude filters" =
           "*~,*.part,*.o,*.la,*.lo,*.loT,*.moc,moc_*.cpp,qrc_*.cpp,ui_*.h,cmake_install.cmake,CMakeCache.txt,CTestTestfile.cmake,libtool,config.status,confdefs.h,autom4te,conftest,confstat,Makefile.am,*.gcode,.ninja_deps,.ninja_log,build.ninja,*.csproj,*.m4,*.rej,*.gmo,*.pc,*.omf,*.aux,*.tmp,*.po,*.vm*,*.nvram,*.rcore,*.swp,*.swap,lzo,litmain.sh,*.orig,.histfile.*,.xsession-errors*,*.map,*.so,*.a,*.db,*.qrc,*.ini,*.init,*.img,*.vdi,*.vbox*,vbox.log,*.qcow2,*.vmdk,*.vhd,*.vhdx,*.sql,*.sql.gz,*.ytdl,*.tfstate*,*.class,*.pyc,*.pyo,*.elc,*.qmlc,*.jsc,*.fastq,*.fq,*.gb,*.fasta,*.fna,*.gbff,*.faa,po,CVS,.svn,.git,_darcs,.bzr,.hg,CMakeFiles,CMakeTmp,CMakeTmpQmake,.moc,.obj,.pch,.uic,.npm,.yarn,.yarn-cache,__pycache__,node_modules,node_packages,nbproject,.terraform,.venv,venv,core-dumps,lost+found";
         "baloofilerc"."General"."exclude filters version" = 9;
         "kactivitymanagerdrc"."activities"."8a44913d-258b-4faf-b84c-6815d74e5cf1" = "Default";
         "kactivitymanagerdrc"."main"."currentActivity" = "8a44913d-258b-4faf-b84c-6815d74e5cf1";
+        # The paired service actions replace the built-in and vendor duplicates.
+        "dolphinrc"."ContextMenu"."ShowOpenTerminal" = false;
+        "kservicemenurc"."Show"."RunHerdttyDir" = false;
         "dolphinrc"."DetailsMode"."PreviewSize" = 16;
         "dolphinrc"."General"."RememberOpenedTabs" = false;
         "dolphinrc"."IconsMode"."PreviewSize" = 48;

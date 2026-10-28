@@ -5,6 +5,7 @@ in
 {
   den.aspects.ghostty.homeManager =
     {
+      config,
       pkgs,
       lib,
       ...
@@ -13,6 +14,8 @@ in
       ghosttySettings = import ./_settings.nix { inherit lib; };
     in
     {
+      home.sessionVariables.TERMINAL = "${config.programs.ghostty.package}/bin/ghostty";
+
       programs.ghostty = {
         enable = true;
         package = ghostty.packages.${pkgs.stdenv.hostPlatform.system}.default;
