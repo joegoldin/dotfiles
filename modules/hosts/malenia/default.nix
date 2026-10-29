@@ -10,6 +10,7 @@ in
 
   den.aspects.malenia = {
     includes = [
+      den.aspects.rex
       den.aspects.nix-settings
       den.aspects.binary-caches
       den.aspects.attic-post-build-hook

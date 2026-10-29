@@ -10,6 +10,7 @@ in
 
   den.aspects.volcano-manor = {
     includes = [
+      den.aspects.rex
       den.aspects.nix-settings
       # system features
       den.aspects.binary-caches

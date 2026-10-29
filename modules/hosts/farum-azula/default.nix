@@ -21,6 +21,7 @@ in
 
   den.aspects.farum-azula = {
     includes = [
+      den.aspects.rex
       den.aspects.nix-settings
       den.aspects.binary-caches
       den.aspects.numtide-cache

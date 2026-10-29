@@ -16,6 +16,7 @@ in
 
   den.aspects.torrent = {
     includes = [
+      den.aspects.rex
       den.aspects.nix-settings
       den.aspects.binary-caches
       den.aspects.numtide-cache

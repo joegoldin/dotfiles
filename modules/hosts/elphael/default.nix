@@ -10,6 +10,7 @@ in
 
   den.aspects.elphael = {
     includes = [
+      den.aspects.rex
       den.aspects.nix-settings
       den.aspects.ncro
       den.aspects.dynamic-derivations

@@ -10,7 +10,10 @@ in
   den.hosts.x86_64-linux.rennala.users.${meta.username} = { };
 
   den.aspects.rennala = {
-    includes = [ den.aspects.nix-settings ];
+    includes = [
+      den.aspects.nix-settings
+      den.aspects.rex
+    ];
 
     nixos = {
       imports = [

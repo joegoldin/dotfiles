@@ -18,6 +18,7 @@ in
     # substituter aspects are intentionally omitted: deploys build on the
     # build-host and copy the closure over ssh, so the server never builds.
     includes = [
+      den.aspects.rex
       den.aspects.nix-settings
       den.aspects.ncro
       # erdtree is the garnix builder, so it must be able to build the

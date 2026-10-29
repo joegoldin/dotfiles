@@ -362,11 +362,10 @@ in
             maxJobs = 1;
           }
         ];
-        # Authenticate sandboxed evals/builds to attic (and the garnix cache)
-        # so substitution works inside the bubblewrap sandbox — the sandbox
-        # can't read the host nix.conf's netrc path unless it's bound in and
-        # readable by the garnix user (see age.secrets.attic-netrc below).
-        buildNetRcFile = config.age.secrets.attic-netrc.path;
+        # Bind the complete runtime netrc into build sandboxes: caches plus
+        # private package inputs such as Rex. rex-auth preserves the cache
+        # secret's garnix group and mode when assembling this file.
+        buildNetRcFile = config.nix.settings.netrc-file;
         # Native aarch64 builder (farum-azula, Ampere) so garnix stops emulating
         # aarch64 configs (farum-azula, scarab) via qemu — 10-50x faster. The
         # nix-daemon (root) SSHes as nix-ssh with the remote-builder key; the

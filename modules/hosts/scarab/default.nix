@@ -16,6 +16,7 @@ in
 
   den.aspects.scarab = {
     includes = [
+      den.aspects.rex
       den.aspects.nix-settings
       den.aspects.binary-caches # binary-cache substituter + hm attic-client
       den.aspects.numtide-cache

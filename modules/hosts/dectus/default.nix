@@ -16,7 +16,10 @@ in
   den.hosts.x86_64-linux.dectus.users.${meta.username} = { };
 
   den.aspects.dectus = {
-    includes = [ den.aspects.nix-settings ];
+    includes = [
+      den.aspects.nix-settings
+      den.aspects.rex
+    ];
 
     nixos =
       { lib, pkgs, ... }:

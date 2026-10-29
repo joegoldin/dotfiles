@@ -1162,11 +1162,11 @@
     "dotfiles-secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1793004869,
-        "narHash": "sha256-gstHinS9GHfjIrflQWZzN8YoFTT8VtOH9q+mWkxJ5Hk=",
+        "lastModified": 1793244994,
+        "narHash": "sha256-SJ6jYJwnmdoxdYbxQjvEsBrPBRM56NOcCdnNrCmxLcs=",
         "ref": "main",
-        "rev": "81f1c8b15b2710b9fa63cd8af68e506032814a4a",
-        "revCount": 221,
+        "rev": "d3b826dc816d1d7f8299864894bfb8194aff2567",
+        "revCount": 223,
         "type": "git",
         "url": "ssh://git@github.com/joegoldin/dotfiles-secrets"
       },
@@ -3959,6 +3959,23 @@
         "type": "github"
       }
     },
+    "rex": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1793231964,
+        "narHash": "sha256-nQpelICT/XbtIxeEbh6Gl8OhWAgg0ELojVc/MZ+9nqA=",
+        "type": "tarball",
+        "url": "https://pkgs.superlogical.com/rex/nix/snapshot/0.0.1793231964-ga3e149.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://pkgs.superlogical.com/rex/nix/snapshot.tar.gz"
+      }
+    },
     "root": {
       "inputs": {
         "affinity-nix": "affinity-nix",
@@ -4015,6 +4032,7 @@
         "nixpkgs-unstable": "nixpkgs-unstable_2",
         "plasma-manager": "plasma-manager",
         "punktfunk": "punktfunk",
+        "rex": "rex",
         "sem": "sem",
         "systems": "systems_19",
         "tailcat": "tailcat",

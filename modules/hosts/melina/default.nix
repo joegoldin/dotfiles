@@ -17,6 +17,7 @@ in
 
   den.aspects.melina = {
     includes = [
+      den.aspects.rex
       den.aspects.nix-settings
     ];
 
