@@ -51,7 +51,7 @@ in
             wvous-br-corner = 1;
 
             # Fully declarative dock layout (replaces the old lporg justfile
-            # recipes). Captured from the live dock on 2026-09-30.
+            # recipes). Captured from the live dock on 2026-10-29, minus removed apps.
             # NOTE: Zen is pinned via the signed copy that the zenSignedApp home
             # activation maintains (modules/home/_hm/zen); a stable path that
             # survives rebuilds and carries the real code signature 1Password
@@ -72,6 +72,7 @@ in
               "/System/Applications/Photos.app"
               "/System/Applications/VoiceMemos.app"
               "/Applications/Zed.app"
+              "/Applications/Rex Beta.app"
               "/Users/${username}/Applications/herdtty.app"
               "/Users/${username}/Applications/herdtty Terminal.app"
               "/Applications/Android Studio.app"
@@ -79,7 +80,6 @@ in
               "/Applications/Xcode-beta.app/Contents/Applications/DeviceHub.app"
               "/Applications/OrbStack.app"
               "/Applications/Punktfunk.app"
-              "/Applications/Parsec.app"
               "/System/Applications/Preview.app"
               "/System/Applications/System Settings.app"
             ];

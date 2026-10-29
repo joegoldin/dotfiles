@@ -61,7 +61,6 @@ let
       lotion
       unstable.obsidian
       unstable.openshot-qt
-      unstable.parsec-bin
       qdirstat # graphical disk usage analyzer
       remmina # remote desktop client
       unstable.slack
