@@ -64,13 +64,14 @@ The shared Lua fragment matches the explicitly configured Ghostty shortcuts:
 | Ctrl+Shift+T | New tab |
 | Ctrl+Shift+W | Close pane |
 | Ctrl+Shift+N | New client window |
-| Ctrl+Enter | Unbound; passed to terminal applications |
+| Ctrl+Enter | Left at Rex's default (passed to terminal applications) |
 | Shift+Enter | Send ESC followed by CR, matching Ghostty |
 
 On Torrent, Nix also sets TX02 Nerd Font Mono at 13 points, disables copy on
 select, keeps Fish as the startup shell, and enables the theme palette. Native
-macOS menu equivalents add Ctrl+Shift+C/V for Copy/Paste without replacing
-other custom menu equivalents. App restart may be needed for native defaults.
+macOS menu equivalents keep Cmd+C/V for Copy/Paste, replacing the old
+Ctrl+Shift+C/V overrides without changing other custom menu equivalents.
+App restart may be needed for native defaults.
 
 The managed Gruvbox Dark Hard theme is copied from Ghostty's shipped theme.
 Activation imports and selects it through Rex's supported client actions.

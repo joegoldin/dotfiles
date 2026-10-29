@@ -2,7 +2,6 @@
 rex.bind("ctrl+shift+t", "client.tab.new")
 rex.bind("ctrl+shift+w", "pane.close")
 rex.bind("ctrl+shift+n", "client.window.new")
-rex.unbind("ctrl+enter")
 
 -- Match Ghostty's text:\x1b\r, not a client-dependent interpretation of Return.
 rex.bind("shift+enter", function(ctx, ev)
