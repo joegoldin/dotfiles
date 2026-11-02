@@ -2295,11 +2295,11 @@
         "zon2nix": "zon2nix_2"
       },
       "locked": {
-        "lastModified": 1793398717,
-        "narHash": "sha256-tQV+b7a9damMmFPQei5/sDv9WQOV1sxY7biqSs9kdVE=",
+        "lastModified": 1793577913,
+        "narHash": "sha256-HJIKwFPtR4wDZof48YaBGCypd2ZoELY91bq7DRAf3ck=",
         "ref": "main",
-        "rev": "92e48bb679480f96fac70d44b1d68c5150531e34",
-        "revCount": 18278,
+        "rev": "0d293057677e77478f3ad6271e5815441eb6592f",
+        "revCount": 18279,
         "type": "git",
         "url": "ssh://git@github.com/joegoldin/herdtty"
       },
