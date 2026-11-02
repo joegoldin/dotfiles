@@ -26,6 +26,7 @@ in
       den.aspects.zen
       den.aspects.workstation-packages
       den.aspects.herdtty
+      den.aspects.twindesk
     ];
 
     darwin = {

@@ -260,6 +260,11 @@
     };
 
     # ── Desktop / NixOS applications ───────────────────────────────────────
+    # TwinDesk tracks main; review new source before updating its lock.
+    twindesk = {
+      url = "github:InukaAsith/TwinDesk/main";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     # affinity apps
     affinity-nix = {
       url = "github:mrshmllow/affinity-nix";

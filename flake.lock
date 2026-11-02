@@ -4038,6 +4038,7 @@
         "tailcat": "tailcat",
         "tinygrad-nix": "tinygrad-nix",
         "ttt": "ttt",
+        "twindesk": "twindesk",
         "virby": "virby",
         "zed-editor": "zed-editor",
         "zed-nix-ext": "zed-nix-ext",
@@ -4896,6 +4897,27 @@
         "owner": "eugenioenko",
         "ref": "v1.7.1",
         "repo": "ttt",
+        "type": "github"
+      }
+    },
+    "twindesk": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1793659356,
+        "narHash": "sha256-tQX+4246Yp6u27ws5907UzySv3tt3TTx51yHnGgG9B8=",
+        "owner": "InukaAsith",
+        "repo": "TwinDesk",
+        "rev": "76b69c1d00609d5cb82e9e5cdfe2f42f8257955d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "InukaAsith",
+        "ref": "main",
+        "repo": "TwinDesk",
         "type": "github"
       }
     },
