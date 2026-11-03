@@ -139,7 +139,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # The channel URL locks to an immutable release; auth stays in netrc.
+    # Public channel URL; the lock file pins an immutable release.
     rex = {
       url = "https://pkgs.superlogical.com/rex/nix/snapshot.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs";

@@ -29,31 +29,22 @@ Roundtable, and Travelboi24 have no host configuration in this repository and
 need a separate installation once accessible. iOS devices and the Windows
 machine are not supported by the current public server packages.
 
-## Package authentication
+## Package installation
 
-The `rex` flake is pinned to an immutable snapshot URL. Its credential lives in
-`dotfiles-secrets/rex-netrc.age`, encrypted for `all_keys` (including Torrent).
-It never appears in the Nix store as plaintext.
+The Rex package channel is public and requires no auth token or netrc, including
+for first-time bootstrap and CI. The `rex` flake input uses
+`https://pkgs.superlogical.com/rex/nix/snapshot.tar.gz`; `flake.lock` pins the
+resolved immutable snapshot.
 
-On hosts with a key in `keys.nix`, agenix decrypts it and the aspect atomically
-combines it with any existing `attic-netrc` into `/etc/nix/rex-netrc`. Existing
-cache credentials and their read-group/mode are preserved. Erdtree's Garnix
-build sandbox uses this combined file too, so evaluating the private Rex input
-works in CI after Erdtree is switched. The cache proxy still uses only its
-original cache netrc.
+For a standalone installation outside this configuration:
 
-On Darwin, merging runs only after the agenix launchd job exits successfully;
-a post-activation merge would race asynchronous decryption. On NixOS it depends
-on the completed agenix activation step.
+```fish
+nix profile add https://pkgs.superlogical.com/rex/nix/snapshot.tar.gz
+```
 
-Dectus has no host key in `dotfiles-secrets/keys.nix`, so it does not get automatic
-package-credential decryption. Build its closure on an authenticated host and
-copy it over, or enroll its verified host key before building locally.
-
-For first-time bootstrap, Nix needs access to the private flake *before* it can
-build the generation that installs the secret. Use a protected temporary netrc
-with `nix --option netrc-file /absolute/path/to/netrc …`, or copy a closure built
-on an already-authenticated machine. Do not put the token into a flake URL.
+The Rex aspect does not decrypt package credentials or override Nix's netrc.
+Existing cache authentication is independent; Erdtree's Garnix build sandbox
+continues to use the cache netrc.
 
 ## Ghostty parity
 
@@ -118,5 +109,5 @@ panes. Do not run `rex skill setup` over Nix-managed agent configuration.
 
 The optional read-only community MCP is at
 <https://www.superlogical.com/rex/community-mcp>. It requires Discord OAuth and
-Rex Beta Discord membership, not the package token. It is not automatically
-installed or authenticated by this aspect.
+Rex Beta Discord membership even though package downloads are public. It is not
+automatically installed or authenticated by this aspect.

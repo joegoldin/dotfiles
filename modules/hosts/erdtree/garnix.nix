@@ -362,9 +362,8 @@ in
             maxJobs = 1;
           }
         ];
-        # Bind the complete runtime netrc into build sandboxes: caches plus
-        # private package inputs such as Rex. rex-auth preserves the cache
-        # secret's garnix group and mode when assembling this file.
+        # Bind cache credentials into build sandboxes. The cache secret's
+        # garnix group and mode above let the service read it.
         buildNetRcFile = config.nix.settings.netrc-file;
         # Native aarch64 builder (farum-azula, Ampere) so garnix stops emulating
         # aarch64 configs (farum-azula, scarab) via qemu — 10-50x faster. The
