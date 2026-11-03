@@ -2,6 +2,7 @@
   lib,
   stdenv,
   swift,
+  sqlite,
   python3,
   makeWrapper,
   electron,
@@ -26,12 +27,38 @@ stdenv.mkDerivation {
     python3
     makeWrapper
   ];
+  buildInputs = [ sqlite ];
   dontConfigure = true;
+  postPatch = ''
+    # Nix's SDK declares SQLite3 but removes its headers. Use a distinct module
+    # backed by Nix SQLite so Swift does not load the SDK's broken module map.
+    mkdir -p sqlite-module
+    cat > sqlite-module/module.modulemap <<EOF
+    module TwinDeskSQLite3 [system] {
+      header "${lib.getDev sqlite}/include/sqlite3.h"
+      link "sqlite3"
+      export *
+    }
+    EOF
+    substituteInPlace mac-helper/Sources/macshare-helper/Notifs.swift \
+      --replace-fail 'import SQLite3' 'import TwinDeskSQLite3'
+    substituteInPlace mac-helper/build.sh \
+      --replace-fail 'swiftc -O' 'swiftc -I "$TWINDESK_SQLITE_MODULE" -O'
+  '';
   # Repack Nix's Electron, not upstream's npm/electron-packager download pipeline.
   buildPhase = ''
     runHook preBuild
+    export TWINDESK_SQLITE_MODULE="$PWD/sqlite-module"
     sh mac-helper/build.sh ${if stdenv.hostPlatform.isAarch64 then "arm64" else "x64"}
     runHook postBuild
+  '';
+  doCheck = true;
+  checkPhase = ''
+    runHook preCheck
+    printf 'import TwinDeskSQLite3\nprint(String(cString: sqlite3_libversion()))\n' > sqlite-module/check.swift
+    swiftc -I sqlite-module sqlite-module/check.swift -o sqlite-module/check
+    sqlite-module/check
+    runHook postCheck
   '';
   installPhase = ''
     runHook preInstall
@@ -46,7 +73,8 @@ stdenv.mkDerivation {
     cp mac-helper/.build/release/* "$resources/app/mac-helper/.build/release/"
     tar -xf ${ws} -C "$resources/app/node_modules/ws" --strip-components=1
     mkdir -p "$resources/app/mac/vendor/adb"
-    ln -s ${android-tools}/bin/adb "$resources/app/mac/vendor/adb/adb"
+    # Signed app resources cannot contain symlinks outside the bundle.
+    cp ${android-tools}/bin/adb "$resources/app/mac/vendor/adb/adb"
     cp shared/icon/teindesk-dark.icns "$resources/twindesk.icns"
     export app
     python3 - <<'PY'
@@ -77,6 +105,7 @@ stdenv.mkDerivation {
   postFixup = ''
     /usr/bin/codesign --force --deep --sign - \
       --entitlements mac/entitlements.plist "$out/Applications/TwinDesk.app"
+    /usr/bin/codesign --verify --deep --strict "$out/Applications/TwinDesk.app"
   '';
   meta = {
     description = "Share screens, input, clipboard and files between your devices";
