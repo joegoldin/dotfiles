@@ -10,7 +10,15 @@ in
     {
       system.stateVersion = 5;
 
-      services.openssh.enable = true;
+      services.openssh = {
+        enable = true;
+        extraConfig = ''
+          AuthenticationMethods publickey
+          PubkeyAuthentication yes
+          PasswordAuthentication no
+          KbdInteractiveAuthentication no
+        '';
+      };
 
       nixpkgs = {
         hostPlatform = lib.mkDefault "aarch64-darwin";
