@@ -1,8 +1,7 @@
 # Oracle Cloud bastion — tailnet entry (exit/subnet router) + attic binary-cache
-# client + a Calagopus Wings node (aarch64; Pelican was retired, this now runs
-# wings-rs against the Calagopus panel; cloudflared removed). Entity name
-# (= flake output) and hostName are both "farum-azula". Aspect content lives in the
-# sibling files (system.nix, machine.nix, wings.nix, home.nix).
+# client + native aarch64 Garnix remote builder. Entity name (= flake output) and
+# hostName are both "farum-azula". Aspect content lives in the sibling files
+# (system.nix, machine.nix, home.nix).
 #
 # NB: ./_attic.nix is intentionally not imported; the old tree never
 # imported it either (dead file kept for reference).

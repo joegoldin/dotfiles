@@ -47,6 +47,9 @@ in
       };
 
       networking.firewall = {
+        # The bastion trusts its tailnet independently of any container services.
+        enable = true;
+        trustedInterfaces = [ "tailscale0" ];
         extraCommands = ''
           iptables -w -C nixos-fw -p tcp -s ${domains.garnixHostingPublicIp}/32 --dport 9100 -j nixos-fw-accept 2>/dev/null \
             || iptables -w -I nixos-fw 1 -p tcp -s ${domains.garnixHostingPublicIp}/32 --dport 9100 -j nixos-fw-accept
