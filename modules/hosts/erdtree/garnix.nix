@@ -461,14 +461,14 @@ in
         # Terminal cert source-address pin (H2): the host's own address on the
         # guest bridge (garnix.provisioner.hostAddress = 10.111.0.1/24).
         terminalSourceAddress = "10.111.0.1/32";
-        # `authentik: default` hosting: a deployed server can reuse garnix's OWN
-        # Authentik OIDC application (same login + entitlements as garnix itself)
-        # by setting `authentik = "default"` on its garnix.yaml server entry and
-        # importing the garnix-authentik guest module with mode = "default". The
-        # backend drops these creds (client secret read as a bare value) onto the
-        # guest at /var/garnix/keys/default-authentik.env at deploy time. NOTE:
-        # the garnix Authentik provider must allow the guest callback redirect
-        # `https://*.${domains.garnixAppsDomain}/oauth2/callback` (regex URI).
+        # `authentik: default` is the historical name for shared OIDC hosting.
+        # The backend installs these credentials (client secret as a bare value)
+        # at /var/garnix/keys/default-authentik.env for the guest module. Guests
+        # choose their own scopes and group gates; sharing the client does not
+        # automatically apply the main proxy's entitlement gate.
+        # Register each guest's exact HTTPS /oauth2/callback URL with the IdP
+        # before enabling authentication. New hostnames require registration;
+        # wildcard callbacks are not supported.
         defaultAuthentik = {
           issuerUrl = garnixData.authentik.issuerUrl;
           clientId = garnixData.authentik.clientId;
@@ -564,9 +564,9 @@ in
         wants = [ "agenix.service" ];
       };
 
-      # oauth2-proxy: OIDC client against Authentik; Caddy forward_auths to it.
-      # ACCESS GATE = Authentik application *entitlements* (like gitea), enforced
-      # here by `allowed-group`: a custom Authentik scope mapping synthesizes an
+      # oauth2-proxy: OIDC client; Caddy forward_auths to it.
+      # ACCESS GATE = application entitlements, enforced here by `allowed-group`:
+      # the garnix scope mapping synthesizes an
       # OIDC `groups` claim from the user's entitlements (garnixadmin ->
       # "garnix-admins", garnixuser -> "garnix-users"); a user with NO garnix
       # entitlement gets no allowed group and is 403'd at the proxy. The
@@ -597,6 +597,7 @@ in
         keyFile = config.age.secrets.garnix-oauth2-proxy-env.path;
         extraConfig = {
           skip-provider-button = true;
+          code-challenge-method = "S256";
           cookie-refresh = "50m";
           # oidc-groups-claim defaults to "groups" (what the mapping returns).
           # allowed-group is the entitlement gate; repeatable flag -> list value.
