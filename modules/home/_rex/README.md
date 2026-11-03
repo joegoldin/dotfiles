@@ -9,9 +9,17 @@ Siofra, Volcano Manor, and Torrent. It is not a global `den.default`.
 On Linux it imports the upstream NixOS module and enables
 `services.rex.loginServer.tailscaleServe.enable`. The login server allows only
 the Tailscale identity in `dotfiles-secrets/domains.nix` to use `joe`; it grants
-neither root nor anonymous access. Tailscale Serve forwards HTTPS **8443** to
-`/run/rex/serve.sock`. Port 443 is left alone (Elphael uses it for Collie).
-Tailscale must already be enrolled with HTTPS enabled.
+neither root nor anonymous access. Tailscale Serve forwards HTTPS on the upstream
+default port **7297** to `/run/rex/serve.sock`. Host entries omit the port: Rex
+tries 443 and then 7297 automatically. Tailscale must already be enrolled with
+HTTPS enabled.
+
+Home Manager installs the CLI and configuration, not a separate personal
+systemd service. The system login server owns account-server startup. On logind
+hosts, an account server is also the personal server local commands use, so
+local and remote clients share sessions. No shared `rex.service`, embedded
+Tailscale node, anonymous TCP listener, or extra firewall opening is needed.
+Account servers survive login-server restarts and upgrades.
 
 Torrent keeps its native **Rex Beta.app**, including its bundled server and CLI.
 The aspect exposes that CLI on PATH without installing another Mac server.
@@ -28,6 +36,24 @@ targets. A menu entry is not evidence that a server has been deployed. Gitea,
 Roundtable, and Travelboi24 have no host configuration in this repository and
 need a separate installation once accessible. iOS devices and the Windows
 machine are not supported by the current public server packages.
+
+## Login without a desktop session
+
+The system `rex-login-server.service` and `rex-tailscale-serve.service` start at
+boot under `multi-user.target`, independently of the desktop. A permitted
+Tailscale connection selects `joe`; PAM opens an account session and the login
+server starts the account's Rex server if none is running, or reuses it otherwise.
+The account server is started on demand; a persistent personal service is not
+required. Other aspects may enable user lingering independently.
+
+`rex server status` with no server argument checks the personal Unix socket,
+not the system login server. A missing personal socket does not establish that
+remote login is broken. To test the system login path, connect from another
+tailnet device using `rex -S elphael ls --json` (with the managed host list), or
+`rex -S <hostname>.<tailnet>.ts.net ls --json`. No graphical login is required.
+If this fails, inspect `journalctl -u rex-login-server -u rex-tailscale-serve`;
+account expiration/lock, PAM rejection, and Tailscale identity or ACL failures
+are distinct from a missing local socket.
 
 ## Package installation
 
@@ -97,6 +123,10 @@ rex -S elphael ls --json
 Configuration tests are available as `checks.<system>.rex-config` for upstream
 supported systems. They cover Lua merging, backup/idempotence, validation
 failure preservation, theme import retries, and the real CLI's Lua validation.
+`checks.x86_64-linux.rex-services` (also on aarch64-linux) evaluates the service
+wiring: no separate personal/shared service, restricted Serve on the default
+7297, boot-time login-server activation, and the native Mac server remaining
+unmanaged by systemd.
 
 ## Agent integration
 

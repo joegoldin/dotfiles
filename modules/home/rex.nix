@@ -29,10 +29,7 @@ in
         accounts.${meta.username}.principals = [
           "tailscale:${domains.tailscaleUser}"
         ];
-        tailscaleServe = {
-          enable = true;
-          httpsPort = 8443;
-        };
+        tailscaleServe.enable = true;
       };
     };
 
@@ -85,7 +82,7 @@ in
           + lib.concatMapStrings (host: ''
             rex.host {
               label = "${host}",
-              endpoint = "https://${host}.${lib.removePrefix "elphael." domains.elphaelTailscale}:8443",
+              endpoint = "https://${host}.${lib.removePrefix "elphael." domains.elphaelTailscale}",
             }
           '') (builtins.filter (host: host != osConfig.networking.hostName) hosts);
 
