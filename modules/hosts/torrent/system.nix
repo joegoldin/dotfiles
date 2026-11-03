@@ -62,7 +62,8 @@ in
         tailcat # every other host gets this via _core-packages.nix (nixos-only)
         wget
         inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
-        # darwin.xcode_16_3  # TODO: enable this when available in nixpkgs
+        # Xcode and iOS SDKs are managed with Apple's installer, not Nix.
+        # Nix builds retain their own isolated macOS SDK through stdenv.
       ];
 
       # nh uses NH_DARWIN_FLAKE to locate the flake for darwin commands

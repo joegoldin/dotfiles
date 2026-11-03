@@ -21,7 +21,8 @@
       # otherwise Apple Store will refuse to install them.
       # For details, see https://github.com/mas-cli/mas
       masApps = {
-        # Xcode = 497799835; // using the beta from apple dev
+        # Xcode is installed manually at /Applications/Xcode.app.
+        # Manage iOS SDKs and simulator runtimes in Xcode's Settings.
         Flycut = 442160987;
         RosettaStone = 1476088902;
         Amphetamine = 937984704;

@@ -51,7 +51,8 @@ in
             wvous-br-corner = 1;
 
             # Fully declarative dock layout (replaces the old lporg justfile
-            # recipes). Captured from the live dock on 2026-10-29, minus removed apps.
+            # recipes). Captured from the live dock on 2026-11-03.
+            # DeviceHub keeps its position but targets the installed Xcode.app.
             # NOTE: Zen is pinned via the signed copy that the zenSignedApp home
             # activation maintains (modules/home/_hm/zen); a stable path that
             # survives rebuilds and carries the real code signature 1Password
@@ -75,9 +76,9 @@ in
               "/Applications/Rex Beta.app"
               "/Users/${username}/Applications/herdtty.app"
               "/Users/${username}/Applications/herdtty Terminal.app"
+              "/Applications/Xcode.app"
               "/Applications/Android Studio.app"
-              "/Applications/Xcode-beta.app"
-              "/Applications/Xcode-beta.app/Contents/Applications/DeviceHub.app"
+              "/Applications/Xcode.app/Contents/Applications/DeviceHub.app"
               "/Applications/OrbStack.app"
               "/Applications/Punktfunk.app"
               "/System/Applications/Preview.app"
