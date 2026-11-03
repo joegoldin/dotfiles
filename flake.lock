@@ -1964,11 +1964,11 @@
         "treetop": "treetop"
       },
       "locked": {
-        "lastModified": 1790974509,
-        "narHash": "sha256-54cuUrytu4lYuNAp6zn4KeI8yeO/P1YsrqK0oPBAXVY=",
+        "lastModified": 1793728193,
+        "narHash": "sha256-wiVvgAeYpkyLaZIaGxleZGfo9S0BhfQjvCiWLPd2ex8=",
         "owner": "joegoldin",
         "repo": "garnix-ci-selfhosted",
-        "rev": "d9c2896ef154f0cc576f86a8dd8e9da8a8d35e88",
+        "rev": "c008d975d66eaaca337f5ea7601407bb5fd37b35",
         "type": "github"
       },
       "original": {
