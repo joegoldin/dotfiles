@@ -9,6 +9,7 @@ in
 {
   den.aspects.elphael.nixos =
     {
+      config,
       pkgs,
       lib,
       ...
@@ -172,7 +173,6 @@ in
         '';
       };
 
-      # ssh with 1password
       environment.plasma6.excludePackages = with pkgs.kdePackages; [
         discover
         elisa
@@ -180,7 +180,8 @@ in
       ];
 
       environment.sessionVariables = {
-        SSH_AUTH_SOCK = "/home/${username}/.1password/agent.sock";
+        # PAM sets this before pam_systemd provides XDG_RUNTIME_DIR.
+        SSH_AUTH_SOCK = "/run/user/${toString config.users.users.${username}.uid}/ssh-agent";
         LIBRARY_PATH = "${pkgs.glibc}/lib:${pkgs.gcc.cc.lib}/lib";
       };
 

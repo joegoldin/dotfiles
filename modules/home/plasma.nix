@@ -248,13 +248,13 @@ in
         '';
       };
 
-      # ssh with 1password
+      # Legacy default; hosts migrating to local keys override the agent.
       programs.ssh = {
         enable = true;
         enableDefaultConfig = false;
         settings = {
           "*" = {
-            IdentityAgent = "\"/home/${username}/.1password/agent.sock\"";
+            IdentityAgent = lib.mkDefault "\"/home/${username}/.1password/agent.sock\"";
           };
         };
       };

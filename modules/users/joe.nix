@@ -7,6 +7,11 @@
 let
   meta = import ../_lib/meta.nix;
   keys = import "${inputs.dotfiles-secrets}/keys.nix";
+  loginKeys = [
+    keys.${meta.username}
+    keys.elphael
+    keys.torrent
+  ];
 in
 {
   den.aspects.${meta.username} = {
@@ -27,7 +32,7 @@ in
           uid = 1000;
           isNormalUser = true;
           shell = pkgs.fish;
-          openssh.authorizedKeys.keys = [ keys.${meta.username} ];
+          openssh.authorizedKeys.keys = loginKeys;
           extraGroups = [
             "wheel"
             "networkmanager"
@@ -42,7 +47,7 @@ in
           # home-manager's darwin module derives home.homeDirectory from this
           home = "/Users/${meta.username}";
           shell = pkgs.fish;
-          openssh.authorizedKeys.keys = [ keys.${meta.username} ];
+          openssh.authorizedKeys.keys = loginKeys;
           description = meta.username;
         };
       };

@@ -22,6 +22,7 @@ in
       den.aspects.numtide-cache
       # home features (projected onto users via the host-aspects battery)
       den.aspects.home-baseline
+      den.aspects.local-ssh
       den.aspects.zed
       den.aspects.zen
       den.aspects.workstation-packages

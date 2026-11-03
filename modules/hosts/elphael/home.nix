@@ -10,25 +10,5 @@
       ./_python.nix
       ./_dolphin.nix
     ];
-
-    # TODO: git signing with 1password
-    # programs.git = {
-    #   enable = true;
-    #   extraConfig = {
-    #     gpg = {
-    #       format = "ssh";
-    #     };
-    #     gpg."ssh" = {
-    #       program = "${lib.getExe' pkgs._1password-gui "op-ssh-sign"}";
-    #     };
-    #     commit = {
-    #       gpgsign = true;
-    #     };
-
-    #     # user = {
-    #     #   signingKey = "...";
-    #     # };
-    #   };
-    # };
   };
 }
