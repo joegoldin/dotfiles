@@ -35,5 +35,8 @@ scarab_host_ed25519.pub
 # pi
 .pi
 
+# Wrangler local development cache and state
+.wrangler/
+
 # temp
 nohup.out
