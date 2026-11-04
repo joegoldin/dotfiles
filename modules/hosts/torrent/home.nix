@@ -26,7 +26,6 @@ in
       imports = [
         ./_packages
         ./_python.nix
-        ./_ghostty.nix
       ];
 
       home.packages = [

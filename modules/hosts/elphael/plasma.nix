@@ -43,9 +43,8 @@
         "baloofilerc"."General"."exclude filters version" = 9;
         "kactivitymanagerdrc"."activities"."8a44913d-258b-4faf-b84c-6815d74e5cf1" = "Default";
         "kactivitymanagerdrc"."main"."currentActivity" = "8a44913d-258b-4faf-b84c-6815d74e5cf1";
-        # The paired service actions replace the built-in and vendor duplicates.
+        # Our directory action replaces the built-in duplicate.
         "dolphinrc"."ContextMenu"."ShowOpenTerminal" = false;
-        "kservicemenurc"."Show"."RunHerdttyDir" = false;
         "dolphinrc"."DetailsMode"."PreviewSize" = 16;
         "dolphinrc"."General"."RememberOpenedTabs" = false;
         "dolphinrc"."IconsMode"."PreviewSize" = 48;

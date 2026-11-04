@@ -144,6 +144,8 @@
       url = "https://pkgs.superlogical.com/rex/nix/snapshot.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Linux GUI keeps its own Rust/Zig pins; the Mac uses the native Rex app.
+    rex-rune.url = "github:joegoldin/rex-rune";
 
     # ── Server services ────────────────────────────────────────────────────
     # binary cache server
@@ -214,20 +216,6 @@
     virby = {
       url = "github:quinneden/virby-nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    # Herdr's own pins supply its Rust and Zig toolchains. Review background
-    # networking before a version bump; see modules/home/_herdr/README.md.
-    herdr.url = "github:herdrdev/herdr/2ecf19a92fc3a7fff75b6ce3655ef04f4625ec01";
-    herdtty = {
-      url = "git+ssh://git@github.com/joegoldin/herdtty?ref=main";
-      inputs.herdr.follows = "herdr";
-    };
-    ttt.url = "github:eugenioenko/ttt/v1.7.1";
-    # Fork: session name first, and jj repos named like the prompt (main~1).
-    herdr-auto-title = {
-      url = "github:joegoldin/herdr-auto-title/jj-titles";
-      flake = false;
     };
 
     # ── Development tools ──────────────────────────────────────────────────

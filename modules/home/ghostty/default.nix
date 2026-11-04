@@ -13,7 +13,7 @@ in
     let
       ghosttySettings = import ./_settings.nix { inherit lib; };
     in
-    {
+    lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
       home.sessionVariables.TERMINAL = "${config.programs.ghostty.package}/bin/ghostty";
 
       programs.ghostty = {

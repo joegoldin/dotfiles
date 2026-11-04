@@ -6,10 +6,11 @@ let
     let
       system = if isDarwin then "aarch64-darwin" else "x86_64-linux";
       pkgs = {
-        stdenv.hostPlatform = { inherit isDarwin system; };
-        herdtty = "/test/herdtty";
+        stdenv.hostPlatform = {
+          inherit isDarwin system;
+          isLinux = !isDarwin;
+        };
         duti = "/test/duti";
-        writeShellScriptBin = name: _: "/test/${name}";
       };
       config = {
         home.homeDirectory = "/home/test";
@@ -20,6 +21,7 @@ let
       args = {
         inherit pkgs config;
         lib = lib // {
+          mkIf = condition: content: if condition then content else { };
           hm.dag.entryAfter = after: data: { inherit after data; };
         };
       };
@@ -28,15 +30,26 @@ let
           inputs.ghostty.packages.${system}.default = config.programs.ghostty.package;
         }).den.aspects.ghostty.homeManager
           args;
-      herdtty = (import ../herdtty.nix { }).den.aspects.herdtty.homeManager args;
     in
     {
       terminal = ghostty.home.sessionVariables.TERMINAL or null;
-      herdttyOwnsTerminal = herdtty.home ? sessionVariables.TERMINAL;
-      herdttyOverridesMacDefault = herdtty.home.activation ? herdttyDefaultTerminal;
-      terminalService =
-        herdtty.xdg.dataFile.content."dbus-1/services/dev.herdtty.terminal.service".text or "";
+      enabled = ghostty.programs.ghostty.enable or false;
     };
+  macHomebrew =
+    (import ../../hosts/torrent/homebrew.nix { inputs = { }; }).den.aspects.torrent.darwin
+      {
+        config.nix-homebrew.taps = { };
+        pkgs.mas = "/test/mas";
+      };
+  macHome =
+    (import ../../hosts/torrent/home.nix {
+      inputs.dotfiles-assets = { };
+    }).den.aspects.torrent.homeManager
+      {
+        inherit lib;
+        config = { };
+        pkgs = { };
+      };
   linux = evaluate false;
   darwin = evaluate true;
   host = (import ../../hosts/elphael/plasma.nix { inherit lib; }).den.aspects.elphael.homeManager;
@@ -52,12 +65,6 @@ let
       "";
 in
 lib.runTests {
-  testHerdrTerminalActivation = {
-    expr =
-      lib.hasInfix "Name=dev.herdtty.terminal" linux.terminalService
-      && lib.hasInfix "Exec=/test/profile/bin/herdtty --herdr-terminal=true --gtk-single-instance=true --initial-window=false" linux.terminalService;
-    expected = true;
-  };
   testNoDuplicateGhosttyMenu = {
     expr = shared.programs.plasma.configFile.kservicemenurc.Show.RunGhosttyDir or true;
     expected = false;
@@ -66,19 +73,12 @@ lib.runTests {
     expr = desktop.configFile.dolphinrc.ContextMenu.ShowOpenTerminal or true;
     expected = false;
   };
-  testNoDuplicateHerdttyMenu = {
-    expr = desktop.configFile.kservicemenurc.Show.RunHerdttyDir or true;
-    expected = false;
-  };
   testMenuNames = {
-    expr =
-      lib.hasInfix "Name=Open in Terminal\n" menu && lib.hasInfix "Name=Open in Herdr Terminal\n" menu;
+    expr = lib.hasInfix "Actions=OpenInTerminal;\n" menu && lib.hasInfix "Name=Open in Terminal\n" menu;
     expected = true;
   };
   testMenuDirectoryArguments = {
-    expr =
-      lib.hasInfix "Exec=ghostty +new-window --working-directory=%f" menu
-      && lib.hasInfix "Exec=herdtty +new-window --class=dev.herdtty.terminal --working-directory=%f" menu;
+    expr = lib.hasInfix "Exec=ghostty +new-window --working-directory=%f" menu;
     expected = true;
   };
   testMenuLocalSingleDirectory = {
@@ -91,14 +91,22 @@ lib.runTests {
   };
   testDarwinTerminal = {
     expr = darwin.terminal;
-    expected = "/test/ghostty/bin/ghostty";
+    expected = null;
   };
-  testHerdttyDoesNotOwnTerminal = {
-    expr = linux.herdttyOwnsTerminal || darwin.herdttyOwnsTerminal;
+  testLinuxEnabled = {
+    expr = linux.enabled;
+    expected = true;
+  };
+  testDarwinDisabled = {
+    expr = darwin.enabled;
     expected = false;
   };
-  testHerdttyDoesNotOverrideMacDefault = {
-    expr = darwin.herdttyOverridesMacDefault;
+  testNoMacGhosttyCask = {
+    expr = builtins.elem "ghostty" macHomebrew.homebrew.casks;
+    expected = false;
+  };
+  testNoMacGhosttyConfigImport = {
+    expr = builtins.any (path: baseNameOf path == "_ghostty.nix") macHome.imports;
     expected = false;
   };
   testKdeTerminal = {

@@ -74,8 +74,6 @@ in
               "/System/Applications/VoiceMemos.app"
               "/Applications/Zed.app"
               "/Applications/Rex Beta.app"
-              "/Users/${username}/Applications/herdtty.app"
-              "/Users/${username}/Applications/herdtty Terminal.app"
               "/Applications/Xcode.app"
               "/Applications/Android Studio.app"
               "/Applications/Xcode.app/Contents/Applications/DeviceHub.app"

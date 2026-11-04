@@ -78,7 +78,6 @@ in
           "displaylink"
           "fantastical"
           "figma"
-          "ghostty"
           "gitbutler"
           "google-chrome"
           "hidock"

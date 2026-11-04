@@ -22,7 +22,6 @@ in
       den.aspects.gh
       den.aspects.gpg
       den.aspects.starship
-      den.aspects.herdr
     ];
 
     provides.to-hosts.nixos =

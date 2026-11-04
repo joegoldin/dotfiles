@@ -11,6 +11,7 @@ in
   den.aspects.elphael = {
     includes = [
       den.aspects.rex
+      den.aspects.rex-linux
       den.aspects.nix-settings
       den.aspects.ncro
       den.aspects.dynamic-derivations
@@ -38,7 +39,6 @@ in
       den.aspects.workstation-packages
       den.aspects.linux-workstation-packages
       den.aspects.ghostty
-      den.aspects.herdtty
       den.aspects.kicad
       den.aspects.zed
       den.aspects.default-apps
