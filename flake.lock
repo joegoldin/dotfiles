@@ -3833,11 +3833,11 @@
         "zig": "zig_2"
       },
       "locked": {
-        "lastModified": 1793840328,
-        "narHash": "sha256-JJI22zVx25jwUd/iwoOouR6wDGZjoFItRxX9Tz4YqYc=",
+        "lastModified": 1793906341,
+        "narHash": "sha256-T6AufjttIhnRyrXQHskYgRkFaAyR0dOABP4Delxprjo=",
         "owner": "joegoldin",
         "repo": "rex-rune",
-        "rev": "0e8b7a26d668aad542752972a16d3bd232c82f58",
+        "rev": "3e11e45fff33b32bedbf1a161cf395037510e224",
         "type": "github"
       },
       "original": {
