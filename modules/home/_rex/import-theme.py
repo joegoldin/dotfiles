@@ -19,7 +19,11 @@ try:
     clients = json.loads(result.stdout)["clients"]
 except (json.JSONDecodeError, KeyError) as error:
     raise SystemExit(f"Cannot read Rex client list: {error}") from error
-app = next((client for client in clients if client.get("info", {}).get("kind") == "app"), None)
+# A Mac activation must not send its local theme path to a remote app.
+app = next((client for client in clients
+            if client.get("info", {}).get("kind") == "app"
+            and client.get("info", {}).get("platform") == "macos"
+            and client.get("principal", {}).get("transport") == "unix"), None)
 if app is None:
     print("Rex theme pending: open Rex with Remote Control enabled, then apply again.")
     sys.exit(0)
