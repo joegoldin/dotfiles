@@ -3586,11 +3586,11 @@
     "pam-watchid-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1793871990,
-        "narHash": "sha256-S5TNyOD+SNO+3biggIx6CyfLv5fILuJ5Unw1Z1UZtIA=",
+        "lastModified": 1793913938,
+        "narHash": "sha256-NsdINr7847pNMQs3kXMHLexxq5LFMhuKJHq530njgPs=",
         "owner": "joegoldin",
         "repo": "pam-watchid",
-        "rev": "59d58fb106cfb186cecc880277d9c2bd25a8f115",
+        "rev": "c6b5322213e603bd281c0e6282f352a6e67318a3",
         "type": "github"
       },
       "original": {

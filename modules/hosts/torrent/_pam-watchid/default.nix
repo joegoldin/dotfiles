@@ -23,7 +23,11 @@ let
   '';
 in
 pam-watchid.overrideAttrs (old: {
-  version = "2-unstable-${builtins.substring 0 7 pamWatchidSource.rev}";
+  version =
+    if pamWatchidSource ? rev then
+      "2-unstable-${builtins.substring 0 7 pamWatchidSource.rev}"
+    else
+      "2-local";
   src = lib.cleanSourceWith {
     src = pamWatchidSource;
     filter =
