@@ -38,6 +38,17 @@ in
       ];
 
       age.identityPaths = [ "/var/lib/agenix/identity" ];
+      assertions = [
+        {
+          assertion = builtins.pathExists "${inputs.dotfiles-secrets}/ssh-passphrase-torrent.age";
+          message = "Enroll torrent's SSH passphrase and include it in dotfiles-secrets before activation.";
+        }
+      ];
+      age.secrets.ssh-key-passphrase = {
+        file = "${inputs.dotfiles-secrets}/ssh-passphrase-torrent.age";
+        mode = "0400";
+        owner = meta.username;
+      };
       age.secrets.attic-netrc = {
         file = "${inputs.dotfiles-secrets}/attic-netrc.age";
         mode = "0400";

@@ -14,6 +14,10 @@ in
     let
       signingKey = "${config.home.homeDirectory}/.ssh/id_ed25519.pub";
       allowedSigners = "${config.xdg.configHome}/git/allowed_signers";
+      loader = import ./_local-ssh/package.nix { inherit pkgs; };
+      loadKey = ''
+        ${lib.getExe loader} ${lib.escapeShellArg "${config.home.homeDirectory}/.ssh/id_ed25519"} /run/agenix/ssh-key-passphrase
+      '';
       setAgentEnvironment = ''
         /bin/launchctl setenv SSH_AUTH_SOCK "$(${lib.getExe pkgs.getconf} DARWIN_USER_TEMP_DIR)/${config.services.ssh-agent.socket}"
       '';
@@ -31,7 +35,12 @@ in
           ProgramArguments = [
             (lib.getExe pkgs.bash)
             "-c"
-            setAgentEnvironment
+            ''
+              set -euo pipefail
+              ${setAgentEnvironment}
+              export SSH_AUTH_SOCK="$(${lib.getExe pkgs.getconf} DARWIN_USER_TEMP_DIR)/${config.services.ssh-agent.socket}"
+              ${loadKey}
+            ''
           ];
           RunAtLoad = true;
         };
@@ -39,7 +48,30 @@ in
 
       services.ssh-agent = {
         enable = true;
-        defaultMaximumIdentityLifetime = 3600;
+        defaultMaximumIdentityLifetime = null;
+      };
+      systemd.user.services = lib.mkIf pkgs.stdenv.isLinux {
+        # User lingering is enabled for other services; this agent must still
+        # stop at desktop logout rather than live for the whole user-manager.
+        ssh-agent = {
+          Install.WantedBy = lib.mkForce [ "graphical-session.target" ];
+          Unit.PartOf = [ "graphical-session.target" ];
+        };
+        ssh-login-key = {
+          Unit = {
+            Description = "Unlock the local SSH key for this desktop session";
+            Requires = [ "ssh-agent.service" ];
+            After = [ "ssh-agent.service" ];
+            PartOf = [ "graphical-session.target" ];
+          };
+          Service = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            Environment = "SSH_AUTH_SOCK=%t/${config.services.ssh-agent.socket}";
+            ExecStart = "${lib.getExe loader} ${config.home.homeDirectory}/.ssh/id_ed25519 /run/agenix/ssh-key-passphrase";
+          };
+          Install.WantedBy = [ "graphical-session.target" ];
+        };
       };
       xdg.configFile."git/allowed_signers".text = ''
         joe@joegold.in ${keys.elphael}
@@ -73,7 +105,8 @@ in
             IdentityAgent = "SSH_AUTH_SOCK";
             IdentityFile = "~/.ssh/id_ed25519";
             IdentitiesOnly = true;
-            AddKeysToAgent = "1h";
+            # Manual eviction must last until the next login or explicit add.
+            AddKeysToAgent = "no";
             ForwardAgent = false;
           };
         };

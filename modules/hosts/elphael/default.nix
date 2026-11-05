@@ -59,6 +59,17 @@ in
         # ./_hyprwhspr.nix  # disabled: underscored so import-tree skips it
       ];
 
+      assertions = [
+        {
+          assertion = builtins.pathExists "${inputs.dotfiles-secrets}/ssh-passphrase-elphael.age";
+          message = "Enroll elphael's SSH passphrase and include it in dotfiles-secrets before activation.";
+        }
+      ];
+      age.secrets.ssh-key-passphrase = {
+        file = "${inputs.dotfiles-secrets}/ssh-passphrase-elphael.age";
+        mode = "0400";
+        owner = meta.username;
+      };
       age.secrets.deepgram_api_key = {
         file = "${inputs.dotfiles-secrets}/deepgram_api_key.age";
         mode = "0400";
