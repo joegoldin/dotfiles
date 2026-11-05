@@ -55,7 +55,9 @@ let
   host = (import ../../hosts/elphael/plasma.nix { inherit lib; }).den.aspects.elphael.homeManager;
   desktop = host.programs.plasma;
   shared = (import ../plasma.nix { inputs = { }; }).den.aspects.plasma.homeManager {
-    inherit lib;
+    lib = lib // {
+      hm.dag.entryAfter = after: data: { inherit after data; };
+    };
     pkgs = { };
   };
   menu =
@@ -120,5 +122,21 @@ lib.runTests {
   testTerminalShortcut = {
     expr = desktop.hotkeys.commands.launch-konsole.command;
     expected = "ghostty";
+  };
+  testPlasmaApplyAfterLinkedGeneration = {
+    expr = builtins.elem "linkGeneration" shared.home.activation.applyPlasmaManager.after;
+    expected = true;
+  };
+  testPlasmaApplyAfterConfiguredPlasma = {
+    expr = builtins.elem "configure-plasma" shared.home.activation.applyPlasmaManager.after;
+    expected = true;
+  };
+  testPlasmaIconCacheAfterLinkedGeneration = {
+    expr = builtins.elem "linkGeneration" shared.home.activation.rebuildKsycoca.after;
+    expected = true;
+  };
+  testPlasmaIconCacheAfterInstalledPackages = {
+    expr = builtins.elem "installPackages" shared.home.activation.rebuildKsycoca.after;
+    expected = true;
   };
 }

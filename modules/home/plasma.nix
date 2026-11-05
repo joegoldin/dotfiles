@@ -212,7 +212,7 @@ in
         # the new instance has to be authorised. Best-effort: when a rebuild is
         # driven from a TTY or over SSH the ambient XDG_DATA_DIRS won't match the
         # session's, and this becomes a no-op rather than a failure.
-        rebuildKsycoca = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        rebuildKsycoca = lib.hm.dag.entryAfter [ "linkGeneration" "installPackages" ] ''
           run ${pkgs.kdePackages.kservice}/bin/kbuildsycoca6 --noincremental || true
         '';
 
@@ -222,30 +222,34 @@ in
         # is hash-gated (it only re-runs the scripts whose generated content changed)
         # and the panels script restarts plasmashell when it re-applies. We run it only
         # when a live Plasma session is reachable on the bus; otherwise it's a no-op
-        # and the normal login autostart applies the changes.
-        applyPlasmaManager = lib.hm.dag.entryAfter [ "writeBoundary" "rebuildKsycoca" ] ''
-          export XDG_RUNTIME_DIR="''${XDG_RUNTIME_DIR:-/run/user/$(${pkgs.coreutils}/bin/id -u)}"
-          export DBUS_SESSION_BUS_ADDRESS="''${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus}"
-          export PATH="${
-            lib.makeBinPath [
-              pkgs.kdePackages.qttools
-              pkgs.coreutils
-              pkgs.gnused
-              pkgs.systemd
-            ]
-          }:$PATH"
-          runAll="$HOME/.local/share/plasma-manager/run_all.sh"
-          if [ -x "$runAll" ] && qdbus org.kde.plasmashell >/dev/null 2>&1; then
-            run "$runAll" || true
-            # The panels script recreates the icon-tasks applets and restarts
-            # plasmashell immediately, so the fresh launcher model can come up
-            # collapsed/blank even though the appletsrc on disk is already correct.
-            # Once it has settled, restart once more so plasmashell reconstructs the
-            # panels cleanly from disk (this is what reliably renders the pins).
-            run sleep 3
-            run systemctl --user restart plasma-plasmashell || true
-          fi
-        '';
+        # and the normal login autostart applies the changes. Wait for the new links
+        # and configuration: before linkGeneration, run_all.sh still targets the old
+        # generation and its unchanged hash skips the new layout.
+        applyPlasmaManager =
+          lib.hm.dag.entryAfter [ "linkGeneration" "configure-plasma" "rebuildKsycoca" ]
+            ''
+              export XDG_RUNTIME_DIR="''${XDG_RUNTIME_DIR:-/run/user/$(${pkgs.coreutils}/bin/id -u)}"
+              export DBUS_SESSION_BUS_ADDRESS="''${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus}"
+              export PATH="${
+                lib.makeBinPath [
+                  pkgs.kdePackages.qttools
+                  pkgs.coreutils
+                  pkgs.gnused
+                  pkgs.systemd
+                ]
+              }:$PATH"
+              runAll="$HOME/.local/share/plasma-manager/run_all.sh"
+              if [ -x "$runAll" ] && qdbus org.kde.plasmashell >/dev/null 2>&1; then
+                run "$runAll" || true
+                # The panels script recreates the icon-tasks applets and restarts
+                # plasmashell immediately, so the fresh launcher model can come up
+                # collapsed/blank even though the appletsrc on disk is already correct.
+                # Once it has settled, restart once more so plasmashell reconstructs the
+                # panels cleanly from disk (this is what reliably renders the pins).
+                run sleep 3
+                run systemctl --user restart plasma-plasmashell || true
+              fi
+            '';
       };
 
       # Legacy default; hosts migrating to local keys override the agent.
