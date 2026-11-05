@@ -3583,6 +3583,23 @@
         "type": "github"
       }
     },
+    "pam-watchid-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1793871990,
+        "narHash": "sha256-S5TNyOD+SNO+3biggIx6CyfLv5fILuJ5Unw1Z1UZtIA=",
+        "owner": "joegoldin",
+        "repo": "pam-watchid",
+        "rev": "59d58fb106cfb186cecc880277d9c2bd25a8f115",
+        "type": "github"
+      },
+      "original": {
+        "owner": "joegoldin",
+        "ref": "main",
+        "repo": "pam-watchid",
+        "type": "github"
+      }
+    },
     "pi-nix": {
       "inputs": {
         "agent-statusline": "agent-statusline_2",
@@ -3879,6 +3896,7 @@
         "nixpkgs-darwin": "nixpkgs-darwin",
         "nixpkgs-python": "nixpkgs-python",
         "nixpkgs-unstable": "nixpkgs-unstable_2",
+        "pam-watchid-src": "pam-watchid-src",
         "plasma-manager": "plasma-manager",
         "punktfunk": "punktfunk",
         "rex": "rex",

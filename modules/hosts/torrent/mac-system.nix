@@ -1,11 +1,16 @@
-{ ... }:
+{ inputs, ... }:
 let
   meta = import ../../_lib/meta.nix;
   username = meta.username;
 in
 {
   den.aspects.torrent.darwin =
-    { ... }:
+    { pkgs, ... }:
+    let
+      timedWatchId = pkgs.callPackage ./_pam-watchid {
+        pamWatchidSource = inputs.pam-watchid-src;
+      };
+    in
     ###################################################################################
     #
     #  macOS's System configuration
@@ -209,8 +214,15 @@ in
         };
       };
 
-      # Add ability to used TouchID for sudo authentication
-      security.pam.services.sudo_local.touchIdAuth = true;
+      # Apple's pam_tid has no deadline. Use one bounded Touch ID/Watch prompt,
+      # then let /etc/pam.d/sudo continue to password authentication after 5s.
+      security.pam.services.sudo_local = {
+        touchIdAuth = false;
+        watchIdAuth = false;
+        text = ''
+          auth       sufficient     ${timedWatchId}/lib/pam_watchid.so
+        '';
+      };
 
       # Set your time zone.
       # comment this due to the issue:

@@ -76,6 +76,11 @@
       url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Follow the hardened fork's main; flake.lock pins the build revision.
+    pam-watchid-src = {
+      url = "github:joegoldin/pam-watchid/main";
+      flake = false;
+    };
     # jovian (Steam Deck)
     jovian-nixos = {
       url = "github:Jovian-Experiments/Jovian-NixOS";
