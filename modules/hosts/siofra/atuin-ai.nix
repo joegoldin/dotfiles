@@ -1,13 +1,10 @@
 # Atuin AI: self-hosted backend for `atuin ai` (the `?` key on an empty
 # prompt), so the shell's AI runs on our own API keys instead of Atuin Hub.
 #
-# atuin-ai-server only speaks chat completions, and OpenAI refuses function
-# tools there for every GPT-6 model unless reasoning_effort is "none" (atuin
-# sends tools on every turn). A loopback-only LiteLLM sits in between and
-# serves chat completions on top of OpenAI's Responses API, where tools and
-# reasoning work together.
+# A loopback-only LiteLLM routes Atuin's chat completions to Synthetic using
+# our own API key. Keep the provider credential on the server, not clients.
 #
-#   client ──https──▶ Caddy ──▶ atuin-ai-server :8082 ──▶ LiteLLM :4000 ──▶ OpenAI Responses
+#   client ──https──▶ Caddy ──▶ atuin-ai-server :8082 ──▶ LiteLLM :4000 ──▶ Synthetic
 #                                     └─▶ Brave (web_search), Firecrawl (web_scrape)
 #
 # The server is open unless AUTH_TOKEN is set, so it always is: clients send
@@ -25,33 +22,15 @@ let
   serverPort = 8082; # 8080 = wings, 8081 = attic
 
   # Each entry becomes both a LiteLLM route and an atuin model alias. `model`
-  # is the OpenAI ID; LiteLLM matches on it and atuin sends it verbatim.
-  #
-  # OpenAI only: Claude through LiteLLM's Anthropic translation failed once a
-  # session carried tool history ("each tool_use must have a single result").
+  # is the Synthetic ID; LiteLLM matches on it and atuin sends it verbatim.
   models = [
     {
-      model = "gpt-6.1-sol";
-      name = "GPT-6.1 Sol";
-      description = "Near-Astra quality at lower cost";
-    }
-    {
-      model = "gpt-6-astra";
-      name = "GPT-6 Astra";
-      description = "Most capable";
-    }
-    {
-      model = "gpt-6-sol";
-      name = "GPT-6 Sol";
-      description = "Balanced";
-    }
-    {
-      model = "gpt-6-luna";
-      name = "GPT-6 Luna";
-      description = "Fastest";
+      model = "hf:deepseek-ai/DeepSeek-V4.1-Flash-1017";
+      name = "DeepSeek V4.1 Flash 1017";
+      description = "DeepSeek V4.1 Flash via Synthetic";
     }
   ];
-  defaultModel = "gpt-6.1-sol";
+  defaultModel = "hf:deepseek-ai/DeepSeek-V4.1-Flash-1017";
 in
 {
   den.aspects.siofra.nixos =
@@ -86,7 +65,7 @@ in
       envDir = "/run/atuin-ai";
 
       secretNames = [
-        "openai_api_key"
+        "synthetic_api_key"
         "atuin_ai_api_token"
         "brave_api_key"
         "firecrawl_api_key"
@@ -119,7 +98,7 @@ in
             s = n: config.age.secrets.${n}.path;
           in
           ''
-            printf 'OPENAI_API_KEY=%s\n' "$(cat ${s "openai_api_key"})" \
+            printf 'SYNTHETIC_API_KEY=%s\n' "$(cat ${s "synthetic_api_key"})" \
               > ${envDir}/litellm.env
             printf 'AUTH_TOKEN=%s\nBRAVE_API_KEY=%s\nFIRECRAWL_API_KEY=%s\n' \
               "$(cat ${s "atuin_ai_api_token"})" "$(cat ${s "brave_api_key"})" \
@@ -136,9 +115,8 @@ in
         settings.model_list = map (m: {
           model_name = m.model;
           litellm_params = {
-            # The responses/ route is what lets tools and reasoning coexist.
-            model = "openai/responses/${m.model}";
-            api_key = "os.environ/OPENAI_API_KEY";
+            model = "synthetic/${m.model}";
+            api_key = "os.environ/SYNTHETIC_API_KEY";
           };
         }) models;
       };
