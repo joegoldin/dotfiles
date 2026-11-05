@@ -67,11 +67,11 @@
         "vfkit-src": "vfkit-src"
       },
       "locked": {
-        "lastModified": 1793830743,
-        "narHash": "sha256-zuuHjcsQ8pMMKJWqruvIsMwts8dWzygwtSMAfv+tmhw=",
+        "lastModified": 1793903835,
+        "narHash": "sha256-sk1QAgBt1tW9jqX479irq8MrbDhsR/VaT/Ml9yy0xYM=",
         "owner": "joegoldin",
         "repo": "agent-skills",
-        "rev": "a79ec0c6c8158933dcbeb6e923341fe027f16477",
+        "rev": "9f7526d0dd24f32fc39cbdf777cb27066dadcd12",
         "type": "github"
       },
       "original": {
@@ -137,11 +137,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793334411,
-        "narHash": "sha256-L4R52UEqv1eCUSaJLLxMdQY6ePgp2QN2IqnEeeqrkQE=",
+        "lastModified": 1793903399,
+        "narHash": "sha256-77xVu1xaVvYL/Tj1UkJsmg0ih25laWgBdkusffIdRvM=",
         "owner": "joegoldin",
         "repo": "agent-statusline",
-        "rev": "63a78d1acb9323527ae52f3863ed9b932d7cba47",
+        "rev": "c7796b7dc63f70dc5b9324056ffafb0d029a53d3",
         "type": "github"
       },
       "original": {
@@ -3613,11 +3613,11 @@
         "nixpkgs-x86_64-darwin": "nixpkgs-x86_64-darwin"
       },
       "locked": {
-        "lastModified": 1793724703,
-        "narHash": "sha256-IAhQzWGRn4OM5pt9a8xlrxd0nUEaL93pyVmlK13u/Tk=",
+        "lastModified": 1793903713,
+        "narHash": "sha256-UIdyFuDYJFGs7gp8DqM99QtloP8wcY5Kt406Fx5v84w=",
         "owner": "joegoldin",
         "repo": "pi-nix",
-        "rev": "d4ad6e80f0b746968ae5ca802c7ffa9c084d571f",
+        "rev": "b0e29642226a1c61fac7a45d1256f92fb7a2642b",
         "type": "github"
       },
       "original": {
