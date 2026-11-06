@@ -151,7 +151,7 @@
     };
     # Upstream-rebased client with our fixes; keep its own Rust/Zig pins.
     # flake.lock pins the verified commit. The Mac uses the native Rex app.
-    rex-rune.url = "github:joegoldin/rex-rune?ref=integration/upstream-master-3e52b9b";
+    rex-rune.url = "github:joegoldin/rex-rune?ref=master";
 
     # ── Server services ────────────────────────────────────────────────────
     # binary cache server

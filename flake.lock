@@ -3833,16 +3833,16 @@
         "zig": "zig_2"
       },
       "locked": {
-        "lastModified": 1793934781,
-        "narHash": "sha256-SEqhYVPzvjCr67D9mw2wUYEi4nForFA9wv90KSNT0uk=",
+        "lastModified": 1793976545,
+        "narHash": "sha256-4pkzTZShZeqa6HFTOuXsiIQ5mIegN5j7uaASbE434x4=",
         "owner": "joegoldin",
         "repo": "rex-rune",
-        "rev": "e84e0fa665e22928d3285c08765fa11da2ff3980",
+        "rev": "11a0a1ca7f7d4009d6aa4390a32bfa808d8659ec",
         "type": "github"
       },
       "original": {
         "owner": "joegoldin",
-        "ref": "integration/upstream-master-3e52b9b",
+        "ref": "master",
         "repo": "rex-rune",
         "type": "github"
       }
