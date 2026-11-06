@@ -137,11 +137,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793903399,
-        "narHash": "sha256-77xVu1xaVvYL/Tj1UkJsmg0ih25laWgBdkusffIdRvM=",
+        "lastModified": 1793976995,
+        "narHash": "sha256-84+71WGiNrzLTlhhruPD74q7CKpVaivdnKN0yPz+v2Y=",
         "owner": "joegoldin",
         "repo": "agent-statusline",
-        "rev": "c7796b7dc63f70dc5b9324056ffafb0d029a53d3",
+        "rev": "1decba6f05f39c34018b8d38b6e5afea6a9cb215",
         "type": "github"
       },
       "original": {
@@ -3613,11 +3613,11 @@
         "nixpkgs-x86_64-darwin": "nixpkgs-x86_64-darwin"
       },
       "locked": {
-        "lastModified": 1793903713,
-        "narHash": "sha256-UIdyFuDYJFGs7gp8DqM99QtloP8wcY5Kt406Fx5v84w=",
+        "lastModified": 1793977449,
+        "narHash": "sha256-A0FwKPOW4064PQytuXnE+f69bSsgWPiS7HAXnxhuvC0=",
         "owner": "joegoldin",
         "repo": "pi-nix",
-        "rev": "b0e29642226a1c61fac7a45d1256f92fb7a2642b",
+        "rev": "5d3fa22298bf40717a2d16e2f6c1a0f54cfd714d",
         "type": "github"
       },
       "original": {
@@ -3833,11 +3833,11 @@
         "zig": "zig_2"
       },
       "locked": {
-        "lastModified": 1793976545,
-        "narHash": "sha256-4pkzTZShZeqa6HFTOuXsiIQ5mIegN5j7uaASbE434x4=",
+        "lastModified": 1793977629,
+        "narHash": "sha256-7XkM228DHjw/DjamTp2h9lA2OwDh4lQSNHu4CnfKhfY=",
         "owner": "joegoldin",
         "repo": "rex-rune",
-        "rev": "11a0a1ca7f7d4009d6aa4390a32bfa808d8659ec",
+        "rev": "4d2372b47758fcb061c832e6ea59e54201e74eb4",
         "type": "github"
       },
       "original": {
