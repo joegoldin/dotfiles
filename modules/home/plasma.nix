@@ -501,10 +501,7 @@ in
             "Meta+B,Battery"
             "Meta+B,Switch Power Profile"
           ];
-          "plasmashell"."activate application launcher" = [
-            "Meta"
-            "Ctrl+Space"
-          ];
+          "plasmashell"."activate application launcher" = "Meta";
           "plasmashell"."activate task manager entry 1" = "none,Meta+1,Activate Task Manager Entry 1";
           "plasmashell"."activate task manager entry 10" = "none,Meta+0,Activate Task Manager Entry 10";
           "plasmashell"."activate task manager entry 2" = "none,Meta+2,Activate Task Manager Entry 2";
