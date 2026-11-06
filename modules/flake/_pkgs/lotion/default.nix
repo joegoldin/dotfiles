@@ -2,7 +2,7 @@
   lib,
   buildNpmPackage,
   fetchFromGitHub,
-  electron_42,
+  electron,
   makeWrapper,
   python3,
   pkg-config,
@@ -55,7 +55,8 @@ buildNpmPackage rec {
   '';
 
   postInstall = ''
-    makeWrapper ${electron_42}/bin/electron $out/bin/lotion \
+    # Follow nixpkgs' supported Electron runtime rather than retaining an EOL major.
+    makeWrapper ${electron}/bin/electron $out/bin/lotion \
       --add-flags $out/lib/node_modules/lotion/src/main/index.js
 
     install -Dm644 $out/lib/node_modules/lotion/assets/icon.png \
