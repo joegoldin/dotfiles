@@ -79,6 +79,10 @@ _nh-darwin action *args="": system-info _check-maintenance
 # ── Remote rebuilds (existing hosts) ──────────────────────────────────────
 # Domains/users come from the dotfiles-secrets flake input via _secret-domain.
 
+# Rebuild all cloud hosts sequentially, building on each target
+[unix]
+build-to-all: build-to-erdtree build-to-siofra build-to-rennala build-to-dectus build-to-farum-azula
+
 # Rebuild dectus in place (pass --local to build here)
 [unix]
 build-to-dectus local="":
@@ -97,16 +101,22 @@ build-to-dectus local="":
     nh os switch . -H dectus --target-host "$SSH_USER@$SSH_DOMAIN" "${BUILD_HOST_ARGS[@]}" --elevation-strategy passwordless --accept-flake-config
     echo "✅  Rebuilt dectus VPS!"
 
-# Rebuild rennala in place (build locally, deploy over ssh)
+# Rebuild rennala in place (pass --local to build here)
 [unix]
-build-to-rennala:
+build-to-rennala local="":
     #!/usr/bin/env bash
     set -euo pipefail
-    echo "🔨  Rebuilding NixOS on rennala VPS (build locally, deploy remote)..."
+    echo "🔨  Rebuilding NixOS on rennala VPS..."
     SSH_DOMAIN=$(just _secret-domain rennalaSshDomain)
     SSH_USER=$(just _secret-domain sshUser)
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    nh os switch . -H rennala --target-host "$SSH_USER@$SSH_DOMAIN" --elevation-strategy passwordless --accept-flake-config --fallback
+    # Default: build in place on the box. --local: build here (omit --build-host;
+    # localhost would ssh to :22).
+    BUILD_HOST_ARGS=(--build-host "$SSH_USER@$SSH_DOMAIN")
+    if [ "{{ local }}" = "--local" ]; then
+      BUILD_HOST_ARGS=()
+    fi
+    nh os switch . -H rennala --target-host "$SSH_USER@$SSH_DOMAIN" "${BUILD_HOST_ARGS[@]}" --elevation-strategy passwordless --accept-flake-config --fallback
     echo "✅  Rebuilt rennala VPS!"
 
 # Rebuild farum-azula (aarch64, Oracle ARM). Default builds ON the box. On an
