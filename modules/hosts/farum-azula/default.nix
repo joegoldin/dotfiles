@@ -39,11 +39,6 @@ in
         file = "${inputs.dotfiles-secrets}/attic-netrc.age";
         mode = "0400";
       };
-      age.secrets.umans_api_key = {
-        file = "${inputs.dotfiles-secrets}/umans_api_key.age";
-        mode = "0400";
-        owner = meta.username;
-      };
       # Decrypt with the machine's own SSH host key (seeded by deploy-farum-azula),
       # not a personal user key on a public box. After a fresh deploy, replace the
       # farum-azula key in keys.nix with the printed one and rekey.

@@ -36,11 +36,6 @@ in
         owner = meta.username;
         group = "users";
       };
-      age.secrets.umans_api_key = {
-        file = "${inputs.dotfiles-secrets}/umans_api_key.age";
-        mode = "0400";
-        owner = meta.username;
-      };
       # Decrypt with the machine's own SSH host key (present from first boot).
       # No user key needed — every secret this host uses is encrypted to
       # `systems`, so the host key (once added to `systems` + rekeyed) covers

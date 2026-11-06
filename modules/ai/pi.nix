@@ -23,7 +23,6 @@
         extensionPackages = lib.mkDefault [
           inputs.agent-skills.inputs.pi-nix.packages.${pkgs.stdenv.hostPlatform.system}.ext-pi-mcp-adapter
           inputs.agent-skills.inputs.pi-nix.packages.${pkgs.stdenv.hostPlatform.system}.ext-aliou-pi-synthetic
-          inputs.agent-skills.inputs.pi-nix.packages.${pkgs.stdenv.hostPlatform.system}.ext-pi-provider-umans
         ];
         # The adapter reads shared .mcp.json and Pi's existing MCP files.
         # Keep codemode from the shared profile, but only one MCP client.
@@ -40,10 +39,7 @@
             "synthetic/hf:zai-org/GLM-5.3"
             "synthetic/hf:zai-org/GLM-5.3-Flash"
             "synthetic/hf:deepseek-ai/DeepSeek-V4.1-Flash-1017"
-            "synthetic/hf:moonshotai/Kimi-K3"
-            "umans/umans-deepseek-v4.1-flash"
-            "umans/umans-glm-5.3"
-            "umans/umans-kimi-k3"
+            "synthetic/hf:moonshotai/Kimi-K3.1-Pro"
           ];
         };
         environment = lib.filterAttrs (_: key: key.file != null) {

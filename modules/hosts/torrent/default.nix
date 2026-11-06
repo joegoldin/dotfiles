@@ -123,11 +123,6 @@ in
         mode = "0400";
         owner = meta.username;
       };
-      age.secrets.umans_api_key = {
-        file = "${inputs.dotfiles-secrets}/umans_api_key.age";
-        mode = "0400";
-        owner = meta.username;
-      };
       # Authentik API token for the garnix authentik-provision helper. Read via
       # `authentik-provision --token-file /run/agenix/authentik-api-token`.
       age.secrets.authentik-api-token = {

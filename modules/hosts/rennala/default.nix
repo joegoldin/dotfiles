@@ -23,11 +23,6 @@ in
         ./_hardware-configuration.nix
       ];
 
-      age.secrets.umans_api_key = {
-        file = "${inputs.dotfiles-secrets}/umans_api_key.age";
-        mode = "0400";
-        owner = meta.username;
-      };
       age.identityPaths = [ "/home/${meta.username}/.ssh/id_rsa" ];
     };
   };
