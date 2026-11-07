@@ -23,9 +23,8 @@
         # else on erdtree uses oci-containers.
         backend = "docker";
         containers.github-runner-zen = {
-          # Official actions/runner inside Ubuntu noble; the tag tracks the
-          # runner version. Updates arrive by bumping this tag (auto-update
-          # off), so pin exactly.
+          # Pin the Ubuntu noble image; let actions/runner update itself so
+          # GitHub deprecating the bundled version doesn't strand queued jobs.
           # NB: the ghcr package is named after the GitHub repo
           # (docker-github-actions-runner) — myoung34/github-runner is only
           # the Docker Hub name; pulling it from ghcr is denied.
@@ -39,7 +38,6 @@
             # erdtree] land here.
             LABELS = "erdtree";
             EPHEMERAL = "1";
-            DISABLE_AUTO_UPDATE = "1";
           };
           environmentFiles = [ config.age.secrets.github-runner-zen-env.path ];
           # Compile cache survives the ephemeral wipe; everything else is
