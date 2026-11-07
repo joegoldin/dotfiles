@@ -1,4 +1,4 @@
-# GitHub Actions self-hosted runner for joegoldin/zen-browser-desktop — the
+# GitHub Actions self-hosted runner for joegoldin/zen-bonsai-browser — the
 # multi-hour zen (Firefox fork) release build. The workflow is Ubuntu-shaped
 # (sudo apt-get, rustup, mach bootstrap), so it can't run on a bare NixOS
 # runner; instead GitHub's official actions/runner runs inside an Ubuntu
@@ -12,7 +12,7 @@
   den.aspects.erdtree.nixos =
     { config, lib, ... }:
     {
-      # Fine-grained PAT (Administration r/w on zen-browser-desktop only) as
+      # Fine-grained PAT (Administration r/w on zen-bonsai-browser only) as
       # ACCESS_TOKEN=… — the image mints runner registration tokens from it.
       # agenix defaults (root:root 0400) are correct: systemd reads the
       # env file as root.
@@ -33,7 +33,7 @@
           autoStart = true;
           environment = {
             RUNNER_SCOPE = "repo";
-            REPO_URL = "https://github.com/joegoldin/zen-browser-desktop";
+            REPO_URL = "https://github.com/joegoldin/zen-bonsai-browser";
             RUNNER_NAME = "erdtree";
             # Dedicated label: only jobs that say runs-on [self-hosted,
             # erdtree] land here.
