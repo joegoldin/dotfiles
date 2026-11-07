@@ -85,12 +85,6 @@ pkgs: {
 
   mkWindowsApp = pkgs.callPackage ./mkwindowsapp { };
 
-  mouse-actions-gui-appimage = pkgs.callPackage ./mouse-actions/gui-appimage.nix { };
-
-  mouse-actions-gui-fork = pkgs.callPackage ./mouse-actions/gui-fork.nix { };
-
-  mouse-actions-patched = pkgs.callPackage ./mouse-actions/patched.nix { };
-
   # From unstable for sherpa-onnx 1.13.8, the exact version upstream pins.
   nowcaption = pkgs.unstable.callPackage ./nowcaption.nix { };
 

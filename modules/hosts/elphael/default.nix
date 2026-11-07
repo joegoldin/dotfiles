@@ -42,7 +42,6 @@ in
       den.aspects.kicad
       den.aspects.zed
       den.aspects.default-apps
-      den.aspects.mouse-actions
       # den.aspects.chatgpt-desktop  # blocked: chatgpt-desktop-linux patches
       # don't support ChatGPT.dmg 26.715 yet (upstream last updated 2026-07-10,
       # DMG moved to 26.715 on 2026-07-17). Re-enable once

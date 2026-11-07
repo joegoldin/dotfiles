@@ -30,7 +30,6 @@ in
       den.aspects.plasma
       den.aspects.zed
       den.aspects.ghostty
-      den.aspects.mouse-actions
     ];
 
     nixos = {

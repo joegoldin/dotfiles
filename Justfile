@@ -724,7 +724,6 @@ update-pkgs *names:
     # src hash + cargoHash/vendorHash/npmDepsHash where present).
     auto=(blip-caption git-hunk hyprwhspr lotion plasma-applet-netspeed plasma-applet-resources-monitor)
     # NOT auto-updated (edit the list above to change):
-    #   mouse-actions-{patched,gui-fork,gui-appimage} – joegoldin fork / appimage, pinned
     #   sunfounder-*, mac-app-util, mkWindowsApp       – hardware libs / vendored tooling
     #   calagopus-wings                                – fetchurl asset; bump by hand
     #   zmx                                            – nix-update bumps src+version, but its
