@@ -175,9 +175,34 @@ in
     # it is a dependency of pandoc rather than something developed here, so its
     # tests are upstream's to run.
     haskellPackages = prev.haskellPackages.override {
-      overrides = _hFinal: hPrev: {
-        typst = prev.haskell.lib.compose.dontCheck hPrev.typst;
-      };
+      overrides =
+        _hFinal: hPrev:
+        {
+          typst = prev.haskell.lib.compose.dontCheck hPrev.typst;
+        }
+        # These GHC 9.6.7 Haddock jobs deadlock with -j16 on erdtree, holding
+        # output locks across subsequent rebuilds. A trailing -j1 wins over
+        # the builder's -j$NIX_BUILD_CORES without serializing compilation or
+        # dropping documentation. Remove when the compiler pin is upgraded.
+        //
+          prev.lib.genAttrs
+            [
+              "crypton-connection"
+              "crypton-x509-store"
+              "djot"
+              "fsnotify"
+              "hslua-cli"
+              "hslua-typing"
+              "servant"
+              "skylighting"
+              "wai-cors"
+            ]
+            (
+              name:
+              prev.haskell.lib.overrideCabal hPrev.${name} (old: {
+                haddockFlags = (old.haddockFlags or [ ]) ++ [ "--haddock-option=-j1" ];
+              })
+            );
     };
 
     # SunFounder robotics Python libs for the crawler (Robot HAT / PiCrawler).
