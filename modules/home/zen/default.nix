@@ -73,7 +73,20 @@ in
       # buildMozillaMach. The `zen-src` input tracks that fork's dev branch,
       # which also pins the Firefox base source it patches.
       zenBrowser =
-        inputs.zen-src.packages.${pkgs.stdenv.hostPlatform.system}.zen-bonsai-browser-unwrapped;
+        let
+          browser = inputs.zen-src.packages.${pkgs.stdenv.hostPlatform.system}.zen-bonsai-browser-unwrapped;
+          staleHash = "sha512-FLj/3DJaI0Bh2xTeqb0UR4bcLIRGil3+K7cLuVWPY/c0J88kTq9GEBDuAd/fBPLK5ouunwe0ggYDpLzURi95YA==";
+        in
+        # The fork bumped Firefox without updating its source hash. Verified
+        # against Mozilla's releases/158.0.1/SHA512SUMS; retire on a fixed pin.
+        if browser.src.name == "firefox-158.0.1.source.tar.xz" && browser.src.outputHash == staleHash then
+          browser.overrideAttrs (old: {
+            src = old.src.overrideAttrs {
+              hash = "sha512-pcwWpj9LQ/Abwm4v6xLlTlKBrr3IF3XLwOjXfdXO76UFXnjSpq1UiVw5fUFNH6wT1J3fKAmfU0JppqFm3tr6Xg==";
+            };
+          })
+        else
+          browser;
     in
     {
       # 0xc000022070/zen-browser-flake's home-manager module: same
