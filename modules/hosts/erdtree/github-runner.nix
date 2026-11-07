@@ -13,7 +13,7 @@
     { config, lib, ... }:
     {
       # Fine-grained PAT (Administration r/w on zen-bonsai-browser only) as
-      # ACCESS_TOKEN=… — the image mints runner registration tokens from it.
+      # ACCESS_TOKEN=… — the startup script mints registration tokens from it.
       # agenix defaults (root:root 0400) are correct: systemd reads the
       # env file as root.
       age.secrets.github-runner-zen-env.file = "${inputs.dotfiles-secrets}/github-runner-zen-env.age";
@@ -23,27 +23,27 @@
         # else on erdtree uses oci-containers.
         backend = "docker";
         containers.github-runner-zen = {
-          # Pin the Ubuntu noble image; let actions/runner update itself so
-          # GitHub deprecating the bundled version doesn't strand queued jobs.
-          # NB: the ghcr package is named after the GitHub repo
-          # (docker-github-actions-runner) — myoung34/github-runner is only
-          # the Docker Hub name; pulling it from ghcr is denied.
-          image = "ghcr.io/myoung34/docker-github-actions-runner:2.336.0-ubuntu-noble";
+          # Official Ubuntu noble runner, not actions/runner-images (hosted VMs).
+          # Keep auto-update enabled as GitHub stops assigning obsolete runners.
+          image = "ghcr.io/actions/actions-runner:2.338.2";
           autoStart = true;
+          entrypoint = "/bin/bash";
+          cmd = [ "/runner-start.sh" ];
           environment = {
-            RUNNER_SCOPE = "repo";
             REPO_URL = "https://github.com/joegoldin/zen-bonsai-browser";
             RUNNER_NAME = "erdtree";
             # Dedicated label: only jobs that say runs-on [self-hosted,
             # erdtree] land here.
             LABELS = "erdtree";
-            EPHEMERAL = "1";
           };
           environmentFiles = [ config.age.secrets.github-runner-zen-env.path ];
           # Compile cache survives the ephemeral wipe; everything else is
           # fresh per job. NO docker socket mount — the socket would be a
           # root-equivalent escape hatch and the zen workflow doesn't need it.
-          volumes = [ "gha-zen-sccache:/opt/sccache" ];
+          volumes = [
+            "gha-zen-sccache:/opt/sccache"
+            "${./github-runner-start.sh}:/runner-start.sh:ro"
+          ];
           # Ceilings, not reservations: 18 of the box's 32 threads at most,
           # and at half the default cgroup weight it yields to garnix, game
           # servers, and interactive use under contention. memory-swap ==
