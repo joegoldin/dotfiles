@@ -62,6 +62,20 @@ let
 
       pythonPackagesExtensions = uPrev.pythonPackagesExtensions ++ [
         (pyFinal: pyPrev: {
+          # 0.9.7 is still the latest release. Quote template names as Python
+          # literals to fix CVE-2026-119716 until upstream ships a fixed release.
+          pybars3 = pyPrev.pybars3.overridePythonAttrs (old: {
+            patches = (old.patches or [ ]) ++ [ ./pybars3-CVE-2026-119716.patch ];
+            checkPhase = old.checkPhase + ''
+              ${pyFinal.python.interpreter} ${./pybars3-security-test.py}
+            '';
+            meta = old.meta // {
+              knownVulnerabilities =
+                uPrev.lib.remove "CVE-2026-119716: Code Injection via Bracketed Path Segments"
+                  (old.meta.knownVulnerabilities or [ ]);
+            };
+          });
+
           # face-recognition-models pkg_resources override removed: the pin now
           # carries nixpkgs PR #541758 (0001-use-importlib-resources.patch in
           # pkgs/development/python-modules/face-recognition), so re-applying
