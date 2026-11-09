@@ -56,14 +56,14 @@ pkgs: {
 
   hyprwhspr = pkgs.callPackage ./hyprwhspr { };
 
-  iterm2-terminal-integration = pkgs.stdenv.mkDerivation rec {
+  iterm2-terminal-integration = pkgs.stdenv.mkDerivation {
     pname = "iterm2-terminal-integration";
     version = "0.0.1";
-    sha256 = "sha256-aKTt7HRMlB7htADkeMavWuPJOQq1EHf27dEIjKgQgo0=";
 
     src = pkgs.fetchurl {
-      url = "https://iterm2.com/shell_integration/fish";
-      sha256 = "${sha256}";
+      # The unversioned iterm2.com URL changes without a corresponding hash update.
+      url = "https://raw.githubusercontent.com/gnachman/iTerm2-Shell-Integration/718d363924df773acee02a5d59acfb31d0d54a82/shell_integration/fish";
+      hash = "sha256-Nq0qFA21cULkubqcir4Mdp6acrdjxXCN3GdS47GVmu0=";
     };
 
     unpackPhase = ''
