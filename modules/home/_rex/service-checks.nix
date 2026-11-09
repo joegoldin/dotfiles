@@ -43,26 +43,27 @@ in
 assert !linux.services.rex.enable;
 assert !(builtins.hasAttr "rex" linux.systemd.user.services);
 assert !nixos.services.rex.enable;
-assert login.enable && login.tailscaleServe.enable;
-assert login.tailscaleServe.httpsPort == 7297;
+assert login.enable && !login.tailscaleServe.enable;
 assert nixos.systemd.services.rex-login-server.wantedBy == [ "multi-user.target" ];
-assert lib.hasInfix "--https=7297"
-  nixos.systemd.services.rex-tailscale-serve.serviceConfig.ExecStart;
+assert !(builtins.hasAttr "rex-tailscale-serve" nixos.systemd.services);
+assert
+  !(lib.hasInfix "tailnet-serve://" nixos.systemd.services.rex-login-server.serviceConfig.ExecStart);
 assert !(lib.hasInfix ":8443" linux.xdg.configFile."rex/dotfiles.lua".text);
 assert !login.allowAnonymous;
 assert builtins.attrNames login.accounts == [ meta.username ];
-assert builtins.length login.accounts.${meta.username}.principals == 2;
-assert lib.hasPrefix "tailscale:" (builtins.head login.accounts.${meta.username}.principals);
-assert builtins.elem "tailscale:tag:rex-host" login.accounts.${meta.username}.principals;
-assert login.extraListen == [ "tailnet://:7298" ];
-assert lib.hasInfix "tailnet://:7298"
+assert login.accounts.${meta.username}.principals == [ "tailscale:tag:full-access" ];
+assert login.extraListen == [ "tailnet://:7297" ];
+assert lib.hasInfix "tailnet://:7297"
   nixos.systemd.services.rex-login-server.serviceConfig.ExecStart;
-assert nixos.networking.firewall.interfaces.tailscale0.allowedTCPPorts == [ 7298 ];
-assert !(builtins.elem 7298 nixos.networking.firewall.allowedTCPPorts);
+assert nixos.networking.firewall.interfaces.tailscale0.allowedTCPPorts == [ 7297 ];
+assert !(builtins.elem 7297 nixos.networking.firewall.allowedTCPPorts);
 assert !mac.services.rex.enable;
 assert mac.programs.rex.package == null;
 assert !(lib.hasInfix "-tagged" mac.xdg.configFile."rex/dotfiles.lua".text);
 assert !(lib.hasInfix ":7298" mac.xdg.configFile."rex/dotfiles.lua".text);
+assert lib.hasInfix ''endpoint = "http://${meta.username}@elphael.''
+  mac.xdg.configFile."rex/dotfiles.lua".text;
+assert lib.hasInfix ":7297" mac.xdg.configFile."rex/dotfiles.lua".text;
 pkgs.runCommand "rex-service-tests" { } ''
   touch "$out"
 ''

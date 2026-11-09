@@ -1,4 +1,4 @@
-# Named Rex aspect: native Mac client and Tailscale Serve login servers.
+# Named Rex aspect: native Mac client and direct tailnet login servers.
 { inputs, ... }:
 let
   meta = import ../_lib/meta.nix;
@@ -26,19 +26,15 @@ in
       imports = [ inputs.rex.nixosModules.default ];
       services.rex.loginServer = lib.mkIf config.services.tailscale.enable {
         enable = true;
-        accounts.${meta.username}.principals = [
-          "tailscale:${domains.tailscaleUser}"
-          "tailscale:tag:rex-host"
-        ];
-        tailscaleServe.enable = true;
-        # Serve does not forward tagged identities; direct tailnet listeners use
-        # tailscaled WhoIs instead, with WireGuard providing transport encryption.
-        extraListen = [ "tailnet://:7298" ];
+        accounts.${meta.username}.principals = [ "tailscale:tag:full-access" ];
+        # Direct listeners verify the caller's tag through tailscaled WhoIs;
+        # WireGuard encrypts transport without trusting Serve identity headers.
+        extraListen = [ "tailnet://:7297" ];
       };
       networking.firewall.interfaces.tailscale0.allowedTCPPorts =
         lib.mkIf config.services.tailscale.enable
           [
-            7298
+            7297
           ];
     };
 
@@ -91,7 +87,7 @@ in
           + lib.concatMapStrings (host: ''
             rex.host {
               label = "${host}",
-              endpoint = "https://${host}.${lib.removePrefix "elphael." domains.elphaelTailscale}",
+              endpoint = "http://${meta.username}@${host}.${lib.removePrefix "elphael." domains.elphaelTailscale}:7297",
             }
           '') (builtins.filter (host: host != osConfig.networking.hostName) hosts);
 

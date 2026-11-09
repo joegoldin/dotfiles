@@ -6,52 +6,55 @@
 Elphael, Dectus, Erdtree, Farum Azula, Malenia, Melina, Rennala, Scarab,
 Siofra, Volcano Manor, and Torrent. It is not a global `den.default`.
 
-On Linux it imports the upstream NixOS module and enables
-`services.rex.loginServer.tailscaleServe.enable`. The login server allows only
-the Tailscale identity in `dotfiles-secrets/domains.nix` and machines explicitly
-tagged `tag:rex-host` to use `joe`; it grants neither root nor anonymous access.
-Tailscale Serve forwards HTTPS on the upstream default port **7297** to `/run/rex/serve.sock`. Host entries omit the port: Rex
-tries 443 and then 7297 automatically. Tailscale must already be enrolled with
-HTTPS enabled.
+On Linux it imports the upstream NixOS module and runs one direct **TCP 7297**
+login-server listener, bound only to the host's Tailscale addresses. The firewall
+opens 7297 only on `tailscale0`. Tailscale Serve is disabled: the direct listener
+uses tailscaled WhoIs to verify the caller's device identity rather than Serve's
+forwarded user headers. HTTP transport is encrypted by Tailscale/WireGuard;
+Tailscale HTTPS certificates and a second embedded Tailscale node are not needed.
 
-Tagged clients use a second, direct **TCP 7298** listener, bound only to the
-host's Tailscale addresses. Serve does not forward tagged identities, so adding
-a policy grant for HTTPS alone would not authenticate them. The direct listener
-uses tailscaled WhoIs and the explicit `tailscale:tag:rex-host` account
-principal. Its HTTP transport is encrypted by Tailscale/WireGuard; it is not an
-anonymous or public HTTP listener. The firewall opens 7298 only on `tailscale0`.
+Only clients tagged **`tag:full-access`** may authenticate as `joe`, through the
+explicit `tailscale:tag:full-access` principal. Untagged user identities and
+`tag:rex-host` alone do not authorize Rex login. No anonymous or root Rex access
+is granted. A permitted Rex login can run commands as `joe`, so treat assignment
+of `full-access` as granting shell access, not just permission to view terminals.
 
-The private policy grants `tag:rex-host` only TCP 7298 (direct Rex) and TCP
-22/222 (SSH) to user-owned and tagged tailnet machines. It does not grant general
-HTTPS, subnet routes, exit-node internet, or arbitrary ports. Existing SSH
-credentials are still required: the network role does not add a Tailscale SSH
-login grant. Use ordinary key-authenticated OpenSSH (port 222 on hosts whose
-port 22 is handled by Tailscale SSH). Do not put this tag on a restricted server
-unless it should gain outgoing Rex and SSH access.
-Rex account access permits running commands as `joe`; treat enrollment of this
-tag as granting shell access, not just permission to view terminals.
+`tag:rex-host` is an **inbound-only server role**, like `tag:ssh-in-only`.
+Full-access clients can connect to all its services, including Rex. A machine
+with only `rex-host` cannot initiate new tailnet connections, including Rex,
+SSH, or ping; replies to incoming sessions are allowed. Untagged tailnet members
+retain their existing SSH access, not Rex access. This policy does not restrict
+direct LAN/internet traffic outside Tailscale. Do not combine `rex-host` with
+`full-access` if the server must remain isolated: permissions are additive.
 
-After the policy and server configuration are deployed, assign `tag:rex-host`
-to the dedicated client node in Tailscale's admin console. Connect using a
-direct address with MagicDNS; managed host aliases remain unchanged:
+Keep the initiating Mac tagged `full-access`; put `rex-host` on restricted
+servers, not on clients that need to initiate Rex sessions. Rex can use the
+Mac's existing system Tailscale connection without a separate Rex Tailscale
+sign-in. The tag must belong to the actual originating Tailscale node if an
+embedded client is used instead.
+
+Existing managed host aliases use direct endpoints; no additional aliases are
+created. After the policy and server configuration are deployed:
 
 ```fish
-rex -S http://joe@elphael:7298 ls --json
+rex -S elphael ls --json
+# Without the managed host list:
+rex -S http://joe@elphael:7297 ls --json
 ```
 
-For a client without the managed host list, configure its host endpoint as
-`http://joe@<full-MagicDNS-hostname>:7298`. The tag must belong to the Tailscale
-node actually originating the connection, which can be Rex's embedded client
-node rather than the operating system's node. Full-access network permissions
-alone do not add a Rex account principal: a tagged full-access client also needs
-`rex-host` for this application login path.
+For other clients configure `http://joe@<full-MagicDNS-hostname>:7297`.
+Old HTTPS endpoints are not interchangeable with the direct HTTP endpoint.
+During activation the old managed Serve unit removes its 7297 HTTPS mapping.
+Inspect `tailscale serve status` for older manually configured Rex mappings
+(such as 8443); remove only obsolete Rex mappings, not unrelated services.
 
 Home Manager installs the CLI and configuration, not a separate personal
 systemd service. The system login server owns account-server startup. On logind
 hosts, an account server is also the personal server local commands use, so
 local and remote clients share sessions. No shared `rex.service`, embedded
-Tailscale server node or anonymous TCP listener is needed. The direct tagged
-client port is permitted only on the Tailscale interface. Account servers survive login-server restarts and upgrades.
+Tailscale server node or anonymous TCP listener is needed. The direct listener
+is permitted only on the Tailscale interface. Account servers survive
+login-server restarts and upgrades.
 
 Torrent keeps its native **Rex Beta.app**, including its bundled server and CLI.
 The aspect exposes that CLI on PATH without installing another Mac server.
@@ -71,8 +74,8 @@ machine are not supported by the current public server packages.
 
 ## Login without a desktop session
 
-The system `rex-login-server.service` and `rex-tailscale-serve.service` start at
-boot under `multi-user.target`, independently of the desktop. A permitted
+The system `rex-login-server.service` starts at boot under `multi-user.target`,
+independently of the desktop. A permitted
 Tailscale connection selects `joe`; PAM opens an account session and the login
 server starts the account's Rex server if none is running, or reuses it otherwise.
 The account server is started on demand; a persistent personal service is not
@@ -82,8 +85,9 @@ required. Other aspects may enable user lingering independently.
 not the system login server. A missing personal socket does not establish that
 remote login is broken. To test the system login path, connect from another
 tailnet device using `rex -S elphael ls --json` (with the managed host list), or
-`rex -S <hostname>.<tailnet>.ts.net ls --json`. No graphical login is required.
-If this fails, inspect `journalctl -u rex-login-server -u rex-tailscale-serve`;
+`rex -S http://joe@<hostname>.<tailnet>.ts.net:7297 ls --json`.
+No graphical login is required. If this fails, inspect
+`journalctl -u rex-login-server`;
 account expiration/lock, PAM rejection, and Tailscale identity or ACL failures
 are distinct from a missing local socket.
 
