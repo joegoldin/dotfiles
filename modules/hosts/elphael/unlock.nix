@@ -25,9 +25,9 @@ in
             echo "Run as root: sudo elphael-unlock-enroll" >&2
             exit 1
           fi
-          echo "Before continuing, configure tag:ssh-in-only in the Tailscale access policy:"
-          echo "  Allow only your clients -> tag:ssh-in-only on TCP 222."
-          echo "  Remove any broad rules that let this tag initiate tailnet connections."
+          echo "Before continuing, deploy the default-deny Tailscale policy:"
+          echo "  Keep tag:ssh-in-only defined; use a tag:full-access client for TCP 222."
+          echo "  No grants may let this unlock identity initiate tailnet connections."
           read -r -p "Have you applied and tested that policy? Type yes: " policyReady
           if [ "$policyReady" != yes ]; then
             echo "Enrollment cancelled; configure the tailnet policy first." >&2

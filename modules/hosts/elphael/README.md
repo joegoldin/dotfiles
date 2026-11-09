@@ -20,23 +20,28 @@ The policy is managed in the private `dotfiles-secrets` repository at
 `tailscale/policy.hujson`, with setup and deployment steps in its
 `tailscale/README.md`. Before enrollment, validate and deploy that policy through
 its GitHub Actions workflow. The enrollment helper requests `tag:ssh-in-only`.
-The role permits user-owned clients and `tag:full-access` machines to initiate
-SSH on TCP 22/222, but grants no new outbound tailnet connections. This initrd
-listens only on TCP 222. Return traffic for incoming SSH is automatically allowed.
+Full-access clients can reach this node on every port/protocol; the initrd
+itself listens only on TCP 222. Untagged clients have no outgoing permission,
+and this server role has no grants to initiate tailnet connections. Return
+traffic for incoming SSH is automatically allowed.
 
-Keep personal computers user-owned; tag restricted servers `ssh-in-only`.
-**Never assign both `full-access` and `ssh-in-only` to one device**: additive
-permissions would defeat isolation.
+Keep initiating clients tagged `full-access`. Existing `ssh-in-only` machines,
+including this unlock identity, keep their tags and credentials; do not
+reauthenticate them for the role cleanup. Untagged servers are also inbound-only
+by default, so new general servers need no extra role just for isolation.
+**Never give the unlock node `full-access`**: additive permissions would defeat
+its outbound isolation.
 
 Permissions are additive: broad rules with `*` as source (or another selector
-that includes this tag) must be narrowed too. Review both `grants` and legacy
+that includes isolated nodes) must be narrowed too. Review both `grants` and legacy
 `acls`, and preserve existing access for your normal devices and servers. Do
 not replace the entire policy with a generic example. Add policy tests for the
 allowed incoming connection and denied outgoing connections to your actual
 servers, and verify that they pass before saving.
 
 This dotfiles repository does **not** apply or verify the live policy; the
-private repo's workflow does that. The tag alone does **not** isolate the node.
+private repo's workflow does that. Isolation comes from the absence of outgoing
+grants, not from the tag itself.
 The helper asks you to confirm that policy has been applied before registering
 anything. Tailnet policy does not prohibit
 ordinary LAN/internet traffic; Tailscale still needs outbound coordination and

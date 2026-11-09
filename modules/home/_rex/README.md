@@ -15,22 +15,22 @@ Tailscale HTTPS certificates and a second embedded Tailscale node are not needed
 
 Only clients tagged **`tag:full-access`** may authenticate as `joe`, through the
 explicit `tailscale:tag:full-access` principal. Untagged user identities and
-`tag:rex-host` alone do not authorize Rex login. No anonymous or root Rex access
+other role tags alone do not authorize Rex login. No anonymous or root Rex access
 is granted. A permitted Rex login can run commands as `joe`, so treat assignment
 of `full-access` as granting shell access, not just permission to view terminals.
 
-`tag:rex-host` is an **inbound-only server role**, like `tag:ssh-in-only`.
-Full-access clients can connect to all its services, including Rex. A machine
-with only `rex-host` cannot initiate new tailnet connections, including Rex,
-SSH, or ping; replies to incoming sessions are allowed. Untagged devices are
-also inbound-only by default: they cannot initiate tailnet SSH, Rex, subnet,
-or exit-node connections. Full-access clients retain incoming access to them;
-ordinary SSH still needs an authorized key. This policy does not restrict direct
-LAN/internet traffic outside Tailscale. Do not combine `rex-host` with
-`full-access` if the server must remain isolated: permissions are additive.
+Rex servers need no dedicated role. Untagged devices and existing
+`tag:ssh-in-only` servers are **inbound-only by default**: they cannot initiate
+new tailnet SSH, Rex, ping, subnet, or exit-node connections. Replies to
+incoming sessions are allowed. Full-access clients can reach all their services,
+including Rex. Ordinary SSH still needs an authorized key; full-access clients
+may use Tailscale SSH to tagged devices when enabled on the destination.
+This policy does not restrict direct LAN/internet traffic outside Tailscale.
+Do not give an isolated server `full-access`: permissions are additive.
 
-Keep the initiating Mac tagged `full-access`; put `rex-host` on restricted
-servers, not on clients that need to initiate Rex sessions. Rex can use the
+Keep the initiating Mac tagged `full-access`. Existing `ssh-in-only` servers
+can keep that identity without reauthentication; new general servers need no
+extra tag just for isolation. Rex can use the
 Mac's existing system Tailscale connection without a separate Rex Tailscale
 sign-in. The tag must belong to the actual originating Tailscale node if an
 embedded client is used instead.
