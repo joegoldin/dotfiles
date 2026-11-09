@@ -1,0 +1,21 @@
+--- a/tests/test_store.py
++++ b/tests/test_store.py
+@@ -261,8 +261,7 @@
+             pytest.skip("no small text file found in first store entry")
+ 
+         result = await _store_read(text_file, 2000)
+-        assert "Error" not in result
+-        assert f"File: {text_file}" in result
++        assert result.startswith(f"File: {text_file}\nSize: ")
+         assert "Size:" in result
+ 
+     @pytest.mark.asyncio
+@@ -302,7 +301,7 @@
+             pytest.skip("no multi-line text file found in first store entry")
+ 
+         result = await _store_read(candidate, 1)
+-        assert "Error" not in result
++        assert result.startswith(f"File: {candidate}\nSize: ")
+         assert "Showing 1 of" in result
+ 
+ 

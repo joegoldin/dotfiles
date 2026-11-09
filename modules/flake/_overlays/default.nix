@@ -134,6 +134,12 @@ in
     # ...
     # });
 
+    # Store file contents may legitimately contain "Error"; test the response
+    # header instead. Keep the read/truncation tests enabled until upstream fixes them.
+    mcp-nixos = prev.mcp-nixos.overridePythonAttrs (old: {
+      patches = (old.patches or [ ]) ++ [ ./mcp-nixos-store-read-tests.patch ];
+    });
+
     # nix-output-monitor 2.2.0 declares the GHC2024 language edition, and the
     # stable haskellPackages compiles it with ghc-9.6.7, which predates that
     # edition. It fails in configurePhase with "requires the following
@@ -333,9 +339,8 @@ in
   # MCP server packages for declarative MCP configuration
   # The upstream overlay only exports github-mcp-server; we also need mcp-language-server
   # Inlined upstream overlay to avoid deprecated pkgs.system access in mcps.overlays.default
-  # NB: mcp-nixos is deliberately NOT overridden here; nixpkgs carries a
-  # working (cached) mcp-nixos, while the mcps.nix-pinned 1.0.3 fails to build
-  # (fastmcp dep). pkgs.mcp-nixos therefore resolves to nixpkgs' own package.
+  # Use nixpkgs' mcp-nixos (with the test fix above), not mcps.nix's pinned
+  # 1.0.3, which fails to build against fastmcp.
   mcps-packages =
     final: _prev:
     let
