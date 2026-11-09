@@ -56,29 +56,6 @@ pkgs: {
 
   hyprwhspr = pkgs.callPackage ./hyprwhspr { };
 
-  iterm2-terminal-integration = pkgs.stdenv.mkDerivation {
-    pname = "iterm2-terminal-integration";
-    version = "0.0.1";
-
-    src = pkgs.fetchurl {
-      # The unversioned iterm2.com URL changes without a corresponding hash update.
-      url = "https://raw.githubusercontent.com/gnachman/iTerm2-Shell-Integration/718d363924df773acee02a5d59acfb31d0d54a82/shell_integration/fish";
-      hash = "sha256-Nq0qFA21cULkubqcir4Mdp6acrdjxXCN3GdS47GVmu0=";
-    };
-
-    unpackPhase = ''
-      for srcFile in $src; do
-        cp $srcFile $(stripHash $srcFile)
-      done
-    '';
-
-    installPhase = ''
-      outDir=$out/bin
-      mkdir -p $outDir
-      cp $src $outDir/iterm2_shell_integration.fish
-    '';
-  };
-
   litra = pkgs.callPackage ./litra.nix { };
 
   lotion = pkgs.callPackage ./lotion { };

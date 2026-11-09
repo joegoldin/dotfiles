@@ -15,9 +15,6 @@ in
     let
       initConfigAdditions = ''
         eval $(/opt/homebrew/bin/brew shellenv)
-        if test "$TERM_PROGRAM" = "iTerm.app"
-          source ${pkgs.iterm2-terminal-integration}/bin/iterm2_shell_integration.fish
-        end
         fish_add_path -a /Applications/Obsidian.app/Contents/MacOS
       '';
       fonts = import ../../_data/fonts { inherit pkgs lib dotfiles-assets; };

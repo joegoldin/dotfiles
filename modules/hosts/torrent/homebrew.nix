@@ -81,8 +81,6 @@ in
           "gitbutler"
           "google-chrome"
           "hidock"
-          "iterm2"
-          "itermai"
           "mac-mouse-fix"
           "modern-csv"
           "monodraw"

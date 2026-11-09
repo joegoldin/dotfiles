@@ -1,5 +1,5 @@
 # Mac-ONLY home packages; only things tied to this platform belong here
-# (Xcode/Swift tooling, macOS VMs, iTerm2, brew-replacement build libs).
+# (Xcode/Swift tooling, macOS VMs, brew-replacement build libs).
 # Anything cross-platform goes in modules/home/_hm/packages/workstation.nix
 # (workstations) or modules/home/_hm/packages/default.nix (all hosts).
 # GUI apps come from Homebrew casks (../homebrew.nix), not nixpkgs.
@@ -12,7 +12,6 @@ let
   packageGroups = with pkgs; {
     cli = [
       fastlane
-      iterm2-terminal-integration
       softnet # tart VM networking (cirruslabs)
       swift-format
       swiftlint
