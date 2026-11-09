@@ -22,9 +22,11 @@ of `full-access` as granting shell access, not just permission to view terminals
 `tag:rex-host` is an **inbound-only server role**, like `tag:ssh-in-only`.
 Full-access clients can connect to all its services, including Rex. A machine
 with only `rex-host` cannot initiate new tailnet connections, including Rex,
-SSH, or ping; replies to incoming sessions are allowed. Untagged tailnet members
-retain their existing SSH access, not Rex access. This policy does not restrict
-direct LAN/internet traffic outside Tailscale. Do not combine `rex-host` with
+SSH, or ping; replies to incoming sessions are allowed. Untagged devices are
+also inbound-only by default: they cannot initiate tailnet SSH, Rex, subnet,
+or exit-node connections. Full-access clients retain incoming access to them;
+ordinary SSH still needs an authorized key. This policy does not restrict direct
+LAN/internet traffic outside Tailscale. Do not combine `rex-host` with
 `full-access` if the server must remain isolated: permissions are additive.
 
 Keep the initiating Mac tagged `full-access`; put `rex-host` on restricted

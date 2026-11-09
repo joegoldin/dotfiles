@@ -1110,11 +1110,11 @@
     "dotfiles-secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1794253192,
-        "narHash": "sha256-VeusJESWIXjaYj6Wn54V7467GbECKcsat6DfCPthWmU=",
+        "lastModified": 1794255268,
+        "narHash": "sha256-e/InMO3zJ+6ioX404LHBR1yOwUYG2wdDgPGxRlng4WY=",
         "ref": "main",
-        "rev": "39489eb2caae0f7e2430f8c749d2ce85e11a1d0f",
-        "revCount": 237,
+        "rev": "a9c98206f0f68cce606c6f78ccb9ef8359270d54",
+        "revCount": 239,
         "type": "git",
         "url": "ssh://git@github.com/joegoldin/dotfiles-secrets"
       },
