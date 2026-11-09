@@ -51,10 +51,18 @@ assert lib.hasInfix "--https=7297"
 assert !(lib.hasInfix ":8443" linux.xdg.configFile."rex/dotfiles.lua".text);
 assert !login.allowAnonymous;
 assert builtins.attrNames login.accounts == [ meta.username ];
-assert builtins.length login.accounts.${meta.username}.principals == 1;
+assert builtins.length login.accounts.${meta.username}.principals == 2;
 assert lib.hasPrefix "tailscale:" (builtins.head login.accounts.${meta.username}.principals);
+assert builtins.elem "tailscale:tag:rex-host" login.accounts.${meta.username}.principals;
+assert login.extraListen == [ "tailnet://:7298" ];
+assert lib.hasInfix "tailnet://:7298"
+  nixos.systemd.services.rex-login-server.serviceConfig.ExecStart;
+assert nixos.networking.firewall.interfaces.tailscale0.allowedTCPPorts == [ 7298 ];
+assert !(builtins.elem 7298 nixos.networking.firewall.allowedTCPPorts);
 assert !mac.services.rex.enable;
 assert mac.programs.rex.package == null;
+assert !(lib.hasInfix "-tagged" mac.xdg.configFile."rex/dotfiles.lua".text);
+assert !(lib.hasInfix ":7298" mac.xdg.configFile."rex/dotfiles.lua".text);
 pkgs.runCommand "rex-service-tests" { } ''
   touch "$out"
 ''

@@ -28,9 +28,18 @@ in
         enable = true;
         accounts.${meta.username}.principals = [
           "tailscale:${domains.tailscaleUser}"
+          "tailscale:tag:rex-host"
         ];
         tailscaleServe.enable = true;
+        # Serve does not forward tagged identities; direct tailnet listeners use
+        # tailscaled WhoIs instead, with WireGuard providing transport encryption.
+        extraListen = [ "tailnet://:7298" ];
       };
+      networking.firewall.interfaces.tailscale0.allowedTCPPorts =
+        lib.mkIf config.services.tailscale.enable
+          [
+            7298
+          ];
     };
 
   den.aspects.rex.homeManager =
