@@ -333,7 +333,8 @@
     # modules; over ssh; bump with `nix flake update agent-skills`
     agent-skills = {
       url = "github:joegoldin/agent-skills";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # Keep the plugin builders on agent-skills' own unstable package set.
+      # Following the host's stable pin also downgrades skill-owned MCP servers.
       # pi runs on Bun, and the stable channel's Bun 1.3 cannot load
       # extensions that import subpath exports such as `typebox/compile`
       # (pi-subagents fails with "Cannot access 'registerExtension' before
