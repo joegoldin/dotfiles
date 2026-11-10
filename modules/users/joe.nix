@@ -25,8 +25,18 @@ in
     ];
 
     provides.to-hosts.nixos =
-      { pkgs, ... }:
       {
+        config,
+        lib,
+        pkgs,
+        ...
+      }:
+      {
+        # Login and encrypted-root recovery must accept the same workstation
+        # keys. Host-local lists used to leave root/initrd on the old 1Password key.
+        users.users.root.openssh.authorizedKeys.keys = loginKeys;
+        boot.initrd.network.ssh.authorizedKeys = lib.mkIf config.boot.initrd.network.ssh.enable loginKeys;
+
         users.users.${meta.username} = {
           uid = 1000;
           isNormalUser = true;
