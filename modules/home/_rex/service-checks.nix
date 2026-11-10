@@ -45,6 +45,11 @@ assert !(builtins.hasAttr "rex" linux.systemd.user.services);
 assert !nixos.services.rex.enable;
 assert login.enable && !login.tailscaleServe.enable;
 assert nixos.systemd.services.rex-login-server.wantedBy == [ "multi-user.target" ];
+# A running tailscaled unit does not guarantee its addresses are bindable yet.
+assert
+  nixos.systemd.services.rex-login-server.serviceConfig.ExecStartPre == [
+    "${lib.getExe nixos.services.tailscale.package} wait --timeout=60s"
+  ];
 assert !(builtins.hasAttr "rex-tailscale-serve" nixos.systemd.services);
 assert
   !(lib.hasInfix "tailnet-serve://" nixos.systemd.services.rex-login-server.serviceConfig.ExecStart);

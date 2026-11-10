@@ -31,6 +31,11 @@ in
         # WireGuard encrypts transport without trusting Serve identity headers.
         extraListen = [ "tailnet://:7297" ];
       };
+      # tailscaled reports ready before its interface has bindable addresses.
+      # Check on every start: a completed online target can outlive a daemon restart.
+      systemd.services.rex-login-server.serviceConfig.ExecStartPre =
+        lib.mkIf config.services.tailscale.enable
+          [ "${lib.getExe config.services.tailscale.package} wait --timeout=60s" ];
       networking.firewall.interfaces.tailscale0.allowedTCPPorts =
         lib.mkIf config.services.tailscale.enable
           [
