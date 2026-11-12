@@ -15,6 +15,7 @@ in
 
     # macOS ships `open`; Linux uses `xdg-open` (routes dirs → Dolphin via XDG mime).
     open = mkIf isLinux "xdg-open";
+    restart-plasma = mkIf isLinux "systemctl --user restart plasma-plasmashell.service";
   };
 
   shellAbbrs = {
