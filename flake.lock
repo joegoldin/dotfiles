@@ -3126,17 +3126,17 @@
     },
     "nixpkgs-newer": {
       "locked": {
-        "lastModified": 1791801211,
-        "narHash": "sha256-XsB2Jsfnl5pJrdHLzTbRQJSGFViPVOu8OmCSE7LCgPs=",
+        "lastModified": 1792874615,
+        "narHash": "sha256-va/8/+Wg1f0q7kTfd7AX3KSXsXm52sZ22KgAujlfx6I=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "40e2bf74e0a965f1dcd08f3b4088207d4d71a4c4",
+        "rev": "806ae6af4159c4e7d03558ad683530510072de9a",
         "type": "github"
       },
       "original": {
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "40e2bf74e0a965f1dcd08f3b4088207d4d71a4c4",
+        "rev": "806ae6af4159c4e7d03558ad683530510072de9a",
         "type": "github"
       }
     },
@@ -4860,11 +4860,11 @@
         "nixpkgs-newer": "nixpkgs-newer"
       },
       "locked": {
-        "lastModified": 1794121271,
-        "narHash": "sha256-zFZsTEL2RlNHb3LTAV6Yh3fvgrnoHgOr+z72PMZ0VZw=",
+        "lastModified": 1794293897,
+        "narHash": "sha256-mM36x9mODTkQ5L6cgDakwICFN0QLGjw5yGum+vq7hos=",
         "owner": "joegoldin",
         "repo": "zen-bonsai-browser",
-        "rev": "ba31a24c457a1ff286657df759f3ffa76a7d8782",
+        "rev": "c08ae1b4467f1b2657349ebde6a7e594ceedc7a9",
         "type": "github"
       },
       "original": {
