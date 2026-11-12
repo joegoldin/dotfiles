@@ -81,11 +81,28 @@ in
           bash.initExtra = lib.mkAfter shellInit;
           zsh.initContent = lib.mkAfter shellInit;
         };
-        home.packages = lib.optional isMac (
-          pkgs.writeShellScriptBin "rex" ''
-            exec ${lib.escapeShellArg appRex} "$@"
-          ''
-        );
+        home = {
+          # Run outside Rex's terminal so stopping the server cannot kill the restart.
+          # Keep the newly detached server alive after the transient unit exits.
+          shellAliases.restart-rex-server = lib.mkIf (!isMac) (
+            "${pkgs.systemd}/bin/systemd-run --user --collect --no-block --property=KillMode=process "
+            + "${pkgs.runtimeShell} -c "
+            + lib.escapeShellArg "${rex} --autostart=false server stop && ${rex} server start"
+          );
+          packages = lib.optional isMac (
+            pkgs.writeShellScriptBin "rex" ''
+              exec ${lib.escapeShellArg appRex} "$@"
+            ''
+          );
+          # init.lua remains writable. The loader is merged ahead of local Lua,
+          # which can override managed defaults without being overwritten.
+          activation.rexConfig = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+            run ${pkgs.python3}/bin/python3 ${./_rex/merge-config.py} \
+              ${lib.escapeShellArg "${configDir}/init.lua"} \
+              ${lib.escapeShellArg "${configDir}/dotfiles.lua"} \
+              ${lib.escapeShellArg rex}
+          '';
+        };
         xdg.configFile."rex/dotfiles.lua".text =
           builtins.readFile ./_rex/ghostty.lua
           + "\n"
@@ -95,15 +112,6 @@ in
               endpoint = "http://${meta.username}@${host}.${lib.removePrefix "elphael." domains.elphaelTailscale}:7297",
             }
           '') (builtins.filter (host: host != osConfig.networking.hostName) hosts);
-
-        # init.lua remains writable. The loader is merged ahead of local Lua,
-        # which can override managed defaults without being overwritten.
-        home.activation.rexConfig = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-          run ${pkgs.python3}/bin/python3 ${./_rex/merge-config.py} \
-            ${lib.escapeShellArg "${configDir}/init.lua"} \
-            ${lib.escapeShellArg "${configDir}/dotfiles.lua"} \
-            ${lib.escapeShellArg rex}
-        '';
       };
     };
 }

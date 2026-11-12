@@ -40,6 +40,16 @@ let
   mac = home "aarch64-darwin" { networking.hostName = "torrent"; };
   login = nixos.services.rex.loginServer;
 in
+assert
+  linux.home.shellAliases.restart-rex-server == (
+    "${pkgs.systemd}/bin/systemd-run --user --collect --no-block --property=KillMode=process "
+    + "${pkgs.runtimeShell} -c "
+    + lib.escapeShellArg (
+      "${lib.getExe linux.programs.rex.package} --autostart=false server stop"
+      + " && ${lib.getExe linux.programs.rex.package} server start"
+    )
+  );
+assert !(mac.home.shellAliases ? restart-rex-server);
 assert !linux.services.rex.enable;
 assert !(builtins.hasAttr "rex" linux.systemd.user.services);
 assert !nixos.services.rex.enable;

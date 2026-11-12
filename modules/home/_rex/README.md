@@ -58,6 +58,14 @@ Tailscale server node or anonymous TCP listener is needed. The direct listener
 is permitted only on the Tailscale interface. Account servers survive
 login-server restarts and upgrades.
 
+After `just switch` on Linux, run `restart-rex-server` when you want the
+personal/account server to use the newly installed Rex package. The alias runs
+stop/start in a detached systemd user unit, so it also works from inside Rex and
+bypasses the old server's `REX_BIN_DIR`. **This ends all running programs in your
+Rex sessions.** The new server restores saved session layouts, not the programs
+that were running in them. Restart failures appear in the user journal
+(`journalctl --user --since '5 minutes ago'`).
+
 Torrent keeps its native **Rex Beta.app**, including its bundled server and CLI.
 The aspect exposes that CLI on PATH without installing another Mac server.
 
