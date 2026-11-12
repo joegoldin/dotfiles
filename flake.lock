@@ -232,6 +232,23 @@
         "type": "github"
       }
     },
+    "atuin": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1794275082,
+        "narHash": "sha256-4CBh/FcX5HxGUz2qqIDVstTGy343rX8sZucAzAQ6aqU=",
+        "owner": "atuinsh",
+        "repo": "atuin",
+        "rev": "c71cd7baad5aaf0ff4d19db369d247f08da76ec9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "atuinsh",
+        "ref": "v18.24.6",
+        "repo": "atuin",
+        "type": "github"
+      }
+    },
     "audiomemo": {
       "inputs": {
         "flake-utils": "flake-utils_2",
@@ -3797,6 +3814,7 @@
         "agenix": "agenix",
         "agent-skills": "agent-skills",
         "attic": "attic",
+        "atuin": "atuin",
         "audiomemo": "audiomemo",
         "brew-api": "brew-api",
         "brew-nix": "brew-nix",

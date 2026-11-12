@@ -16,6 +16,12 @@ in
       ...
     }:
     let
+      atuin = pkgs.unstable.atuin.overrideAttrs (_: {
+        version = (lib.importTOML "${inputs.atuin}/Cargo.toml").workspace.package.version;
+        src = inputs.atuin;
+        cargoHash = "sha256-eB0HHlrHdttJB7DYo68c6hGeqAiMj/b9zS/9eZLw1hM=";
+      });
+
       # The AI server rejects requests without its bearer token. atuin reads
       # any setting from ATUIN_<SECTION>__<KEY>, so inject ai.api_token from
       # agenix at launch rather than writing it into the store-backed
@@ -23,9 +29,9 @@ in
       atuinWithAiToken = pkgs.symlinkJoin {
         # home-manager gates options on .version and runs lib.getExe on it.
         pname = "atuin";
-        inherit (pkgs.unstable.atuin) version;
+        inherit (atuin) version;
         meta.mainProgram = "atuin";
-        paths = [ pkgs.unstable.atuin ];
+        paths = [ atuin ];
         buildInputs = [ pkgs.makeWrapper ];
         postBuild = ''
           wrapProgram $out/bin/atuin \
@@ -36,11 +42,16 @@ in
     {
       programs.atuin = {
         enable = true;
-        # unstable for self-hosted AI support (ai.endpoint_protocol, 18.20+).
+        # Keep nixpkgs' build/tests, with the independently pinned upstream source.
         package = atuinWithAiToken;
         enableFishIntegration = true;
         enableBashIntegration = true;
+        daemon.enable = true;
         settings = {
+          # The daemon watches Pi's JSONL sessions directly; no Pi hook is
+          # needed for Threads. Its optional shell-history hook is separate.
+          daemon.autostart = false;
+          threads.capture = true;
           auto_sync = true;
           sync_frequency = "5m";
           sync_address = "https://${domains.atuinDomain}";

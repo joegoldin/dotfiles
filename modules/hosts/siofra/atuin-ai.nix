@@ -117,6 +117,9 @@ in
           litellm_params = {
             model = "synthetic/${m.model}";
             api_key = "os.environ/SYNTHETIC_API_KEY";
+            # LiteLLM's model metadata lags Synthetic's new models. Forward
+            # tools explicitly: dropping them would break Atuin's agent loop.
+            allowed_openai_params = [ "tools" ];
           };
         }) models;
       };
