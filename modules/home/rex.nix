@@ -82,13 +82,9 @@ in
           zsh.initContent = lib.mkAfter shellInit;
         };
         home = {
-          # Run outside Rex's terminal so stopping the server cannot kill the restart.
-          # Keep the newly detached server alive after the transient unit exits.
-          shellAliases.restart-rex-server = lib.mkIf (!isMac) (
-            "${pkgs.systemd}/bin/systemd-run --user --collect --no-block --property=KillMode=process "
-            + "${pkgs.runtimeShell} -c "
-            + lib.escapeShellArg "${rex} --autostart=false server stop && ${rex} server start"
-          );
+          shellAliases.restart-rex-server = lib.mkIf (
+            !isMac
+          ) "sudo ${pkgs.systemd}/bin/systemctl restart rex-login-server.service";
           packages = lib.optional isMac (
             pkgs.writeShellScriptBin "rex" ''
               exec ${lib.escapeShellArg appRex} "$@"
