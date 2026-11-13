@@ -16,11 +16,7 @@
           nixfmt.enable = true;
           check-yaml.enable = true;
           end-of-file-fixer.enable = true;
-          gitleaks = {
-            enable = true;
-            name = "gitleaks";
-            entry = "${inputs.nixpkgs.legacyPackages.${system}.gitleaks}/bin/gitleaks detect --source . -v";
-          };
+          gitleaks.enable = true;
         };
       };
 

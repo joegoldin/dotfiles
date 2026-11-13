@@ -38,6 +38,7 @@ let
       gcc15
       glibc
       unstable.jdk25_headless
+      unstable.pkgsRocm.vllm
       libgcc
       reptyr
       rocmPackages.rocm-smi
