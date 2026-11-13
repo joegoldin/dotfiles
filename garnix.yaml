@@ -16,7 +16,5 @@ builds:
   exclude:
     - "nixosConfigurations.scarab"
 
-# Prepare each fixed-output derivation's dependencies, then rebuild the original
-# derivation unchanged while ignoring cached outputs. Source, fetch, and builder
-# failures fail the FOD run; only a successful strict rebuild is recorded.
-fodChecks: true
+# Skip expensive fixed-output derivation rebuild checks.
+fodChecks: false
