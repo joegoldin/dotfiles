@@ -6,19 +6,22 @@
 let
   meta = import ../../_lib/meta.nix;
   aspect = (import ../rex.nix { inherit inputs; }).den.aspects.rex;
-  nixos =
+  system =
+    tailscale:
     (inputs.nixpkgs.lib.nixosSystem {
       system = pkgs.stdenv.hostPlatform.system;
       modules = [
         aspect.nixos
         {
-          networking.hostName = "rex-test";
-          services.tailscale.enable = true;
+          networking.hostName = "elphael";
+          services.tailscale.enable = tailscale;
           users.users.${meta.username}.isNormalUser = true;
           system.stateVersion = "26.05";
         }
       ];
     }).config;
+  nixos = system true;
+  noTailscale = system false;
   home =
     system: osConfig:
     (inputs.home-manager.lib.homeManagerConfiguration {
@@ -37,42 +40,47 @@ let
       ];
     }).config;
   linux = home pkgs.stdenv.hostPlatform.system nixos;
+  linuxNoTailscale = home pkgs.stdenv.hostPlatform.system noTailscale;
   mac = home "aarch64-darwin" { networking.hostName = "torrent"; };
-  login = nixos.services.rex.loginServer;
+  checkSystem =
+    config:
+    assert config.users.users.${meta.username}.linger;
+    assert builtins.elem config.services.rex.package config.environment.systemPackages;
+    assert !config.services.rex.enable;
+    assert !config.services.rex.loginServer.enable;
+    assert !config.services.rex.tailscale.enable;
+    assert !config.services.rex.tailscaleServe.enable;
+    assert !config.services.rex.loginServer.tailscaleServe.enable;
+    assert config.services.rex.loginServer.extraListen == [ ];
+    assert config.services.rex.loginServer.accounts == { };
+    assert !(config.systemd.services ? rex-login-server);
+    assert !(config.systemd.services ? rex-tailscale-serve);
+    assert !(builtins.elem 7297 config.networking.firewall.allowedTCPPorts);
+    assert !(config.networking.firewall.interfaces ? tailscale0);
+    true;
+  checkHome =
+    config:
+    let
+      lua = config.xdg.configFile."rex/dotfiles.lua".text;
+    in
+    assert config.programs.rex.enable;
+    assert !config.services.rex.enable;
+    assert !(config.systemd.user.services ? rex);
+    assert !(config.home.shellAliases ? restart-rex-server);
+    assert lib.hasInfix ''endpoint = "ssh://erdtree",'' lua;
+    assert !(lib.hasInfix "http://" lua);
+    assert !(lib.hasInfix ".ts.net" lua);
+    assert !(lib.hasInfix ":7297" lua);
+    true;
 in
-assert
-  linux.home.shellAliases.restart-rex-server
-  == "sudo ${pkgs.systemd}/bin/systemctl restart rex-login-server.service";
-assert !(mac.home.shellAliases ? restart-rex-server);
-assert !linux.services.rex.enable;
-assert !(builtins.hasAttr "rex" linux.systemd.user.services);
-assert !nixos.services.rex.enable;
-assert login.enable && !login.tailscaleServe.enable;
-assert nixos.systemd.services.rex-login-server.wantedBy == [ "multi-user.target" ];
-# A running tailscaled unit does not guarantee its addresses are bindable yet.
-assert
-  nixos.systemd.services.rex-login-server.serviceConfig.ExecStartPre == [
-    "${lib.getExe nixos.services.tailscale.package} wait --timeout=60s"
-  ];
-assert !(builtins.hasAttr "rex-tailscale-serve" nixos.systemd.services);
-assert
-  !(lib.hasInfix "tailnet-serve://" nixos.systemd.services.rex-login-server.serviceConfig.ExecStart);
-assert !(lib.hasInfix ":8443" linux.xdg.configFile."rex/dotfiles.lua".text);
-assert !login.allowAnonymous;
-assert builtins.attrNames login.accounts == [ meta.username ];
-assert login.accounts.${meta.username}.principals == [ "tailscale:tag:full-access" ];
-assert login.extraListen == [ "tailnet://:7297" ];
-assert lib.hasInfix "tailnet://:7297"
-  nixos.systemd.services.rex-login-server.serviceConfig.ExecStart;
-assert nixos.networking.firewall.interfaces.tailscale0.allowedTCPPorts == [ 7297 ];
-assert !(builtins.elem 7297 nixos.networking.firewall.allowedTCPPorts);
-assert !mac.services.rex.enable;
+assert checkSystem nixos;
+assert checkSystem noTailscale;
+assert checkHome linux;
+assert checkHome linuxNoTailscale;
+assert checkHome mac;
+assert !(lib.hasInfix ''label = "elphael",'' linux.xdg.configFile."rex/dotfiles.lua".text);
+assert lib.hasInfix ''endpoint = "ssh://elphael",'' mac.xdg.configFile."rex/dotfiles.lua".text;
 assert mac.programs.rex.package == null;
-assert !(lib.hasInfix "-tagged" mac.xdg.configFile."rex/dotfiles.lua".text);
-assert !(lib.hasInfix ":7298" mac.xdg.configFile."rex/dotfiles.lua".text);
-assert lib.hasInfix ''endpoint = "http://${meta.username}@elphael.''
-  mac.xdg.configFile."rex/dotfiles.lua".text;
-assert lib.hasInfix ":7297" mac.xdg.configFile."rex/dotfiles.lua".text;
 pkgs.runCommand "rex-service-tests" { } ''
   touch "$out"
 ''

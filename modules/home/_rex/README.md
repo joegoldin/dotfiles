@@ -2,68 +2,36 @@
 
 ## Configuration
 
-`den.aspects.rex` is explicitly included by the managed Tailscale hosts:
-Elphael, Dectus, Erdtree, Farum Azula, Malenia, Melina, Rennala, Scarab,
-Siofra, Volcano Manor, and Torrent. It is not a global `den.default`.
+`den.aspects.rex` is explicitly included by Elphael, Dectus, Erdtree,
+Farum Azula, Malenia, Melina, Rennala, Scarab, Siofra, Volcano Manor, and
+Torrent. It is not a global `den.default`.
 
-On Linux it imports the upstream NixOS module and runs one direct **TCP 7297**
-login-server listener, bound only to the host's Tailscale addresses. The firewall
-opens 7297 only on `tailscale0`. Tailscale Serve is disabled: the direct listener
-uses tailscaled WhoIs to verify the caller's device identity rather than Serve's
-forwarded user headers. HTTP transport is encrypted by Tailscale/WireGuard;
-Tailscale HTTPS certificates and a second embedded Tailscale node are not needed.
+Linux hosts install the Rex CLI and use **SSH-only remote access**. No Rex
+login server, shared server, TCP listener, Tailscale Serve mapping, embedded
+Tailscale node, or Rex firewall opening is configured. SSH starts or reuses
+`joe`'s personal server on its local Unix socket. Home Manager does not install
+a separate personal systemd service.
 
-Only clients tagged **`tag:full-access`** may authenticate as `joe`, through the
-explicit `tailscale:tag:full-access` principal. Untagged user identities and
-other role tags alone do not authorize Rex login. No anonymous or root Rex access
-is granted. A permitted Rex login can run commands as `joe`, so treat assignment
-of `full-access` as granting shell access, not just permission to view terminals.
-
-Rex servers need no dedicated role. Untagged devices and existing
-`tag:ssh-in-only` servers are **inbound-only by default**: they cannot initiate
-new tailnet SSH, Rex, ping, subnet, or exit-node connections. Replies to
-incoming sessions are allowed. Full-access clients can reach all their services,
-including Rex. Ordinary SSH still needs an authorized key; full-access clients
-may use Tailscale SSH to tagged devices when enabled on the destination.
-This policy does not restrict direct LAN/internet traffic outside Tailscale.
-Do not give an isolated server `full-access`: permissions are additive.
-
-Keep the initiating Mac tagged `full-access`. Existing `ssh-in-only` servers
-can keep that identity without reauthentication; new general servers need no
-extra tag just for isolation. Rex can use the
-Mac's existing system Tailscale connection without a separate Rex Tailscale
-sign-in. The tag must belong to the actual originating Tailscale node if an
-embedded client is used instead.
-
-Existing managed host aliases use direct endpoints; no additional aliases are
-created. After the policy and server configuration are deployed:
+Managed host entries use `ssh://<host>`. Rex uses the system SSH client, so
+existing SSH aliases, users, ports, keys, and agents apply. There is no Rex
+Tailscale sign-in or tag-based Rex principal. SSH itself may still travel over
+Tailscale if that is how the existing SSH connection is configured; unrelated
+Tailscale services and access policy are unchanged.
 
 ```fish
 rex -S elphael ls --json
 # Without the managed host list:
-rex -S http://joe@elphael:7297 ls --json
+rex -S ssh://elphael ls --json
 ```
 
-For other clients configure `http://joe@<full-MagicDNS-hostname>:7297`.
-Old HTTPS endpoints are not interchangeable with the direct HTTP endpoint.
-During activation the old managed Serve unit removes its 7297 HTTPS mapping.
-Inspect `tailscale serve status` for older manually configured Rex mappings
-(such as 8443); remove only obsolete Rex mappings, not unrelated services.
+For other clients, add `ssh://<host>` as the remote host address. Both the client
+and remote Rex binary must support SSH endpoints. The pinned package includes
+SSH support; Torrent's native app must also be recent enough. The old HTTP and
+HTTPS Rex endpoints are no longer used.
 
-Home Manager installs the CLI and configuration, not a separate personal
-systemd service. The system login server owns account-server startup. On logind
-hosts, an account server is also the personal server local commands use, so
-local and remote clients share sessions. No shared `rex.service`, embedded
-Tailscale server node or anonymous TCP listener is needed. The direct listener
-is permitted only on the Tailscale interface. Account servers survive
-login-server restarts and upgrades.
-
-On Linux, `restart-rex-server` runs
-`sudo systemctl restart rex-login-server.service`, using the service definition
-installed by `just switch`. This restarts only the system login server; existing
-account servers and their programs keep running on their current Rex version.
-Remote connections through the login server may briefly disconnect. Inspect
-`journalctl -u rex-login-server` for restart failures.
+The former `restart-rex-server` alias is removed: there is no system login
+server to restart. Do not stop a personal server to upgrade it while its
+sessions are needed; stopping it ends those sessions.
 
 Torrent keeps its native **Rex Beta.app**, including its bundled server and CLI.
 The aspect exposes that CLI on PATH without installing another Mac server.
@@ -75,7 +43,7 @@ is checked with the installed Rex CLI before replacement; changed local files
 get a timestamp-independent unique backup alongside them. Activation reloads
 an already-running local server but never starts one just to reload config.
 
-The host list includes the other Linux tailnet machines as future connection
+The host list includes the other Linux machines as future connection
 targets. A menu entry is not evidence that a server has been deployed. Gitea,
 Roundtable, and Travelboi24 have no host configuration in this repository and
 need a separate installation once accessible. iOS devices and the Windows
@@ -83,22 +51,28 @@ machine are not supported by the current public server packages.
 
 ## Login without a desktop session
 
-The system `rex-login-server.service` starts at boot under `multi-user.target`,
-independently of the desktop. A permitted
-Tailscale connection selects `joe`; PAM opens an account session and the login
-server starts the account's Rex server if none is running, or reuses it otherwise.
-The account server is started on demand; a persistent personal service is not
-required. Other aspects may enable user lingering independently.
+The Rex aspect sets `users.users.joe.linger = true` on every included Linux host,
+including Elphael. Lingering keeps the user manager and `/run/user/<uid>` alive
+after the final SSH or desktop logout, preserving the personal Rex socket and
+running sessions. User services can run while logged out and use resources;
+this does not grant remote access or open ports.
 
-`rex server status` with no server argument checks the personal Unix socket,
-not the system login server. A missing personal socket does not establish that
-remote login is broken. To test the system login path, connect from another
-tailnet device using `rex -S elphael ls --json` (with the managed host list), or
-`rex -S http://joe@<hostname>.<tailnet>.ts.net:7297 ls --json`.
-No graphical login is required. If this fails, inspect
-`journalctl -u rex-login-server`;
-account expiration/lock, PAM rejection, and Tailscale identity or ACL failures
-are distinct from a missing local socket.
+SSH starts a missing personal server on demand. No graphical login or system
+login server is needed. Rex must be on the noninteractive SSH PATH; the aspect
+installs it in the system profile as well as the Home Manager profile.
+`REX_AUTOSTART=0` on the remote machine prevents automatic startup.
+
+```fish
+loginctl show-user joe -p Linger
+ssh elphael 'command -v rex'
+rex -S ssh://elphael ls --json
+```
+
+When switching from the old configuration, NixOS removes the managed login
+server and its Rex-specific firewall opening. Existing personal/account servers
+are not deliberately stopped. Check `tailscale serve status` for any older
+manually configured Rex mappings (such as 7297 or 8443), and remove only confirmed
+obsolete Rex mappings, not unrelated services.
 
 ## Package installation
 
@@ -153,8 +127,9 @@ upstream GUI/settings interface; the portable Lua bindings are ready for it.
 On a Linux host:
 
 ```fish
-systemctl status rex-login-server rex-tailscale-serve
-sudo tailscale serve status
+loginctl show-user joe -p Linger
+# Neither old system unit should be active:
+systemctl is-active rex-login-server rex-tailscale-serve
 rex config check
 rex hosts --json
 ```
@@ -169,9 +144,9 @@ Configuration tests are available as `checks.<system>.rex-config` for upstream
 supported systems. They cover Lua merging, backup/idempotence, validation
 failure preservation, theme import retries, and the real CLI's Lua validation.
 `checks.x86_64-linux.rex-services` (also on aarch64-linux) evaluates the service
-wiring: no separate personal/shared service, restricted Serve on the default
-7297, boot-time login-server activation, and the native Mac server remaining
-unmanaged by systemd.
+wiring with and without Tailscale: SSH host entries, lingering, system CLI
+availability, no personal/shared/login service or Rex firewall opening, and
+the native Mac server remaining unmanaged by systemd.
 
 ## Agent integration
 

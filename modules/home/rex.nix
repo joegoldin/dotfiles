@@ -1,8 +1,7 @@
-# Named Rex aspect: native Mac client and direct tailnet login servers.
+# Named Rex aspect: native Mac client and SSH-accessible personal Linux servers.
 { inputs, ... }:
 let
   meta = import ../_lib/meta.nix;
-  domains = import "${inputs.dotfiles-secrets}/domains.nix";
   hosts = [
     "dectus"
     "elphael"
@@ -21,26 +20,13 @@ let
 in
 {
   den.aspects.rex.nixos =
-    { config, lib, ... }:
+    { config, ... }:
     {
       imports = [ inputs.rex.nixosModules.default ];
-      services.rex.loginServer = lib.mkIf config.services.tailscale.enable {
-        enable = true;
-        accounts.${meta.username}.principals = [ "tailscale:tag:full-access" ];
-        # Direct listeners verify the caller's tag through tailscaled WhoIs;
-        # WireGuard encrypts transport without trusting Serve identity headers.
-        extraListen = [ "tailnet://:7297" ];
-      };
-      # tailscaled reports ready before its interface has bindable addresses.
-      # Check on every start: a completed online target can outlive a daemon restart.
-      systemd.services.rex-login-server.serviceConfig.ExecStartPre =
-        lib.mkIf config.services.tailscale.enable
-          [ "${lib.getExe config.services.tailscale.package} wait --timeout=60s" ];
-      networking.firewall.interfaces.tailscale0.allowedTCPPorts =
-        lib.mkIf config.services.tailscale.enable
-          [
-            7297
-          ];
+      # SSH starts the personal server on demand; keep its runtime socket and
+      # sessions alive after the last login ends.
+      users.users.${meta.username}.linger = true;
+      environment.systemPackages = [ config.services.rex.package ];
     };
 
   den.aspects.rex.homeManager =
@@ -53,7 +39,6 @@ in
     }:
     let
       isMac = pkgs.stdenv.hostPlatform.isDarwin;
-      enabled = isMac || (osConfig.services.tailscale.enable or false);
       appRex = "/Applications/Rex Beta.app/Contents/Helpers/Rex Server.rex/Contents/MacOS/rex";
       rex = if isMac then appRex else lib.getExe config.programs.rex.package;
       configDir = "${config.xdg.configHome}/rex";
@@ -65,7 +50,7 @@ in
     in
     {
       imports = [ inputs.rex.homeManagerModules.default ];
-      config = lib.mkIf enabled {
+      config = {
         programs = {
           rex = {
             enable = true;
@@ -82,9 +67,6 @@ in
           zsh.initContent = lib.mkAfter shellInit;
         };
         home = {
-          shellAliases.restart-rex-server = lib.mkIf (
-            !isMac
-          ) "sudo ${pkgs.systemd}/bin/systemctl restart rex-login-server.service";
           packages = lib.optional isMac (
             pkgs.writeShellScriptBin "rex" ''
               exec ${lib.escapeShellArg appRex} "$@"
@@ -105,7 +87,7 @@ in
           + lib.concatMapStrings (host: ''
             rex.host {
               label = "${host}",
-              endpoint = "http://${meta.username}@${host}.${lib.removePrefix "elphael." domains.elphaelTailscale}:7297",
+              endpoint = "ssh://${host}",
             }
           '') (builtins.filter (host: host != osConfig.networking.hostName) hosts);
       };
