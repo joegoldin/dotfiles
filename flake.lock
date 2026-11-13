@@ -1090,11 +1090,11 @@
     "dotfiles-secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1794278586,
-        "narHash": "sha256-E9zBdju8lFpFdBQSFU1X1mfp3FIQ7OEzvIyQqfgA/ng=",
+        "lastModified": 1794598717,
+        "narHash": "sha256-EbkDh1ZI7vxei0eILnYKKJSVHG1pHoC2GpoMCPOUEuM=",
         "ref": "main",
-        "rev": "536961bd0dbefe7babf4dab28cf3c8ff33109b32",
-        "revCount": 243,
+        "rev": "93ebfad9b200ca0dceb4ab253310515234323da1",
+        "revCount": 244,
         "type": "git",
         "url": "ssh://git@github.com/joegoldin/dotfiles-secrets"
       },
@@ -2215,6 +2215,28 @@
         "owner": "nix-community",
         "ref": "release-26.05",
         "repo": "home-manager",
+        "type": "github"
+      }
+    },
+    "home-manager_3": {
+      "inputs": {
+        "nixpkgs": [
+          "pi-manager-agent",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1794251182,
+        "narHash": "sha256-R2sZBXiOJo3HAnvTiVkbbHDJy//JMlAwUKEiPbfqPXk=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "6eb2d33d1d0c95a37ef6443c88e6c1686012ee8b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "6eb2d33d1d0c95a37ef6443c88e6c1686012ee8b",
         "type": "github"
       }
     },
@@ -3563,6 +3585,28 @@
         "type": "github"
       }
     },
+    "pi-manager-agent": {
+      "inputs": {
+        "home-manager": "home-manager_3",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1794597205,
+        "narHash": "sha256-VzvCEOVB9MhOzh+e2dWk5ebtPEB2WnptpelkLaBjSPE=",
+        "ref": "pi-manager-acceptance",
+        "rev": "e256a0be1ece6d32a2cf03fdc4edfb756d92225d",
+        "revCount": 22,
+        "type": "git",
+        "url": "ssh://git@github.com/joegoldin/pi-manager-agent"
+      },
+      "original": {
+        "ref": "pi-manager-acceptance",
+        "type": "git",
+        "url": "ssh://git@github.com/joegoldin/pi-manager-agent"
+      }
+    },
     "pi-nix": {
       "inputs": {
         "agent-statusline": "agent-statusline_2",
@@ -3860,6 +3904,7 @@
         "nixpkgs-python": "nixpkgs-python",
         "nixpkgs-unstable": "nixpkgs-unstable_2",
         "pam-watchid-src": "pam-watchid-src",
+        "pi-manager-agent": "pi-manager-agent",
         "plasma-manager": "plasma-manager",
         "punktfunk": "punktfunk",
         "rex": "rex",

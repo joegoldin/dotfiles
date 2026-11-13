@@ -306,6 +306,12 @@
       inputs.home-manager.follows = "home-manager";
     };
 
+    # Acceptance deployment stays on its reviewed private branch until release gates pass.
+    pi-manager-agent = {
+      url = "git+ssh://git@github.com/joegoldin/pi-manager-agent?ref=pi-manager-acceptance";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # ── Claude / LLM tooling ───────────────────────────────────────────────
     # Claude Desktop for Linux.
     # TEMP-PINNED (the one exception to the no-URL-pins rule): HEAD's
