@@ -3444,11 +3444,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794597205,
-        "narHash": "sha256-VzvCEOVB9MhOzh+e2dWk5ebtPEB2WnptpelkLaBjSPE=",
+        "lastModified": 1794612047,
+        "narHash": "sha256-o9nRoaXF1SKlJpKrXR48NHSMni0JioeIcs3OjDZ8hmE=",
         "ref": "pi-manager-acceptance",
-        "rev": "e256a0be1ece6d32a2cf03fdc4edfb756d92225d",
-        "revCount": 22,
+        "rev": "4e511f5a33f69b0004b007abc5112dc6a34d91b0",
+        "revCount": 23,
         "type": "git",
         "url": "ssh://git@github.com/joegoldin/pi-manager-agent"
       },
