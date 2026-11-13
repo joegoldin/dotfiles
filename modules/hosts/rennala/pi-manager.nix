@@ -76,7 +76,9 @@ in
           };
           pi = {
             executable = "/etc/profiles/per-user/${user}/bin/pi";
-            version = "1.4.0";
+            # Follow the normal managed Pi input; startup still checks the executable.
+            version =
+              inputs.agent-skills.inputs.pi-nix.packages.${pkgs.stdenv.hostPlatform.system}.default.version;
             homeDirectory = home;
             searchPath = [
               "/etc/profiles/per-user/${user}/bin"
