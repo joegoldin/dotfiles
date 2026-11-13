@@ -110,6 +110,15 @@ in
 
       # Additional Steam config (merged with gaming.nix)
       programs.steam = {
+        # Prefer Jovian's wrapper over the shared desktop package, retaining the
+        # .NET cleanup while Jovian adds its own shims and startup flags.
+        package = lib.mkForce (
+          pkgs.jovianPackages.steam.override {
+            extraProfile = ''
+              unset DOTNET_ROOT DOTNET_ROOT_X64 DOTNET_ROOT_X86 'DOTNET_ROOT(x86)'
+            '';
+          }
+        );
         protontricks.enable = true;
         dedicatedServer.openFirewall = true;
         localNetworkGameTransfers.openFirewall = true;
