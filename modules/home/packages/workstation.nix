@@ -54,7 +54,6 @@
         ];
 
         containers = [
-          claude-container # needs native build, no QEMU; workstations only
           dive
           docker-compose
           kubefwd

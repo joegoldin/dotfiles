@@ -300,12 +300,6 @@ in
     };
   };
 
-  # claude-container (claude-code wrapper in docker container with sandboxing)
-  # Inlined upstream overlay to avoid deprecated prev.system access in claude-container.overlays.default
-  claude-container-packages = final: _prev: {
-    inherit (inputs.claude-container.packages.${final.stdenv.hostPlatform.system}) claude-container;
-  };
-
   # affinity-nix (Affinity Photo/Designer/Publisher via wine)
   affinity-packages = inputs.affinity-nix.overlays.default;
 

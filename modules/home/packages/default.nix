@@ -31,7 +31,6 @@
       # Not listed here because dedicated modules provide them:
       #   audiomemo (programs.audiomemo), claude-code (../claude), codex (../codex),
       #   pueue (services.pueue via ../pueue.nix),
-      # claude-container is added per-host (needs native build, no QEMU).
       packageGroups = with pkgs; {
         core = [
           bc

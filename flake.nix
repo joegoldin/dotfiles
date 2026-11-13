@@ -120,11 +120,6 @@
       url = "github:joegoldin/audiomemo";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # claude-code wrapper in docker container with sandboxing
-    claude-container = {
-      url = "github:joegoldin/claude-container";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     # CIT200 desk phone; reactive dataflow engine
     desk-phone = {
       url = "github:joegoldin/desk-phone-cit200";

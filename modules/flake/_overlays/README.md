@@ -15,7 +15,7 @@ The named overlays:
 | `additions` | every package from `../_pkgs` as `pkgs.<name>` |
 | `modifications` | fixes/patches to stable nixpkgs packages (flaky-test `doCheck` disables, pipenv site-packages cleanup, freerdp/openh264 swap, howdy patch) |
 | `unstable-packages` | `pkgs.unstable`, a second nixpkgs evaluation of `nixpkgs-unstable` (allowUnfree + android_sdk license), with `unstableOverlays` applied |
-| `<input>-packages` | re-exported overlays from flake inputs: tinygrad, claude-desktop, llm-agents, audiomemo, claude-container, affinity, mcps (inlined to avoid its deprecated `pkgs.system` use) |
+| `<input>-packages` | re-exported overlays from flake inputs: tinygrad, claude-desktop, llm-agents, audiomemo, affinity, mcps (inlined to avoid its deprecated `pkgs.system` use) |
 
 ## The two-layer `unstable` scheme
 
