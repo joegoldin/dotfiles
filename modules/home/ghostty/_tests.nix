@@ -50,6 +50,9 @@ let
         config = { };
         pkgs = { };
       };
+  macGhostty = import ../../hosts/torrent/_ghostty.nix { inherit lib; };
+  macGhosttyConfig =
+    macGhostty.home.file."Library/Application Support/com.mitchellh.ghostty/config".text;
   linux = evaluate false;
   darwin = evaluate true;
   host = (import ../../hosts/elphael/plasma.nix { inherit lib; }).den.aspects.elphael.homeManager;
@@ -107,9 +110,27 @@ lib.runTests {
     expr = builtins.elem "ghostty" macHomebrew.homebrew.casks;
     expected = false;
   };
-  testNoMacGhosttyConfigImport = {
+  testMacGhosttyConfigImport = {
     expr = builtins.any (path: baseNameOf path == "_ghostty.nix") macHome.imports;
-    expected = false;
+    expected = true;
+  };
+  testMacGhosttySettings = {
+    expr = builtins.all (line: builtins.elem line (lib.splitString "\n" macGhosttyConfig)) [
+      "font-family = TX02 Nerd Font Mono"
+      "font-size = 13"
+      "theme = Gruvbox Dark Hard"
+      "command = /etc/profiles/per-user/joe/bin/fish"
+      "window-subtitle = working-directory"
+      "shell-integration-features = sudo,title,ssh-env,ssh-terminfo"
+      "mouse-shift-capture = true"
+      "keybind = shift+enter=text:\\x1b\\r"
+    ];
+    expected = true;
+  };
+  testMacGhosttyConfigOnly = {
+    expr =
+      builtins.attrNames macGhostty == [ "home" ] && builtins.attrNames macGhostty.home == [ "file" ];
+    expected = true;
   };
   testKdeTerminal = {
     expr = desktop.configFile.kdeglobals.General.TerminalApplication.content;
