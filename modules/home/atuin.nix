@@ -20,6 +20,9 @@ in
         version = (lib.importTOML "${inputs.atuin}/Cargo.toml").workspace.package.version;
         src = inputs.atuin;
         cargoHash = "sha256-eB0HHlrHdttJB7DYo68c6hGeqAiMj/b9zS/9eZLw1hM=";
+        # The close_fds tests dup2 onto fixed descriptor numbers, which can
+        # close descriptors owned by other tests in the same process.
+        RUST_TEST_THREADS = "1";
       });
 
       # The AI server rejects requests without its bearer token. atuin reads
