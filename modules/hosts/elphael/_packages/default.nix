@@ -8,6 +8,21 @@
 }:
 let
   inherit (pkgs) unstable;
+  # Keep vLLM's RCCL device code to the RX 7900 XTX and RX 9070 XT.
+  vllmPkgs = unstable.pkgsRocm.extend (
+    _final: prev: {
+      rocmPackages = prev.rocmPackages.overrideScope (
+        _rocmFinal: rocmPrev: {
+          rccl = rocmPrev.rccl.override {
+            gpuTargets = [
+              "gfx1100"
+              "gfx1201"
+            ];
+          };
+        }
+      );
+    }
+  );
   goModule = import ../../../home/_go.nix { inherit pkgs lib; };
   appImagePackages = import ../../../home/_appimages.nix { inherit pkgs; };
 
@@ -38,7 +53,7 @@ let
       gcc15
       glibc
       unstable.jdk25_headless
-      unstable.pkgsRocm.vllm
+      vllmPkgs.vllm
       libgcc
       reptyr
       rocmPackages.rocm-smi
