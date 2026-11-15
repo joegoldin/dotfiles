@@ -8,17 +8,22 @@
 }:
 let
   inherit (pkgs) unstable;
-  # Keep vLLM's RCCL device code to the RX 7900 XTX and RX 9070 XT.
+  # Keep vLLM's Torch and RCCL device code to the RX 7900 XTX and RX 9070 XT.
+  gpuTargets = [
+    "gfx1100"
+    "gfx1201"
+  ];
   vllmPkgs = unstable.pkgsRocm.extend (
     _final: prev: {
+      # Extend the Python scope so vLLM and its dependencies share this Torch.
+      pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+        (_pythonFinal: pythonPrev: {
+          torch = pythonPrev.torch.override { inherit gpuTargets; };
+        })
+      ];
       rocmPackages = prev.rocmPackages.overrideScope (
         _rocmFinal: rocmPrev: {
-          rccl = rocmPrev.rccl.override {
-            gpuTargets = [
-              "gfx1100"
-              "gfx1201"
-            ];
-          };
+          rccl = rocmPrev.rccl.override { inherit gpuTargets; };
         }
       );
     }
