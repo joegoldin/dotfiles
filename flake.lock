@@ -4725,11 +4725,11 @@
         "nixpkgs-newer": "nixpkgs-newer"
       },
       "locked": {
-        "lastModified": 1794818893,
-        "narHash": "sha256-9grzWJL+oXMv2Rx1qkyCX4AQ4o1hj9JIOTLCJhsu38k=",
+        "lastModified": 1794822522,
+        "narHash": "sha256-L3uTjcsNVLAMqLxKMCdc1qKuV8gsROIS0u9Mkrt5oYE=",
         "owner": "joegoldin",
         "repo": "zen-bonsai-browser",
-        "rev": "620114d2803cd0d315f8e988eec68e313bf0f6e3",
+        "rev": "a486d030cfe5ffa8d674f2abeb65cb5a721e0fa9",
         "type": "github"
       },
       "original": {
