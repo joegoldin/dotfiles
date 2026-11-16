@@ -1,11 +1,10 @@
 # Binary-cache client aspect. Trusts + substitutes from TWO caches — attic and
 # the self-hosted garnix CI cache — so local builds skip anything either has
-# already built. Cross-class: `os` forwards into nixos + darwin (substituter
-# trust + combined netrc); homeManager carries the attic-client CLI config (and
-# its hm module, so no host has to wire it separately).
+# already built. Keep the existing Attic URL, public key and secret names during
+# the Celler migration: Nix substitution is unchanged; only the upload API moves.
 { inputs, ... }:
 let
-  dotfiles-secrets = inputs.dotfiles-secrets;
+  inherit (inputs) dotfiles-secrets;
   domains = import "${dotfiles-secrets}/domains.nix";
   attic = import "${dotfiles-secrets}/attic.nix";
   garnix = import "${dotfiles-secrets}/garnix.nix";
@@ -35,17 +34,20 @@ in
         };
       };
 
-    homeManager = {
-      imports = [ inputs.nix-attic-infra.homeManagerModules.attic-client ];
-      programs.attic-client = {
-        enable = true;
-        defaultServer = "default-server";
-        servers.default-server = {
-          endpoint = "https://${domains.atticDomain}/";
-          tokenPath = "/run/agenix/attic-token";
-          aliases = [ attic.cacheName ];
+    homeManager =
+      { pkgs, ... }:
+      {
+        home.packages = [ inputs.celler.packages.${pkgs.stdenv.hostPlatform.system}.celler ];
+        xdg.configFile."celler/config.toml".text = ''
+          default-server = "default-server"
+          [servers.default-server]
+          endpoint = "https://${domains.atticDomain}/"
+          token-file = "/run/agenix/attic-token"
+        '';
+        home.shellAliases = {
+          "celler-push-${attic.cacheName}" = "celler push ${attic.cacheName}";
+          "celler-info-${attic.cacheName}" = "celler cache info ${attic.cacheName}";
         };
       };
-    };
   };
 }

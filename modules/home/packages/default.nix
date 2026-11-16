@@ -87,7 +87,6 @@
         ];
 
         nix-tooling = [
-          attic-client
           cachix
           unstable.devenv
           nil

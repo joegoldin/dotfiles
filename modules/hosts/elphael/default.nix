@@ -17,7 +17,7 @@ in
       den.aspects.dynamic-derivations
       # system features
       den.aspects.binary-caches
-      den.aspects.attic-post-build-hook
+      den.aspects.celler-watch-store
       den.aspects.numtide-cache
       den.aspects.howdy
       den.aspects.microvm-host

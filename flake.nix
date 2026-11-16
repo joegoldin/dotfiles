@@ -149,16 +149,10 @@
     rex-rune.url = "github:shuv1337/rex-rune?ref=master";
 
     # ── Server services ────────────────────────────────────────────────────
-    # binary cache server
-    attic = {
-      url = "github:joegoldin/attic";
+    # Celler server and client share the same upload protocol.
+    celler = {
+      url = "github:celler-cache/celler/590c6bca864a5614dd8b94a0b8862eeefb9d3a77";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-    # attic infrastructure (client modules, post-build hooks)
-    nix-attic-infra = {
-      url = "github:joegoldin/nix-attic-infra";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.attic.follows = "attic";
     };
     # self-hosted garnix CI (fork with self-hosting patches). No `follows` —
     # the fork's pinned nixpkgs builds its Haskell/Node packages reproducibly.

@@ -14,7 +14,7 @@ in
       den.aspects.nix-settings
       # system features
       den.aspects.binary-caches
-      den.aspects.attic-post-build-hook
+      den.aspects.celler-watch-store
       den.aspects.numtide-cache
       den.aspects.app-autostart
       den.aspects.filesystem-tools

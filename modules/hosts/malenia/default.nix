@@ -13,7 +13,7 @@ in
       den.aspects.rex
       den.aspects.nix-settings
       den.aspects.binary-caches
-      den.aspects.attic-post-build-hook
+      den.aspects.celler-watch-store
       den.aspects.numtide-cache
       den.aspects.filesystem-tools
       den.aspects.gaming
