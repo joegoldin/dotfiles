@@ -11,6 +11,9 @@
 {
   imports = [ inputs.den.flakeModule ];
 
+  # Only explicit host-side batteries deliver user content after Den's migration.
+  den.migrations.user-host-content.acknowledged = true;
+
   # Every user entity gets a home-manager environment.
   den.schema.user.classes = lib.mkDefault [ "homeManager" ];
 
@@ -18,10 +21,12 @@
   #  - networking.hostName from its hostName option (hostname battery)
   #  - the host aspect tree's homeManager blocks projected onto its users
   #    (host-aspects battery); this is how hosts select home features
+  #  - user-provided OS accounts and SSH keys via provides.to-hosts
   #  - the shared home-manager plumbing (useGlobalPkgs/backupCommand)
   den.schema.host.includes = [
     den.batteries.hostname
     den.batteries.host-aspects
+    den.batteries.mutual-provider
     den.aspects.hm-settings
   ];
 
