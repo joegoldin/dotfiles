@@ -12,6 +12,8 @@
   stdenvNoCC,
   fetchFromGitHub,
   rustPlatform,
+  aws-lc,
+  sqlite,
   cmake,
   pkg-config,
   protobuf,
@@ -41,6 +43,12 @@ let
       cmake
       pkg-config
       protobuf
+    ];
+
+    # The Cargo setup hook requires system libraries for aws-lc-sys and rusqlite.
+    buildInputs = [
+      aws-lc
+      sqlite
     ];
 
     PROTOC = "${protobuf}/bin/protoc";
