@@ -1,0 +1,14 @@
+--- a/vllm/env_override.py
++++ b/vllm/env_override.py
+@@ -123,6 +123,11 @@
+         lib = os.path.join(torch_root, "lib", "libtorch_cpu.so")
+         if not os.path.exists(lib):
+             return
++        # Load Triton's LLVM locally before ROCm's LLVM becomes globally
++        # visible through libtorch. Otherwise LLVM option registration can
++        # bind to the other copy and abort with duplicate command-line options.
++        import triton  # noqa: F401
++
+         try:
+             ctypes.CDLL(lib, mode=ctypes.RTLD_GLOBAL)
+         except OSError:

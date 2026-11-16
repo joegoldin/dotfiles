@@ -19,7 +19,9 @@ let
       pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
         (_pythonFinal: pythonPrev: {
           # vLLM defaults to CLR's full target list, independently of Torch.
-          vllm = pythonPrev.vllm.override { inherit gpuTargets; };
+          vllm = (pythonPrev.vllm.override { inherit gpuTargets; }).overrideAttrs (old: {
+            patches = (old.patches or [ ]) ++ [ ./vllm-rocm-load-triton-first.patch ];
+          });
           torch = pythonPrev.torch.override { inherit gpuTargets; };
         })
       ];
