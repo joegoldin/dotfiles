@@ -59,13 +59,21 @@ let
     assert !(config.networking.firewall.interfaces ? tailscale0);
     true;
   checkHome =
-    config:
+    isLinux: config:
     let
       lua = config.xdg.configFile."rex/dotfiles.lua".text;
     in
     assert config.programs.rex.enable;
-    assert !config.services.rex.enable;
-    assert !(config.systemd.user.services ? rex);
+    assert config.services.rex.enable == isLinux;
+    assert (config.systemd.user.services ? rex) == isLinux;
+    assert
+      isLinux
+      -> (
+        config.systemd.user.services.rex.Unit.X-SwitchMethod == "restart"
+        && builtins.elem "default.target" config.systemd.user.services.rex.Install.WantedBy
+        && config.services.rex.extraListen == [ ]
+        && !config.services.rex.tailscale.enable
+      );
     assert !(config.home.shellAliases ? restart-rex-server);
     assert lib.hasInfix ''endpoint = "ssh://erdtree",'' lua;
     assert !(lib.hasInfix "http://" lua);
@@ -75,9 +83,9 @@ let
 in
 assert checkSystem nixos;
 assert checkSystem noTailscale;
-assert checkHome linux;
-assert checkHome linuxNoTailscale;
-assert checkHome mac;
+assert checkHome true linux;
+assert checkHome true linuxNoTailscale;
+assert checkHome false mac;
 assert !(lib.hasInfix ''label = "elphael",'' linux.xdg.configFile."rex/dotfiles.lua".text);
 assert lib.hasInfix ''endpoint = "ssh://elphael",'' mac.xdg.configFile."rex/dotfiles.lua".text;
 assert mac.programs.rex.package == null;

@@ -2,7 +2,12 @@
 { inputs, ... }:
 {
   den.aspects.rex-linux.homeManager =
-    { lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       package = inputs.rex-rune.packages.${pkgs.stdenv.hostPlatform.system}.default;
       ghostty = (import ./ghostty/_settings.nix { inherit lib; }).baseSettings;
@@ -10,6 +15,10 @@
     lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
       # Keep the client's own compiler/dependency pins, not the host nixpkgs.
       home.packages = [ package ];
+      home.activation.rexLinuxWorkspace = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        run ${pkgs.python3}/bin/python3 ${./_rex/migrate-workspace.py} \
+          ${lib.escapeShellArg config.xdg.configHome}
+      '';
       # The upstream default font need not be installed on this machine.
       xdg.desktopEntries."dev.shuv.rex-linux" = {
         name = "Rex Linux";

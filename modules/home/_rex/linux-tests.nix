@@ -13,6 +13,7 @@ let
     }).den.aspects.rex-linux.homeManager;
   linux = module {
     inherit lib;
+    config.xdg.configHome = "/config";
     pkgs.stdenv.hostPlatform = {
       system = "x86_64-linux";
       isLinux = true;
@@ -20,6 +21,7 @@ let
   };
   darwin = module {
     inherit lib;
+    config.xdg.configHome = "/config";
     pkgs.stdenv.hostPlatform = {
       system = "aarch64-darwin";
       isLinux = false;
@@ -55,8 +57,8 @@ lib.runTests {
     expr = linux.content ? systemd || linux.content ? launchd;
     expected = false;
   };
-  testNoActivation = {
-    expr = linux.content.home ? activation;
-    expected = false;
+  testWorkspaceMigration = {
+    expr = linux.content.home.activation ? rexLinuxWorkspace;
+    expected = true;
   };
 }

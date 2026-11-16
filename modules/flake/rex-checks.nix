@@ -13,6 +13,11 @@
           '';
         }
         // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+          rex-linux =
+            assert import ../home/_rex/linux-tests.nix { inherit lib; } == [ ];
+            pkgs.runCommand "rex-linux-tests" { } ''
+              touch "$out"
+            '';
           rex-services = import ../home/_rex/service-checks.nix { inherit inputs pkgs lib; };
         };
     };

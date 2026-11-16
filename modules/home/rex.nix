@@ -23,8 +23,7 @@ in
     { config, ... }:
     {
       imports = [ inputs.rex.nixosModules.default ];
-      # SSH starts the personal server on demand; keep its runtime socket and
-      # sessions alive after the last login ends.
+      # Keep the personal user service and its sessions alive after logout.
       users.users.${meta.username}.linger = true;
       environment.systemPackages = [ config.services.rex.package ];
     };
@@ -51,6 +50,12 @@ in
     {
       imports = [ inputs.rex.homeManagerModules.default ];
       config = {
+        services.rex.enable = !isMac;
+        # Switches must pick up server updates, even when a server is running.
+        # Restarting ends its terminal sessions; macOS remains app-managed.
+        systemd.user.services = lib.mkIf (!isMac) {
+          rex.Unit.X-SwitchMethod = "restart";
+        };
         programs = {
           rex = {
             enable = true;
