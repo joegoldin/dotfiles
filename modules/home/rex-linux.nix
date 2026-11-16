@@ -15,8 +15,8 @@
       # Keep the client's own compiler/dependency pins, not the host nixpkgs.
       home.packages = [ package ];
       # The upstream default font need not be installed on this machine.
-      # Preserve the pinned taskbar ID while matching the upstream window/icon.
-      xdg.desktopEntries."dev.shuv.rex-linux" = {
+      # Match the upstream desktop ID so pinned launchers group with its windows.
+      xdg.desktopEntries."dev.shuv.rex-rune" = {
         name = "Rex Rune";
         genericName = "Terminal Workspace";
         exec = "${lib.getExe package} --font \"${ghostty.font-family}\"";

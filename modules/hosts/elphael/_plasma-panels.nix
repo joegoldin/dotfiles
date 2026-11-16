@@ -38,13 +38,12 @@ let
     # (Other apps below aren't defaults for any role, so they aren't rewritten.)
     files = "file://${pkgs.kdePackages.dolphin}/share/applications/org.kde.dolphin.desktop";
     zen = "applications:zen.desktop";
-    rex = "applications:dev.shuv.rex-linux.desktop";
+    rex = "applications:dev.shuv.rex-rune.desktop";
     zed = "applications:dev.zed.Zed-Nightly.desktop";
     punktfunk = "applications:punktfunk-office-pc.desktop";
     discord = "applications:discord.desktop";
     steam = "applications:steam.desktop";
     zoom = "applications:Zoom.desktop";
-    claude = "applications:claude-desktop.desktop";
     obsidian = "applications:md.obsidian.Obsidian.desktop";
     slack = "applications:slack.desktop";
   };
@@ -146,7 +145,6 @@ in
           apps.steam
           apps.punktfunk
           apps.zoom
-          apps.claude
           apps.obsidian
           apps.slack
         ];
