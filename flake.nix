@@ -28,7 +28,6 @@
     # at the same time. Here's an working example:
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     # Also see the 'unstable-packages' overlay at 'overlays/default.nix'.
-    nixpkgs-darwin.url = "github:nixos/nixpkgs/nixpkgs-26.05-darwin";
 
     # Track Atuin releases independently of nixpkgs (Threads fixes land quickly).
     atuin = {
@@ -226,8 +225,6 @@
     };
 
     # ── Development tools ──────────────────────────────────────────────────
-    devenv.url = "github:cachix/devenv";
-    nixpkgs-python.url = "github:cachix/nixpkgs-python";
     git-hooks.url = "github:cachix/git-hooks.nix";
     # sem: semantic, entity-level git diff/impact/blame/context (tree-sitter)
     sem = {
@@ -252,11 +249,6 @@
     };
 
     # ── Desktop / NixOS applications ───────────────────────────────────────
-    # TwinDesk tracks main; review new source before updating its lock.
-    twindesk = {
-      url = "github:InukaAsith/TwinDesk/main";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
     # affinity apps
     affinity-nix = {
       url = "github:mrshmllow/affinity-nix";
@@ -308,16 +300,6 @@
     };
 
     # ── Claude / LLM tooling ───────────────────────────────────────────────
-    # ChatGPT Desktop for Linux (unofficial Electron repack of the official
-    # macOS app, which OpenAI renamed from Codex to ChatGPT; torrent gets the
-    # official apps via its chatgpt/codex-app casks). PINNED to the security-
-    # reviewed rev (2026-07-09, full diff vs ilysenko/codex-desktop-linux
-    # merge-base ddcd9b5 audited clean); review new commits before bumping.
-    chatgpt-desktop-linux = {
-      url = "github:EricKrouss/chatgpt-desktop-linux/7b0ff84e130037a31700deb32cb361bd35ae4535";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
-    };
     # LLM agent tools (claude-code, codex, antigravity)
     llm-agents.url = "github:numtide/llm-agents.nix";
     # declarative MCP server configuration
