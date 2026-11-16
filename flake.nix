@@ -301,9 +301,9 @@
       inputs.home-manager.follows = "home-manager";
     };
 
-    # Acceptance deployment stays on its reviewed private branch until release gates pass.
+    # Track merged application source; host policy keeps acceptance dispatch disabled.
     pi-manager-agent = {
-      url = "git+ssh://git@github.com/joegoldin/pi-manager-agent?ref=pi-manager-acceptance";
+      url = "git+ssh://git@github.com/joegoldin/pi-manager-agent?ref=main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
