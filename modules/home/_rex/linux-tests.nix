@@ -3,9 +3,9 @@
 let
   package = {
     type = "derivation";
-    name = "rex-linux";
-    outPath = "/test/rex-linux";
-    meta.mainProgram = "rex-linux";
+    name = "rex-rune";
+    outPath = "/test/rex-rune";
+    meta.mainProgram = "rex-rune";
   };
   module =
     (import ../rex-linux.nix {
@@ -35,11 +35,11 @@ lib.runTests {
   };
   testLinuxPackage = {
     expr = map toString linux.content.home.packages;
-    expected = [ "/test/rex-linux" ];
+    expected = [ "/test/rex-rune" ];
   };
   testDesktopUsesSharedFont = {
     expr = linux.content.xdg.desktopEntries."dev.shuv.rex-linux".exec;
-    expected = ''/test/rex-linux/bin/rex-linux --font "TX02 Nerd Font Mono"'';
+    expected = ''/test/rex-rune/bin/rex-rune --font "TX02 Nerd Font Mono"'';
   };
   testDesktopDoesNotOpenAnotherTerminal = {
     expr = linux.content.xdg.desktopEntries."dev.shuv.rex-linux".terminal;
@@ -57,8 +57,20 @@ lib.runTests {
     expr = linux.content ? systemd || linux.content ? launchd;
     expected = false;
   };
-  testWorkspaceMigration = {
-    expr = linux.content.home.activation ? rexLinuxWorkspace;
-    expected = true;
+  testUpstreamDesktopIdentity = {
+    expr = with linux.content.xdg.desktopEntries."dev.shuv.rex-linux"; [
+      name
+      icon
+      settings.StartupWMClass
+    ];
+    expected = [
+      "Rex Rune"
+      "dev.shuv.rex-rune"
+      "dev.shuv.rex-rune"
+    ];
+  };
+  testNoObsoleteWorkspaceMigration = {
+    expr = linux.content.home ? activation;
+    expected = false;
   };
 }

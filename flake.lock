@@ -3689,15 +3689,15 @@
         "zig": "zig_2"
       },
       "locked": {
-        "lastModified": 1793997271,
-        "narHash": "sha256-2YS7x0Ra5/QWaOC1fDxE+nYNZDbAloH1BIT85xqKOdk=",
-        "owner": "joegoldin",
+        "lastModified": 1794811901,
+        "narHash": "sha256-HAvk7p8GgkU1vUIGJA3bbPS0l339L+9OPsA94QUH29Y=",
+        "owner": "shuv1337",
         "repo": "rex-rune",
-        "rev": "e75cd395774fd512e8ce2c0189fa3d74f21e9a21",
+        "rev": "2612ce685804fbbaeb2e1421b1f53eb262c1c3ad",
         "type": "github"
       },
       "original": {
-        "owner": "joegoldin",
+        "owner": "shuv1337",
         "ref": "master",
         "repo": "rex-rune",
         "type": "github"

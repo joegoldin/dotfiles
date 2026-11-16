@@ -150,9 +150,9 @@
       url = "https://pkgs.superlogical.com/rex/nix/snapshot.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # Upstream-rebased client with our fixes; keep its own Rust/Zig pins.
+    # Upstream client; keep its own Rust/Zig pins.
     # flake.lock pins the verified commit. The Mac uses the native Rex app.
-    rex-rune.url = "github:joegoldin/rex-rune?ref=master";
+    rex-rune.url = "github:shuv1337/rex-rune?ref=master";
 
     # ── Server services ────────────────────────────────────────────────────
     # binary cache server
