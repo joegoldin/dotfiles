@@ -8,7 +8,7 @@
 }:
 let
   inherit (pkgs) unstable;
-  # Keep vLLM, Torch and RCCL device code to the RX 7900 XTX and RX 9070 XT.
+  # Keep vLLM, Torch and their ROCm libraries to the RX 7900 XTX and RX 9070 XT.
   gpuTargets = [
     "gfx1100"
     "gfx1201"
@@ -18,7 +18,7 @@ let
       # Extend the Python scope so vLLM and its dependencies share this Torch.
       pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
         (_pythonFinal: pythonPrev: {
-          # vLLM defaults to CLR's full target list, independently of Torch.
+          # Keep vLLM and Torch's own device code on the same targets as ROCm.
           vllm = (pythonPrev.vllm.override { inherit gpuTargets; }).overrideAttrs (old: {
             patches = (old.patches or [ ]) ++ [ ./vllm-rocm-load-triton-first.patch ];
           });
@@ -26,9 +26,36 @@ let
         })
       ];
       rocmPackages = prev.rocmPackages.overrideScope (
-        _rocmFinal: rocmPrev: {
-          rccl = rocmPrev.rccl.override { inherit gpuTargets; };
-        }
+        _rocmFinal: rocmPrev:
+        # Override target-aware libraries rather than clr.localGpuTargets:
+        # MAGMA also inherits that default but supports neither of these GPUs.
+        # Keep composable_kernel's defaults: nixpkgs marks builds without gfx9 broken.
+        lib.genAttrs [
+          "aotriton"
+          "hipblaslt"
+          "hipcub"
+          "hipfft"
+          "hiprand"
+          "hipsparse"
+          "hipsparselt"
+          "migraphx"
+          "miopen"
+          "mivisionx"
+          "rccl"
+          "rocalution"
+          "rocblas"
+          "rocfft"
+          "rocprim"
+          "rocprofiler"
+          "rocprofiler-sdk"
+          "rocrand"
+          "rocshmem"
+          "rocsolver"
+          "rocsparse"
+          "rocthrust"
+          "rocwmma"
+          "rpp"
+        ] (name: rocmPrev.${name}.override { inherit gpuTargets; })
       );
     }
   );
