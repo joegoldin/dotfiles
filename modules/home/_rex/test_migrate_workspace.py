@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import json
 from pathlib import Path
 import subprocess
 import sys
@@ -35,6 +36,44 @@ class MigrationTests(unittest.TestCase):
             root = Path(directory)
             self.run_migration(root)
             self.assertEqual(list(root.iterdir()), [])
+
+    def test_repairs_unsupported_ssh_hosts_and_preserves_backup(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            target = root / "rex-linux/workspace.json"
+            target.parent.mkdir()
+            original = json.dumps({
+                "hosts": [{"label": "local", "endpoint": "unix:///run/rex.sock"},
+                          {"label": "remote", "endpoint": "ssh://remote"}],
+                "last_host": "ssh://remote", "font_size": 15,
+                "sessions": {"ssh://remote": "saved-session"},
+            })
+            target.write_text(original)
+            self.run_migration(root)
+            repaired = json.loads(target.read_text())
+            self.assertEqual(repaired["hosts"], [{"label": "local", "endpoint": "unix:///run/rex.sock"}])
+            self.assertEqual(repaired["last_host"], "unix:///run/rex.sock")
+            self.assertEqual(repaired["font_size"], 15)
+            self.assertEqual(repaired["sessions"], {"ssh://remote": "saved-session"})
+            backup = target.with_suffix(".json.unsupported-hosts.bak")
+            self.assertEqual(backup.read_text(), original)
+            self.run_migration(root)
+            self.assertEqual(backup.read_text(), original)
+
+    def test_repairs_migrated_workspace_with_no_last_host(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            old = root / "rex-rune/workspace.json"
+            old.parent.mkdir()
+            original = json.dumps({"hosts": [
+                {"label": "local", "endpoint": "unix:///run/rex.sock"},
+                {"label": "old", "endpoint": "ssh://old"}], "last_host": None})
+            old.write_text(original)
+            self.run_migration(root)
+            repaired = json.loads((root / "rex-linux/workspace.json").read_text())
+            self.assertEqual(len(repaired["hosts"]), 1)
+            self.assertIsNone(repaired["last_host"])
+            self.assertEqual(old.read_text(), original)
 
     def run_migration(self, root):
         subprocess.run([sys.executable, str(SCRIPT), str(root)], check=True,

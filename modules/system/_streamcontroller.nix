@@ -1,18 +1,14 @@
 { pkgs }:
 let
   package = (pkgs.unstable.streamcontroller.override { isKde = true; }).overrideAttrs (old: {
-    version = "1.5.0-beta.15-unstable-2026-07-10";
+    version = "1.5.0-beta.15-unstable-2026-11-16";
     src = pkgs.fetchFromGitHub {
       owner = "joegoldin";
       repo = "StreamController";
-      # PR #2 (MiraBox StreamDock device support), rebased onto fork main =
-      # upstream beta.15 + the fork's GTK-threading/watcher stability fixes.
-      # Carries the N3 same-handle unlock repaint, no-HAN lock handling, atomic
-      # resume recovery, fast-replug reconciliation, quality-100 StreamDock
-      # JPEGs, canonical HIDAPI report framing, prioritized CONNECT keepalives,
-      # and stalled-write diagnostics. See joegoldin/StreamController#2.
-      rev = "13a21d93fd79072e8069d18dd812b0a198517628";
-      hash = "sha256-Y3rCWa9ZfL+omMA7/8m7a7IubxvDnZaKC2WC4UVR7x8=";
+      # Fork main includes StreamDock support, event-driven KWin tracking and
+      # main-thread generative ComboRow repopulation (GTK4 startup crash fix).
+      rev = "14a93b8a3ff394a5f70176de762d52594d80aab4";
+      hash = "sha256-L3n/xstKovxjGOkiTFBGdrSgXLbMu15mkcjQynWCdZU=";
     };
     nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
     # The upstream nixpkgs derivation builds the Python env from a fixed list,
