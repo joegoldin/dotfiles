@@ -30,7 +30,6 @@ let
         # Override target-aware libraries rather than clr.localGpuTargets:
         # MAGMA also inherits that default but supports neither of these GPUs.
         lib.genAttrs [
-          "aotriton"
           "hipblaslt"
           "hipcub"
           "hipfft"
@@ -56,6 +55,9 @@ let
           "rpp"
         ] (name: rocmPrev.${name}.override { inherit gpuTargets; })
         // {
+          aotriton = (rocmPrev.aotriton.override { inherit gpuTargets; }).overrideAttrs (old: {
+            patches = (old.patches or [ ]) ++ [ ./aotriton-triton-3.9-offsets.patch ];
+          });
           # CK still requires a gfx9 target alongside the installed GPUs.
           composable_kernel_base = rocmPrev.composable_kernel_base.override {
             gpuTargets = [ "gfx90a" ] ++ gpuTargets;
