@@ -40,23 +40,20 @@ let
 
   # Force-installed extension from AMO.
   #
-  # Update policy: extensions are PINNED by default (updates_disabled = true);
-  # we only auto-update a small, trusted security/privacy set. `extra` overrides
-  # the defaults, e.g. { updates_disabled = false; private_browsing = true; }.
+  # Enable updates by default; individual entries can pin a custom build.
+  # `extra` overrides the defaults, e.g. { private_browsing = true; }.
   extension = shortId: uuid: extra: {
     name = uuid;
     value = {
       install_url = "https://addons.mozilla.org/en-US/firefox/downloads/latest/${shortId}/latest.xpi";
       installation_mode = "force_installed";
-      updates_disabled = true;
+      updates_disabled = false;
     }
     // extra;
   };
 
-  # Trusted security/privacy extensions: keep auto-updates ON (so blocklists and
-  # vulnerability fixes land) AND enable them in private/incognito windows.
+  # Enable trusted security/privacy extensions in private/incognito windows too.
   trusted = {
-    updates_disabled = false;
     private_browsing = true;
   };
 
@@ -122,9 +119,9 @@ in
   # `jq .applications.gecko.id manifest.json` to get the UUID
   #
   # The 3rd argument controls update/private-browsing policy:
-  #   {}        → pinned (no auto-update), not in private windows  [default]
-  #   trusted   → auto-update + enabled in private windows
-  #   autoUpdate → auto-update only
+  #   {}      → auto-update, not in private windows [default]
+  #   trusted → auto-update + enabled in private windows
+  #   { updates_disabled = true; } → pin a custom build
 
   "3rdparty".Extensions = {
     # https://github.com/gorhill/uBlock/blob/master/platform/common/managed_storage.json

@@ -179,10 +179,8 @@ in
             Enabled = true;
             Locked = true;
           };
-          # Allow updates globally, then pin individual extensions via each entry's
-          # `updates_disabled` (see addons.nix): trusted security addons (uBlock,
-          # Privacy Badger, 1Password, ClearURLs, …) auto-update; everything else is
-          # pinned. Selective control isn't possible with a global hard-off.
+          # Allow add-on updates; _addons.nix only pins the locally patched
+          # ClearURLs build so AMO cannot overwrite it.
           ExtensionUpdate = true;
           # Can be used to restrict domains per extension:
           # "restricted_domains": [
