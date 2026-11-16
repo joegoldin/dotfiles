@@ -106,10 +106,10 @@
       url = "github:joegoldin/dotfiles-assets";
       flake = false;
     };
-    # secrets (domains, encrypted age files, etc.); private repo over ssh;
+    # secrets (domains, encrypted age files, etc.); private GitHub repo;
     # bump with `nix flake update dotfiles-secrets`
     dotfiles-secrets = {
-      url = "git+ssh://git@github.com/joegoldin/dotfiles-secrets?ref=main";
+      url = "github:joegoldin/dotfiles-secrets/main";
       flake = false;
     };
 
@@ -134,13 +134,8 @@
     # Home Assistant custom integration: composes a virtual device from entities
     # you already have (an action bound to a power-meter state source).
     # Bind-mounted into melina's HA container by containers.nix.
-    #
-    # git+ssh, not the `github:` shorthand the other inputs use: that resolves
-    # through api.github.com, which 404s on private repos here (the configured
-    # access-token doesn't reach them — `crawler` only works because it is
-    # already pinned and in the store). ssh uses the same key as `git push`.
     ha-compose = {
-      url = "git+ssh://git@github.com/joegoldin/ha-compose";
+      url = "github:joegoldin/ha-compose";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -295,7 +290,7 @@
 
     # Track merged application source; host policy keeps acceptance dispatch disabled.
     pi-manager-agent = {
-      url = "git+ssh://git@github.com/joegoldin/pi-manager-agent?ref=main";
+      url = "github:joegoldin/pi-manager-agent/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

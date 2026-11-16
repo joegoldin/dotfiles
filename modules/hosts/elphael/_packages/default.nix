@@ -29,7 +29,6 @@ let
         _rocmFinal: rocmPrev:
         # Override target-aware libraries rather than clr.localGpuTargets:
         # MAGMA also inherits that default but supports neither of these GPUs.
-        # Keep composable_kernel's defaults: nixpkgs marks builds without gfx9 broken.
         lib.genAttrs [
           "aotriton"
           "hipblaslt"
@@ -56,6 +55,12 @@ let
           "rocwmma"
           "rpp"
         ] (name: rocmPrev.${name}.override { inherit gpuTargets; })
+        // {
+          # CK still requires a gfx9 target alongside the installed GPUs.
+          composable_kernel_base = rocmPrev.composable_kernel_base.override {
+            gpuTargets = [ "gfx90a" ] ++ gpuTargets;
+          };
+        }
       );
     }
   );

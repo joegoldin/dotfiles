@@ -889,17 +889,17 @@
       "flake": false,
       "locked": {
         "lastModified": 1794598717,
-        "narHash": "sha256-EbkDh1ZI7vxei0eILnYKKJSVHG1pHoC2GpoMCPOUEuM=",
-        "ref": "main",
+        "owner": "joegoldin",
+        "repo": "dotfiles-secrets",
         "rev": "93ebfad9b200ca0dceb4ab253310515234323da1",
-        "revCount": 244,
-        "type": "git",
-        "url": "ssh://git@github.com/joegoldin/dotfiles-secrets"
+        "type": "github",
+        "narHash": "sha256-EbkDh1ZI7vxei0eILnYKKJSVHG1pHoC2GpoMCPOUEuM="
       },
       "original": {
-        "ref": "main",
-        "type": "git",
-        "url": "ssh://git@github.com/joegoldin/dotfiles-secrets"
+        "owner": "joegoldin",
+        "repo": "dotfiles-secrets",
+        "type": "github",
+        "ref": "main"
       }
     },
     "drowse": {
@@ -1770,16 +1770,16 @@
       },
       "locked": {
         "lastModified": 1785861615,
-        "narHash": "sha256-PJRYPA6n9i+A4Z4eUwQ3+KXnMbF8ZB6hxmhV7dETYo8=",
-        "ref": "refs/heads/main",
+        "owner": "joegoldin",
+        "repo": "ha-compose",
         "rev": "eaf571a0197c97c2ff0320179dde2d956ba98a08",
-        "revCount": 50,
-        "type": "git",
-        "url": "ssh://git@github.com/joegoldin/ha-compose"
+        "type": "github",
+        "narHash": "sha256-PJRYPA6n9i+A4Z4eUwQ3+KXnMbF8ZB6hxmhV7dETYo8="
       },
       "original": {
-        "type": "git",
-        "url": "ssh://git@github.com/joegoldin/ha-compose"
+        "owner": "joegoldin",
+        "repo": "ha-compose",
+        "type": "github"
       }
     },
     "haumea": {
@@ -3075,17 +3075,17 @@
       },
       "locked": {
         "lastModified": 1794737726,
-        "narHash": "sha256-YhO4yJr0KoXEFvyRtEqn8R6Sgf3T3pcZDQYSvml/RY0=",
-        "ref": "main",
+        "owner": "joegoldin",
+        "repo": "pi-manager-agent",
         "rev": "0959542e061d6bc05e32403556823dbf6457b055",
-        "revCount": 25,
-        "type": "git",
-        "url": "ssh://git@github.com/joegoldin/pi-manager-agent"
+        "type": "github",
+        "narHash": "sha256-YhO4yJr0KoXEFvyRtEqn8R6Sgf3T3pcZDQYSvml/RY0="
       },
       "original": {
-        "ref": "main",
-        "type": "git",
-        "url": "ssh://git@github.com/joegoldin/pi-manager-agent"
+        "owner": "joegoldin",
+        "repo": "pi-manager-agent",
+        "type": "github",
+        "ref": "main"
       }
     },
     "pi-nix": {
