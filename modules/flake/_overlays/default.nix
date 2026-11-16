@@ -114,9 +114,18 @@ in
   # You can change versions, add patches, set compilation flags, anything really.
   # https://nixos.wiki/wiki/Overlays
   modifications = final: prev: {
-    # example = prev.example.overrideAttrs (oldAttrs: rec {
-    # ...
-    # });
+    # The launcher accepts 64-bit quotas but accounting stores unsigned ints.
+    # NixOS's large session limits otherwise wrap to a 264 MiB byte budget.
+    dbus-broker = prev.dbus-broker.overrideAttrs (old: {
+      patches = (old.patches or [ ]) ++ [ ./dbus-broker-saturate-quotas.patch ];
+      # The launcher requires journald, which is absent in a build sandbox.
+      # Exercise its real socket-activated protocol in a VM, not a mock broker.
+      passthru = (old.passthru or { }) // {
+        tests = (old.passthru.tests or { }) // {
+          quotas = import ./dbus-broker-quota-vm.nix { pkgs = final; };
+        };
+      };
+    });
 
     # nix-output-monitor 2.2.0 declares the GHC2024 language edition, and the
     # stable haskellPackages compiles it with ghc-9.6.7, which predates that
