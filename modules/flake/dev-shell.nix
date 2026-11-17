@@ -1,10 +1,10 @@
 # Pre-commit checks + the devShell that installs them.
-{ inputs, ... }:
+{ inputs, packageSets, ... }:
 {
   perSystem =
     { system, config, ... }:
     let
-      pkgs = inputs.nixpkgs.legacyPackages.${system};
+      pkgs = packageSets.${system}.plain;
       # These hooks need no compiler. On macOS, stdenv's SDK and xcrun would
       # otherwise mask the manually installed Xcode and its iOS SDKs.
       mkShell = if pkgs.stdenv.hostPlatform.isDarwin then pkgs.mkShellNoCC else pkgs.mkShell;

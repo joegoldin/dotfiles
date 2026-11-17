@@ -24,9 +24,14 @@
           )
         )
         (
-          lib.filterAttrs (_: nixos: nixos.config.programs.vllm-rocm.enable) {
-            inherit (config.flake.nixosConfigurations) elphael volcano-manor;
-          }
+          lib.filterAttrs
+            (
+              _: nixos:
+              lib.any (package: (package.pname or "") == "vllm") nixos.config.home-manager.users.joe.home.packages
+            )
+            {
+              inherit (config.flake.nixosConfigurations) elphael volcano-manor;
+            }
         )
     );
   };

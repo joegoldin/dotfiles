@@ -1,10 +1,11 @@
 # Package sets and overlays
 
 `modules/flake/package-sets.nix` constructs the common stable and unstable
-package sets once per platform. Flake outputs and ordinary hosts reuse them.
+package sets once per platform in flake-parts' `config.systems`. Flake outputs
+and ordinary hosts reuse them.
 The provider is also exposed as `lib.packageSets.<system>` for evaluation and
 inspection. A separate plain set reuses nixpkgs' `legacyPackages` for isolated
-module-test fixtures that do not need host policy.
+module-test fixtures and the dev shell that do not need host policy.
 
 The `nix-settings` aspect supplies `nixpkgs.pkgs`, leaving `nixpkgs.config`
 empty: configuration policy belongs to the supplied set. NixOS and nix-darwin
@@ -34,15 +35,17 @@ upstream artifacts into `customPackages`, supplied to OS and Home Manager
 modules. Home Manager still uses the host's global nixpkgs. Consume a leaf as
 `customPackages.sem`, for example, rather than adding an alias to `pkgs`.
 Upstream-built artifacts keep their own pins and binary-cache identities;
-tailcat keeps its existing test override. Local packages remain available
-through `packages.<system>`.
+tailcat keeps its existing test override. Platform-available local derivations
+are exported through `packages.<system>`; constructors and foreign-platform
+packages remain in `customPackages`, not the build-target list.
 
-Elphael and volcano-manor include `den.aspects.vllm`, whose isolated ROCm
-scope lives in [`modules/ai/_vllm`](../../ai/_vllm). Both use the same package
-composition, targets (`gfx1100;gfx1201`), and two patches.
-`programs.vllm-rocm.enable` defaults to false; enabling it on a host restores
-both the application and that host's installed-app check. The check outputs
-are absent while disabled, not passing GPU runtime tests.
+The shared `den.aspects.vllm` installs the isolated ROCm application from
+[`modules/ai/_vllm`](../../ai/_vllm), with targets `gfx1100;gfx1201` and two
+patches. Its include is temporarily commented out in elphael and
+volcano-manor's `default.nix` to skip the PyTorch/AOTriton build. Restore the
+include on a host to install it; there is no separate enable option.
+Installed-app checks follow the host's actual package list. Their absence
+while the aspect is omitted is not a passing GPU runtime test.
 
 The common Python environment keeps its existing CPU-only Torch policy.
 Volcano-manor's removed global ROCm import was already superseded by the

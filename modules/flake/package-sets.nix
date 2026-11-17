@@ -7,7 +7,7 @@
   ...
 }:
 let
-  packageSets = lib.genAttrs (import inputs.systems) (
+  packageSets = lib.genAttrs config.systems (
     system:
     let
       stable = import inputs.nixpkgs {

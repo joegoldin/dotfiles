@@ -10,14 +10,13 @@
       ...
     }:
     let
-      enabled = customPackages ? llm-agents;
       secrets = osConfig.age.secrets or { };
       ageKey = name: secrets.${name}.path or null;
     in
     {
       imports = [ inputs.agent-skills.homeManagerModules.pi ];
 
-      programs.pi.coding-agent = lib.mkIf enabled {
+      programs.pi.coding-agent = {
         enable = true;
         minimap.enable = true;
         # Match the shared profile's priority so this adds to its defaults.

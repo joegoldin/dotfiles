@@ -26,7 +26,6 @@
           streamcontroller.package
           unstable.tailscale
           unstable.umu-launcher
-          # unstable.vllm-rocm # broken rn, needs updates (also marked insecure in unstable)
           wl-clipboard
           xclip
         ];

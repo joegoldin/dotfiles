@@ -12,7 +12,8 @@ in
     includes = [
       den.aspects.rex
       den.aspects.nix-settings
-      den.aspects.vllm
+      # Temporarily omitted to skip the PyTorch/AOTriton build.
+      # den.aspects.vllm
       # system features
       den.aspects.binary-caches
       den.aspects.celler-watch-store

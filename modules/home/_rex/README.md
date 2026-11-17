@@ -6,6 +6,12 @@
 Farum Azula, Malenia, Melina, Rennala, Scarab, Siofra, Volcano Manor, and
 Torrent. It is not a global `den.default`.
 
+Shared service and CLI wiring lives in [`../rex.nix`](../rex.nix). Native Mac
+preferences and theme activation live in [`../rex-darwin.nix`](../rex-darwin.nix),
+which contributes to the same aspect with a Darwin platform guard—not to the
+torrent host aspect. The optional Linux GUI has its own
+[`rex-linux` aspect](../rex-linux.nix).
+
 Linux hosts install the Rex CLI and use **SSH-only remote access**. No Rex
 login server, shared server, TCP listener, Tailscale Serve mapping, embedded
 Tailscale node, or Rex firewall opening is configured. SSH starts or reuses

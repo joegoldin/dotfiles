@@ -2,11 +2,11 @@
 { inputs, ... }:
 {
   den.aspects.codex.homeManager =
-    { customPackages, lib, ... }:
+    { customPackages, ... }:
     {
       imports = [ inputs.agent-skills.homeManagerModules.codex ];
 
-      programs.codex-nix = lib.mkIf (customPackages ? llm-agents) {
+      programs.codex-nix = {
         enable = true;
         package = customPackages.llm-agents.codex;
         settings = {

@@ -1,8 +1,10 @@
 # dotfiles
 
 My NixOS, nix-darwin, and Home Manager configuration. Features are composed
-with [den](https://github.com/denful/den), following the
-[dendritic pattern](https://github.com/mightyiam/dendritic).
+with [Den](https://github.com/denful/den), with import-tree discovering
+flake-parts modules. This keeps Dendritic-style file discovery while using
+Den's current aspect-oriented model; see the
+[module conventions](modules/flake/README.md).
 
 ## Usage
 
@@ -34,7 +36,7 @@ not authenticate a `github:` fetch. Keep tokens out of source and logs.
 For evaluation without builds or activation:
 
 ```fish
-nix flake check --no-build --option allow-import-from-derivation false
+nix flake check --no-build --all-systems --option allow-import-from-derivation false
 nix eval --raw .#nixosConfigurations.elphael.config.system.build.toplevel.drvPath --option allow-import-from-derivation false
 nix eval --raw .#darwinConfigurations.torrent.config.system.build.toplevel.drvPath --option allow-import-from-derivation false
 ```
@@ -61,7 +63,10 @@ describes the update and GC tools and their limits.
 
 To add a feature, define a `den.aspects.<name>` with its NixOS, darwin, or
 Home Manager config, then add it to the host or user's `includes` list.
-A feature imports any upstream modules it needs.
+A feature imports any upstream modules it needs. Inclusion selects the
+feature; do not add a second custom enable flag or silently skip it when a
+required package is missing. Upstream enable options and legitimate platform
+or safety conditions still belong inside the aspect.
 
 Every `.nix` file under `modules/` whose path contains no underscore-prefixed
 component loads automatically. Use underscore-prefixed paths for helpers and
@@ -90,15 +95,16 @@ checkout's upstream runtime and regenerates model data; it does not publish
 that chain or activate a system. Updating only this repository's lock file
 cannot select a new upstream Pi runtime on its own.
 
-Elphael and volcano-manor share the
-[`vllm` aspect](modules/ai/vllm.nix) and its isolated ROCm package scope.
-**vLLM is disabled on both hosts** by the default
-`programs.vllm-rocm.enable = false`. Enabling it adds the application and
-its installed-package checks; the common Python environment keeps its
-existing CPU-only Torch policy.
+The shared [`vllm` aspect](modules/ai/vllm.nix) owns an isolated ROCm package
+scope. **vLLM is currently omitted on both GPU hosts**: its include is
+commented out in each host's `default.nix` to skip the PyTorch/AOTriton build.
+Include `den.aspects.vllm` to install it; the installed-package checks follow
+the resulting host package list. There is no second enable flag. The common
+Python environment keeps its existing CPU-only Torch policy.
 
 ## Subsystem guides
 
+- [Den and flake-parts module conventions](modules/flake/README.md)
 - [Rex: SSH access, server lifetime, and GUI configuration](modules/home/_rex/README.md)
 - [Script builder and `bins`](modules/home/bin/README.md)
 - [Disposable microVMs](modules/_data/microvm/README.md)

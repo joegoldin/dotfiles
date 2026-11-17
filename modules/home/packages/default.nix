@@ -170,9 +170,6 @@
       };
     in
     {
-      imports = [
-      ];
-
       options.custom.python.extraPackages = lib.mkOption {
         type = lib.types.functionTo (lib.types.listOf lib.types.package);
         default = _ps: [ ];

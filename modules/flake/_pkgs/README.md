@@ -12,10 +12,11 @@ Local package derivations surface in two ways:
   [`../_custom-packages.nix`](../_custom-packages.nix) and the shared provider.
   There is no `additions` overlay or automatic `pkgs.<name>` alias.
 
-The flake export includes only derivations. Constructors such as
+The flake export includes only derivations available on the target platform.
+Linux-only packages are not advertised as Darwin build targets. Constructors such as
 `mkWindowsApp` remain callable through `customPackages.mkWindowsApp` but are
 not standalone `nix build` targets. `checks.<system>.package-exports` verifies
-this boundary and preserves the derivation identities of the local packages.
+this boundary and preserves the derivation identities of the exported packages.
 
 Add a package by writing `foo.nix` or `foo/default.nix` here and registering it
 in `default.nix`, usually with `pkgs.callPackage`. Accept `customPackages` as

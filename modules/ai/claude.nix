@@ -5,12 +5,10 @@
     {
       pkgs,
       customPackages,
-      lib,
       config,
       ...
     }:
     let
-      enabled = customPackages ? llm-agents;
       homeDir = config.home.homeDirectory;
     in
     {
@@ -25,11 +23,11 @@
       # Bash tool but invisible at an interactive prompt. re-shell is meant to
       # be run by a human at a terminal (it manages job control, Ctrl-C, TTY
       # state), so it needs to be on the login shell's PATH explicitly.
-      home.packages = lib.mkIf enabled [
+      home.packages = [
         inputs.agent-skills.packages.${pkgs.stdenv.hostPlatform.system}.re-shell
       ];
 
-      programs.claude-nix = lib.mkIf enabled {
+      programs.claude-nix = {
         enable = true;
         package = customPackages.llm-agents.claude-code;
         # This machine ships a lot of skills; 1% of the window truncates
