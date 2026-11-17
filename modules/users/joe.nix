@@ -11,6 +11,7 @@ let
     keys.${meta.username}
     keys.elphael
     keys.torrent
+    keys.iphone-duo
   ];
 in
 {

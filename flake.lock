@@ -889,12 +889,12 @@
     "dotfiles-secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1794598717,
+        "lastModified": 1794875086,
         "owner": "joegoldin",
         "repo": "dotfiles-secrets",
-        "rev": "93ebfad9b200ca0dceb4ab253310515234323da1",
+        "rev": "e84b9de9f4413f8d4ad5b4e0e9e0f5675d6ebdf8",
         "type": "github",
-        "narHash": "sha256-EbkDh1ZI7vxei0eILnYKKJSVHG1pHoC2GpoMCPOUEuM="
+        "narHash": "sha256-uj4oaakSTBFJrVqQ9qhXrbrVpzwi9hk211c28JSa1EI="
       },
       "original": {
         "owner": "joegoldin",
