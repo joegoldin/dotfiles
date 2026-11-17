@@ -31,10 +31,10 @@
           extensions = [ "-builtin:mcp" ];
           # settings is an untyped attrset: lists replace rather than merge.
           # Retain the shared profile's scope before adding these providers.
-          defaultModel = "gpt-6.1-sol";
+          defaultModel = "gpt-6.2-sol";
           enabledModels = [
-            "openai/gpt-6-astra"
-            "openai/gpt-6.1-sol"
+            "openai/gpt-6.2-astra"
+            "openai/gpt-6.2-sol"
             "openai/gpt-6-luna"
             "cerebras/qwen-3.8-27b"
             "synthetic/hf:zai-org/GLM-5.3"
