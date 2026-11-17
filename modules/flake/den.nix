@@ -36,6 +36,7 @@
     nixos = {
       system.stateVersion = lib.mkDefault "24.11";
       imports = [
+        ./_ghostty-terminfo.nix
         # `unlock` alias for the initrd LUKS-unlock command (no-op off the encrypted
         # initrd-SSH hosts — see the module for details).
         ./_initrd-unlock.nix
@@ -56,6 +57,7 @@
       # openFirewall (default true) opens.
       programs.mosh.enable = true;
     };
+    darwin.imports = [ ./_ghostty-terminfo.nix ];
     homeManager.home.stateVersion = lib.mkDefault "24.11";
   };
 }

@@ -21,6 +21,7 @@ in
       modules = [
         "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-calamares-plasma6.nix"
         disko.nixosModules.disko
+        ../../flake/_ghostty-terminfo.nix
         ./_disk-config.nix
         (
           { pkgs, ... }:
