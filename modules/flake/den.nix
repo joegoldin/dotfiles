@@ -28,6 +28,7 @@
     den.batteries.host-aspects
     den.batteries.mutual-provider
     den.aspects.hm-settings
+    den.aspects.ssh-host-keys
   ];
 
   # Default stateVersions; hosts that diverge override in their own aspect

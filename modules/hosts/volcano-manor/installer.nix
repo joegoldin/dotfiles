@@ -22,6 +22,7 @@ in
         "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-calamares-plasma6.nix"
         disko.nixosModules.disko
         ../../flake/_ghostty-terminfo.nix
+        ../../system/_ssh-host-keys.nix
         ./_disk-config.nix
         (
           { pkgs, ... }:

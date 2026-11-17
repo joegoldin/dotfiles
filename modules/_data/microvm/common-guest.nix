@@ -15,6 +15,8 @@
   ...
 }:
 {
+  imports = [ ../../system/_ssh-host-keys.nix ];
+
   # ── Identity ──────────────────────────────────────────────────────────────
   networking.hostName = meta.name;
   networking.domain = "vm";
