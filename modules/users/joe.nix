@@ -18,6 +18,7 @@ in
   den.aspects.${meta.username} = {
     includes = [
       den.aspects.git
+      den.aspects.nix-tools
       den.aspects.fish
       den.aspects.atuin
       den.aspects.gh

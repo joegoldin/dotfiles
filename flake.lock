@@ -947,6 +947,23 @@
         "type": "github"
       }
     },
+    "fast-nix-gc": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1791463433,
+        "narHash": "sha256-CNSHu5tKx//E9+ayDlfhk9C/3JVDFxiB0PKYQA37CC4=",
+        "owner": "Mic92",
+        "repo": "fast-nix-gc",
+        "rev": "b4471ec56911541f72f7a7b9b8fee7f42183f21b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Mic92",
+        "repo": "fast-nix-gc",
+        "rev": "b4471ec56911541f72f7a7b9b8fee7f42183f21b",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "locked": {
         "lastModified": 1751685974,
@@ -3316,6 +3333,7 @@
         "dotfiles-secrets": "dotfiles-secrets",
         "drowse": "drowse",
         "flake-parts": "flake-parts_7",
+        "fast-nix-gc": "fast-nix-gc",
         "flake-utils": "flake-utils_3",
         "fusion-360-flake": "fusion-360-flake",
         "garnix-ci": "garnix-ci",

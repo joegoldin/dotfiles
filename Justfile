@@ -651,12 +651,23 @@ update-python-packages:
 
 # ── Repo checks & maintenance ──────────────────────────────────────────────
 
-# Run nix flake check for this system
+# Validate flake outputs, then evaluate/build this system's checks in parallel.
+# Keep flake check's validation gate: nix-fast-build alone is not equivalent.
 [unix]
 check: lint
-    @echo "🔍  Checking Nix config for {{ arch() }}-{{ os() }}..."
-    @NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 NIXPKGS_ALLOW_UNFREE=1 NIXPKGS_ALLOW_BROKEN=1 nix --extra-experimental-features 'nix-command flakes' flake check --impure --system {{ arch() }}-{{ os() }} --show-trace
-    @echo "✅  Check completed!"
+    #!/usr/bin/env bash
+    set -euo pipefail
+    export NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 NIXPKGS_ALLOW_UNFREE=1 NIXPKGS_ALLOW_BROKEN=1
+    echo "🔍  Checking Nix config for {{ arch() }}-{{ os() }}..."
+    nix --extra-experimental-features 'nix-command flakes' flake check --no-build --impure --system {{ arch() }}-{{ os() }} --show-trace
+    nix-fast-build --flake '.#checks.{{ arch() }}-{{ os() }}' --impure --eval-workers 2 --max-jobs 2
+    echo "✅  Check completed!"
+
+# Build an attribute set without activation (e.g. just fast-build packages).
+# Limit evaluation concurrency: each worker can use several GiB of RAM.
+[unix]
+fast-build target="checks" *args="":
+    nix-fast-build --flake '.#{{ target }}.{{ arch() }}-{{ os() }}' --eval-workers 2 --max-jobs 2 {{ args }}
 
 # Format all nix files (nixfmt)
 [unix]
@@ -728,17 +739,18 @@ update-pkgs *names:
     #   calagopus-wings                                – fetchurl asset; bump by hand
     #   zmx                                            – nix-update bumps src+version, but its
     #     zigDeps FOD (outputHash) is NOT rehashed. To update: run
-    #     `nix run nixpkgs#nix-update -- --flake zmx`, then `just build` and paste the
+    #     `nix-update --flake zmx`, then `just build` and paste the
     #     "got: sha256-…" from the zigDeps failure into modules/flake/_pkgs/zmx.nix.
     targets=({{ names }})
     [[ ${#targets[@]} -eq 0 ]] && targets=("${auto[@]}")
     fails=()
     for p in "${targets[@]}"; do
       echo "⬆️   $p"
-      nix run nixpkgs#nix-update -- --flake "$p" || fails+=("$p")
+      nix-update --flake "$p" || fails+=("$p")
     done
     if [[ ${#fails[@]} -gt 0 ]]; then
       echo "⚠️   nix-update couldn't finish: ${fails[*]} (custom FOD hash or manual bump needed)"
+      exit 1
     else
       echo "✅  package update pass complete — review the diff, then \`just build\`"
     fi
@@ -764,6 +776,20 @@ nix-gc:
     @echo "🧹  Sweeping unreferenced store paths…"
     nix store gc
     @echo "✅  Garbage collected!"
+
+# Preview fast GC without changing profile retention. This newer collector
+# writes Nix's DB directly; keep nix-gc above as the conservative default.
+# --dry-run can still clean stale auto-root links and take the GC lock.
+# To collect after reviewing: just nix-gc-fast collect
+[unix]
+nix-gc-fast mode="preview":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    case "{{ mode }}" in
+      preview) sudo fast-nix-gc --dry-run --no-vacuum ;;
+      collect) sudo fast-nix-gc --no-vacuum ;;
+      *) echo "Usage: just nix-gc-fast [preview|collect]" >&2; exit 1 ;;
+    esac
 
 # ── Private helpers ────────────────────────────────────────────────────────
 

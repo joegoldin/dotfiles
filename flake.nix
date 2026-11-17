@@ -161,6 +161,12 @@
     };
 
     # ── Nix utilities ──────────────────────────────────────────────────────
+    # Not yet in our nixpkgs pins. Source-only: use our toolchain, not its
+    # flake configuration, caches or service modules. Review before repinning.
+    fast-nix-gc = {
+      url = "github:Mic92/fast-nix-gc/b4471ec56911541f72f7a7b9b8fee7f42183f21b";
+      flake = false;
+    };
     flake-utils.url = "github:numtide/flake-utils";
     systems.url = "github:nix-systems/default";
     # agenix
