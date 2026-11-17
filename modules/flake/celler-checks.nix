@@ -1,5 +1,10 @@
 # Guard the migration boundaries: no synchronous uploads and no fresh database.
-{ config, lib, ... }:
+{
+  config,
+  inputs,
+  lib,
+  ...
+}:
 let
   hosts = config.flake.nixosConfigurations;
   watchers = [
@@ -24,11 +29,21 @@ let
       && lib.hasInfix "token-file = \"$CREDENTIALS_DIRECTORY/celler-token\"" service.script
     ) "${name}: Celler uploads must be supervised and use runtime credentials, never a build hook";
   server = hosts.siofra.config;
+  mac = config.flake.darwinConfigurations.torrent.config;
+  macWatcher = mac.launchd.daemons.celler-watch-store;
 in
 {
   perSystem = { pkgs, ... }: {
     checks.celler-migration =
       assert lib.all checkWatcher watchers;
+      assert (mac.nix.settings.post-build-hook or "") == "";
+      assert macWatcher.serviceConfig.RunAtLoad && macWatcher.serviceConfig.KeepAlive;
+      assert macWatcher.serviceConfig.ThrottleInterval == 30;
+      assert macWatcher.serviceConfig.UserName == "root";
+      assert macWatcher.serviceConfig.Umask == 63;
+      assert macWatcher.environment.XDG_CONFIG_HOME == "/var/run/celler-watch-store";
+      assert lib.hasInfix "celler watch-store --jobs 5 default-server:" macWatcher.script;
+      assert lib.hasInfix "token-file = \"${mac.age.secrets.attic-token.path}\"" macWatcher.script;
       assert !(server.services ? atticd) || !(server.services.atticd.enable or false);
       assert server.services.cellerd.enable;
       assert
@@ -41,8 +56,24 @@ in
         == "/run/celler-jwt-public-key/public-key.pem";
       assert server.services.cellerd.settings.listen == "[::1]:8081";
       assert !(server.services.cellerd.settings ? chunking);
-      pkgs.runCommand "celler-migration-checks" { } ''
-        touch "$out"
-      '';
+      pkgs.runCommand "celler-migration-checks"
+        {
+          nativeBuildInputs = [
+            pkgs.bash
+            pkgs.python3
+          ];
+          # Inspect the Darwin-generated files without realizing Darwin binaries
+          # on the Linux check runner.
+          CELLER_DARWIN_SCRIPT = builtins.unsafeDiscardStringContext macWatcher.script;
+          CELLER_DARWIN_PLIST =
+            builtins.unsafeDiscardStringContext
+              mac.environment.launchDaemons."org.nixos.celler-watch-store.plist".text;
+          CELLER_DARWIN_EXECUTABLE = builtins.unsafeDiscardStringContext "${inputs.celler.packages.aarch64-darwin.celler}/bin/celler";
+          CELLER_DARWIN_TOKEN_PATH = mac.age.secrets.attic-token.path;
+        }
+        ''
+          python3 ${../services/_celler/test_darwin_watcher.py} -v
+          touch "$out"
+        '';
   };
 }

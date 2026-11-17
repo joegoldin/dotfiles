@@ -19,6 +19,7 @@ in
       den.aspects.rex
       den.aspects.nix-settings
       den.aspects.binary-caches
+      den.aspects.celler-watch-store
       den.aspects.numtide-cache
       # home features (projected onto users via the host-aspects battery)
       den.aspects.home-baseline
