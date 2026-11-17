@@ -65,11 +65,11 @@
         "vfkit-src": "vfkit-src"
       },
       "locked": {
-        "lastModified": 1794895549,
-        "narHash": "sha256-ufQmxEiBXnm4k2iFhGWIgVS5hc0Vk4MtYhYv7WCoKU8=",
+        "lastModified": 1794938845,
+        "narHash": "sha256-N+b+P54URaYZjoB/fQAd9IXVU9sg4Amb0pfYX7QOCf0=",
         "owner": "joegoldin",
         "repo": "agent-skills",
-        "rev": "a26f738028afc3d1deb7a2b860c4620248c69a4b",
+        "rev": "251f2f1589c2bd9e0bf0acf8bfc5df42c30c6d21",
         "type": "github"
       },
       "original": {
@@ -2144,11 +2144,11 @@
         "spectrum": "spectrum"
       },
       "locked": {
-        "lastModified": 1793281488,
-        "narHash": "sha256-ErGIqtoWEX9KKC8NFtJDx2pGGG02Cr6LGxrvzLd2sqA=",
+        "lastModified": 1794529892,
+        "narHash": "sha256-m5iXk3ILiCuRpCgqYWNiGVFmu8YLh2FNxxaZj/Auc10=",
         "owner": "microvm-nix",
         "repo": "microvm.nix",
-        "rev": "b7bd556974fa8a171b5b639200e81d52244dfde4",
+        "rev": "194a254693f49af939a2b53d04982bd4b276fdb3",
         "type": "github"
       },
       "original": {
@@ -2760,11 +2760,11 @@
     },
     "nixpkgs-vfkit": {
       "locked": {
-        "lastModified": 1793977579,
-        "narHash": "sha256-WrSODdZFVIs/Hh2NzC0bY+ROByi0bATg8WfePX8dPj8=",
+        "lastModified": 1794705614,
+        "narHash": "sha256-DZ5eNWHA6heAHwkMt1SBtF1p8Lfgi4ivqdqmgxUZkLs=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "4fe25e12eb9f4c744966dd3de5a05246cf098601",
+        "rev": "1c872b8c508bbbfebc1b0b74777ff391ce0a574c",
         "type": "github"
       },
       "original": {
@@ -2872,11 +2872,11 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1793977579,
-        "narHash": "sha256-WrSODdZFVIs/Hh2NzC0bY+ROByi0bATg8WfePX8dPj8=",
+        "lastModified": 1794705614,
+        "narHash": "sha256-DZ5eNWHA6heAHwkMt1SBtF1p8Lfgi4ivqdqmgxUZkLs=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "4fe25e12eb9f4c744966dd3de5a05246cf098601",
+        "rev": "1c872b8c508bbbfebc1b0b74777ff391ce0a574c",
         "type": "github"
       },
       "original": {
@@ -3079,11 +3079,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794895493,
-        "narHash": "sha256-zwA5DXOY+fY9CdQG9gRN6yTQLOUUVmkVKAXtVyZDQ6U=",
+        "lastModified": 1794938583,
+        "narHash": "sha256-P1B5ZAsE3QIxEBiIiPgeN8AKYcgl/ddAkJ9+Pn6oIhA=",
         "owner": "joegoldin",
         "repo": "pi-nix",
-        "rev": "0e0257a18761f8d04658367329ba38a7241376b0",
+        "rev": "28922d931b1acadbeb4593d27a1fcb8629edb19d",
         "type": "github"
       },
       "original": {
