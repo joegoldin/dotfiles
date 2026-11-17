@@ -2,8 +2,9 @@
 
 Rennala owns the native controller, the normal Home Manager Pi profile and a
 persistent headless KDE X11 session. The application comes from the private
-`pi-manager-agent` flake input. `flake.lock` pins the acceptance branch; this is
-not a production release or a waiver of application acceptance gates.
+`pi-manager-agent` flake input. `flake.lock` pins a revision of its `main`
+branch. This host configuration is an acceptance deployment, not a production
+release or a waiver of application acceptance gates.
 
 `modules/ai/pi-manager.nix` imports the reusable application module and the
 existing Pi aspect. `pi-manager.nix` here owns host policy, resource limits,
@@ -41,12 +42,27 @@ secret paths and HTTPS routing. Nothing installs Pi or systemd units by hand.
   enabled by this initial deployment. The independent ingress role must remain
   on a separately selected host; it must not become a native-host dependency.
 
+## Native Pi version compatibility
+
+The controller template in [`pi-manager.nix`](pi-manager.nix) derives
+`core.pi.version` from the locked agent-skills → pi-nix `coding-agent-bun`
+package, currently Pi 1.5.2, instead of maintaining a separate version literal.
+The `checks.x86_64-linux.pi-manager-template` assertions verify that the
+serialized template matches that version and keeps dispatch disabled.
+
+The managed Pi profile defaults to `openai/gpt-6.2-sol`, with 6.2 Astra also
+available. Model choice is separate from native runtime compatibility.
+Check the pinned application's version/protocol requirements against the
+installed executable before deployment or dispatch enablement. Matching
+version metadata and successful Nix evaluation do not prove the full native
+protocol or waive any acceptance gate.
+
 ## Build before switching
 
 From this dotfiles checkout, evaluate and build without activation:
 
 ```fish
-nix eval --raw .#nixosConfigurations.rennala.config.system.build.toplevel.drvPath
+nix eval --raw .#nixosConfigurations.rennala.config.system.build.toplevel.drvPath --option allow-import-from-derivation false
 nix build --cores 1 --max-jobs 1 --no-link --print-out-paths .#nixosConfigurations.rennala.config.system.build.toplevel
 ```
 
@@ -72,3 +88,6 @@ permissions and loopback-only backend listeners. Human AuthHero code/PKCE/MFA,
 a denied valid identity, intended mobile/PWA use, exact desktop takeover,
 installed-Pi GUI work and loaded-host behavior remain separate acceptance
 checks. A healthy service or version probe does not prove them.
+
+For host layout, first-install warnings, and routine upgrade steps, see
+[DEPLOYMENT.md](DEPLOYMENT.md).

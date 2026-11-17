@@ -3,9 +3,12 @@
 Reviewed 2026-11-17. No obvious malicious behavior found in the inspected
 first-party source and packaging. This is a focused source review, not a
 security audit, a full transitive dependency review, or a guarantee of safety.
-Future package/input updates need fresh review.
+Future package/input updates need fresh review. Versions and test results below
+are a record of that review, not a live inventory or a new safety attestation.
+For current package wiring, see [`tools.nix`](tools.nix); for commands, see the
+[Justfile](../../Justfile).
 
-## Installed sources
+## Sources at review time
 
 | Tool | Version / revision | Source of pin |
 | --- | --- | --- |

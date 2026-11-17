@@ -18,6 +18,7 @@ in
       runtime = "/run/user/1000/pi-manager";
       credentials = "${runtime}/credentials";
       application = config.services.pi-manager.controller.package;
+      pi = inputs.agent-skills.inputs.pi-nix.packages.${pkgs.stdenv.hostPlatform.system}.coding-agent-bun;
       grant = {
         allowedOperations = [
           "state.get"
@@ -76,7 +77,7 @@ in
           };
           pi = {
             executable = "/etc/profiles/per-user/${user}/bin/pi";
-            version = "1.4.0";
+            inherit (pi) version;
             homeDirectory = home;
             searchPath = [
               "/etc/profiles/per-user/${user}/bin"

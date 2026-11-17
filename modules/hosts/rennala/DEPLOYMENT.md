@@ -1,334 +1,112 @@
-# RackNerd VPS Deployment Guide
+# Rennala deployment
 
-This guide covers deploying Happy Server to your RackNerd VPS using NixOS.
+Rennala is the x86_64-linux RackNerd VPS. Its current configuration runs a
+**dispatch-disabled Pi Manager acceptance deployment**, a headless desktop,
+and the normal managed Pi and Rex profiles. See
+[PI_MANAGER.md](PI_MANAGER.md) for authentication, credentials, resource limits,
+and acceptance gates.
 
-## Services Overview
+The previous Happy Server guide is retired. This host no longer declares the
+Happy Docker container, PostgreSQL, Redis, or MinIO stack. Do not follow the
+old instructions to build a `happy-server:latest` image, create local
+`secrets/` files, use ports 3005/3006, or run `deploy-racknerd`.
 
-- **PostgreSQL**: Database server (port 5432, internal only)
-- **Redis**: Cache/queue server (port 6379, internal only)
-- **MinIO**: S3-compatible object storage (port 9000, internal only)
-- **Happy Server**: Relay server for Claude Code mobile
-  - Port 3005: Direct HTTP access (Tailscale only)
-  - Port 3006: Public HTTPS via Caddy reverse proxy
-- **Caddy**: Reverse proxy with automatic HTTPS/SSL certificates
-  - Provides HTTPS access on port 3006
-  - Handles Let's Encrypt certificate management
+This guide describes the declarative configuration, not an assertion that it
+has been deployed or passed live acceptance.
+
+## Configuration map
+
+| File | Responsibility |
+| --- | --- |
+| [`default.nix`](default.nix) | Host/user entity, base aspects, disk/hardware imports, and agenix identity path |
+| [`system.nix`](system.nix) | BIOS GRUB on `/dev/vda`, key-only SSH with root login disabled, and fail2ban |
+| [`machine.nix`](machine.nix) | Tailscale, Docker, SSH firewall rule, and trusted interfaces |
+| [`home.nix`](home.nix) | Lean server CLI profile |
+| [`pi-manager.nix`](pi-manager.nix) | Application policy/template, credential paths, HTTPS frontend, and limits |
+| [`_render-pi-manager.mjs`](_render-pi-manager.mjs) | Runtime policy merge and configuration validation |
+| [`_disk-config.nix`](_disk-config.nix) | First-install disk layout; applying it can erase `/dev/vda` |
+
+The reusable application module is imported by
+[`modules/ai/pi-manager.nix`](../../ai/pi-manager.nix). Pi's model defaults and
+host integration live in [`modules/ai/pi.nix`](../../ai/pi.nix).
 
 ## Prerequisites
 
-1. **RackNerd VPS** with NixOS installed
-2. **Tailscale** configured and running
-3. **agenix** installed locally (`nix-shell -p agenix`)
-4. **SSH access** to the RackNerd server
-5. **Domain config**: Copy `secrets/domains.nix.example` to `secrets/domains.nix` and fill in your actual domains
+- GitHub credentials that can fetch the private flake inputs.
+- A working SSH connection to the intended host, with a separate recovery path.
+- The correct host key, agenix identity, and secret recipients in the private
+  `dotfiles-secrets` repository. This configuration decrypts with
+  `/home/joe/.ssh/id_rsa`; do not put that key or plaintext credentials in
+  this checkout or the Nix store.
+- The six Pi Manager credentials and owner policy described in
+  [PI_MANAGER.md](PI_MANAGER.md), plus DNS and AuthHero application settings
+  appropriate for `https://display.amia.live`.
 
-## Initial Setup
+## Evaluate, then build without activation
 
-### 1. Get RackNerd Host SSH Key
+Run from the repository root:
 
-After deploying NixOS to RackNerd, get the host's SSH key:
-
-```bash
-ssh joe@<racknerd-ip> cat /etc/ssh/ssh_host_ed25519_key.pub
+```fish
+nix eval --raw .#nixosConfigurations.rennala.config.system.build.toplevel.drvPath --option allow-import-from-derivation false
+nix build --cores 1 --max-jobs 1 --no-link --print-out-paths .#nixosConfigurations.rennala.config.system.build.toplevel
 ```
 
-Update `secrets/secrets.nix` with the actual key (replace the placeholder on line 8).
+The first command evaluates; the second builds. Neither activates Rennala.
+Before switching, compare the proposed closure with the host's current
+`/run/current-system` using `nvd diff` and record the old store path as a
+rollback reference. Keep a working SSH connection open and review firewall
+changes and application acceptance requirements.
 
-### 2. Create and Encrypt Secrets
+The template derives its native Pi version from the locked runtime package.
+Still verify the installed executable and the application's protocol support;
+see the [version compatibility note](PI_MANAGER.md#native-pi-version-compatibility).
+Matching metadata is not a substitute for that application-level check.
 
-Create the secrets file with a secure random seed:
+## Activate an existing host
 
-```bash
-# Copy the example file
-cp secrets/happy-secrets.env.example secrets/happy-secrets.env
+Only after build, review, acceptance checks, and deployment authorization:
 
-# Generate a secure random seed
-echo "HANDY_MASTER_SECRET=$(openssl rand -hex 32)" > secrets/happy-secrets.env
-
-# Encrypt the file with agenix
-agenix -e secrets/happy-secrets.env.age
-
-# Remove the unencrypted file
-rm secrets/happy-secrets.env
+```fish
+just build-to-rennala --local
 ```
 
-### 3. Build Happy Server Docker Image
+This recipe runs **`nh os switch` on the target**. `--local` builds on the
+machine running the command and copies the closure to Rennala; without it,
+the recipe builds on Rennala. Both forms activate. The target SSH user and
+domain come from the private input's `domains.nix`.
 
-Before deploying, build the Docker image on the server:
+Do not substitute first-install tooling for a routine upgrade. The separate
+`just deploy-rennala IP` recipe runs nixos-anywhere against `joe@IP` and uses
+the disko configuration. It is for an explicitly authorized first install,
+not a non-destructive test or an application redeploy.
 
-```bash
-# SSH into the server
-ssh joe@<racknerd-ip>
+A Linux switch may restart the managed personal Rex service and end its
+sessions. Save work and keep an independent SSH connection; see the
+[Rex service-lifetime guide](../../home/_rex/README.md).
 
-# Clone happy-server repo
-git clone https://github.com/slopus/happy.git ~/happy
-cd ~/happy/packages/happy-server
+## Network and post-switch checks
 
-# Build the Docker image
-docker build -t happy-server:latest .
+The declared public TCP ports are 22 for SSH, 80 for ACME, and 443 for Caddy.
+The browser backend binds to `127.0.0.1:8787`; private desktop backends are not
+public reverse-proxy targets. `tailscale0` and `docker0` are trusted firewall
+interfaces, so do not infer that the public-port allowlist restricts tailnet
+or container-bridge access in the same way.
+
+After an authorized switch, inspect on Rennala:
+
+```fish
+systemctl status caddy fail2ban
+systemctl --user status pi-manager-controller rex
+ss -ltn
+loginctl show-user joe -p Linger
 ```
 
-### 4. Initialize Database Schema
-
-After building the image, initialize the PostgreSQL database schema with Prisma:
-
-```bash
-# Run Prisma migrations to create all tables
-docker run --rm \
-  --network host \
-  -v ~/happy:/repo \
-  -e DATABASE_URL="postgresql://happy@127.0.0.1:5432/happy" \
-  happy-server:latest \
-  sh -c "cd /repo/packages/happy-server && npx prisma migrate deploy"
-```
-
-**Note**: This only needs to be run once during initial setup. The database schema will persist across container restarts.
-
-### 5. Deploy to RackNerd
-
-Deploy the configuration:
-
-```bash
-just deploy-racknerd <racknerd-ip>
-```
-
-Or manually:
-
-```bash
-nixos-anywhere --flake .#rennala --build-on-remote joe@<racknerd-ip>
-```
-
-## Accessing Services
-
-Happy Server is accessible via multiple methods:
-
-### Public HTTPS Access (Recommended)
-
-Caddy provides automatic HTTPS with Let's Encrypt:
-
-- **Public HTTPS**: `https://<YOUR_DOMAIN>:3006`
-  - Accessible from anywhere
-  - Automatic SSL certificates
-  - Reverse proxy to Happy Server on port 3005
-
-### Tailscale Access
-
-Direct HTTP access via Tailscale (private network):
-
-- **Tailscale HTTP**: `http://<racknerd-tailscale-ip>:3005`
-  - Only accessible within your Tailscale network
-  - Lower latency for devices on Tailscale
-
-### Configure Happy CLI
-
-On your computer, configure the Happy CLI to use your server:
-
-```bash
-# Option 1: Public HTTPS (works everywhere)
-export HAPPY_SERVER_URL="https://<YOUR_DOMAIN>:3006"
-
-# Option 2: Tailscale (private network only)
-export HAPPY_SERVER_URL="http://<racknerd-tailscale-ip>:3005"
-```
-
-Or add to your shell config (`~/.bashrc`, `~/.zshrc`, etc.):
-
-```bash
-echo 'export HAPPY_SERVER_URL="https://<YOUR_DOMAIN>:3006"' >> ~/.bashrc
-```
-
-### Configure Happy Mobile App
-
-On your phone:
-
-1. Open Happy app
-2. Go to Settings
-3. Set "Relay Server URL" to:
-   - **Public**: `https://<YOUR_DOMAIN>:3006` (works anywhere)
-   - **Tailscale**: `http://<racknerd-tailscale-ip>:3005` (requires Tailscale)
-4. Save
-
-### Via SSH Port Forwarding (Optional)
-
-If you need direct access:
-
-```bash
-# Forward happy-server
-ssh -L 3005:127.0.0.1:3005 joe@<racknerd-tailscale-ip>
-
-# Forward postgres
-ssh -L 5432:127.0.0.1:5432 joe@<racknerd-tailscale-ip>
-
-# Forward redis
-ssh -L 6379:127.0.0.1:6379 joe@<racknerd-tailscale-ip>
-```
-
-## Monitoring & Management
-
-### Check Service Status
-
-```bash
-# SSH into the server
-ssh joe@<racknerd-tailscale-ip>
-
-# Check PostgreSQL status
-sudo systemctl status postgresql
-
-# Check Redis status
-sudo systemctl status redis-happy
-
-# Check MinIO status
-sudo systemctl status minio
-
-# Check happy-server container status
-sudo systemctl status docker-happy-server
-
-# View happy-server logs
-docker logs happy-server
-
-# View PostgreSQL logs
-sudo journalctl -u postgresql -f
-
-# View Redis logs
-sudo journalctl -u redis-happy -f
-
-# View MinIO logs
-sudo journalctl -u minio -f
-```
-
-### Update Happy Server Version
-
-To update to the latest happy-server code:
-
-```bash
-# SSH into the server
-ssh joe@<racknerd-tailscale-ip>
-
-# Pull latest changes
-cd ~/happy
-git pull
-
-# Rebuild the Docker image
-cd packages/happy-server
-docker build -t happy-server:latest .
-
-# Apply any new database migrations
-docker run --rm \
-  --network host \
-  -v ~/happy:/repo \
-  -e DATABASE_URL="postgresql://happy@127.0.0.1:5432/happy" \
-  happy-server:latest \
-  sh -c "cd /repo/packages/happy-server && npx prisma migrate deploy"
-
-# Restart the service
-sudo systemctl restart docker-happy-server
-```
-
-### Update Secrets
-
-```bash
-# Edit the encrypted secret
-agenix -e secrets/happy-secrets.env.age
-
-# Redeploy
-just deploy-racknerd <racknerd-ip>
-
-# Or just restart the service on the server
-ssh joe@<racknerd-tailscale-ip> 'sudo systemctl restart docker-happy-server'
-```
-
-## Firewall Configuration
-
-The RackNerd firewall (`hosts/racknerd-cloud/system/racknerd-cloud.nix:31-37`) is configured to:
-
-- **Allow**: SSH (port 22) from public internet
-- **Allow**: HTTP (port 80) for ACME/Let's Encrypt certificate challenges
-- **Allow**: HTTPS (port 443) for general HTTPS traffic
-- **Allow**: Happy Server HTTPS (port 3006) via Caddy reverse proxy
-- **Allow**: All traffic on Tailscale interface (`tailscale0`)
-- **Allow**: Docker bridge traffic (internal only, 172.17.0.0/16)
-- **Block**: Direct access to port 3005, PostgreSQL (5432), Redis (6379), MinIO (9000)
-
-This ensures:
-- Happy Server is accessible publicly via HTTPS on port 3006 (Caddy reverse proxy)
-- Happy Server also accessible via Tailscale on port 3005 (direct HTTP)
-- PostgreSQL, Redis, and MinIO remain internal only
-- Docker containers can communicate with host services securely
-- Automatic SSL certificate management via Let's Encrypt
-
-## Troubleshooting
-
-### Container won't start
-
-Check logs:
-```bash
-docker logs handy-server
-```
-
-Verify secrets are accessible:
-```bash
-sudo ls -la /run/agenix/
-```
-
-### Redis connection refused
-
-Check if Redis is listening:
-```bash
-sudo ss -tlnp | grep 6379
-```
-
-Verify Redis is running:
-```bash
-sudo systemctl status redis-happy
-```
-
-### Cannot access services
-
-Verify Tailscale is connected:
-```bash
-tailscale status
-```
-
-Check firewall rules:
-```bash
-sudo iptables -L -n
-```
-
-## Architecture Notes
-
-- **PostgreSQL** runs as a native NixOS service with automatic database/user setup
-  - Listens on 127.0.0.1 (localhost) and 172.17.0.1 (Docker bridge)
-  - Only accepts Docker container connections from 172.17.0.0/16 subnet
-- **Redis** runs as a native NixOS service for better performance and integration
-  - Listens on 127.0.0.1 (localhost) and 172.17.0.1 (Docker bridge)
-- **MinIO** provides S3-compatible object storage locally
-  - Listens on 127.0.0.1:9000 and 172.17.0.1:9000
-  - Console accessible at 127.0.0.1:9001 (via Tailscale only)
-  - Automatically creates "happy" bucket with public read access
-  - Uses default credentials (minioadmin/minioadmin)
-- **Happy Server** runs in Docker using locally-built image
-  - Uses Docker bridge network (no host network needed)
-  - Connects to PostgreSQL, Redis, and MinIO via 172.17.0.1 (Docker gateway)
-  - Port 3005 mapped to localhost only (127.0.0.1:3005)
-- All external access requires Tailscale connection
-- Secrets managed via agenix with encryption at rest
-- Only requires a single secret: the SEED for token generation
-
-## What Happy Server Does
-
-Happy Server is a lightweight relay that:
-- Forwards encrypted messages between your phone and Claude Code
-- Stores encrypted blobs (it cannot decrypt them)
-- Never sees your actual code or prompts
-- Is only 1,293 lines of TypeScript
-- Source: https://github.com/slopus/happy-server
-
-## File Locations
-
-- Service config: `hosts/racknerd-cloud/system/services.nix`
-- Secrets template: `secrets/happy-secrets.env.example`
-- Encrypted secrets: `secrets/happy-secrets.env.age`
-- Secrets mapping: `secrets/secrets.nix`
-- Main config: `hosts/racknerd-cloud/system/racknerd-cloud.nix`
-- Redis data: `/var/lib/redis-happy` (on server)
-- PostgreSQL data: `/var/lib/postgresql` (on server)
+Also verify the private desktop units named by the pinned application module,
+the HTTPS certificate and unauthenticated redirects, secret ownership/modes,
+and loopback-only backend listeners. Do not print credential contents,
+authentication callback URLs, or private desktop URLs into shared logs.
+
+Dispatch must remain disabled until the separate native/protocol, AuthHero
+code/PKCE/MFA, denied-identity, mobile/PWA, desktop takeover, installed-Pi GUI,
+and loaded-host acceptance gates in `PI_MANAGER.md` pass. Healthy units or a
+new model selection are not a waiver of those gates.

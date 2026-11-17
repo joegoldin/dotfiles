@@ -9,8 +9,9 @@ Torrent. It is not a global `den.default`.
 Linux hosts install the Rex CLI and use **SSH-only remote access**. No Rex
 login server, shared server, TCP listener, Tailscale Serve mapping, embedded
 Tailscale node, or Rex firewall opening is configured. SSH starts or reuses
-`joe`'s personal server on its local Unix socket. Home Manager does not install
-a separate personal systemd service.
+`joe`'s personal server on its local Unix socket. Home Manager enables the
+personal `rex.service` user unit on Linux, wanted by `default.target`. It is
+not a system-wide login or shared server.
 
 Managed host entries use `ssh://<host>`. Rex uses the system SSH client, so
 existing SSH aliases, users, ports, keys, and agents apply. There is no Rex
@@ -30,8 +31,11 @@ SSH support; Torrent's native app must also be recent enough. The old HTTP and
 HTTPS Rex endpoints are no longer used.
 
 The former `restart-rex-server` alias is removed: there is no system login
-server to restart. Do not stop a personal server to upgrade it while its
-sessions are needed; stopping it ends those sessions.
+server to restart. **A switch that updates the managed Linux user service
+restarts it, ending its terminal sessions.** The unit explicitly uses
+`X-SwitchMethod=restart` so switches pick up server updates. Save work and
+arrange another SSH connection before switching; lingering does not protect
+sessions from a service restart.
 
 Torrent keeps its native **Rex Beta.app**, including its bundled server and CLI.
 The aspect exposes that CLI on PATH without installing another Mac server.
@@ -57,10 +61,11 @@ after the final SSH or desktop logout, preserving the personal Rex socket and
 running sessions. User services can run while logged out and use resources;
 this does not grant remote access or open ports.
 
-SSH starts a missing personal server on demand. No graphical login or system
-login server is needed. Rex must be on the noninteractive SSH PATH; the aspect
-installs it in the system profile as well as the Home Manager profile.
-`REX_AUTOSTART=0` on the remote machine prevents automatic startup.
+The user service maintains the personal server independently of graphical
+login. SSH can also start a missing personal server on demand. Rex must be
+on the noninteractive SSH PATH; the aspect installs it in the system profile
+as well as the Home Manager profile. `REX_AUTOSTART=0` disables the CLI's
+on-demand startup, not the managed systemd user service.
 
 ```fish
 loginctl show-user joe -p Linger
@@ -119,8 +124,16 @@ left alone.
 
 The documented Rex Lua API does not expose Ghostty's exact 95% opacity, 4-pixel
 padding, 1-GB scrollback limit, font-feature list, or cursor/mouse options. Those
-are not represented by invented settings. Linux GUI appearance is pending an
-upstream GUI/settings interface; the portable Lua bindings are ready for it.
+are not represented by invented settings.
+
+### Linux GUI
+
+Elphael additionally includes `den.aspects.rex-linux`. It installs the
+`rex-rune` client from its independently pinned flake and a **Rex Rune**
+desktop entry (`dev.shuv.rex-rune`) that selects the shared Ghostty font.
+The client adds no separate server service; server lifetime still belongs to
+the shared Rex aspect. Other Linux hosts receive the CLI/server configuration,
+not this GUI aspect. Torrent keeps its native Mac app.
 
 ## Verify after switching
 
@@ -128,7 +141,8 @@ On a Linux host:
 
 ```fish
 loginctl show-user joe -p Linger
-# Neither old system unit should be active:
+systemctl --user status rex.service
+# Neither old system unit should be active (a nonzero exit is expected):
 systemctl is-active rex-login-server rex-tailscale-serve
 rex config check
 rex hosts --json
@@ -145,8 +159,11 @@ supported systems. They cover Lua merging, backup/idempotence, validation
 failure preservation, theme import retries, and the real CLI's Lua validation.
 `checks.x86_64-linux.rex-services` (also on aarch64-linux) evaluates the service
 wiring with and without Tailscale: SSH host entries, lingering, system CLI
-availability, no personal/shared/login service or Rex firewall opening, and
-the native Mac server remaining unmanaged by systemd.
+availability, the personal Linux user service and its restart policy, no
+system-wide shared/login service or Rex firewall opening, and the native Mac
+server remaining unmanaged by systemd. `checks.<linux-system>.rex-linux`
+contains the GUI aspect's package and desktop-entry assertions. A check being
+defined is not evidence that it currently passes.
 
 ## Agent integration
 

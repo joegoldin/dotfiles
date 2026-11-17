@@ -38,16 +38,16 @@ lib.runTests {
     expected = [ "/test/rex-rune" ];
   };
   testDesktopUsesSharedFont = {
-    expr = linux.content.xdg.desktopEntries."dev.shuv.rex-linux".exec;
+    expr = linux.content.xdg.desktopEntries."dev.shuv.rex-rune".exec;
     expected = ''/test/rex-rune/bin/rex-rune --font "TX02 Nerd Font Mono"'';
   };
   testDesktopDoesNotOpenAnotherTerminal = {
-    expr = linux.content.xdg.desktopEntries."dev.shuv.rex-linux".terminal;
+    expr = linux.content.xdg.desktopEntries."dev.shuv.rex-rune".terminal;
     expected = false;
   };
   testDesktopIdMatchesTaskbar = {
     expr = builtins.attrNames linux.content.xdg.desktopEntries;
-    expected = [ "dev.shuv.rex-linux" ];
+    expected = [ "dev.shuv.rex-rune" ];
   };
   testMacDisabledWithoutMacPackage = {
     expr = darwin.condition;
@@ -58,7 +58,7 @@ lib.runTests {
     expected = false;
   };
   testUpstreamDesktopIdentity = {
-    expr = with linux.content.xdg.desktopEntries."dev.shuv.rex-linux"; [
+    expr = with linux.content.xdg.desktopEntries."dev.shuv.rex-rune"; [
       name
       icon
       settings.StartupWMClass

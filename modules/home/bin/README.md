@@ -10,13 +10,20 @@ The script body is written as a field named after the language. The builder deri
 
 | Field | Shell | Flag Parsing | Notes |
 |---|---|---|---|
-| `fish` | fish | `argparse` builtin | Default. `$_flag_*` variables |
+| `fish` | fish | `argparse` builtin | `$_flag_*` variables |
 | `bash` | bash | `getopt` | Strict mode, cleanup traps |
 | `python` | python3 | `argparse` module | `pythonPackages` for deps |
 | `python-argparse` | python3 | manual | Raw python, no auto-generation |
 | `function` | fish | N/A | Fish function (no wrapper script) |
 
-Using the language name as the field enables tree-sitter injection for syntax highlighting in editors that support it.
+Using the language name as the field enables tree-sitter injection for syntax
+highlighting in editors that support it. Select a language explicitly; older
+`type` + `body` definitions are also accepted.
+
+The den aspect in [`default.nix`](default.nix) imports the standalone Home
+Manager module [`_module.nix`](_module.nix). MicroVM guests import that module
+directly and set `vmGuest = true` to exclude top-level scripts marked
+`hostOnly = true`. The `vm` subcommand group is Linux-only.
 
 ## Minimal Example
 
@@ -33,7 +40,10 @@ Using the language name as the field enables tree-sitter injection for syntax hi
 
 ## Subcommand Groups
 
-Place `.nix` files in a subdirectory of `_scripts/` to create a command group with subcommands. The directory name becomes the parent command, and each file becomes a subcommand.
+Place `.nix` files in a subdirectory of `_scripts/` to create a command group
+with subcommands. The directory name becomes the parent command, and each
+file becomes a subcommand. The following `ai` group is an example, not an
+installed group; the repository currently defines `vm`.
 
 ```
 _scripts/
@@ -123,7 +133,18 @@ Each subcommand `.nix` file uses the same format as a top-level script; all feat
 
 ## Flag Definition
 
-Always declare flags in the `flags` field rather than parsing them manually with `argparse`, `contains`, or switch/case. The builder auto-generates `argparse` calls, `--help` text, fish completions, env var overrides, and required validation from the declaration. Manual parsing bypasses all of this.
+For generated parsing, declare flags in the `flags` field rather than parsing
+them again in the body. The builder generates parsing, help, completions,
+environment defaults, and required-flag validation from those declarations.
+Short flags reserve `-h` and `-v`; collisions automatically try the opposite
+case and fail evaluation if both letters are taken.
+
+`python-argparse` is the explicit escape hatch for a script that owns its
+whole CLI, as several `vm` commands do. It receives only the Python shebang
+and body, not generated helpers, parsing, cleanup, or a `runtimeInputs` PATH
+preamble. `pythonPackages` still selects its interpreter environment.
+Bash's `autoparse = false` similarly disables generated parsing and required
+validation; the body must handle them.
 
 All fields except `name` and `desc` are optional:
 
@@ -143,7 +164,10 @@ All fields except `name` and `desc` are optional:
 
 ## Auto-Generated Features
 
-When flags or `runtimeInputs`/`beforeExit` are present, scripts get:
+Generated Bash scripts include the help/parser/helper preamble by default.
+Fish adds helpers when flags, `runtimeInputs`, or `beforeExit` are present;
+Python also enables its generated argparse path when `params` are declared.
+Depending on the selected language, these provide:
 
 - **`--help` / `-h`** - auto-generated usage with all flags/params
 - **`--verbose` / `-v`** - debug output toggle (auto-added)
@@ -157,7 +181,11 @@ When flags or `runtimeInputs`/`beforeExit` are present, scripts get:
 - **Fish completions** - auto-generated for all flags and params
 - **Examples** - shown in `--help` output when `examples` field is defined
 
-Scripts without these features produce the same output as before (backward compatible).
+Fish and Python's minimal paths still provide basic help, but do not gain all
+these helpers. `function` entries are installed as fish functions without an
+executable wrapper. Raw `python-argparse` bodies own their own help and error
+handling. Declare flags and positional parameters, then inspect the generated
+help rather than assuming every language has the same preamble.
 
 ## Accessing Parsed Values
 
@@ -171,7 +199,8 @@ Flag names are normalized: `--dry-run` becomes `$_flag_dry_run` (fish), `$dry_ru
 
 ## Python Packages
 
-Python scripts can declare pip dependencies:
+Python scripts can select packages from `pkgs.python3Packages`; this does not
+run pip or install dependencies at runtime:
 
 ```nix
 {
@@ -185,9 +214,12 @@ Python scripts can declare pip dependencies:
 }
 ```
 
-## Scripts Needing pkgs
+## Package arguments
 
-If a script needs access to `pkgs` (for `runtimeInputs`), export a function:
+A script definition can be an attrset or a function. The module supplies the
+function's declared `pkgs` and `customPackages` arguments; no other required
+arguments are injected. Use `pkgs` for nixpkgs tools and `customPackages` for
+composed local packages or upstream artifacts:
 
 ```nix
 # _scripts/deploy.nix
@@ -202,11 +234,20 @@ If a script needs access to `pkgs` (for `runtimeInputs`), export a function:
 }
 ```
 
+For example, a definition using a composed application can accept
+`{ pkgs, customPackages }` and include `customPackages.audiomemo` in
+`runtimeInputs`. Standalone importers must supply `customPackages` too.
+MicroVM guests deliberately pass an empty set; a reusable script should
+handle an optional application explicitly, as
+[`watchyt.nix`](_scripts/watchyt.nix) does, or be marked `hostOnly`.
+
 ## Interactive Mode and Help
 
-```sh
+```fish
 bins                       # list all scripts
 bins -i                    # fuzzy-find and run a script
 bins -i --raw "question"   # select a script, run it with those args
-bins help ai               # show help for a command (runs ai --help)
+bins help vm               # list the installed VM subcommands
+vm new --help              # parent help also lists subcommands
+vm--new --help             # the generated executable's detailed help
 ```
