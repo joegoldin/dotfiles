@@ -8,6 +8,7 @@ let
     "hslua-cli"
     "hslua-typing"
     "servant"
+    "servant-client"
     "skylighting"
     "wai-cors"
   ];
@@ -25,4 +26,6 @@ assert builtins.all serialDocumentation affected;
 # Do not change unrelated libraries or disable package test suites.
 assert !(pkgs.lib.hasInfix "--haddock-option=-j1" pkgs.haskellPackages.aeson.haddockPhase);
 assert pkgs.haskellPackages.djot.doCheck;
+assert pkgs.haskellPackages.servant-client.doCheck;
+assert builtins.elem "doc" pkgs.haskellPackages.servant-client.outputs;
 true

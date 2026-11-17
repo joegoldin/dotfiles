@@ -171,10 +171,11 @@ in
         {
           typst = prev.haskell.lib.compose.dontCheck hPrev.typst;
         }
-        # These GHC 9.6.7 Haddock jobs deadlock with -j16 on erdtree, holding
-        # output locks across subsequent rebuilds. A trailing -j1 wins over
-        # the builder's -j$NIX_BUILD_CORES without serializing compilation or
-        # dropping documentation. Remove when the compiler pin is upgraded.
+        # Parallel Haddock jobs have hung with GHC 9.6.7 on erdtree and
+        # GHC 9.10.3 on elphael (servant-client with -j6). A trailing -j1
+        # wins over the builder's -j$NIX_BUILD_CORES without serializing
+        # compilation or dropping documentation. Keep until parallel
+        # Haddock is verified to finish with a newer compiler.
         //
           prev.lib.genAttrs
             [
@@ -185,6 +186,7 @@ in
               "hslua-cli"
               "hslua-typing"
               "servant"
+              "servant-client"
               "skylighting"
               "wai-cors"
             ]
