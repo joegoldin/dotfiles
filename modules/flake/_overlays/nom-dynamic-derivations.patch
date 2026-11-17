@@ -1,0 +1,90 @@
+--- a/lib/NOM/Update/Monad.hs
++++ b/lib/NOM/Update/Monad.hs
+@@ -4,0 +5 @@
++  parseDerivationForGraph,
+@@ -15 +16,2 @@
+-import Data.Attoparsec.Text (eitherResult, parse)
++import Data.Attoparsec.Text (Parser, char, eitherResult, parse, sepBy, string)
++import Data.Text qualified as Text
+@@ -59 +61 @@
+-          . parse Nix.parseDerivation
++          . parse parseDerivationForGraph
+@@ -63,0 +66,48 @@
++
++-- Dynamic inputs name outputs of derivation-producing materializers. Their
++-- eventual child paths are unknown here; retain the materializer dependencies
++-- and let Nix's subsequent build events discover the generated derivations.
++parseDerivationForGraph :: Parser (Nix.Derivation FilePath Text)
++parseDerivationForGraph = Nix.parseDerivation <|> do
++  dynamic <- False <$ string "Derive(" <|> True <$ string "DrvWithVersion(\"xp-dyn-drv\","
++  outputs <- mapping do
++    _ <- char '('
++    key <- text <* char ','
++    path <- outputPath <* char ','
++    algo <- text <* char ','
++    hash <- text <* char ')'
++    pure (key, Nix.DerivationOutput path algo hash)
++  _ <- char ','
++  inputDrvs <- mapping do
++    _ <- char '('
++    path <- absolutePath <* char ','
++    names <- if dynamic then dynamicOutputs else namesOnly
++    _ <- char ')'
++    pure (path, names)
++  _ <- char ','
++  inputSrcs <- Set.fromList <$> list absolutePath
++  _ <- char ','
++  platform <- text <* char ','
++  builder <- text <* char ','
++  args <- fromList <$> list text
++  _ <- char ','
++  env <- mapping (pair text text)
++  _ <- char ')'
++  pure $ Nix.Derivation outputs inputDrvs inputSrcs platform builder args env
++ where
++  text = Nix.textParser
++  list item = char '[' *> sepBy item (char ',') <* char ']'
++  mapping item = fromList <$> list item
++  pair key value = (,) <$> (char '(' *> key <* char ',') <*> (value <* char ')')
++  absolutePath = do
++    path <- text
++    guard $ Text.isPrefixOf "/" path
++    pure $ toString path
++  outputPath = ("" <$ string "\"\"") <|> absolutePath
++  namesOnly = Set.fromList <$> list text
++  dynamicOutputs = namesOnly <|> do
++    _ <- char '('
++    names <- namesOnly <* char ','
++    children <- list (pair text dynamicOutputs)
++    _ <- char ')'
++    pure $ names <> Set.fromList (fst <$> children)
+--- a/test/UnitTests.hs
++++ b/test/UnitTests.hs
+@@ -1,0 +2,6 @@
++import Data.Attoparsec.Text qualified as TextParser
++import Data.Map.Strict qualified as Map
++import Data.Set qualified as Set
++import Data.Text qualified as Text
++import Nix.Derivation qualified as Nix
++import NOM.Update.Monad (parseDerivationForGraph)
+@@ -24 +30,19 @@
+-        [ "Parse Plan" ~: do
++        [ "Parse dynamic derivation materializers" ~: do
++            let input = "DrvWithVersion(\"xp-dyn-drv\",[(\"out\",\"\",\"\",\"\")],[(\"/nix/store/00000000000000000000000000000000-parent.drv\",([\"dev\"],[(\"out\",([\"child\"],[(\"nested\",[\"out\"])]))]))],[],\"x86_64-linux\",\"builtin:fetchurl\",[],[(\"name\",\"dynamic\")])"
++            case TextParser.parseOnly (parseDerivationForGraph <* TextParser.endOfInput) input of
++              Left err -> assertFailure err
++              Right drv -> do
++                assertEqual "known materializers are retained" (Map.singleton "/nix/store/00000000000000000000000000000000-parent.drv" (Set.fromList ["dev", "out"])) (Nix.inputDrvs drv)
++                assertEqual "unrealized output stays unknown" (Just "") (Nix.path <$> Map.lookup "out" (Nix.outputs drv))
++                assertEqual "metadata survives" (Map.singleton "name" "dynamic") (Nix.env drv)
++            assertBool "unknown versions fail" $ isLeft $ TextParser.parseOnly parseDerivationForGraph $ Text.replace "xp-dyn-drv" "unknown-version" input
++            assertBool "truncated input fails" $ isLeft $ TextParser.parseOnly (parseDerivationForGraph <* TextParser.endOfInput) $ Text.dropEnd 1 input
++        , "Parse floating content-addressed derivation" ~: do
++            let input = "Derive([(\"out\",\"\",\"r:sha256\",\"\")],[],[],\"x86_64-linux\",\"builtin:fetchurl\",[],[])"
++            case TextParser.parseOnly (parseDerivationForGraph <* TextParser.endOfInput) input of
++              Left err -> assertFailure err
++              Right drv -> assertEqual "content-addressing is retained" (Just (Nix.DerivationOutput "" "r:sha256" "")) (Map.lookup "out" (Nix.outputs drv))
++        , "Reject malformed dynamic children" ~: do
++            let input = "DrvWithVersion(\"xp-dyn-drv\",[],[(\"/nix/store/00000000000000000000000000000000-parent.drv\",([],[(\"out\",42)]))],[],\"x86_64-linux\",\"builtin:fetchurl\",[],[])"
++            assertBool "invalid child trees fail" $ isLeft $ TextParser.parseOnly parseDerivationForGraph input
++        , "Parse Plan" ~: do

@@ -142,7 +142,13 @@ in
     # unstable builds the same 2.2.0 against ghc-9.10.3, which does support
     # GHC2024. Taken from there rather than pinned back to 2.1.8, since the
     # package is fine and only its compiler was wrong.
-    nix-output-monitor = final.unstable.nix-output-monitor;
+    nix-output-monitor = final.unstable.nix-output-monitor.override {
+      extraComposeFunctions = [
+        (final.unstable.haskell.lib.compose.overrideCabal (old: {
+          patches = (old.patches or [ ]) ++ [ ./nom-dynamic-derivations.patch ];
+        }))
+      ];
+    };
 
     # nixfmt 1.5.0 declares GHC2024 too and fails on stable the same way, which
     # breaks every host that installs it from stable (erdtree via
