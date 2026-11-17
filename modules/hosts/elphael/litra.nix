@@ -9,7 +9,12 @@
 { ... }:
 {
   den.aspects.elphael.nixos =
-    { lib, pkgs, ... }:
+    {
+      lib,
+      pkgs,
+      customPackages,
+      ...
+    }:
     let
       facecam = import ./_facecam.nix { inherit lib pkgs; };
 
@@ -20,7 +25,7 @@
       # lights being briefly wrong is not worth killing the watcher over.
       litra-follow-facecam = pkgs.writeShellApplication {
         name = "litra-follow-facecam";
-        runtimeInputs = [ pkgs.litra ];
+        runtimeInputs = [ customPackages.litra ];
         text = ''
           ${lib.getExe' facecam.watchStreaming "facecam-watch-streaming"} \
             | while read -r state; do
@@ -31,12 +36,12 @@
       };
     in
     {
-      environment.systemPackages = [ pkgs.litra ];
+      environment.systemPackages = [ customPackages.litra ];
 
       services.udev.packages = [
         # 99-litra.rules from upstream: GROUP="video" on the Litra hidraw
         # nodes, so both the CLI and the daemon work without root.
-        pkgs.litra
+        customPackages.litra
         (facecam.restartOnReplug "litra-autotoggle.service")
       ];
 

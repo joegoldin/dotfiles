@@ -6,7 +6,12 @@ let
 in
 {
   den.aspects.torrent.darwin =
-    { lib, pkgs, ... }:
+    {
+      lib,
+      pkgs,
+      customPackages,
+      ...
+    }:
     {
       system.stateVersion = 5;
 
@@ -59,7 +64,7 @@ in
         mosh
         nh
         nixos-rebuild-ng
-        tailcat # every other host gets this via _core-packages.nix (nixos-only)
+        customPackages.tailcat # every other host gets this via _core-packages.nix (nixos-only)
         wget
         inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
         # Xcode and iOS SDKs are managed with Apple's installer, not Nix.

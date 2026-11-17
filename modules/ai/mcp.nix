@@ -19,13 +19,13 @@
         #
         # GitHub MCP: needs a token. Reference an env var, never a raw secret.
         # github = {
-        #   command = lib.getExe' pkgs.github-mcp-server "github-mcp-server";
+        #   command = lib.getExe' customPackages.github-mcp-server "github-mcp-server";
         #   env.GITHUB_PERSONAL_ACCESS_TOKEN = "$GITHUB_TOKEN";
         # };
         #
         # Language-server MCP: needs per-language args.
         # language-server = {
-        #   command = lib.getExe' pkgs.mcp-language-server "mcp-language-server";
+        #   command = lib.getExe' customPackages.mcp-language-server "mcp-language-server";
         #   args = [ "--workspace" "%WORKSPACE%" "--lsp" "gopls" ];
         # };
         #

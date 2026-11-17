@@ -11,6 +11,7 @@ in
     {
       config,
       pkgs,
+      customPackages,
       lib,
       ...
     }:
@@ -441,7 +442,7 @@ in
         vial
 
         # On-device live captions for desktop audio or the microphone
-        nowcaption
+        customPackages.nowcaption
       ];
 
       # Fonts

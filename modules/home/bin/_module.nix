@@ -1,4 +1,4 @@
-{ pkgs, ... }@args:
+{ pkgs, customPackages, ... }@args:
 let
   # When imported into a microVM guest (via `_module.args.vmGuest = true;`),
   # strip scripts marked `hostOnly = true;`.
@@ -11,7 +11,11 @@ let
       f:
       let
         raw = import (./_scripts + "/${f}");
-        resolved = if builtins.isFunction raw then raw { inherit pkgs; } else raw;
+        resolved =
+          if builtins.isFunction raw then
+            raw (builtins.intersectAttrs (builtins.functionArgs raw) { inherit pkgs customPackages; })
+          else
+            raw;
       in
       normalizeScript resolved
     ) scriptFiles
@@ -33,7 +37,11 @@ let
           f:
           let
             raw = import (./_scripts + "/${dir}/${f}");
-            resolved = if builtins.isFunction raw then raw { inherit pkgs; } else raw;
+            resolved =
+              if builtins.isFunction raw then
+                raw (builtins.intersectAttrs (builtins.functionArgs raw) { inherit pkgs customPackages; })
+              else
+                raw;
           in
           normalizeScript resolved
         ) subFiles

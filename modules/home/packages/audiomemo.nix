@@ -3,11 +3,12 @@
 # deep-merges them with these.
 { inputs, ... }:
 {
-  den.aspects.audiomemo.homeManager = {
+  den.aspects.audiomemo.homeManager = { customPackages, ... }: {
     imports = [ inputs.audiomemo.homeManagerModules.default ];
 
     programs.audiomemo = {
       enable = true;
+      package = customPackages.audiomemo;
       settings = {
         onboard_version = 1;
         record.output_dir = "~/Recordings";

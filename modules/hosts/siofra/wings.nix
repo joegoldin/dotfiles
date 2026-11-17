@@ -32,6 +32,7 @@ in
   den.aspects.siofra.nixos =
     {
       pkgs,
+      customPackages,
       lib,
       ...
     }:
@@ -70,7 +71,7 @@ in
         serviceConfig = {
           User = "root";
           WorkingDirectory = "/etc/pterodactyl";
-          ExecStart = lib.getExe pkgs.calagopus-wings;
+          ExecStart = lib.getExe customPackages.calagopus-wings;
           Restart = "on-failure";
           LimitNOFILE = 4096;
           RuntimeDirectory = "calagopus-wings";

@@ -120,7 +120,7 @@ in
       services.resolved.enable = true;
 
       services.udev.packages = [
-        # Litra hidraw rules ship with pkgs.litra; see ./litra.nix.
+        # Litra hidraw rules ship with customPackages.litra; see ./litra.nix.
         streamcontroller-rules
         (import ../../system/_streamcontroller.nix { inherit pkgs; }).package
         vial-rules

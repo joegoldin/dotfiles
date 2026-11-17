@@ -7,13 +7,13 @@
 # profile). zmx is session persistence for SSH work — the lean servers are
 # exactly where it matters (shell integration lives in modules/home/zmx.nix).
 # Imported into every NixOS host via den.default.nixos.imports.
-{ pkgs, ... }:
+{ pkgs, customPackages, ... }:
 {
   environment.systemPackages = with pkgs; [
     btop
     gping
     iputils
-    tailcat # from the tailcat-packages overlay; torrent adds it in its own system file
-    zmx
+    customPackages.tailcat # from the customPackages provider; torrent adds it in its own system file
+    customPackages.zmx
   ];
 }

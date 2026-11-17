@@ -2,7 +2,7 @@
 {
   den.aspects.torrent.darwin =
     {
-      pkgs,
+      customPackages,
       ...
     }:
     # Spotlight/Launchpad trampolines for Nix-installed .app bundles, via our
@@ -16,7 +16,7 @@
     {
       # System-wide apps: /Applications/Nix Apps -> /Applications/Nix Trampolines
       system.activationScripts.postActivation.text = ''
-        ${pkgs.mac-app-util}/bin/mac-app-util sync-trampolines \
+        ${customPackages.mac-app-util}/bin/mac-app-util sync-trampolines \
           "/Applications/Nix Apps" "/Applications/Nix Trampolines"
       '';
 
@@ -27,7 +27,7 @@
           { lib, ... }:
           {
             home.activation.trampolineApps = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-              ${pkgs.mac-app-util}/bin/mac-app-util sync-trampolines \
+              ${customPackages.mac-app-util}/bin/mac-app-util sync-trampolines \
                 "$HOME/Applications/Home Manager Apps" \
                 "$HOME/Applications/Home Manager Trampolines"
             '';

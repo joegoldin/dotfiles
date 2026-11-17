@@ -4,12 +4,13 @@
   den.aspects.claude.homeManager =
     {
       pkgs,
+      customPackages,
       lib,
       config,
       ...
     }:
     let
-      enabled = pkgs ? llm-agents;
+      enabled = customPackages ? llm-agents;
       homeDir = config.home.homeDirectory;
     in
     {
@@ -30,7 +31,7 @@
 
       programs.claude-nix = lib.mkIf enabled {
         enable = true;
-        package = pkgs.llm-agents.claude-code;
+        package = customPackages.llm-agents.claude-code;
         # This machine ships a lot of skills; 1% of the window truncates
         # their descriptions before the model ever sees the trigger text.
         skills.skillListingBudgetFraction = 0.04;

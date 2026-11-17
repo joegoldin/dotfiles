@@ -10,6 +10,7 @@ in
   den.aspects.plasma.homeManager =
     {
       pkgs,
+      customPackages,
       lib,
       ...
     }:
@@ -20,8 +21,8 @@ in
       # (home-manager adds the user profile), so they show up in the
       # "Add Widgets" picker without any imperative kpackagetool6 install.
       home.packages = [
-        pkgs.plasma-applet-netspeed
-        pkgs.plasma-applet-resources-monitor
+        customPackages.plasma-applet-netspeed
+        customPackages.plasma-applet-resources-monitor
       ];
 
       # plasmashell D-Bus wedge watchdog.
@@ -552,6 +553,9 @@ in
         };
 
         configFile = {
+          # Plasma's default popup duration is measured in milliseconds.
+          "plasmanotifyrc"."Notifications"."PopupTimeout" = 10000;
+
           # Power management
           #
           # DPMS the displays off after 15min idle, but never while locked.

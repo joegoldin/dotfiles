@@ -27,7 +27,7 @@
     # You can access packages and modules from different nixpkgs revs
     # at the same time. Here's an working example:
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    # Also see the 'unstable-packages' overlay at 'overlays/default.nix'.
+    # Shared policy lives in modules/flake/package-sets.nix.
 
     # Track Atuin releases independently of nixpkgs (Threads fixes land quickly).
     atuin = {

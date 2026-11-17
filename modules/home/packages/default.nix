@@ -10,6 +10,7 @@
   den.aspects.cli-packages.homeManager =
     {
       pkgs,
+      customPackages,
       lib,
       config,
       ...
@@ -78,12 +79,12 @@
           act
           bfg-repo-cleaner
           git
-          git-hunk
+          customPackages.git-hunk
           git-stack
           git-worktree-switcher
           gitleaks
           pre-commit
-          sem # semantic, entity-level git diff/impact/blame/context (tree-sitter)
+          customPackages.sem # semantic, entity-level git diff/impact/blame/context (tree-sitter)
         ];
 
         nix-tooling = [
@@ -102,8 +103,8 @@
         containers = [
           helm-docs
           helm-ls
-          helm-with-plugins
-          helmfile-with-plugins
+          customPackages.helm-with-plugins
+          customPackages.helmfile-with-plugins
           k9s
           kubectl
           kubectx
@@ -113,7 +114,7 @@
         ];
 
         cloud = [
-          aws-cli
+          customPackages.aws-cli
           caddy
           flyctl
           stripe-cli
@@ -163,7 +164,7 @@
         misc = [
           unstable.playwright-driver
           unstable.playwright-driver.browsers
-          shopt-script
+          customPackages.shopt-script
           spritesModule.packages.sprite
         ];
       };

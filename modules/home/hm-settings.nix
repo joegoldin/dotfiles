@@ -4,10 +4,11 @@
 { ... }:
 {
   den.aspects.hm-settings.os =
-    { pkgs, ... }:
+    { pkgs, customPackages, ... }:
     {
       home-manager = {
         useGlobalPkgs = true;
+        extraSpecialArgs = { inherit customPackages; };
         useUserPackages = true;
         # timestamped so reruns never collide. Must be a script, not an inline
         # snippet: home-manager word-splits the value and runs it without a

@@ -2,15 +2,15 @@
 { inputs, ... }:
 {
   den.aspects.antigravity.homeManager =
-    { pkgs, lib, ... }:
+    { customPackages, lib, ... }:
     {
       imports = [ inputs.agent-skills.homeManagerModules.antigravity ];
 
       programs.antigravity-cli-nix =
-        lib.mkIf ((pkgs ? llm-agents) && (pkgs.llm-agents ? antigravity-cli))
+        lib.mkIf ((customPackages ? llm-agents) && (customPackages.llm-agents ? antigravity-cli))
           {
             enable = true;
-            package = pkgs.llm-agents.antigravity-cli;
+            package = customPackages.llm-agents.antigravity-cli;
             # Antigravity's settings.json uses flat keys (per the CLI reference):
             # `notifications` is the real key. The old nested
             # `general.enableNotifications` / `skills.enabled` are not in the

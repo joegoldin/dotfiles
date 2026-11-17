@@ -5,9 +5,9 @@
 # every NixOS box through modules/flake/_core-packages.nix.
 _: {
   den.aspects.zmx.homeManager =
-    { pkgs, ... }:
+    { customPackages, ... }:
     {
-      home.packages = [ pkgs.zmx ];
+      home.packages = [ customPackages.zmx ];
 
       # Sourced at completion-load time so completions always match the
       # installed zmx (upstream-recommended setup).

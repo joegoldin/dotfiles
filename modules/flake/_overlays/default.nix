@@ -1,9 +1,7 @@
 # This file defines overlays
-{ inputs, ... }:
+{ inputs, packageSets, ... }:
 let
-  # Common overlays applied to the unstable nixpkgs import.
-  # Host-specific unstable overrides (e.g. for rocmSupport) should include these
-  # to avoid losing package patches.
+  # Dependency fixes applied inside the shared unstable package set.
   unstableOverlays = [
     inputs.tinygrad-nix.overlays.default
     (uFinal: uPrev: {
@@ -106,9 +104,6 @@ let
 in
 {
   inherit unstableOverlays;
-
-  # This one brings our custom packages from the '_pkgs' directory
-  additions = final: _prev: import ../_pkgs final.pkgs;
 
   # This one contains whatever you want to overlay
   # You can change versions, add patches, set compilation flags, anything really.
@@ -249,85 +244,16 @@ in
     });
   };
 
-  # When applied, the unstable nixpkgs set (declared in the flake inputs) will
-  # be accessible through 'pkgs.unstable'
+  # Dependency patches above consume unstable internally. Reuse the provider's
+  # value rather than importing a new package set for every stable fixpoint.
   unstable-packages = final: _prev: {
-    unstable = import inputs.nixpkgs-unstable {
-      inherit (final.stdenv.hostPlatform) system;
-      config = {
-        allowUnfree = true;
-        android_sdk.accept_license = true;
-        # torch-bin 2.12.0 marks itself "broken" whenever nixpkgs' cudaPackages
-        # is older than the cuda-bindings>=13.0.3 it expects (currently 12.9.7).
-        # That check is platform-agnostic, so it trips on aarch64-darwin too —
-        # even though the macOS torch-bin wheel ships no CUDA at all. Downgrade
-        # the false positive to a warning so the env still evaluates. Remove
-        # once nixpkgs' default cudaPackages reaches >=13.0.3.
-        problems.handlers.torch.unsupported-cuda-version = "warn";
-      };
-      overlays = unstableOverlays;
-    };
+    unstable = packageSets.${final.stdenv.hostPlatform.system}.unstable;
   };
 
   # tinygrad with ROCm/CUDA/OpenCL support
   tinygrad-packages = inputs.tinygrad-nix.overlays.default;
 
-  # LLM agent packages (claude-code, codex, antigravity) available as pkgs.llm-agents.*
-  # Upstream dropped overlays.default (a passthrough of the flake's own
-  # prebuilt packages), keeping only overlays.shared-nixpkgs, which rebuilds
-  # everything against our nixpkgs and misses the numtide binary cache.
-  # Replicate the old passthrough so the cache keeps hitting.
-  llm-agents-packages = final: _prev: {
-    llm-agents = inputs.llm-agents.packages.${final.stdenv.hostPlatform.system};
-  };
-
-  # audiomemo (recording + transcription CLI)
-  # Inlined upstream overlay to avoid deprecated final.system access in audiomemo.overlays.default
-  audiomemo-packages = final: _prev: {
-    inherit (inputs.audiomemo.packages.${final.stdenv.hostPlatform.system}) audiomemo;
-  };
-
-  # sem (semantic, entity-level version control CLI) available as pkgs.sem
-  sem-packages = final: _prev: {
-    sem = inputs.sem.packages.${final.stdenv.hostPlatform.system}.default;
-  };
-
-  # tailcat (netcat over Tailscale's data plane) available as pkgs.tailcat
-  #
-  # Checks off: the suite is mostly end-to-end DERP/magicsock tests with
-  # 10-30s deadlines, and on a loaded builder they time out. On siofra (4
-  # cores, ~500 derivations building alongside) TestProbeStrangerSSH failed,
-  # then with that skipped TestServeExitNode/socks5 did, each failure taking
-  # the whole system build down. Upstream CI runs them on an idle machine;
-  # rerunning them here only tests our build host's load.
-  tailcat-packages = final: _prev: {
-    tailcat = inputs.tailcat.packages.${final.stdenv.hostPlatform.system}.default.overrideAttrs {
-      doCheck = false;
-    };
-  };
-
   # affinity-nix (Affinity Photo/Designer/Publisher via wine)
   affinity-packages = inputs.affinity-nix.overlays.default;
 
-  # Autodesk Fusion (wine prefix built by nix) available as pkgs.fusion360
-  fusion360-packages = final: _prev: {
-    fusion360 = inputs.fusion-360-flake.packages.${final.stdenv.hostPlatform.system}.fusion360;
-  };
-
-  # MCP server packages for declarative MCP configuration
-  # The upstream overlay only exports github-mcp-server; we also need mcp-language-server
-  # Inlined upstream overlay to avoid deprecated pkgs.system access in mcps.overlays.default
-  # Use nixpkgs' mcp-nixos, not mcps.nix's pinned 1.0.3, which fails to
-  # build against fastmcp.
-  mcps-packages =
-    final: _prev:
-    let
-      unstable-pkgs = import inputs.mcps.inputs.nixpkgs-unstable {
-        inherit (final.stdenv.hostPlatform) system;
-      };
-    in
-    {
-      inherit (unstable-pkgs) github-mcp-server;
-      inherit (inputs.mcps.packages.${final.stdenv.hostPlatform.system}) mcp-language-server;
-    };
 }

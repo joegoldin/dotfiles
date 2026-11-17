@@ -2,9 +2,10 @@
 # opensearch :9200 — all localhost; Caddy fronts the app + cache domains.
 # Secrets: agenix files installed at /run/secrets/<name> (the backend's
 # built-in fallback paths). Design: docs/plans/2026-07-10-garnix-self-hosting-design.md
-{ inputs, ... }:
+{ inputs, config, ... }:
 let
   inherit (inputs) dotfiles-secrets;
+  flakeOverlays = config.flake.overlays;
 in
 {
   den.aspects.erdtree.nixos =
@@ -181,6 +182,9 @@ in
         # (older-nixpkgs) opensearch installPhase copied. No-op if the string ever
         # changes upstream. Mirrors the fork's own installPhase-patch overlay.
         (final: prev: {
+          # Garnix replaces the Haskell scope with GHC 9.6.7. Apply our fixes
+          # to that scope too, preserving the pre-provider compiler/patch policy.
+          inherit (flakeOverlays.modifications final prev) haskellPackages;
           opensearch = prev.opensearch.overrideAttrs (old: {
             installPhase =
               builtins.replaceStrings

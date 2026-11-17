@@ -40,6 +40,9 @@ in
 
   # Tell `./bin` to strip hostOnly scripts for guest use.
   _module.args.vmGuest = true;
+  # Standalone guests have no flake-provided tools; watchyt can use an
+  # audiomemo supplied on PATH without pulling host applications into the VM.
+  _module.args.customPackages = { };
 
   # home-manager requires an explicit stateVersion; username/homeDirectory
   # are inferred from the NixOS user config (useUserPackages = true).

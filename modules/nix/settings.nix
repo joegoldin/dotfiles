@@ -1,10 +1,9 @@
 # Repo-wide nix daemon + nixpkgs settings; included by every host via its
 # aspect. The `os` half serves both nixos and darwin; per-host deltas
 # (cores, gc cadence, extra platforms) live in each host's system file.
-{ config, inputs, ... }:
+{ inputs, packageSets, ... }:
 let
   meta = import ../_lib/meta.nix;
-  flakeOverlays = builtins.attrValues config.flake.overlays;
   flakeInputs = inputs;
 in
 {
@@ -12,20 +11,17 @@ in
     {
       config,
       lib,
+      pkgs,
       ...
     }:
     let
       registryInputs = lib.filterAttrs (_: lib.isType "flake") flakeInputs;
     in
     {
-      nixpkgs = {
-        overlays = flakeOverlays;
-        config = {
-          allowUnfree = true;
-          allowUnsupportedSystem = true;
-          experimental-features = "nix-command flakes";
-        };
-      };
+      # NixOS/nix-darwin append host-local overlays to this base. Their
+      # nixpkgs.config stays empty: policy belongs to the supplied package set.
+      nixpkgs.pkgs = lib.mkDefault packageSets.${config.nixpkgs.hostPlatform.system}.stable;
+      _module.args.customPackages = packageSets.${pkgs.stdenv.hostPlatform.system}.mkCustomPackages pkgs;
 
       nix = {
         settings = {

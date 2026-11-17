@@ -1,4 +1,4 @@
-{ pkgs }:
+{ pkgs, customPackages }:
 # Customized port of https://github.com/bradautomates/claude-video (MIT).
 # Drops the brew installer and bundled Whisper client in favor of audiomemo
 # and home-manager-provided binaries.
@@ -8,8 +8,8 @@
   runtimeInputs = [
     pkgs.yt-dlp
     pkgs.ffmpeg
-    pkgs.audiomemo
-  ];
+  ]
+  ++ pkgs.lib.optional (customPackages ? audiomemo) customPackages.audiomemo;
   params = [
     {
       name = "source";

@@ -13,6 +13,7 @@ in
       den.aspects.rex
       den.aspects.rex-linux
       den.aspects.nix-settings
+      den.aspects.vllm
       den.aspects.ncro
       den.aspects.dynamic-derivations
       # system features

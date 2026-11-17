@@ -1,4 +1,9 @@
-{ inputs, lib, ... }:
+{
+  inputs,
+  lib,
+  packageSets,
+  ...
+}:
 {
   perSystem =
     { pkgs, system, ... }:
@@ -18,7 +23,14 @@
             pkgs.runCommand "rex-linux-tests" { } ''
               touch "$out"
             '';
-          rex-services = import ../home/_rex/service-checks.nix { inherit inputs pkgs lib; };
+          rex-services = import ../home/_rex/service-checks.nix {
+            inherit
+              inputs
+              pkgs
+              lib
+              packageSets
+              ;
+          };
         };
     };
 }

@@ -1,5 +1,6 @@
 {
   inputs,
+  packageSets,
   pkgs,
   lib,
 }:
@@ -8,7 +9,7 @@ let
   home =
     system:
     (inputs.home-manager.lib.homeManagerConfiguration {
-      pkgs = import inputs.nixpkgs { inherit system; };
+      pkgs = packageSets.${system}.plain;
       modules = [
         aspect.homeManager
         {

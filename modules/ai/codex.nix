@@ -2,13 +2,13 @@
 { inputs, ... }:
 {
   den.aspects.codex.homeManager =
-    { pkgs, lib, ... }:
+    { customPackages, lib, ... }:
     {
       imports = [ inputs.agent-skills.homeManagerModules.codex ];
 
-      programs.codex-nix = lib.mkIf (pkgs ? llm-agents) {
+      programs.codex-nix = lib.mkIf (customPackages ? llm-agents) {
         enable = true;
-        package = pkgs.llm-agents.codex;
+        package = customPackages.llm-agents.codex;
         settings = {
           approval_policy = "on-request";
           sandbox_mode = "workspace-write";

@@ -1,11 +1,9 @@
-# Base system config (lanzaboote secure boot, ROCm unstable overlay);
+# Base system config (lanzaboote secure boot);
 # nix/nixpkgs settings come from den.aspects.nix-settings (cores delta
 # below); OS account from den.aspects.joe.
 { inputs, ... }:
 let
   meta = import ../../_lib/meta.nix;
-  overlaysModule = import ../../flake/_overlays { inherit inputs; };
-  inherit (overlaysModule) unstableOverlays;
 in
 {
   den.aspects.volcano-manor.nixos =
@@ -25,24 +23,6 @@ in
 
       # Enable aarch64 cross-compilation via QEMU
       boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
-
-      # ROCm support (AMD GPU): rebuild the `unstable` package set with
-      # rocmSupport + the vllm-rocm overlay. Later overlays win, so this
-      # replaces the stock pkgs.unstable from the shared overlay set.
-      nixpkgs.overlays = [
-        (final: prev: {
-          unstable = import inputs.nixpkgs-unstable {
-            inherit (final.stdenv.hostPlatform) system;
-            config = {
-              allowUnfree = true;
-              rocmSupport = true;
-            };
-            overlays = unstableOverlays ++ [
-              (import ../../flake/_overlays/vllm-rocm.nix)
-            ];
-          };
-        })
-      ];
 
       # Compute-box nix tuning (deltas from den.aspects.nix-settings)
       nix.settings.builders-use-substitutes = true;

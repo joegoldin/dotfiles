@@ -4,12 +4,13 @@
   den.aspects.pi.homeManager =
     {
       pkgs,
+      customPackages,
       lib,
       osConfig,
       ...
     }:
     let
-      enabled = pkgs ? llm-agents;
+      enabled = customPackages ? llm-agents;
       secrets = osConfig.age.secrets or { };
       ageKey = name: secrets.${name}.path or null;
     in
@@ -48,7 +49,7 @@
         };
         voice = {
           enable = true;
-          inherit (pkgs) audiomemo;
+          inherit (customPackages) audiomemo;
           keyFiles = lib.filterAttrs (_: path: path != null) {
             ELEVENLABS_API_KEY_FILE = ageKey "elevenlabs_api_key";
             DEEPGRAM_API_KEY_FILE = ageKey "deepgram_api_key";
