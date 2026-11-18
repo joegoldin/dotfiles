@@ -144,6 +144,8 @@ in
           # All custom entries can be found by running `defaults read` command.
           # or `defaults read xxx` to read a specific domain.
           CustomUserPreferences = {
+            "com.apple.assistant.support"."Dictation Enabled" = false;
+            "com.apple.HIToolbox".AppleDictationAutoEnable = false;
             ".GlobalPreferences" = {
               # automatically switch to a new space when switching to the application
               AppleSpacesSwitchOnActivate = true;
@@ -204,6 +206,13 @@ in
         keyboard = {
           enableKeyMapping = true; # enable key mapping so that we can use `option` as `control`
 
+          # The microphone glyph sends Consumer Dictation, not keyboard F5.
+          userKeyMapping = [
+            {
+              HIDKeyboardModifierMappingSrc = 51539607759; # 0xC000000CF
+              HIDKeyboardModifierMappingDst = 30064771181; # 0x70000006D (F18)
+            }
+          ];
           remapCapsLockToControl = true; # remap caps lock to control, useful for emac users
 
           # swap left command and left alt

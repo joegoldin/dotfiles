@@ -116,7 +116,7 @@
     # ── My repos ─────────────────────────────────────────────────────────────
     # recording + transcription CLI
     audiomemo = {
-      url = "github:joegoldin/audiomemo";
+      url = "github:joegoldin/audiomemo/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # CIT200 desk phone; reactive dataflow engine

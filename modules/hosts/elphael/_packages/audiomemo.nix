@@ -1,15 +1,31 @@
-_: {
-  # PulseAudio device names; merged with the common audiomemo settings in
-  # modules/home/_hm/packages/audiomemo.nix.
-  programs.audiomemo.settings = {
-    record.device = "mic";
-    devices = {
-      mic = "alsa_input.usb-MOTU_M2_M20000044767-00.HiFi__Mic1__source";
-      speakers = "alsa_output.usb-MOTU_M2_M20000044767-00.HiFi__Line__sink.monitor";
+{ config, ... }:
+{
+  programs = {
+    plasma.hotkeys.commands.audiomemo-dictate = {
+      name = "Toggle Quick Scribe";
+      key = "Meta+G";
+      command = "${config.programs.audiomemo.package}/bin/audiomemo dictate toggle";
     };
-    device_groups.combo = [
-      "mic"
-      "speakers"
-    ];
+    audiomemo = {
+      desktop = {
+        enable = true;
+        autoStart = true;
+      };
+      settings = {
+        desktop = {
+          dictation_mic = "mic";
+          meeting_device = "combo";
+        };
+        record.device = "mic";
+        devices = {
+          mic = "alsa_input.usb-MOTU_M2_M20000044767-00.HiFi__Mic1__source";
+          speakers = "alsa_output.usb-MOTU_M2_M20000044767-00.HiFi__Line__sink.monitor";
+        };
+        device_groups.combo = [
+          "mic"
+          "speakers"
+        ];
+      };
+    };
   };
 }

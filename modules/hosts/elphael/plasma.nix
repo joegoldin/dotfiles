@@ -15,6 +15,8 @@
     programs.plasma = {
       # Desktop-specific shortcuts (activity UUIDs)
       shortcuts = {
+        # One desktop on elphael; give Grid View's shortcut to Quick Scribe.
+        "kwin"."Grid View" = lib.mkForce [ ];
         "ActivityManager"."switch-to-activity-8a44913d-258b-4faf-b84c-6815d74e5cf1" = [ ];
         "ActivityManager"."switch-to-activity-aa47102b-a33c-407f-8039-dbf5985eb3e6" = [ ];
       };
