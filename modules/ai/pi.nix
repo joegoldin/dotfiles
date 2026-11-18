@@ -43,7 +43,6 @@
           ];
         };
         environment = lib.filterAttrs (_: key: key.file != null) {
-          OPENROUTER_API_KEY.file = ageKey "openrouter_api_key";
           CEREBRAS_API_KEY.file = ageKey "cerebras_api_key";
         };
         voice = {
