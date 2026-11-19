@@ -351,12 +351,10 @@ in
         # nix `max-jobs` for local derivation builds; the nix-daemon cgroup caps
         # below bound the actual CPU/RAM they can consume.
         maxLocalJobs = 8;
-        # How many garnix builds eval+run at once. Every build still fans out and
-        # shows pending immediately; the rest queue behind this cap (round-robin
-        # fair by repo owner) and flip to running as slots free. Keeps a big
-        # multi-commit push from spawning dozens of guests and drowning the
-        # fluent-bit log pipeline. 16 of erdtree's 32 threads.
-        maxConcurrentBuilds = 16;
+        # At 16 concurrent Garnix builds, Nix write bursts stalled the encrypted
+        # root for seconds. Queue more requests in Garnix rather than on disk;
+        # keep local Nix parallelism unchanged so the two caps can be compared.
+        maxConcurrentBuilds = 8;
         monitoringBuilders = [
           {
             name = "erdtree";
