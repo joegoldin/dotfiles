@@ -309,6 +309,14 @@ in
         };
       };
 
+      # On erdtree agenix installs credentials during NixOS activation, not
+      # in agenix.service. Retry setup after a rekey and wait for it to create
+      # the database and set role passwords before the backend can migrate.
+      systemd.services.postgresql-setup.restartTriggers = [
+        config.age.secrets.garnix-database-password.file
+        config.age.secrets.garnix-database-monitoring-pgpass.file
+      ];
+
       # Host metrics for the self-host Monitoring page (loopback only; the
       # garnix backend scrapes 127.0.0.1:9100).
       services.prometheus.exporters.node = {
@@ -541,9 +549,10 @@ in
       # DB certs before postgres; secrets before the services that read them.
       systemd.services.postgresql.serviceConfig.ExecStartPre = lib.mkBefore [ "+${mkDbCerts}" ];
       systemd.services.garnixServer = {
+        requires = [ "postgresql-setup.service" ];
         after = [
           "agenix.service"
-          "postgresql.service"
+          "postgresql-setup.service"
           "opensearch.service"
         ];
         wants = [ "agenix.service" ];
@@ -657,6 +666,13 @@ in
         after = [ "agenix.service" ];
         wants = [ "agenix.service" ];
       };
+
+      # The bridge may have no carrier until the first guest starts. It is not
+      # an uplink and must not hold up network-online during boot.
+      systemd.network.networks."40-${config.garnix.local-provisioner.bridge}".linkConfig.RequiredForOnline =
+        false;
+      boot.initrd.systemd.network.networks."40-${config.garnix.local-provisioner.bridge}".linkConfig.RequiredForOnline =
+        false;
 
       # ── Action runner ───────────────────────────────────────────────────────
       # Repo `actions` execute here, isolated in a bubblewrap sandbox. The
