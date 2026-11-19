@@ -16,5 +16,8 @@ builds:
   exclude:
     - "nixosConfigurations.scarab"
 
+# Don't spend builder slots on older commits from the same branch.
+autoCancelSuperseded: true
+
 # Skip expensive fixed-output derivation rebuild checks.
 fodChecks: false
