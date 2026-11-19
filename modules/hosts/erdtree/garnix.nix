@@ -350,10 +350,9 @@ in
         fodCratesProxy.enable = true;
         # nix `max-jobs` for local derivation builds; the nix-daemon cgroup caps
         # below bound the actual CPU/RAM they can consume.
-        maxLocalJobs = 8;
+        maxLocalJobs = 6;
         # At 16 concurrent Garnix builds, Nix write bursts stalled the encrypted
-        # root for seconds. Queue more requests in Garnix rather than on disk;
-        # keep local Nix parallelism unchanged so the two caps can be compared.
+        # root for seconds. Queue more requests in Garnix rather than on disk.
         maxConcurrentBuilds = 8;
         monitoringBuilders = [
           {
@@ -363,7 +362,7 @@ in
               "x86_64-linux"
               "aarch64-linux"
             ];
-            maxJobs = 8;
+            maxJobs = config.services.garnixServer.maxLocalJobs;
           }
           {
             name = "farum-azula";
@@ -521,11 +520,7 @@ in
           "recursive-nix"
         ];
         trusted-users = [ "garnix" ];
-        # Half the box per derivation: erdtree is a dual E5-2667 v2 = 32
-        # threads, so a single build (ghc, rustc, …) may use up to 16. Total
-        # build CPU/RAM is capped by the nix-daemon cgroup below. (mkForce: the
-        # garnix module hardcodes cores = 4.)
-        cores = lib.mkForce 16;
+        cores = 4;
       };
 
       # CI must not starve the machine (it's also a gaming/HPC box): cap the
