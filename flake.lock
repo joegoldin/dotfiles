@@ -65,11 +65,11 @@
         "vfkit-src": "vfkit-src"
       },
       "locked": {
-        "lastModified": 1795112389,
-        "narHash": "sha256-/tEyftsasKgRjiff6KwXnputlZH/5nWQ6u/M+rhOODw=",
+        "lastModified": 1795116461,
+        "narHash": "sha256-Jry3AvUlRxoAhqAGdnBaljvQmbZvlovzS9Cf6els/NE=",
         "owner": "joegoldin",
         "repo": "agent-skills",
-        "rev": "3f9033d366ef83ba9fd590e4183a7f4f31fe709b",
+        "rev": "fc6bf9aba56676a09925fcef34afac3d7d1d8e51",
         "type": "github"
       },
       "original": {
@@ -3033,11 +3033,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1795055326,
-        "narHash": "sha256-TorkOh2+Ux8+Wm7B2F9gdFfhLnuJSkxJLb59QXOCNCM=",
+        "lastModified": 1795116035,
+        "narHash": "sha256-ogVxOxOLZhbQ1krg8HmYOq4pyzj/9sL26K9a6nPu3XA=",
         "owner": "joegoldin",
         "repo": "pi-nix",
-        "rev": "47abbd5558ba8856b018dfc2f8117f27bc3300cd",
+        "rev": "6f507e2906f859f822bfeeb474bce2ec4709ac67",
         "type": "github"
       },
       "original": {
