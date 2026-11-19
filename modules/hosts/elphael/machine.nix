@@ -35,14 +35,6 @@ in
         ];
         text = builtins.readFile ./_displaylink-suspend-settle.sh;
       };
-      desktopIoLatency = pkgs.writeShellApplication {
-        name = "desktop-io-latency";
-        runtimeInputs = with pkgs; [
-          coreutils
-          util-linux
-        ];
-        text = builtins.readFile ./_desktop-io-latency.sh;
-      };
     in
     {
       # Cap nix builds: 3 parallel jobs × 6 threads each = 18 max threads. Memory
@@ -53,22 +45,7 @@ in
       nix.settings.max-jobs = 3;
       nix.settings.cores = 6;
 
-      # Keep a write storm from stalling the desktop. A Steam extraction, a
-      # nix-gc unlink run or the swapfile dd used to hang KWin's main thread for
-      # seconds at a time, with jbd2, dmcrypt_write and every process that
-      # touched the disk parked in D state behind them. On the 9.6-day uptime,
-      # 10 of the 13 KWin hangs landed inside the nix-gc that deleted 21563
-      # store paths, and ncro logged SQLite writes taking up to 47.9s.
-      #
-      # The ratio defaults are a share of RAM, so on 62 GiB they let 12.5 GiB of
-      # dirty pages pile up before writeback is forced and flushing that through
-      # LUKS takes tens of seconds. Bound it in bytes instead: writeback starts
-      # early and the worst-case flush drains in well under a second. Setting
-      # dirty_bytes zeroes dirty_ratio, which is what we want.
       boot.kernel.sysctl = {
-        "vm.dirty_background_bytes" = 256 * 1024 * 1024;
-        "vm.dirty_bytes" = 1024 * 1024 * 1024;
-
         # At the default 60 the kernel treats app memory and page cache as
         # roughly equally evictable, so streaming a game's assets through the
         # cache pushes idle applications out to swap: measured 4.5 GiB of
@@ -101,7 +78,7 @@ in
 
       # Swap here is an 8 GiB random-encrypted partition, so every swap-in
       # pays dm-crypt plus NVMe and queues behind whatever dmcrypt_write is
-      # already draining - the same D-state pile-up the dirty_bytes caps above
+      # already draining - the same D-state pile-up the desktop writeback caps
       # exist to break. zswap puts a compressed RAM cache in front of it:
       # reclaimed anonymous pages are zstd'd into a pool capped at 20% of RAM
       # (12.4 GiB, more than the whole backing partition holds uncompressed),
@@ -135,44 +112,6 @@ in
       services.udev.extraRules = ''
         ACTION=="add|change", KERNEL=="nvme[0-9]n[0-9]", ATTR{queue/scheduler}="mq-deadline"
       '';
-
-      # nix-gc is pure background work with no deadline, so stop it competing
-      # with the session it interrupts; nix-daemon already has the equivalent
-      # memory ceilings. IOSchedulingClass is the knob that bites, and only
-      # because of the mq-deadline switch above - IOWeight stays inert until
-      # something enables bfq or iocost, and is kept for that day.
-      systemd.services.nix-gc.serviceConfig = {
-        IOSchedulingClass = "idle";
-        IOWeight = 10;
-        CPUWeight = 20;
-        Nice = 19;
-      };
-
-      systemd.services.desktop-io-latency = {
-        description = "Protect the desktop session from background I/O storms";
-        wantedBy = [ "multi-user.target" ];
-        serviceConfig = {
-          Type = "oneshot";
-          RemainAfterExit = true;
-          ExecStart = lib.getExe desktopIoLatency;
-        };
-      };
-
-      # The io.latency on user.slice above only throttles its siblings -
-      # system.slice, home of nix builds and nix-gc. It is blind to a writer
-      # inside user.slice itself, and that is exactly where a Steam download
-      # to /home runs (app.slice, next to the compositor's session.slice
-      # under the same user manager). Give session.slice its own latency
-      # target on the root device so the io controller throttles app.slice
-      # when kwin starts missing it. The user manager already delegates the
-      # io controller, so the target lands on a writable cgroup.
-      systemd.user.units."session.slice" = {
-        overrideStrategy = "asDropin";
-        text = ''
-          [Slice]
-          IODeviceLatencyTargetSec=/dev/mapper/luks-bf7e5885-6a8e-447b-bb6d-b682b2991325 50ms
-        '';
-      };
 
       environment.plasma6.excludePackages = with pkgs.kdePackages; [
         discover
