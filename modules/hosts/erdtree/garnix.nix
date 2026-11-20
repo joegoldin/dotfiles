@@ -529,6 +529,9 @@ in
       #  - garnixServer: sandboxed evals, nar packing, cache uploads
       systemd.services.nix-daemon.serviceConfig = {
         CPUQuota = "1600%"; # 16 of 32 threads
+        # Pace build writes before they queue behind dm-crypt. systemd takes
+        # bytes/sec here: 41943040 is the tested 40 MiB/s on cryptroot.
+        IOWriteBandwidthMax = "/dev/mapper/cryptroot 41943040";
         MemoryHigh = "115G"; # throttle before the hard cap
         MemoryMax = "125G"; # half of 251G
       };
