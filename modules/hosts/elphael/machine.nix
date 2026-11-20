@@ -46,6 +46,9 @@ in
       nix.settings.cores = 6;
 
       boot.kernel.sysctl = {
+        # Watchman can approach the default cap across active worktrees.
+        "fs.inotify.max_user_watches" = 1048576;
+
         # At the default 60 the kernel treats app memory and page cache as
         # roughly equally evictable, so streaming a game's assets through the
         # cache pushes idle applications out to swap: measured 4.5 GiB of
