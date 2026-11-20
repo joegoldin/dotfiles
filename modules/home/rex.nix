@@ -38,7 +38,7 @@ in
     }:
     let
       isMac = pkgs.stdenv.hostPlatform.isDarwin;
-      appRex = "/Applications/Rex Beta.app/Contents/Helpers/Rex Server.rex/Contents/MacOS/rex";
+      appRex = (import ./_rex/darwin-app.nix).cli;
       rex = if isMac then appRex else lib.getExe config.programs.rex.package;
       configDir = "${config.xdg.configHome}/rex";
       shellInit = ''

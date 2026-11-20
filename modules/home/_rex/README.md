@@ -43,7 +43,7 @@ restarts it, ending its terminal sessions.** The unit explicitly uses
 arrange another SSH connection before switching; lingering does not protect
 sessions from a service restart.
 
-Torrent keeps its native **Rex Beta.app**, including its bundled server and CLI.
+Torrent keeps its native **Rex.app**, including its bundled server and CLI.
 The aspect exposes that CLI on PATH without installing another Mac server.
 
 Home Manager writes `~/.config/rex/dotfiles.lua`. Activation merges a marked

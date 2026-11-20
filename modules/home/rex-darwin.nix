@@ -10,6 +10,7 @@
     }:
     let
       ghostty = (import ./ghostty/_settings.nix { inherit lib; }).baseSettings;
+      appRex = (import ./_rex/darwin-app.nix).cli;
     in
     lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
       targets.darwin.defaults."com.superlogical.rex" = {
@@ -28,7 +29,7 @@
         '';
         rexTheme = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
           run ${pkgs.python3}/bin/python3 ${./_rex/import-theme.py} \
-            '/Applications/Rex Beta.app/Contents/Helpers/Rex Server.rex/Contents/MacOS/rex' \
+            ${lib.escapeShellArg appRex} \
             ${lib.escapeShellArg "${config.xdg.configHome}/rex/themes/Gruvbox Dark Hard"} \
             ${lib.escapeShellArg "${config.xdg.stateHome}/rex/dotfiles-theme.sha256"}
         '';

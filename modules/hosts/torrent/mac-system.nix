@@ -78,7 +78,7 @@ in
               "/System/Applications/Photos.app"
               "/System/Applications/VoiceMemos.app"
               "/Applications/Zed.app"
-              "/Applications/Rex Beta.app"
+              (import ../../home/_rex/darwin-app.nix).app
               "/Applications/Xcode.app"
               "/Applications/Android Studio.app"
               "/Applications/Xcode.app/Contents/Applications/DeviceHub.app"
