@@ -1537,11 +1537,11 @@
         "treetop": "treetop"
       },
       "locked": {
-        "lastModified": 1794905435,
-        "narHash": "sha256-RnPGl9mcv1kQhO1m4srQXZAnrBa+ybCTGzEhII5gqjc=",
+        "lastModified": 1795320786,
+        "narHash": "sha256-KpXSq30ClyqbEm4G+H3pPD9or/jF+ZwQopPI5yPnLVg=",
         "owner": "joegoldin",
         "repo": "garnix-ci-selfhosted",
-        "rev": "72a56526b61a4780d04bd2777571f1bd3bd169c5",
+        "rev": "78a0e6a4fef5b8f06ecca8aeca6a246e07b78c9d",
         "type": "github"
       },
       "original": {

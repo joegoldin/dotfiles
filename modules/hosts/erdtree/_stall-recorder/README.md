@@ -38,3 +38,17 @@ samples are retained too. At two-second cadence eight days is about 346,000
 rows. SQLite reuses expired space rather than vacuuming under load. The first
 week fills progressively; downtime leaves gaps, and an abrupt crash can lose
 the latest unflushed batch. No storage limits or scheduler settings are changed.
+
+Newer samples also include `devices.disk.flushes` and `flush_total_ms` (interval
+counters), `flush_ms` (mean per completed flush, null if none), and `memory`
+(`dirty_bytes` and `writeback_bytes` at sample time). `slices` shows byte deltas
+for direct children of the root cgroup, including `system.slice`. Compare these
+with whole-disk bytes; **do not add** `slices` to `units` (their scopes overlap).
+
+Once per minute a separate worker overwrites and `fdatasync`s one 4 KiB block
+beside the database. `sync.ms` measures open, write and sync together; a failure
+or latency ≥250 ms is marked `durable-write`. At most one sync probe can be in
+flight; a stuck sync does not queue another, block kernel sampling, or delay the
+PostgreSQL probe. Its latency is recorded on completion. This measures the
+filesystem's durability acknowledgement, not controller power-loss protection.
+Older rows remain readable and lack the new fields.
