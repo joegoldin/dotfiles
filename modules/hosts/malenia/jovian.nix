@@ -31,15 +31,26 @@ in
       jovian.devices.steamdeck.enableVendorDrivers = true;
       jovian.hardware.has.amd.gpu = true;
 
-      # Jovian vendors gamescope 3.16.24 by swapping the src on nixos-26.05's
-      # gamescope 3.16.23, whose shaders-path.patch predates that release's
-      # source reorg — the patch no longer applies. Take gamescope from
-      # unstable instead: same 3.16.24 Valve tag Jovian pins, with coherent
-      # patches and deps, cached upstream. mkAfter so this overlay lands
-      # after Jovian's. Drop once nixos-26.05's gamescope reaches 3.16.24.
       nixpkgs.overlays = lib.mkAfter [
-        (final: _prev: {
-          inherit (final.unstable) gamescope gamescope-wsi;
+        (final: prev: {
+          # Desktop Vulkan layers; Game Mode uses Jovian's separate mangoapp.
+          mangohud = final.callPackage "${inputs.nixpkgs-unstable}/pkgs/by-name/ma/mangohud/package.nix" { };
+
+          jovianPackages = prev.jovianPackages.overrideScope (
+            _: jovianPrev: {
+              # Jovian swaps the source on stable's 3.16 recipe, but 3.17
+              # moved the shader lookup code. Backport the matching recipe
+              # for both the compositor and WSI variants until stable catches up.
+              gamescope =
+                final.callPackage "${inputs.nixpkgs-unstable}/pkgs/by-name/ga/gamescope/package.nix"
+                  { };
+
+              # Update the launcher without replacing Jovian's Deck bootstrap.
+              steam-unwrapped = jovianPrev.steam-unwrapped.overrideAttrs (_: {
+                inherit (final.unstable.steam-unwrapped) version src;
+              });
+            }
+          );
         })
       ];
 
@@ -119,11 +130,14 @@ in
             '';
           }
         );
-        protontricks.enable = true;
+        protontricks = {
+          enable = true;
+          package = pkgs.unstable.protontricks;
+        };
         dedicatedServer.openFirewall = true;
         localNetworkGameTransfers.openFirewall = true;
         extraCompatPackages = [
-          pkgs.proton-ge-bin
+          pkgs.unstable.proton-ge-bin
         ];
         extraPackages = attrValues {
           inherit (pkgs) flatpak;
@@ -157,7 +171,7 @@ in
 
       # Extra gaming packages + virtual keyboard for SDDM
       environment.systemPackages = with pkgs; [
-        steam-rom-manager
+        unstable.steam-rom-manager
         r2modman
         kdePackages.qtvirtualkeyboard
       ];
