@@ -236,17 +236,23 @@ build-to-melina host="192.168.0.236" port="222":
     nh os switch . -H melina --target-host "$SSH_USER@{{ host }}" --elevation-strategy passwordless --accept-flake-config
     echo "✅  Rebuilt melina!"
 
-# Rebuild and switch the Steam Deck over SSH (defaults to its Tailscale name)
+# Rebuild and switch the Steam Deck over SSH (pass an IP to override its Tailscale name)
 [unix]
-build-to-malenia $host="malenia":
+[arg("local", long="local", value="yes", help="Build here instead of on the Steam Deck")]
+build-to-malenia $host="malenia" $local="no":
     #!/usr/bin/env bash
     set -euo pipefail
     echo "🔨  Rebuilding NixOS on malenia 🎮..."
     SSH_USER=$(just _secret-domain sshUser)
     SSH_TARGET="$SSH_USER@$host"
     export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
-    # Build on the x86_64 Deck and let nh prompt for its sudo password.
-    nh os switch . -H malenia --target-host "$SSH_TARGET" --build-host "$SSH_TARGET" --elevation-strategy "$(command -v sudo)" --accept-flake-config
+    # Default to the Deck's native x86_64 builder. --local still switches the Deck.
+    HOST_ARGS=(--target-host "$SSH_TARGET")
+    if [ "$local" = "no" ]; then
+      HOST_ARGS+=(--build-host "$SSH_TARGET")
+    fi
+    nh os switch . -H malenia "${HOST_ARGS[@]}" \
+      --elevation-strategy "$(command -v sudo)" --accept-flake-config
     echo "✅  Rebuilt malenia!"
 
 # Rebuild the scarab (Pi) in place over ssh, updating its active config, via nh.
