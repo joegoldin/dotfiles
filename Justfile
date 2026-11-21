@@ -236,6 +236,19 @@ build-to-melina host="192.168.0.236" port="222":
     nh os switch . -H melina --target-host "$SSH_USER@{{ host }}" --elevation-strategy passwordless --accept-flake-config
     echo "✅  Rebuilt melina!"
 
+# Rebuild and switch the Steam Deck over SSH (defaults to its Tailscale name)
+[unix]
+build-to-malenia $host="malenia":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "🔨  Rebuilding NixOS on malenia 🎮..."
+    SSH_USER=$(just _secret-domain sshUser)
+    SSH_TARGET="$SSH_USER@$host"
+    export NIX_CONFIG="access-tokens = github.com=$(gh auth token 2>/dev/null || echo '')"
+    # Build on the x86_64 Deck and let nh prompt for its sudo password.
+    nh os switch . -H malenia --target-host "$SSH_TARGET" --build-host "$SSH_TARGET" --elevation-strategy "$(command -v sudo)" --accept-flake-config
+    echo "✅  Rebuilt malenia!"
+
 # Rebuild the scarab (Pi) in place over ssh, updating its active config, via nh.
 # Builds locally — aarch64 offloads to the virby linux builder — then copies the
 # closure to the Pi and switches. Deploys as the `joe` user (root ssh login is
