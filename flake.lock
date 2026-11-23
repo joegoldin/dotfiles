@@ -3237,14 +3237,14 @@
         ]
       },
       "locked": {
-        "lastModified": 1794894025,
-        "narHash": "sha256-o2ewnJeh+LJOLchAyD/R/klpVWxWFRZXYrEbj3SkBig=",
+        "lastModified": 1795467078,
+        "narHash": "sha256-Q+GqRAQCGrpaERDvjAR7B0T5AMqnQWullUVDCskIQOU=",
         "type": "tarball",
-        "url": "https://pkgs.superlogical.com/rex/nix/snapshot/0.0.1794894025-gfcef65.tar.gz"
+        "url": "https://pkgs.superlogical.com/rex/nix/preview/0.1.0-preview.23.tar.gz"
       },
       "original": {
         "type": "tarball",
-        "url": "https://pkgs.superlogical.com/rex/nix/snapshot.tar.gz"
+        "url": "https://pkgs.superlogical.com/rex/nix/preview.tar.gz"
       }
     },
     "rex-rune": {
@@ -3253,11 +3253,11 @@
         "zig": "zig_2"
       },
       "locked": {
-        "lastModified": 1794811901,
-        "narHash": "sha256-HAvk7p8GgkU1vUIGJA3bbPS0l339L+9OPsA94QUH29Y=",
+        "lastModified": 1795160971,
+        "narHash": "sha256-1fNKJLh4gOUU1G0cuPI8+X5Zj5l3MxuhAwzFGeLatgY=",
         "owner": "shuv1337",
         "repo": "rex-rune",
-        "rev": "2612ce685804fbbaeb2e1421b1f53eb262c1c3ad",
+        "rev": "2d87403d37d0edbbdff09575022913404901d18b",
         "type": "github"
       },
       "original": {

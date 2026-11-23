@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 SCRIPT = Path(__file__).with_name("merge-config.py")
 spec = importlib.util.spec_from_file_location("merge_config", SCRIPT)
@@ -49,6 +50,22 @@ class MergeTests(unittest.TestCase):
             self.assertEqual(len(backups), 1)
             self.assertEqual(backups[0].read_text(), "-- local\n")
             self.assertEqual(path.stat().st_mode & 0o777, 0o600)
+
+    def test_reload_never_autostarts_even_after_successful_status(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "init.lua"
+            with (
+                patch.object(sys, "argv", [str(SCRIPT), str(path), "/config/dotfiles.lua", "rex"]),
+                patch.dict(module.os.environ),
+                patch.object(module.subprocess, "run") as run,
+            ):
+                run.return_value.returncode = 0
+                module.main()
+            args = [call.args[0] for call in run.call_args_list]
+            self.assertEqual(args[1:], [
+                ["rex", "--autostart=false", "server", "status"],
+                ["rex", "--autostart=false", "config", "reload"],
+            ])
 
 
 if __name__ == "__main__":

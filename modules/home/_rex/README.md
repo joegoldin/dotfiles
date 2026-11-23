@@ -56,8 +56,9 @@ an already-running local server but never starts one just to reload config.
 The host list includes the other Linux machines as future connection
 targets. A menu entry is not evidence that a server has been deployed. Gitea,
 Roundtable, and Travelboi24 have no host configuration in this repository and
-need a separate installation once accessible. iOS devices and the Windows
-machine are not supported by the current public server packages.
+need a separate installation once accessible. iOS devices are clients only.
+The Windows server has separate installation instructions; this aspect does
+not manage it.
 
 ## Login without a desktop session
 
@@ -71,7 +72,11 @@ The user service maintains the personal server independently of graphical
 login. SSH can also start a missing personal server on demand. Rex must be
 on the noninteractive SSH PATH; the aspect installs it in the system profile
 as well as the Home Manager profile. `REX_AUTOSTART=0` disables the CLI's
-on-demand startup, not the managed systemd user service.
+on-demand startup, not the managed systemd user service. Do not run
+`rex server install` for these Home Manager units. On an unmanaged Linux
+machine it can set up a personal server, including over SSH when installation
+is intended. Starting with `preview.23`, new Linux terminals also read
+`/etc/environment`; changes to it don't update already-running terminals.
 
 ```fish
 loginctl show-user joe -p Linger
@@ -88,14 +93,15 @@ obsolete Rex mappings, not unrelated services.
 ## Package installation
 
 The Rex package channel is public and requires no auth token or netrc, including
-for first-time bootstrap and CI. The `rex` flake input uses
-`https://pkgs.superlogical.com/rex/nix/snapshot.tar.gz`; `flake.lock` pins the
-resolved immutable snapshot.
+for first-time bootstrap and CI. The `rex` flake input follows tagged previews
+at `https://pkgs.superlogical.com/rex/nix/preview.tar.gz`; `flake.lock` pins the
+resolved immutable preview. `nix flake update rex rex-rune` refreshes the server
+and the independently pinned Linux client.
 
 For a standalone installation outside this configuration:
 
 ```fish
-nix profile add https://pkgs.superlogical.com/rex/nix/snapshot.tar.gz
+nix profile add https://pkgs.superlogical.com/rex/nix/preview.tar.gz
 ```
 
 The Rex aspect does not decrypt package credentials or override Nix's netrc.
@@ -137,6 +143,8 @@ are not represented by invented settings.
 Elphael additionally includes `den.aspects.rex-linux`. It installs the
 `rex-rune` client from its independently pinned flake and a **Rex Rune**
 desktop entry (`dev.shuv.rex-rune`) that selects the shared Ghostty font.
+Update the Nix input rather than using an in-app installer. Rune's workspace
+state under `~/.config/rex-rune` is client-owned and not replaced on switch.
 The client adds no separate server service; server lifetime still belongs to
 the shared Rex aspect. Other Linux hosts receive the CLI/server configuration,
 not this GUI aspect. Torrent keeps its native Mac app.
@@ -178,7 +186,11 @@ vendoring a version-specific command manual. The shared startup hook appends
 Rex's official context only inside a Rex terminal. Pi's `pi-custom` extension
 adds the same context with a bounded local subprocess, no server autostart, and
 no effect outside Rex. It does not rename sessions or imply permission to open
-panes. Do not run `rex skill setup` over Nix-managed agent configuration.
+panes. Starting with `preview.23`, new terminals set `REX_BLOCK` but no longer
+set `REX_SESSION`. Current Rex accepts `-s "$REX_BLOCK"` to address the containing
+session; use `rex whoami --json` when you need its actual session ID. Older
+terminals can still have both variables. Do not run `rex skill setup` over
+Nix-managed agent configuration.
 
 The optional read-only community MCP is at
 <https://www.superlogical.com/rex/community-mcp>. It requires Discord OAuth and

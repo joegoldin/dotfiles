@@ -139,9 +139,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Public channel URL; the lock file pins an immutable release.
+    # Track tagged previews; the lock file pins an immutable release.
     rex = {
-      url = "https://pkgs.superlogical.com/rex/nix/snapshot.tar.gz";
+      url = "https://pkgs.superlogical.com/rex/nix/preview.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Upstream client; keep its own Rust/Zig pins.

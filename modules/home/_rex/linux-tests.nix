@@ -6,6 +6,7 @@ let
     name = "rex-rune";
     outPath = "/test/rex-rune";
     meta.mainProgram = "rex-rune";
+    overrideAttrs = _: package;
   };
   module =
     (import ../rex-linux.nix {

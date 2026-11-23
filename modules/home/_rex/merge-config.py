@@ -58,7 +58,7 @@ def main():
         # Do not start an extra server during activation, especially on macOS.
         status = subprocess.run([args.rex, "--autostart=false", "server", "status"], capture_output=True)
         if status.returncode == 0:
-            subprocess.run([args.rex, "config", "reload"], check=True)
+            subprocess.run([args.rex, "--autostart=false", "config", "reload"], check=True)
     finally:
         Path(candidate).unlink(missing_ok=True)
 
