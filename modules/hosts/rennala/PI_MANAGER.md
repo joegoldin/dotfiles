@@ -15,15 +15,14 @@ secret paths and HTTPS routing. Nothing installs Pi or systemd units by hand.
 - Dispatch is disabled. The supervisor and worker grants are read-only. Enabling
   work requires a reviewed policy change after the remaining native, provider
   and device acceptance checks.
-- Caddy exposes `https://display.amia.live` and serves ACME on TCP 80. SSH on TCP
-  22 remains configured in `machine.nix`. The browser service listens only on
-  IPv4 loopback port 8787. The private Guacamole and VNC listeners are never
-  reverse-proxied directly or opened in the firewall.
-- The application authenticates the exact configured AuthHero subject and
-  verifies signed MFA evidence. Caddy does not supply identity. It removes its
-  three generated forwarding headers because the application's authority layer
-  refuses forwarding-based authentication. Access logging is disabled so the
-  OIDC callback code and private desktop URLs are not logged.
+- The migration configuration removes the public Caddy site and its HTTP/HTTPS
+  firewall ports. SSH on TCP 22 remains configured in `machine.nix`. The
+  dispatch-disabled browser service listens only on IPv4 loopback port 8787
+  while its state is prepared for migration. No browser proxy is configured.
+- The application verifies the signed AuthHero login and exact configured owner
+  subject. AuthHero owns the application's MFA policy; explicit requested assurance
+  remains enforced, and sensitive operations require a fresh login. The
+  application refuses forwarding-based authentication.
 - Six encrypted files in the existing private `dotfiles-secrets` input supply
   the AuthHero client secret, distinct native and browser-session keys, the
   Guacamole JSON key, VNC password and exact-owner browser policy. Recipients
@@ -47,8 +46,14 @@ secret paths and HTTPS routing. Nothing installs Pi or systemd units by hand.
 The controller template in [`pi-manager.nix`](pi-manager.nix) derives
 `core.pi.version` from the locked agent-skills → pi-nix `coding-agent-bun`
 package, currently Pi 1.5.2, instead of maintaining a separate version literal.
-The `checks.x86_64-linux.pi-manager-template` assertions verify that the
-serialized template matches that version and keeps dispatch disabled.
+The `checks.x86_64-linux.pi-manager-template` check also executes the actual
+Home Manager installed wrapper in a fresh sandbox home, compares its `--version`
+with the serialized template, and keeps dispatch disabled. Metadata agreement
+alone is not enough when a profile overrides the runtime.
+
+Keep the system template and user profile in sync when upgrading Pi. The controller
+intentionally refuses to start if their versions differ; do not bypass that guard
+or substitute the observed runtime version into an unreviewed configuration.
 
 The managed Pi profile defaults to `openai/gpt-6.2-sol`, with 6.2 Astra also
 available. Model choice is separate from native runtime compatibility.

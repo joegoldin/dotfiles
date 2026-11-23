@@ -39,8 +39,9 @@ host integration live in [`modules/ai/pi.nix`](../../ai/pi.nix).
   `/home/joe/.ssh/id_rsa`; do not put that key or plaintext credentials in
   this checkout or the Nix store.
 - The six Pi Manager credentials and owner policy described in
-  [PI_MANAGER.md](PI_MANAGER.md), plus DNS and AuthHero application settings
-  appropriate for `https://display.amia.live`.
+  [PI_MANAGER.md](PI_MANAGER.md). This generation keeps Pi Manager private on
+  Rennala while its state is prepared for migration; it does not need a public
+  DNS record or browser proxy.
 
 ## Evaluate, then build without activation
 

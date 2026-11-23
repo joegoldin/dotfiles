@@ -3008,11 +3008,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794737726,
-        "narHash": "sha256-YhO4yJr0KoXEFvyRtEqn8R6Sgf3T3pcZDQYSvml/RY0=",
+        "lastModified": 1795315765,
+        "narHash": "sha256-BhIXFKvsQFg+lSeBG+HwXQi+Tlvoo+VMNxD+WDBXoE0=",
         "owner": "joegoldin",
         "repo": "pi-manager-agent",
-        "rev": "0959542e061d6bc05e32403556823dbf6457b055",
+        "rev": "9cab2944a552af98a1248c3449d7a35e1d666aa2",
         "type": "github"
       },
       "original": {

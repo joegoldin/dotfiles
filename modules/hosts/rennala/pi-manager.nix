@@ -78,6 +78,8 @@ in
           pi = {
             executable = "/etc/profiles/per-user/${user}/bin/pi";
             inherit (pi) version;
+            # The installed profile can take more than ten seconds at the host's 50% CPU quota.
+            startupTimeoutSeconds = 30;
             homeDirectory = home;
             searchPath = [
               "/etc/profiles/per-user/${user}/bin"
@@ -105,10 +107,12 @@ in
             workTokenBudget = 100000;
             maxActiveSeconds = 120;
             maxElapsedSeconds = 120;
-            sources.pwa = {
-              kind = "pwa";
-              revision = 1;
-              inherit grant;
+            sources = {
+              pwa = {
+                kind = "pwa";
+                revision = 1;
+                inherit grant;
+              };
             };
           };
           dispatchEnabled = false;
@@ -120,7 +124,8 @@ in
             sessionKeyFile = "${credentials}/session-key";
           };
           listener = {
-            publicOrigin = "https://display.amia.live";
+            # The old controller remains loopback-only until its state is migrated.
+            publicOrigin = "https://127.0.0.1:8787";
             clientId = "pi-manager-agent";
             clientSecretFile = "${credentials}/oidc-secret";
             mfaAcrValues = [ ];
@@ -171,21 +176,6 @@ in
             vncPasswordFile = config.age.secrets.pi-manager-desktop-vnc-password.path;
           };
         };
-        caddy = {
-          enable = true;
-          virtualHosts."display.amia.live" = {
-            # Callback query parameters and authenticated desktop URLs are not access logs.
-            logFormat = "output discard";
-            extraConfig = ''
-              reverse_proxy 127.0.0.1:8787 {
-                header_up Host display.amia.live
-                header_up -X-Forwarded-For
-                header_up -X-Forwarded-Proto
-                header_up -X-Forwarded-Host
-              }
-            '';
-          };
-        };
       };
       systemd = {
         tmpfiles.rules = [
@@ -212,11 +202,6 @@ in
           pi-manager-guacd.serviceConfig.MemoryMax = "128M";
         };
       };
-      # Only the maintained TLS frontend is public; SSH remains allowed in machine.nix.
-      networking.firewall.allowedTCPPorts = [
-        80
-        443
-      ];
       assertions = [
         {
           assertion = config.home-manager.users.${user}.programs.pi.coding-agent.enable;
