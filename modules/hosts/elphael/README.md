@@ -1,4 +1,20 @@
-# Elphael pre-boot unlock over Tailscale
+# Elphael
+
+## AirDrop
+
+The **Owly AirDrop** panel icon uses the dedicated Intel Wi-Fi card; Ethernet
+still handles normal networking. To receive, open the panel and turn on
+visibility. The receiver runs as Joe, stops after ten minutes or on logout,
+and saves approved files to `~/Downloads/`. Dismissing or ignoring a prompt
+declines the offer. To send, choose a nearby device in the panel and select files.
+
+Owly does not verify sender names or support Contacts Only. Anyone nearby can
+request a transfer during the receive window, so accept only an offer you were
+expecting. The radio stays up even when receiving is off; the firewall confines
+AirDrop to the AWDL link. No shared account or Owly Share system service is
+installed.
+
+## Pre-boot unlock over Tailscale
 
 The initrd joins the tailnet as **elphael-unlock**, separate from the running
 system's **elphael** node. Connect from a tailnet device with Joe's SSH key:

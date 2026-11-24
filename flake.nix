@@ -244,6 +244,10 @@
     };
 
     # ── Desktop / NixOS applications ───────────────────────────────────────
+    owly = {
+      url = "github:t4t5/owly";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # affinity apps
     affinity-nix = {
       url = "github:mrshmllow/affinity-nix";

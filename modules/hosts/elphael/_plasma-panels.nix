@@ -160,6 +160,7 @@ in
         "org.kde.plasma.systemmonitor.cpucore"
         "org.kde.plasma.systemmonitor.memory"
         "org.kde.plasma.marginsseparator"
+        "red.ruka.owlyshare"
         {
           name = "org.kde.plasma.systemtray";
           config.General = {

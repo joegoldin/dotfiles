@@ -14,6 +14,7 @@ in
       den.aspects.rex-linux
       den.aspects.nix-settings
       den.aspects.desktop-io
+      den.aspects.owly
       # Temporarily omitted to skip the PyTorch/AOTriton build.
       # den.aspects.vllm
       den.aspects.ncro

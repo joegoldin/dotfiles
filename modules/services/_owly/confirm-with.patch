@@ -1,0 +1,89 @@
+--- a/crates/owly-cli/src/airdrop.rs
++++ b/crates/owly-cli/src/airdrop.rs
+@@ -64,6 +64,9 @@
+     /// Accept every request without asking (ASK-3).
+     #[arg(long)]
+     accept: bool,
++    /// Ask this program to confirm each offer instead of reading stdin (exit 0 accepts).
++    #[arg(long, conflicts_with = "accept")]
++    confirm_with: Option<PathBuf>,
+     /// Don't announce over mDNS, for when another responder does.
+     #[arg(long)]
+     no_mdns: bool,
+@@ -637,6 +640,20 @@
+     }
+ }
+
++/// Tie each dialog's answer to its own request; a late click must not accept
++/// the next sender's offer. Leave time before Owly's 15-second request deadline.
++async fn confirm_offer(program: &std::path::Path, message: &str) -> bool {
++    let mut command = tokio::process::Command::new(program);
++    command
++        .arg(message)
++        .stdin(std::process::Stdio::null())
++        .kill_on_drop(true);
++    matches!(
++        tokio::time::timeout(Duration::from_secs(12), command.status()).await,
++        Ok(Ok(status)) if status.success()
++    )
++}
++
+ async fn run_receiver(
+     iface: &Interface,
+     name: String,
+@@ -647,6 +664,7 @@
+         dir,
+         port,
+         accept,
++        confirm_with,
+         no_mdns,
+         flags,
+         ..
+@@ -698,6 +716,47 @@
+         match event {
+             ReceiverEvent::Discovered { peer, .. } => eprintln!("seen by {peer}"),
+             ReceiverEvent::Request(request) => {
++                if let Some(program) = &confirm_with {
++                    let name = format!("{:?}", request.ask.sender_computer_name);
++                    let (count, preview): (usize, Vec<_>) = match &request.ask.offer {
++                        Offer::Files(files) => (
++                            files.len(),
++                            files
++                                .iter()
++                                .take(5)
++                                .map(|f| {
++                                    format!(
++                                        "{:?} ({} bytes)",
++                                        f.name,
++                                        f.size
++                                            .map(|s| s.to_string())
++                                            .unwrap_or_else(|| "unknown".into())
++                                    )
++                                })
++                                .collect(),
++                        ),
++                        Offer::Urls(urls) => (
++                            urls.len(),
++                            urls.iter().take(5).map(|u| format!("{u:?}")).collect(),
++                        ),
++                    };
++                    let preview = preview
++                        .iter()
++                        .map(|item| item.chars().take(160).collect::<String>())
++                        .collect::<Vec<_>>()
++                        .join("\n");
++                    let extra = if count > 5 { "\n(and more)" } else { "" };
++                    let name: String = name.chars().take(100).collect();
++                    let message = format!(
++                        "Accept {count} item(s) from {name}? Sender names are not verified.\n\n{preview}{extra}"
++                    );
++                    if confirm_offer(program, &message).await {
++                        request.accept();
++                    } else {
++                        request.decline();
++                    }
++                    continue;
++                }
+                 // SEC-4: everything here is the sender's; {:?} escapes it.
+                 eprintln!(
+                     "{:?} ({:?}) wants to send:",

@@ -1,0 +1,370 @@
+--- a/plasmoid/red.ruka.owlyshare/contents/ui/main.qml
++++ b/plasmoid/red.ruka.owlyshare/contents/ui/main.qml
+@@ -13,7 +13,7 @@
+
+     property bool receiving: false
+     property string radioState: "unknown"
+-    property string publicDir: "/home/Public/Downloads"
++    property url downloadsUrl
+     property string hostName: ""
+     property bool scanning: false
+     property bool toggling: false
+@@ -33,9 +33,8 @@
+         }
+     }
+     property var sendState: ({})      // peerKey -> {state, what, reason, until}
+-    property var recent: []           // [{name, size, mtime}]
+
+-    readonly property string tool: "/usr/bin/owly-share"
++    readonly property string tool: "@panelTool@"
+     readonly property bool radioUp: radioState === "up"
+     readonly property bool sending: Object.keys(sendState).some(k => sendState[k].state === "sending")
+     readonly property int peerTtlMs: 25000
+@@ -45,7 +44,7 @@
+     toolTipMainText: "AirDrop"
+     toolTipSubText: !radioUp ? "Radio " + radioState
+         : sending ? "Sending…"
+-        : receiving ? "Visible as “" + hostName + "”" : "Hidden. Middle-click to become visible"
++        : receiving ? "Visible as “" + hostName + "”" : "Hidden. Open the panel to receive"
+
+     // --- helpers ---------------------------------------------------------------
+
+@@ -65,26 +64,6 @@
+         m[mac] = name;
+         Plasmoid.configuration.knownNames = JSON.stringify(m);
+     }
+-    function basename(path) {
+-        return String(path).replace(/\/+$/, "").split("/").pop();
+-    }
+-    function humanSize(n) {
+-        const u = ["B", "KB", "MB", "GB"];
+-        let i = 0;
+-        while (n >= 1000 && i < u.length - 1) {
+-            n /= 1000;
+-            i++;
+-        }
+-        return (i === 0 ? n : n.toFixed(n < 10 ? 1 : 0)) + " " + u[i];
+-    }
+-    function timeAgo(secs) {
+-        const d = Math.max(0, Date.now() / 1000 - secs);
+-        if (d < 60) return "just now";
+-        if (d < 3600) return Math.floor(d / 60) + " min ago";
+-        if (d < 86400) return Math.floor(d / 3600) + " h ago";
+-        const days = Math.floor(d / 86400);
+-        return days === 1 ? "yesterday" : days + " days ago";
+-    }
+     function deviceIcon(name) {
+         if (/iphone/i.test(name)) return "smartphone";
+         if (/ipad/i.test(name)) return "tablet";
+@@ -102,19 +81,6 @@
+             h = (h * 31 + name.charCodeAt(i)) >>> 0;
+         return Qt.hsla((h % 360) / 360, 0.45, 0.48, 1);
+     }
+-    function isImage(name) {
+-        return /\.(jpe?g|png|gif|webp|heic|heif|avif|bmp)$/i.test(name);
+-    }
+-    function fileIcon(name) {
+-        if (/\.(mov|mp4|m4v|mkv|webm)$/i.test(name)) return "video-x-generic";
+-        if (/\.(mp3|m4a|aac|wav|flac|ogg)$/i.test(name)) return "audio-x-generic";
+-        if (/\.pdf$/i.test(name)) return "application-pdf";
+-        if (/\.(zip|tar|gz|7z|rar)$/i.test(name)) return "package-x-generic";
+-        if (/\.(txt|md|rtf)$/i.test(name)) return "text-x-generic";
+-        if (/\.vcf$/i.test(name)) return "x-office-address-book";
+-        return isImage(name) ? "image-x-generic" : "unknown";
+-    }
+-
+     // Runs a shell command; cb(exitCode, stdout, stderr).
+     P5Support.DataSource {
+         id: exec
+@@ -140,13 +106,13 @@
+     // --- state -----------------------------------------------------------------
+
+     function refreshStatus() {
+-        exec.run(tool + " status --json", (code, out) => {
++        exec.run(tool + " status", (code, out) => {
+             try {
+                 const st = JSON.parse(out);
+                 if (!root.toggling)
+                     root.receiving = st.visible;
+                 root.radioState = st.radio;
+-                root.publicDir = st.dir;
++                root.downloadsUrl = st.dir;
+                 root.hostName = st.name;
+             } catch (e) {
+                 root.radioState = "unavailable";
+@@ -158,7 +124,7 @@
+         if (scanning)
+             return;
+         scanning = true;
+-        exec.run(tool + " peers --json --seconds 6", (code, out) => {
++        exec.run(tool + " peers", (code, out) => {
+             scanning = false;
+             let found = [];
+             try {
+@@ -181,22 +147,10 @@
+         });
+     }
+
+-    function refreshRecent() {
+-        const cmd = "find " + shellQuote(publicDir) + " -maxdepth 1 -type f ! -name '.*' "
+-            + "-printf '%T@\\t%s\\t%f\\n' 2>/dev/null | sort -rn | head -n 4";
+-        exec.run(cmd, (code, out) => {
+-            root.recent = String(out).split("\n").filter(l => l.length).map(l => {
+-                const f = l.split("\t");
+-                return { mtime: parseFloat(f[0]), size: parseInt(f[1]), name: f.slice(2).join("\t") };
+-            });
+-        });
+-    }
+-
+     function setVisible(on) {
+-        if (toggling || !radioUp)
++        if (toggling || (on && !radioUp))
+             return;
+         toggling = true;
+-        receiving = on;     // optimistic; corrected by refreshStatus
+         exec.run(tool + " visible " + (on ? "on" : "off"), () => {
+             toggling = false;
+             refreshStatus();
+@@ -213,36 +167,31 @@
+     }
+
+     function sendTo(peer, urls) {
+-        const files = urls.map(u => decodeURIComponent(String(u).replace(/^file:\/\//, ""))).filter(f => f.length);
++        const files = urls.map(String).filter(u => u.startsWith("file:///")).map(u =>
++            decodeURIComponent(u.slice("file://".length)));
+         if (!files.length)
+             return;
+         const key = peerKey(peer);
+         if (sendState[key] && sendState[key].state === "sending")
+             return;
+-        const what = files.length === 1 ? basename(files[0]) : files.length + " files";
+-        setSendState(key, { state: "sending", what: what });
++        setSendState(key, { state: "sending" });
+
+-        // --wait --pipe: the transfer still runs in its own unit (progress in
+-        // notifications), but we learn how it ended.
+-        let cmd = "systemd-run --user --collect --quiet --wait --pipe " + tool + " send";
+-        cmd += peer.name ? " --to " + shellQuote(peer.instance || peer.name) : " --mac " + shellQuote(peer.mac);
+-        cmd += " --label " + shellQuote(peerLabel(peer));
++        // Keep transfers in a separate user unit while the popup is closed.
++        let cmd = "@systemdRun@ --user --collect --quiet --wait --pipe " + tool + " send";
++        cmd += peer.name ? " --to=" + shellQuote(peer.instance || peer.name) : " --mac=" + shellQuote(peer.mac);
+         cmd += " -- " + files.map(shellQuote).join(" ") + " </dev/null";
+         exec.run(cmd, (code, out, err) => {
+             err = String(err);
+             const named = err.match(/sending to "((?:[^"\\]|\\.)*)" at/);
+             if (named && !peer.name)
+                 root.rememberName(peer.mac, named[1]);
+-            let state = "failed", reason = "";
++            let state = "failed";
+             if (code === 0) {
+                 state = "sent";
+-            } else if (/owly: declined/.test(err)) {
++            } else if (String(out).trim() === "declined") {
+                 state = "declined";
+-            } else {
+-                const m = err.match(/owly: failed: (.*) \(exit/);
+-                reason = m ? m[1] : "the device didn't answer";
+             }
+-            root.setSendState(key, { state: state, what: what, reason: reason, until: Date.now() + 8000 });
++            root.setSendState(key, { state: state, until: Date.now() + 8000 });
+         });
+     }
+
+@@ -258,8 +207,6 @@
+         triggeredOnStart: true
+         onTriggered: {
+             root.refreshStatus();
+-            if (root.expanded)
+-                root.refreshRecent();
+         }
+     }
+
+@@ -287,8 +234,6 @@
+         }
+     }
+
+-    onExpandedChanged: if (root.expanded) root.refreshRecent()
+-
+     FileDialog {
+         id: fileDialog
+         title: root.sendTarget ? "Send to " + root.peerLabel(root.sendTarget) : "Send"
+@@ -306,15 +251,9 @@
+     compactRepresentation: MouseArea {
+         id: compact
+         hoverEnabled: true
+-        acceptedButtons: Qt.LeftButton | Qt.MiddleButton
+         property bool wasExpanded: false
+         onPressed: wasExpanded = root.expanded
+-        onClicked: mouse => {
+-            if (mouse.button === Qt.MiddleButton)
+-                root.setVisible(!root.receiving);
+-            else
+-                root.expanded = !wasExpanded;
+-        }
++        onClicked: root.expanded = !wasExpanded
+
+         Kirigami.Icon {
+             anchors.fill: parent
+@@ -387,7 +326,7 @@
+                         font.bold: true
+                         elide: Text.ElideRight
+                         text: !root.radioUp ? "AirDrop unavailable"
+-                            : root.receiving ? "Visible to everyone" : "Not visible"
++                            : root.receiving ? "Visible to nearby devices" : "Not visible"
+                     }
+                     PlasmaComponents.Label {
+                         Layout.fillWidth: true
+@@ -395,7 +334,7 @@
+                         opacity: 0.7
+                         elide: Text.ElideRight
+                         text: !root.radioUp ? "AirDrop radio is " + root.radioState
+-                            : root.receiving ? "Visible as “" + root.hostName + "”"
++                            : root.receiving ? "Automatic shutoff after 10 minutes"
+                             : "You can still send"
+                     }
+                 }
+@@ -409,9 +348,9 @@
+
+                 PlasmaComponents.Switch {
+                     checked: root.receiving
+-                    enabled: root.radioUp && !root.toggling
++                    enabled: (root.radioUp || root.receiving) && !root.toggling
+                     onToggled: root.setVisible(checked)
+-                    PlasmaComponents.ToolTip.text: root.receiving ? "Stop receiving" : "Let nearby Apple devices send you files"
++                    PlasmaComponents.ToolTip.text: root.receiving ? "Stop receiving" : "Receive for 10 minutes; each offer needs approval"
+                     PlasmaComponents.ToolTip.visible: hovered
+                     PlasmaComponents.ToolTip.delay: Kirigami.Units.toolTipDelay
+                 }
+@@ -427,8 +366,7 @@
+                 Layout.fillWidth: true
+                 visible: !root.radioUp
+                 type: Kirigami.MessageType.Warning
+-                text: "The AirDrop Wi-Fi adapter isn't ready (radio " + root.radioState
+-                    + "). Check that the USB adapter is plugged in, then: systemctl restart owly-radio"
++                text: "The AirDrop radio is not ready. Check owly-radio.service."
+             }
+
+             // --- send ---
+@@ -546,83 +484,13 @@
+                 Layout.fillWidth: true
+             }
+
+-            // --- received ---
+-            RowLayout {
+-                Layout.fillWidth: true
+-                Layout.leftMargin: Kirigami.Units.smallSpacing
+-                Kirigami.Heading {
+-                    level: 5
+-                    text: "Received"
+-                    Layout.fillWidth: true
+-                }
+-                PlasmaComponents.ToolButton {
+-                    icon.name: "folder-open"
+-                    text: "Open folder"
+-                    display: PlasmaComponents.AbstractButton.TextBesideIcon
+-                    onClicked: Qt.openUrlExternally("file://" + root.publicDir)
+-                }
+-            }
+-
+-            PlasmaComponents.Label {
+-                Layout.fillWidth: true
+-                Layout.margins: Kirigami.Units.smallSpacing
+-                visible: root.recent.length === 0
+-                wrapMode: Text.WordWrap
+-                font: Kirigami.Theme.smallFont
+-                opacity: 0.6
+-                text: "Nothing yet. Files from iPhones are saved to " + root.publicDir
+-            }
+-
+-            Repeater {
+-                model: root.recent
+-                delegate: PlasmaComponents.ItemDelegate {
+-                    id: fileRow
+-                    required property var modelData
+-                    Layout.fillWidth: true
+-                    onClicked: Qt.openUrlExternally("file://" + root.publicDir + "/" + modelData.name)
+-                    PlasmaComponents.ToolTip.text: "Open " + modelData.name
+-                    PlasmaComponents.ToolTip.visible: hovered
+-                    PlasmaComponents.ToolTip.delay: Kirigami.Units.toolTipDelay
+-
+-                    contentItem: RowLayout {
+-                        spacing: Kirigami.Units.largeSpacing
+-                        Item {
+-                            Layout.preferredWidth: Kirigami.Units.iconSizes.medium
+-                            Layout.preferredHeight: Kirigami.Units.iconSizes.medium
+-                            Image {
+-                                id: thumb
+-                                anchors.fill: parent
+-                                visible: status === Image.Ready
+-                                source: root.isImage(fileRow.modelData.name) ? "file://" + root.publicDir + "/" + fileRow.modelData.name : ""
+-                                sourceSize.width: width * 2
+-                                sourceSize.height: height * 2
+-                                fillMode: Image.PreserveAspectCrop
+-                                asynchronous: true
+-                                cache: true
+-                            }
+-                            Kirigami.Icon {
+-                                anchors.fill: parent
+-                                visible: !thumb.visible
+-                                source: root.fileIcon(fileRow.modelData.name)
+-                            }
+-                        }
+-                        ColumnLayout {
+-                            Layout.fillWidth: true
+-                            spacing: 0
+-                            PlasmaComponents.Label {
+-                                Layout.fillWidth: true
+-                                elide: Text.ElideMiddle
+-                                text: fileRow.modelData.name
+-                            }
+-                            PlasmaComponents.Label {
+-                                Layout.fillWidth: true
+-                                font: Kirigami.Theme.smallFont
+-                                opacity: 0.6
+-                                text: root.humanSize(fileRow.modelData.size) + " · " + root.timeAgo(fileRow.modelData.mtime)
+-                            }
+-                        }
+-                    }
+-                }
++            PlasmaComponents.ToolButton {
++                Layout.alignment: Qt.AlignRight
++                icon.name: "folder-open"
++                text: "Open Downloads"
++                enabled: root.downloadsUrl.toString().startsWith("file:///")
++                display: PlasmaComponents.AbstractButton.TextBesideIcon
++                onClicked: Qt.openUrlExternally(root.downloadsUrl)
+             }
+         }
+     }
+@@ -702,6 +570,7 @@
+                     PlasmaComponents.Label {
+                         anchors.centerIn: parent
+                         visible: tile.glyph === ""
++                        textFormat: Text.PlainText
+                         text: root.initials(tile.label)
+                         color: "white"
+                         font.pixelSize: parent.width * 0.36
+@@ -743,6 +612,7 @@
+                 wrapMode: Text.Wrap
+                 maximumLineCount: 2
+                 elide: Text.ElideRight
++                textFormat: Text.PlainText
+                 text: tile.label
+             }
+
+@@ -768,10 +638,10 @@
+         PlasmaComponents.ToolTip.visible: mouse.containsMouse && (tile.st !== null || tile.anonymous || tile.modelData.rssi !== null)
+         PlasmaComponents.ToolTip.delay: Kirigami.Units.toolTipDelay
+         PlasmaComponents.ToolTip.text: tile.st
+-            ? (tile.busy ? "Sending " + tile.st.what + "… (progress in notifications)"
+-               : tile.st.state === "sent" ? "Sent " + tile.st.what
+-               : tile.st.state === "declined" ? "They declined " + tile.st.what
+-               : "Couldn't send " + tile.st.what + ": " + tile.st.reason)
++            ? (tile.busy ? "Sending…"
++               : tile.st.state === "sent" ? "Sent"
++               : tile.st.state === "declined" ? "They declined"
++               : "Transfer failed")
+             : tile.anonymous ? "This device didn't answer discovery, so its name shows after the first send. Sending works anyway."
+             : "Signal " + tile.modelData.rssi + " dBm"
+     }

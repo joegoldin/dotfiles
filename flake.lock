@@ -2983,6 +2983,26 @@
         "type": "github"
       }
     },
+    "owly": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1795175689,
+        "narHash": "sha256-X0lprqPe2DN9yOxBpB5pP7hq61YUjqWUpfB7D6qgMKM=",
+        "owner": "t4t5",
+        "repo": "owly",
+        "rev": "658980a647696bdc45ac92e106f83fd9234517fe",
+        "type": "github"
+      },
+      "original": {
+        "owner": "t4t5",
+        "repo": "owly",
+        "type": "github"
+      }
+    },
     "pam-watchid-src": {
       "flake": false,
       "locked": {
@@ -3312,6 +3332,7 @@
         "nixos-raspberrypi": "nixos-raspberrypi",
         "nixpkgs": "nixpkgs_10",
         "nixpkgs-unstable": "nixpkgs-unstable_2",
+        "owly": "owly",
         "pam-watchid-src": "pam-watchid-src",
         "pi-manager-agent": "pi-manager-agent",
         "plasma-manager": "plasma-manager",

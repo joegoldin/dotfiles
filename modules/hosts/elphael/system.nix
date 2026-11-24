@@ -7,7 +7,12 @@ let
 in
 {
   den.aspects.elphael.nixos =
-    { lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       streamcontroller-rules = pkgs.writeTextFile {
         name = "99-streamcontroller-osplugin.rules";
@@ -58,7 +63,16 @@ in
 
       time.timeZone = "America/Los_Angeles";
 
-      networking.networkmanager.enable = true;
+      networking.networkmanager = {
+        enable = true;
+        # Ethernet handles networking; don't let saved Wi-Fi profiles reclaim the AX211.
+        unmanaged = [ "interface-name:wlo1" ];
+      };
+      services.owly.settings.station = "wlo1";
+      # NetworkManager remembers that Wi-Fi was switched off before Owly was installed.
+      systemd.services.owly-radio.serviceConfig.ExecStartPre =
+        "${config.networking.networkmanager.package}/bin/nmcli radio wifi on";
+
       networking.firewall = {
         allowedTCPPorts = [ 53317 ];
         allowedUDPPorts = [ 53317 ];
