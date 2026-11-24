@@ -65,11 +65,11 @@
         "vfkit-src": "vfkit-src"
       },
       "locked": {
-        "lastModified": 1795494029,
-        "narHash": "sha256-RvsOnNAxQF2EqJt877q2TTomn11fdL/fYtNmPktxM7Q=",
+        "lastModified": 1795550335,
+        "narHash": "sha256-yXDbQ6lqAvYbfy/xxs/s2dRcEMRoXH5bYIPqDQ5pzCM=",
         "owner": "joegoldin",
         "repo": "agent-skills",
-        "rev": "7a8737022abcedb6e33f8b28e7159959800d8226",
+        "rev": "9327acdeb8f1df61fcd19089f1e55b7af87cb415",
         "type": "github"
       },
       "original": {
