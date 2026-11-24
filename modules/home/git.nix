@@ -60,7 +60,8 @@
             "/result"
             "/result-*"
 
-            # Claude Code's personal, unshared project files.
+            # Local agent state, including Pi's background jobs and checklists.
+            ".pi/"
             "**/.claude/settings.local.json"
             "CLAUDE.local.md"
           ];
