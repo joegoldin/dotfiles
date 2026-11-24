@@ -183,7 +183,7 @@
         # Fish glue for tools this aspect installs, co-located so lean hosts
         # don't inherit abbrs for binaries they lack. Inert without fish.
         programs.fish = {
-          shellAliases.ls = "eza -lA --group-directories-first -snew --icons=auto --git -h --hyperlink";
+          shellAliases.ls = "eza -lA --group-directories-first -snew --icons=auto --git -h --hyperlink=always";
 
           shellAbbrs = {
             exa = "eza";
