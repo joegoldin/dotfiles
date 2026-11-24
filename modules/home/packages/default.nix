@@ -114,7 +114,7 @@
         ];
 
         cloud = [
-          customPackages.aws-cli
+          unstable.awscli2
           caddy
           flyctl
           stripe-cli
