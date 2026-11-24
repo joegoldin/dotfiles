@@ -3253,11 +3253,11 @@
         "zig": "zig_2"
       },
       "locked": {
-        "lastModified": 1795160971,
-        "narHash": "sha256-1fNKJLh4gOUU1G0cuPI8+X5Zj5l3MxuhAwzFGeLatgY=",
+        "lastModified": 1795529631,
+        "narHash": "sha256-n+XhNzZVrLdIODRIvUufMCkl46+NcJSlXNqvilQEzoA=",
         "owner": "shuv1337",
         "repo": "rex-rune",
-        "rev": "2d87403d37d0edbbdff09575022913404901d18b",
+        "rev": "94f12efc833e610526023329930ced4a7612a4f3",
         "type": "github"
       },
       "original": {

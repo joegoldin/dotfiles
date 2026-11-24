@@ -8,17 +8,7 @@
       ...
     }:
     let
-      package = inputs.rex-rune.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
-        nativeCheckInputs = (old.nativeCheckInputs or [ ]) ++ [ pkgs.procps ];
-        postPatch = (old.postPatch or "") + ''
-          # Keep Clippy strict until upstream uses byte strings for these arrays.
-          substituteInPlace src/platform/fs.rs \
-            --replace-fail "[b'\n']" '*b"\n"'
-          # The SSH test fixtures need procps from PATH, not /bin/ps in the sandbox.
-          substituteInPlace src/ssh/install.rs \
-            --replace-fail 'Command::new("/bin/ps")' 'Command::new("ps")'
-        '';
-      });
+      package = inputs.rex-rune.packages.${pkgs.stdenv.hostPlatform.system}.default;
       ghostty = (import ./ghostty/_settings.nix { inherit lib; }).baseSettings;
     in
     lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
