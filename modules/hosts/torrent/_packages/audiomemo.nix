@@ -8,6 +8,7 @@ _: {
     settings = {
       desktop = {
         dictation_mic = "mic";
+        dictation_group = "combo";
         meeting_device = "combo";
       };
       record.device = "mic";
