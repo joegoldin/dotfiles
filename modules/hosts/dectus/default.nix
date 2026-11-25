@@ -18,7 +18,7 @@ in
   den.aspects.dectus = {
     includes = [
       den.aspects.nix-settings
-      den.aspects.rex-listed
+      den.aspects.rex
     ];
 
     nixos =
