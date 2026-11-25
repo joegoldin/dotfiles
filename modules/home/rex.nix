@@ -39,6 +39,7 @@ in
     {
       config,
       lib,
+      osConfig,
       pkgs,
       ...
     }:
@@ -47,6 +48,8 @@ in
       appRex = (import ./_rex/darwin-app.nix).cli;
       rex = if isMac then appRex else lib.getExe config.programs.rex.package;
       configDir = "${config.xdg.configHome}/rex";
+      # Rex already connects to this machine over its local socket.
+      peers = builtins.filter (host: host != osConfig.networking.hostName) hosts;
       shellInit = ''
         if [ -n "$REX_BIN_DIR" ]; then
           export PATH="$REX_BIN_DIR:$PATH"
@@ -100,7 +103,7 @@ in
               label = ${builtins.toJSON host},
               endpoint = ${builtins.toJSON "ssh://${host}"},
             }
-          '') hosts;
+          '') peers;
       };
     };
 }

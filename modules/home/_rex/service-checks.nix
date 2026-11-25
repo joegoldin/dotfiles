@@ -57,9 +57,10 @@ let
   nixos = system true;
   noTailscale = system false;
   home =
-    system:
+    system: hostName:
     (inputs.home-manager.lib.homeManagerConfiguration {
       pkgs = packageSets.${system}.plain;
+      extraSpecialArgs.osConfig.networking.hostName = hostName;
       modules = [
         aspect.homeManager
         {
@@ -73,8 +74,9 @@ let
       ]
       ++ lib.optional (lib.hasSuffix "-darwin" system) listedAspect.homeManager;
     }).config;
-  linux = home pkgs.stdenv.hostPlatform.system;
-  mac = home "aarch64-darwin";
+  linux = home pkgs.stdenv.hostPlatform.system "linux-server";
+  unlisted = home pkgs.stdenv.hostPlatform.system "unlisted-server";
+  mac = home "aarch64-darwin" "native-app";
   checkSystem =
     config:
     assert config.users.users.${meta.username}.linger;
@@ -92,7 +94,7 @@ let
     assert !(config.networking.firewall.interfaces ? tailscale0);
     true;
   checkHome =
-    isLinux: config:
+    isLinux: expectedPeers: config:
     let
       lua = config.xdg.configFile."rex/dotfiles.lua".text;
     in
@@ -109,20 +111,16 @@ let
       );
     assert !(config.home.shellAliases ? restart-rex-server);
     assert lib.hasPrefix (builtins.readFile ./ghostty.lua) lua;
-    assert lib.hasInfix ''endpoint = "ssh://linux-server",'' lua;
-    assert lib.hasInfix ''endpoint = "ssh://native-app",'' lua;
-    assert builtins.length (lib.splitString "rex.host {" lua) == 3;
-    assert !(lib.hasInfix "ssh://unlisted-server" lua);
-    assert !(lib.hasInfix "ssh://disabled-server" lua);
-    assert !(lib.hasInfix "ssh://installer" lua);
-    assert !(lib.hasInfix "ssh://cli-only" lua);
+    assert lib.all (host: lib.hasInfix ''endpoint = "ssh://${host}",'' lua) expectedPeers;
+    assert builtins.length (lib.splitString "rex.host {" lua) == builtins.length expectedPeers + 1;
     true;
 in
 assert checkSystem nixos;
 assert checkSystem noTailscale;
-assert checkHome true linux;
-assert checkHome false mac;
-assert !(linux.dotfiles.rex.listed or false);
+assert checkHome true [ "native-app" ] linux;
+assert checkHome true [ "linux-server" "native-app" ] unlisted;
+assert checkHome false [ "linux-server" ] mac;
+assert !(unlisted.dotfiles.rex.listed or false);
 assert mac.dotfiles.rex.listed;
 assert mac.programs.rex.package == null;
 pkgs.runCommand "rex-service-tests" { } ''

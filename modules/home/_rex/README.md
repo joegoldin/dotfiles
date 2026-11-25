@@ -23,10 +23,9 @@ Use `den.aspects.rex-listed` in a host's `includes` to enable Rex and opt the
 machine into the generated host list. Use plain `den.aspects.rex` to run Rex
 without listing the machine. The list takes hostnames from the evaluated Nix
 config and includes only opted-in hosts with the personal Linux server or
-native Mac app configured. Every machine gets the same list, including itself
-if it opted in. Entries use `ssh://<host>` even for self, so they still point to
-the right machine when another client follows that Rex home. Existing system
-SSH aliases, users, ports, keys, and agents apply.
+native Mac app configured. The generated list excludes the local machine: Rex
+already shows its local socket connection. Peers use `ssh://<host>` and inherit
+system SSH aliases, users, ports, keys, and agents.
 
 ```fish
 rex -S elphael ls --json
