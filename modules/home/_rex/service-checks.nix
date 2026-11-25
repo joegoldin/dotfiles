@@ -11,22 +11,36 @@ let
       inherit inputs lib;
       config.flake = {
         nixosConfigurations = {
-          linux-server.config.home-manager.users.${meta.username}.services.rex.enable = true;
-          disabled-server.config.home-manager.users.${meta.username}.services.rex.enable = false;
+          linux-server.config.home-manager.users.${meta.username} = {
+            dotfiles.rex.listed = true;
+            services.rex.enable = true;
+          };
+          unlisted-server.config.home-manager.users.${meta.username}.services.rex.enable = true;
+          disabled-server.config.home-manager.users.${meta.username} = {
+            dotfiles.rex.listed = true;
+            services.rex.enable = false;
+          };
           installer.config = { };
         };
         darwinConfigurations = {
-          native-app.config.home-manager.users.${meta.username}.programs.rex = {
-            enable = true;
-            package = null;
+          native-app.config.home-manager.users.${meta.username} = {
+            dotfiles.rex.listed = true;
+            programs.rex = {
+              enable = true;
+              package = null;
+            };
           };
-          cli-only.config.home-manager.users.${meta.username}.programs.rex = {
-            enable = true;
-            package = "cli";
+          cli-only.config.home-manager.users.${meta.username} = {
+            dotfiles.rex.listed = true;
+            programs.rex = {
+              enable = true;
+              package = "cli";
+            };
           };
         };
       };
     }).den.aspects.rex;
+  listedAspect = (import ../rex-listed.nix { den.aspects.rex = aspect; }).den.aspects.rex-listed;
   system =
     tailscale:
     (inputs.nixpkgs.lib.nixosSystem {
@@ -56,7 +70,8 @@ let
             stateVersion = "26.05";
           };
         }
-      ];
+      ]
+      ++ lib.optional (lib.hasSuffix "-darwin" system) listedAspect.homeManager;
     }).config;
   linux = home pkgs.stdenv.hostPlatform.system;
   mac = home "aarch64-darwin";
@@ -97,6 +112,7 @@ let
     assert lib.hasInfix ''endpoint = "ssh://linux-server",'' lua;
     assert lib.hasInfix ''endpoint = "ssh://native-app",'' lua;
     assert builtins.length (lib.splitString "rex.host {" lua) == 3;
+    assert !(lib.hasInfix "ssh://unlisted-server" lua);
     assert !(lib.hasInfix "ssh://disabled-server" lua);
     assert !(lib.hasInfix "ssh://installer" lua);
     assert !(lib.hasInfix "ssh://cli-only" lua);
@@ -106,6 +122,8 @@ assert checkSystem nixos;
 assert checkSystem noTailscale;
 assert checkHome true linux;
 assert checkHome false mac;
+assert !(linux.dotfiles.rex.listed or false);
+assert mac.dotfiles.rex.listed;
 assert mac.programs.rex.package == null;
 pkgs.runCommand "rex-service-tests" { } ''
   touch "$out"

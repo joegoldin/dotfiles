@@ -16,7 +16,7 @@ in
 
   den.aspects.torrent = {
     includes = [
-      den.aspects.rex
+      den.aspects.rex-listed
       den.aspects.nix-settings
       den.aspects.binary-caches
       den.aspects.celler-watch-store

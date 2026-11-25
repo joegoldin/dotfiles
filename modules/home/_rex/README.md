@@ -19,13 +19,14 @@ Tailscale node, or Rex firewall opening is configured. SSH starts or reuses
 personal `rex.service` user unit on Linux, wanted by `default.target`. It is
 not a system-wide login or shared server.
 
-Dotfiles derive the Rex host list from the flake's configurations: Linux
-machines with the personal Rex server enabled, plus Mac machines using the
-native Rex app. Every machine gets the same list, including its own hostname
-when it qualifies. Entries use `ssh://<host>` even for self, so they still
-point to the right machine when another client follows that Rex home. Rex uses
-the system SSH client, so existing SSH aliases, users, ports, keys, and agents
-apply. There is no Rex Tailscale sign-in or tag-based Rex principal.
+Use `den.aspects.rex-listed` in a host's `includes` to enable Rex and opt the
+machine into the generated host list. Use plain `den.aspects.rex` to run Rex
+without listing the machine. The list takes hostnames from the evaluated Nix
+config and includes only opted-in hosts with the personal Linux server or
+native Mac app configured. Every machine gets the same list, including itself
+if it opted in. Entries use `ssh://<host>` even for self, so they still point to
+the right machine when another client follows that Rex home. Existing system
+SSH aliases, users, ports, keys, and agents apply.
 
 ```fish
 rex -S elphael ls --json
@@ -173,7 +174,7 @@ Configuration tests are available as `checks.<system>.rex-config` for upstream
 supported systems. They cover Lua merging, backup/idempotence, validation
 failure preservation, theme import retries, and the real CLI's Lua validation.
 `checks.x86_64-linux.rex-services` (also on aarch64-linux) evaluates the service
-wiring with and without Tailscale: generated SSH entries for enabled servers,
+wiring with and without Tailscale: SSH entries for opted-in enabled servers,
 lingering, system CLI availability, the personal Linux user service and its
 restart policy, no system-wide shared/login service or Rex firewall opening,
 and the native Mac server remaining unmanaged by systemd. `checks.<linux-system>.rex-linux`

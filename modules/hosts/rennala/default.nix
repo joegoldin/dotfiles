@@ -12,7 +12,7 @@ in
   den.aspects.rennala = {
     includes = [
       den.aspects.nix-settings
-      den.aspects.rex
+      den.aspects.rex-listed
     ];
 
     nixos = {

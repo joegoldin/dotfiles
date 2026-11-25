@@ -10,7 +10,7 @@ in
 
   den.aspects.elphael = {
     includes = [
-      den.aspects.rex
+      den.aspects.rex-listed
       den.aspects.rex-linux
       den.aspects.nix-settings
       den.aspects.desktop-io

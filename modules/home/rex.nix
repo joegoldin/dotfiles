@@ -7,17 +7,21 @@
 }:
 let
   meta = import ../_lib/meta.nix;
-  homeConfig = host: host.config.home-manager.users.${meta.username} or { };
-  linuxServers = lib.filterAttrs (
-    _: host: (homeConfig host).services.rex.enable or false
+  listedServers =
+    serverEnabled:
+    lib.filterAttrs (
+      _: host:
+      let
+        home = host.config.home-manager.users.${meta.username} or { };
+      in
+      (home.dotfiles.rex.listed or false) && serverEnabled home
+    );
+  linuxServers = listedServers (
+    home: home.services.rex.enable or false
   ) config.flake.nixosConfigurations;
   # On Darwin the native app owns the server; Home Manager only exposes its CLI.
-  macServers = lib.filterAttrs (
-    _: host:
-    let
-      rex = (homeConfig host).programs.rex;
-    in
-    (rex.enable or false) && rex.package == null
+  macServers = listedServers (
+    home: (home.programs.rex.enable or false) && home.programs.rex.package == null
   ) config.flake.darwinConfigurations;
   hosts = builtins.attrNames (linuxServers // macServers);
 in
