@@ -44,24 +44,24 @@ in
       # farum-azula key in keys.nix with the printed one and rekey.
       age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
 
-      # Native aarch64 remote builder for the self-hosted garnix CI on erdtree.
-      # Without this, erdtree builds aarch64 configs (farum-azula, scarab, …) by
-      # emulating aarch64 via qemu — 10-50x slower. erdtree's nix-daemon connects
-      # here as the nix-ssh user with the garnix builder key and builds natively.
+      # Native aarch64 remote builder for Hydra on erdtree. Hydra connects as
+      # nix-ssh over the tailnet with the existing builder key.
       # `write` is required so the client can push derivation inputs / pull
       # outputs.
       nix.sshServe = {
         enable = true;
-        protocol = "ssh-ng";
+        protocol = "ssh";
         write = true;
-        keys = [ (import "${inputs.dotfiles-secrets}/garnix.nix").builderSshPubKey ];
+        keys = [
+          ''from="100.64.0.0/10,fd7a:115c:a1e0::/48" ${(import "${inputs.dotfiles-secrets}/garnix.nix").builderSshPubKey}''
+        ];
       };
       # Remote builds push locally-built (unsigned) input closures from erdtree;
       # the daemon only accepts unsigned paths from trusted users, so without
       # this every erdtree-built dep fails with "cannot add path ... because it
       # lacks a signature by a trusted key". Cache-substituted inputs never hit
       # this (they carry cache.nixos.org's signature). Trusting nix-ssh trusts
-      # exactly the holder of the garnix builder key above (erdtree's daemon).
+      # exactly the holder of the builder key above (erdtree's queue runner).
       nix.settings.trusted-users = [ "nix-ssh" ];
     };
   };

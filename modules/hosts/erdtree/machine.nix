@@ -7,7 +7,7 @@ let
   meta = import ../../_lib/meta.nix;
   keys = import "${inputs.dotfiles-secrets}/keys.nix";
   cfTunnels = import "${inputs.dotfiles-secrets}/cloudflared.nix";
-  username = meta.username;
+  inherit (meta) username;
 in
 {
   den.aspects.erdtree.nixos =
@@ -37,14 +37,7 @@ in
           };
         };
 
-        tailscale = {
-          enable = true;
-          useRoutingFeatures = "server";
-          # Advertise the garnix microVM guest subnet so tailnet users can SSH
-          # straight to a deployed server's internal IP (10.111.0.0/24). The
-          # route must be approved once in the tailnet admin console.
-          extraUpFlags = [ "--advertise-routes=10.111.0.0/24" ];
-        };
+        tailscale.enable = true;
       };
 
       programs.ssh.startAgent = true;
@@ -56,13 +49,7 @@ in
       virtualisation.docker.enable = true;
       users.extraGroups.docker.members = [ "${username}" ];
 
-      # Both interfaces are created by this file: tailscale above, docker0 by
-      # the line above it. The trust used to be declared in the Calagopus Wings
-      # module, which is gone, and it was never Wings-specific: tailscale0 is
-      # how tailnet users reach services here, including the garnix microVM
-      # subnet this host advertises, and docker0 is how containers reach the
-      # host. Without them the firewall falls back to the ports caddy and sshd
-      # open for themselves, which is 22, 80 and 443 and nothing else.
+      # Preserve host access for tailnet peers and local Docker workloads.
       networking.firewall.trustedInterfaces = [
         "tailscale0"
         "docker0"

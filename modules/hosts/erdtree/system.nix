@@ -62,7 +62,7 @@ in
       };
 
       # Nix store maintenance. erdtree is a 931 GB build + game host that churns
-      # a lot of closures (garnix CI), so keep the store from crowding out
+      # a lot of CI closures, so keep the store from crowding out
       # everything else: run our own daily job instead of the shared nix.gc so
       # the 14-day retention pass and the hard ~250 GiB cap run in sequence, not
       # racing each other.
@@ -110,7 +110,7 @@ in
 
       # No min-free/max-free auto-GC: it runs *inside* a daemon fork mid-
       # operation and can deadlock against concurrent addToStore path locks
-      # (2026-07-18: wedged every garnix eval for 4+ hours holding gc.lock).
+      # (2026-07-18: wedged CI evaluations for 4+ hours holding gc.lock).
       # The daily job above is the only GC; if the disk ever truly fills,
       # builds fail loudly instead of the daemon silently deadlocking.
     };

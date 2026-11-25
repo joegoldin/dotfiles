@@ -14,15 +14,13 @@ in
   };
 
   den.aspects.erdtree = {
-    # Lean, like racknerd — no home-baseline. The attic/numtide-cache
-    # substituter aspects are intentionally omitted: deploys build on the
-    # build-host and copy the closure over ssh, so the server never builds.
+    # Lean, like racknerd — no home-baseline. CI's own substituters are
+    # configured separately so erdtree never depends on its own cache.
     includes = [
       den.aspects.rex-listed
       den.aspects.nix-settings
       den.aspects.build-host-io
-      den.aspects.ncro
-      # erdtree is the garnix builder, so it must be able to build the
+      # erdtree is the Hydra builder, so it must be able to build the
       # dynamic derivations that other hosts' closures contain.
       den.aspects.dynamic-derivations
     ];

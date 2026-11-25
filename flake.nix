@@ -154,11 +154,6 @@
       url = "github:celler-cache/celler/590c6bca864a5614dd8b94a0b8862eeefb9d3a77";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # self-hosted garnix CI (fork with self-hosting patches). No `follows` —
-    # the fork's pinned nixpkgs builds its Haskell/Node packages reproducibly.
-    garnix-ci = {
-      url = "github:joegoldin/garnix-ci-selfhosted";
-    };
 
     # ── Nix utilities ──────────────────────────────────────────────────────
     # Not yet in our nixpkgs pins. Source-only: use our toolchain, not its

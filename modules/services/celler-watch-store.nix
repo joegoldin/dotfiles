@@ -1,7 +1,7 @@
 # Upload new store paths independently of the Nix build scheduler.
 { inputs, ... }:
 let
-  domains = import "${inputs.dotfiles-secrets}/domains.nix";
+  caches = import ../_lib/ci-caches.nix inputs;
   attic = import "${inputs.dotfiles-secrets}/attic.nix";
 in
 {
@@ -40,7 +40,7 @@ in
             mkdir -p "$XDG_CONFIG_HOME/celler"
             cat > "$XDG_CONFIG_HOME/celler/config.toml" <<EOF
             [servers.default-server]
-            endpoint = "https://${domains.atticDomain}/"
+            endpoint = "${caches.cellerURL}/"
             token-file = "$CREDENTIALS_DIRECTORY/celler-token"
             EOF
             exec ${celler}/bin/celler watch-store --jobs 5 default-server:${attic.cacheName}
@@ -86,7 +86,7 @@ in
             chmod 0700 "$XDG_CONFIG_HOME"
             cat > "$XDG_CONFIG_HOME/celler/config.toml" <<EOF
             [servers.default-server]
-            endpoint = "https://${domains.atticDomain}/"
+            endpoint = "${caches.cellerURL}/"
             token-file = "${tokenFile}"
             EOF
             exec ${celler}/bin/celler watch-store --jobs 5 default-server:${attic.cacheName}

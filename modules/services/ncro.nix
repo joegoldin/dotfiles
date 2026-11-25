@@ -17,8 +17,7 @@
 #   - Nothing is exposed. ncro re-authenticates to attic with this machine's
 #     netrc and returns whatever it gets, so a shared instance reachable
 #     without auth would turn attic's 401 into a 200 for whoever asked.
-#     Measured: attic answers 401 without credentials, garnix and numtide
-#     answer 200. A loopback instance has no such surface and needs no auth
+#     A loopback instance has no such surface and needs no auth
 #     layer, no DNS record and no certificate.
 #   - The credential stays where it already was. Every host that should read
 #     attic already decrypts attic-netrc; none has to trust another host to
@@ -29,10 +28,10 @@
 #     two into a decision that suits neither.
 { inputs, ... }:
 let
-  dotfiles-secrets = inputs.dotfiles-secrets;
-  domains = import "${dotfiles-secrets}/domains.nix";
+  inherit (inputs) dotfiles-secrets;
+  caches = import ../_lib/ci-caches.nix inputs;
   attic = import "${dotfiles-secrets}/attic.nix";
-  garnix = import "${dotfiles-secrets}/garnix.nix";
+  signing = import "${dotfiles-secrets}/garnix.nix";
 
   # Loopback, and the firewall is never opened for it. ncro answers for attic
   # using this machine's netrc, so anything that can reach it can read a
@@ -41,40 +40,17 @@ let
 in
 {
   den.aspects.ncro.nixos =
-    {
-      config,
-      lib,
-      ...
-    }:
+    { config, lib, ... }:
     {
       imports = [ inputs.ncro.nixosModules.ncro ];
 
-      # A host that serves one of these caches must not route to it: reaching
-      # it by public name resolves the host's own address, leaves the box, and
-      # returns through the proxy to a backend on its loopback. That is a full
-      # internet round trip to a local service, on whichever upstream was
-      # marked closest.
-      #
-      # Set by the module that makes the host serve the cache, which is where
-      # the fact actually lives. An earlier version inferred it from
-      # `services.caddy.virtualHosts`, which tied ncro to whatever happened to
-      # be fronting the cache: move it behind cloudflared and the inference
-      # silently returns false, with a wrong answer and no error.
-      options.nixCacheRouter.excludeUpstreams = lib.mkOption {
-        type = lib.types.listOf lib.types.str;
-        default = [ ];
-        description = "Upstream URLs to omit on this host, for a cache it serves itself.";
-        example = lib.literalExpression ''[ "https://cache.example.com" ]'';
-      };
-
       config = {
+        systemd.services.ncro.restartTriggers = [ config.age.secrets.attic-netrc.file ];
         services.ncro = {
           enable = true;
 
-          # The same netrc attic-cache.nix already decrypts. ncro is the one
-          # making the upstream request now, so it needs the credential that
-          # nix used to carry.
-          netrcFile = config.age.secrets.attic-netrc.path;
+          # ncro makes the upstream request using the migrated Celler netrc.
+          netrcFile = caches.cellerNetrc;
 
           settings = {
             server = {
@@ -87,22 +63,18 @@ in
               want_mass_query = true;
             };
 
-            # Ordered nearest-first. garnix leads because it is this machine's
-            # own CI cache and a hit there is both likeliest and cheapest, attic
-            # follows as the estate-wide store, cache.nixos.org is upstream, and
-            # numtide is last because it holds one project's outputs
-            # (llm-agents) rather than anything general.
+            # Prefer CI output, then the shared fleet cache and public upstreams.
             #
             # ncro still measures latency and can prefer a faster upstream; these
             # are the tiebreak, not a strict order.
-            upstreams = builtins.filter (u: !(lib.elem u.url config.nixCacheRouter.excludeUpstreams)) [
+            upstreams = [
               {
-                url = "https://${domains.garnixCacheDomain}";
+                url = caches.hydraURL;
                 priority = 0;
-                public_key = garnix.cachePublicKey;
+                public_key = signing.cachePublicKey;
               }
               {
-                url = "https://${domains.atticDomain}/${attic.cacheName}";
+                url = "${caches.cellerURL}/${attic.cacheName}";
                 priority = 10;
                 public_key = attic.publicKey;
               }

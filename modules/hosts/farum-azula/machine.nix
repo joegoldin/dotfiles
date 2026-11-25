@@ -5,8 +5,7 @@
 let
   meta = import ../../_lib/meta.nix;
   keys = import "${inputs.dotfiles-secrets}/keys.nix";
-  domains = import "${inputs.dotfiles-secrets}/domains.nix";
-  username = meta.username;
+  inherit (meta) username;
 in
 {
   den.aspects.farum-azula.nixos =
@@ -35,10 +34,7 @@ in
         useRoutingFeatures = "server";
       };
 
-      # Builder metrics for garnix's operator-only Monitoring page. The
-      # exporter must bind beyond loopback so erdtree can scrape it, but 9100
-      # is deliberately absent from allowedTCPPorts: only the authenticated
-      # tailnet and erdtree's stable public /32 may reach it.
+      # Keep builder metrics available on the tailnet only.
       services.prometheus.exporters.node = {
         enable = true;
         listenAddress = "0.0.0.0";
@@ -50,14 +46,6 @@ in
         # The bastion trusts its tailnet independently of any container services.
         enable = true;
         trustedInterfaces = [ "tailscale0" ];
-        extraCommands = ''
-          iptables -w -C nixos-fw -p tcp -s ${domains.garnixHostingPublicIp}/32 --dport 9100 -j nixos-fw-accept 2>/dev/null \
-            || iptables -w -I nixos-fw 1 -p tcp -s ${domains.garnixHostingPublicIp}/32 --dport 9100 -j nixos-fw-accept
-        '';
-        extraStopCommands = ''
-          iptables -w -D nixos-fw -p tcp -s ${domains.garnixHostingPublicIp}/32 --dport 9100 -j nixos-fw-accept 2>/dev/null \
-            || true
-        '';
       };
 
       # Independent service-boundary filtering protects the exporter even if
@@ -68,7 +56,6 @@ in
         IPAddressAllow = [
           "localhost"
           "100.64.0.0/10"
-          "${domains.garnixHostingPublicIp}/32"
         ];
       };
 

@@ -1,56 +1,57 @@
-# Nightly restic backups to B2 (the repo's first backup infra — reuse this
-# shape for other hosts). Covers: postgres dumps (written 4x/day by
-# services.postgresqlBackup from the garnix database module) and raw build
-# logs. OpenSearch indices are rebuildable and skipped. Restore drill:
-# docs/plans/2026-07-10-garnix-self-hosting-phase1-plan.md Task 14.
+# Nightly restic backups to B2. Retain the backup repository and back up the
+# Hydra database, not the rebuildable Nix store or build logs.
 { inputs, ... }:
 let
-  dotfiles-secrets = inputs.dotfiles-secrets;
+  inherit (inputs) dotfiles-secrets;
 in
 {
   den.aspects.erdtree.nixos =
-    { config, lib, ... }:
+    { config, ... }:
     let
-      garnixData = import "${dotfiles-secrets}/garnix.nix";
+      inherit (import "${dotfiles-secrets}/garnix.nix") b2;
+      repository = "s3:https://${b2.endpoint}/${b2.backupBucket}/erdtree";
+      environmentFile = config.age.secrets.garnix-restic-env.path;
+      passwordFile = config.age.secrets.garnix-restic-password.path;
     in
     {
       age.secrets.garnix-restic-env.file = "${dotfiles-secrets}/garnix-restic-env.age";
       age.secrets.garnix-restic-password.file = "${dotfiles-secrets}/garnix-restic-password.age";
 
-      services.restic.backups.b2 = {
-        repository = "s3:https://${garnixData.b2.endpoint}/${garnixData.b2.backupBucket}/erdtree";
-        environmentFile = config.age.secrets.garnix-restic-env.path;
-        passwordFile = config.age.secrets.garnix-restic-password.path;
-        initialize = true;
-        paths = [
-          "/var/backup/postgresql"
-          "/var/lib/garnix/logs"
-        ];
-        timerConfig = {
-          OnCalendar = "03:30";
-          RandomizedDelaySec = "15m";
-          Persistent = true;
+      services = {
+        postgresqlBackup = {
+          enable = true;
+          databases = [ "hydra" ];
         };
-        pruneOpts = [
-          "--keep-daily 7"
-          "--keep-weekly 4"
-          "--keep-monthly 6"
-        ];
-      };
 
-      # Weekly integrity check of the restic repo. runCheck/checkOpts verified
-      # present on the pinned nixpkgs (nixos/modules/services/backup/restic.nix).
-      services.restic.backups.b2-check = {
-        repository = "s3:https://${garnixData.b2.endpoint}/${garnixData.b2.backupBucket}/erdtree";
-        environmentFile = config.age.secrets.garnix-restic-env.path;
-        passwordFile = config.age.secrets.garnix-restic-password.path;
-        paths = [ ];
-        timerConfig = {
-          OnCalendar = "Sun 05:00";
-          Persistent = true;
+        restic.backups = {
+          b2 = {
+            inherit repository environmentFile passwordFile;
+            initialize = true;
+            paths = [ config.services.postgresqlBackup.location ];
+            timerConfig = {
+              OnCalendar = "03:30";
+              RandomizedDelaySec = "15m";
+              Persistent = true;
+            };
+            pruneOpts = [
+              "--keep-daily 7"
+              "--keep-weekly 4"
+              "--keep-monthly 6"
+            ];
+          };
+
+          # Run an integrity check even when there are no new backups.
+          b2-check = {
+            inherit repository environmentFile passwordFile;
+            paths = [ ];
+            timerConfig = {
+              OnCalendar = "Sun 05:00";
+              Persistent = true;
+            };
+            runCheck = true;
+            checkOpts = [ "--read-data-subset=5%" ];
+          };
         };
-        runCheck = true;
-        checkOpts = [ "--read-data-subset=5%" ];
       };
     };
 }

@@ -45,7 +45,7 @@
             "${./github-runner-start.sh}:/runner-start.sh:ro"
           ];
           # Ceilings, not reservations: 18 of the box's 32 threads at most,
-          # and at half the default cgroup weight it yields to garnix, game
+          # and at half the default cgroup weight it yields to Hydra, game
           # servers, and interactive use under contention. memory-swap ==
           # memory means the job OOMs at 64G instead of spilling into the
           # 16G swapfile.
