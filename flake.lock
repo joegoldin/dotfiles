@@ -65,11 +65,11 @@
         "vfkit-src": "vfkit-src"
       },
       "locked": {
-        "lastModified": 1795569670,
-        "narHash": "sha256-ozSl/XgM0k3SU11CjBY+hYThztgMPdYcjvA7LgkCSnA=",
+        "lastModified": 1795571865,
+        "narHash": "sha256-BjZaF8NCszi1EUK0edQY2a/+5zdnUqcaVqRv5XaONqs=",
         "owner": "joegoldin",
         "repo": "agent-skills",
-        "rev": "a1b6e87279e8a3bffcf80b1fa8bbb4044bba7d03",
+        "rev": "433f8976709ff5332fde3b3842e122ccec576c01",
         "type": "github"
       },
       "original": {
@@ -3053,11 +3053,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1795569611,
-        "narHash": "sha256-nyXs1F+hn9yHJxrMsI0CVy9syWo1ccO6dwdIvfBS348=",
+        "lastModified": 1795571839,
+        "narHash": "sha256-lqfR92yR4fljNKPkqX2Tz7MuzrhS1096gPtiOyDmVMg=",
         "owner": "joegoldin",
         "repo": "pi-nix",
-        "rev": "3d9350bb893e5239a0032dfa911229468e656e3f",
+        "rev": "93fba015d206257238b84882d794708e5bb04241",
         "type": "github"
       },
       "original": {
@@ -3273,11 +3273,11 @@
         "zig": "zig_2"
       },
       "locked": {
-        "lastModified": 1795529631,
-        "narHash": "sha256-n+XhNzZVrLdIODRIvUufMCkl46+NcJSlXNqvilQEzoA=",
+        "lastModified": 1795568707,
+        "narHash": "sha256-/7CPdGYq/xnDcv9+pq2r3w4ENYwJtbpm2MlET3QMFrQ=",
         "owner": "shuv1337",
         "repo": "rex-rune",
-        "rev": "94f12efc833e610526023329930ced4a7612a4f3",
+        "rev": "76ae65354437f8477fe5bf589454588d0e3b9113",
         "type": "github"
       },
       "original": {
