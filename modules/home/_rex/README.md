@@ -19,15 +19,17 @@ Tailscale node, or Rex firewall opening is configured. SSH starts or reuses
 personal `rex.service` user unit on Linux, wanted by `default.target`. It is
 not a system-wide login or shared server.
 
-Managed host entries use `ssh://<host>`. Rex uses the system SSH client, so
-existing SSH aliases, users, ports, keys, and agents apply. There is no Rex
-Tailscale sign-in or tag-based Rex principal. SSH itself may still travel over
-Tailscale if that is how the existing SSH connection is configured; unrelated
-Tailscale services and access policy are unchanged.
+Dotfiles derive the Rex host list from the flake's configurations: Linux
+machines with the personal Rex server enabled, plus Mac machines using the
+native Rex app. Every machine gets the same list, including its own hostname
+when it qualifies. Entries use `ssh://<host>` even for self, so they still
+point to the right machine when another client follows that Rex home. Rex uses
+the system SSH client, so existing SSH aliases, users, ports, keys, and agents
+apply. There is no Rex Tailscale sign-in or tag-based Rex principal.
 
 ```fish
 rex -S elphael ls --json
-# Without the managed host list:
+# Or connect without using the host list:
 rex -S ssh://elphael ls --json
 ```
 
@@ -53,12 +55,11 @@ is checked with the installed Rex CLI before replacement; changed local files
 get a timestamp-independent unique backup alongside them. Activation reloads
 an already-running local server but never starts one just to reload config.
 
-The host list includes the other Linux machines as future connection
-targets. A menu entry is not evidence that a server has been deployed. Gitea,
-Roundtable, and Travelboi24 have no host configuration in this repository and
-need a separate installation once accessible. iOS devices are clients only.
-The Windows server has separate installation instructions; this aspect does
-not manage it.
+Rex lists declared hosts alphabetically by label, regardless of Lua declaration
+order. Declared entries show their source in Settings; they are not manually
+editable. A generated entry says the server is configured, not that it is
+installed or reachable right now. iOS devices are clients only. The Windows
+server has separate installation instructions; this aspect does not manage it.
 
 ## Login without a desktop session
 
@@ -162,20 +163,20 @@ rex config check
 rex hosts --json
 ```
 
-From Torrent, use the generated host labels:
+From Torrent, use the SSH address directly:
 
 ```fish
-rex -S elphael ls --json
+rex -S ssh://elphael ls --json
 ```
 
 Configuration tests are available as `checks.<system>.rex-config` for upstream
 supported systems. They cover Lua merging, backup/idempotence, validation
 failure preservation, theme import retries, and the real CLI's Lua validation.
 `checks.x86_64-linux.rex-services` (also on aarch64-linux) evaluates the service
-wiring with and without Tailscale: SSH host entries, lingering, system CLI
-availability, the personal Linux user service and its restart policy, no
-system-wide shared/login service or Rex firewall opening, and the native Mac
-server remaining unmanaged by systemd. `checks.<linux-system>.rex-linux`
+wiring with and without Tailscale: generated SSH entries for enabled servers,
+lingering, system CLI availability, the personal Linux user service and its
+restart policy, no system-wide shared/login service or Rex firewall opening,
+and the native Mac server remaining unmanaged by systemd. `checks.<linux-system>.rex-linux`
 contains the GUI aspect's package and desktop-entry assertions. A check being
 defined is not evidence that it currently passes.
 

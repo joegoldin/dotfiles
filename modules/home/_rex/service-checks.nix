@@ -6,7 +6,27 @@
 }:
 let
   meta = import ../../_lib/meta.nix;
-  aspect = (import ../rex.nix { inherit inputs; }).den.aspects.rex;
+  aspect =
+    (import ../rex.nix {
+      inherit inputs lib;
+      config.flake = {
+        nixosConfigurations = {
+          linux-server.config.home-manager.users.${meta.username}.services.rex.enable = true;
+          disabled-server.config.home-manager.users.${meta.username}.services.rex.enable = false;
+          installer.config = { };
+        };
+        darwinConfigurations = {
+          native-app.config.home-manager.users.${meta.username}.programs.rex = {
+            enable = true;
+            package = null;
+          };
+          cli-only.config.home-manager.users.${meta.username}.programs.rex = {
+            enable = true;
+            package = "cli";
+          };
+        };
+      };
+    }).den.aspects.rex;
   system =
     tailscale:
     (inputs.nixpkgs.lib.nixosSystem {
@@ -14,7 +34,6 @@ let
       modules = [
         aspect.nixos
         {
-          networking.hostName = "elphael";
           services.tailscale.enable = tailscale;
           users.users.${meta.username}.isNormalUser = true;
           system.stateVersion = "26.05";
@@ -24,10 +43,9 @@ let
   nixos = system true;
   noTailscale = system false;
   home =
-    system: osConfig:
+    system:
     (inputs.home-manager.lib.homeManagerConfiguration {
       pkgs = packageSets.${system}.plain;
-      extraSpecialArgs = { inherit osConfig; };
       modules = [
         aspect.homeManager
         {
@@ -40,9 +58,8 @@ let
         }
       ];
     }).config;
-  linux = home pkgs.stdenv.hostPlatform.system nixos;
-  linuxNoTailscale = home pkgs.stdenv.hostPlatform.system noTailscale;
-  mac = home "aarch64-darwin" { networking.hostName = "torrent"; };
+  linux = home pkgs.stdenv.hostPlatform.system;
+  mac = home "aarch64-darwin";
   checkSystem =
     config:
     assert config.users.users.${meta.username}.linger;
@@ -76,19 +93,19 @@ let
         && !config.services.rex.tailscale.enable
       );
     assert !(config.home.shellAliases ? restart-rex-server);
-    assert lib.hasInfix ''endpoint = "ssh://erdtree",'' lua;
-    assert !(lib.hasInfix "http://" lua);
-    assert !(lib.hasInfix ".ts.net" lua);
-    assert !(lib.hasInfix ":7297" lua);
+    assert lib.hasPrefix (builtins.readFile ./ghostty.lua) lua;
+    assert lib.hasInfix ''endpoint = "ssh://linux-server",'' lua;
+    assert lib.hasInfix ''endpoint = "ssh://native-app",'' lua;
+    assert builtins.length (lib.splitString "rex.host {" lua) == 3;
+    assert !(lib.hasInfix "ssh://disabled-server" lua);
+    assert !(lib.hasInfix "ssh://installer" lua);
+    assert !(lib.hasInfix "ssh://cli-only" lua);
     true;
 in
 assert checkSystem nixos;
 assert checkSystem noTailscale;
 assert checkHome true linux;
-assert checkHome true linuxNoTailscale;
 assert checkHome false mac;
-assert !(lib.hasInfix ''label = "elphael",'' linux.xdg.configFile."rex/dotfiles.lua".text);
-assert lib.hasInfix ''endpoint = "ssh://elphael",'' mac.xdg.configFile."rex/dotfiles.lua".text;
 assert mac.programs.rex.package == null;
 pkgs.runCommand "rex-service-tests" { } ''
   touch "$out"

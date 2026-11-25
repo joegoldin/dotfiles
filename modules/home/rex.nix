@@ -1,22 +1,25 @@
 # Named Rex aspect: native Mac client and SSH-accessible personal Linux servers.
-{ inputs, ... }:
+{
+  config,
+  inputs,
+  lib,
+  ...
+}:
 let
   meta = import ../_lib/meta.nix;
-  hosts = [
-    "dectus"
-    "elphael"
-    "erdtree"
-    "farum-azula"
-    "gitea"
-    "malenia"
-    "melina"
-    "rennala"
-    "roundtable"
-    "scarab"
-    "siofra"
-    "travelboi24"
-    "volcano-manor"
-  ];
+  homeConfig = host: host.config.home-manager.users.${meta.username} or { };
+  linuxServers = lib.filterAttrs (
+    _: host: (homeConfig host).services.rex.enable or false
+  ) config.flake.nixosConfigurations;
+  # On Darwin the native app owns the server; Home Manager only exposes its CLI.
+  macServers = lib.filterAttrs (
+    _: host:
+    let
+      rex = (homeConfig host).programs.rex;
+    in
+    (rex.enable or false) && rex.package == null
+  ) config.flake.darwinConfigurations;
+  hosts = builtins.attrNames (linuxServers // macServers);
 in
 {
   den.aspects.rex.nixos =
@@ -33,7 +36,6 @@ in
       config,
       lib,
       pkgs,
-      osConfig,
       ...
     }:
     let
@@ -91,10 +93,10 @@ in
           + "\n"
           + lib.concatMapStrings (host: ''
             rex.host {
-              label = "${host}",
-              endpoint = "ssh://${host}",
+              label = ${builtins.toJSON host},
+              endpoint = ${builtins.toJSON "ssh://${host}"},
             }
-          '') (builtins.filter (host: host != osConfig.networking.hostName) hosts);
+          '') hosts;
       };
     };
 }
